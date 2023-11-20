@@ -1,17 +1,22 @@
 <?php
-// Получаем путь из запроса
-$request_uri = $_SERVER['REQUEST_URI'];
 
-// Проверяем путь и отправляем соответствующий файл
-if ($request_uri === '/aida') {
-    header('aida.html');
-    exit();
-} elseif ($request_uri === '/nurbo') {
-    header('political.html');
-    exit();
-} else {
-    header("HTTP/1.0 404 Not Found");
-    echo "Страница не найдена";
-    exit();
+// Получаем запрошенный путь
+$requestPath = $_SERVER['REQUEST_URI'];
+
+// Обрабатываем различные ссылки
+switch ($requestPath) {
+    case '/main':
+        $response = 'Это главная страница';
+        break;
+    case '/home':
+        $response = 'Добро пожаловать на домашнюю страницу';
+        break;
+    default:
+        $response = '404 Страница не найдена';
+        break;
 }
+
+// Возвращаем ответ
+echo $response;
+
 ?>
