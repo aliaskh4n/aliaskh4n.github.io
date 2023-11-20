@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Blackjack Game</title>
+</head>
+<body>
+    <h1>Blackjack Game</h1>
+    
+    <script>
+        function dealCard() {
+            const cards = [11, 2, 3, 4, 5, 6, 7, 8, 9, 10, 10, 10, 10];
+            return cards[Math.floor(Math.random() * cards.length)];
+        }
+
+        function calculateScore(cards) {
+            if (cards.reduce((sum, card) => sum + card, 0) === 21 && cards.length === 2) {
+                return 0; // Blackjack
+            }
+            if (cards.includes(11) && cards.reduce((sum, card) => sum + card, 0) > 21) {
+                cards[cards.indexOf(11)] = 1;
+            }
+            return cards.reduce((sum, card) => sum + card, 0);
+        }
+
+        function compare(userScore, dealerScore) {
+            if (userScore > 21 && dealerScore > 21) {
+                return "You lost. Bust!";
+            }
+            if (userScore === dealerScore) {
+                return "It's a draw!";
+            }
+            if (dealerScore === 0) {
+                return "You lost. Dealer has a Blackjack!";
+            }
+            if (userScore === 0) {
+                return "Congratulations! You got a Blackjack!";
+            }
+            if (userScore > 21) {
+                return "You lost. Bust!";
+            }
+            if (dealerScore > 21) {
+                return "Dealer lost. Bust!";
+            }
+            if (userScore > dealerScore) {
+                return "Congratulations! You won!";
+            }
+            return "You lost.";
+        }
+
+        function playGame() {
+            const userCards = [];
+            const dealerCards = [];
+            let gameOver = false;
+
+            for (let i = 0; i < 2; i++) {
+                userCards.push(dealCard());
+                dealerCards.push(dealCard());
+            }
+
+            while (!gameOver) {
+                const userScore = calculateScore(userCards);
+                const dealerScore = calculateScore(dealerCards);
+
+                console.log("Your cards:", userCards, "Score:", userScore);
+                console.log("Dealer's first card:", dealerCards[0]);
+
+                if (userScore === 0 || dealerScore === 0 || userScore > 21) {
+                    gameOver = true;
+                } else {
+                    const anotherCard = confirm("Do you want another card?");
+                    if (anotherCard) {
+                        userCards.push(dealCard());
+                    } else {
+                        gameOver = true;
+                    }
+                }
+            }
+
+            while (dealerScore !== 0 && dealerScore < 17) {
+                dealerCards.push(dealCard());
+            }
+
+            const userScore = calculateScore(userCards);
+            const dealerScore = calculateScore(dealerCards);
+
+            console.log("Your cards:", userCards, "Score:", userScore);
+            console.log("Dealer's cards:", dealerCards, "Score:", dealerScore);
+            console.log(compare(userScore, dealerScore));
+        }
+
+        playGame();
+    </script>
+</body>
+</html>
