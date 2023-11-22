@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Простой чат</title>
+    <title>Простой чат с веб-сокетами</title>
     <style>
         #chat {
             height: 300px;
@@ -22,13 +22,20 @@
 <input type="text" id="inputMessage" placeholder="Введите сообщение...">
 <button onclick="sendMessage()">Отправить</button>
 
+<script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.1.2/socket.io.js"></script>
 <script>
+    var socket = io();
+
+    socket.on('message', function(message) {
+        appendMessage(message);
+    });
+
     function sendMessage() {
         var messageInput = document.getElementById('inputMessage');
         var message = messageInput.value;
 
         if (message.trim() !== '') {
-            appendMessage('Вы: ' + message);
+            socket.emit('message', 'Вы: ' + message);
             messageInput.value = '';
         }
     }
@@ -43,6 +50,20 @@
         chatDiv.scrollTop = chatDiv.scrollHeight;
     }
 </script>
+<script>
+    var io = require('socket.io')();
 
+    io.on('connection', function(socket){
+        console.log('a user connected');
+        socket.on('message', function(message){
+            io.emit('message', message);
+        });
+        socket.on('disconnect', function(){
+            console.log('user disconnected');
+        });
+    });
+
+    io.listen(3000);
+</script>
 </body>
 </html>
