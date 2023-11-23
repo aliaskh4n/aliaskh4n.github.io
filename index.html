@@ -1,69 +1,108 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Простой чат с веб-сокетами</title>
-    <style>
-        #chat {
-            height: 300px;
-            border: 1px solid #ccc;
-            overflow-y: scroll;
-        }
-
-        #inputMessage {
-            width: 80%;
-        }
-    </style>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<link rel="preconnect" href="https://fonts.googleapis.com">
+	<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+	<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@100&family=Roboto:wght@300&display=swap" rel="stylesheet">
+	<link rel="preconnect" href="https://fonts.googleapis.com">
+	<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+	<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@100&family=Bebas+Neue&family=Roboto:wght@100&family=Vina+Sans&display=swap" rel="stylesheet">
+	<title>Главная</title>
+	<style>
+		body {
+			justify-content: center;
+			font-family: 'Barlow Condensed', sans-serif;
+			font-family: 'Roboto', sans-serif;
+			margin: 0;
+		}
+		.header {
+			background-color: #2a3950;
+			width:	100%;
+			height: 60px;
+			display: flex;
+		}
+		.logo {
+			text-align: center;
+			height: 50px;
+			width: 100px;
+			margin: 5px;
+		}
+		.corpus {
+			height: 50px;
+			width: 60px;
+			margin-top: 5px;
+			margin-left: 20px;
+		}
+		.analogy {
+			height: 50px;
+			width: 80px;
+			margin-top: 5px;
+			margin-left: 10px;
+		}
+		.data-base {
+			height: 50px;
+			width: 100px;
+			margin-top: 5px;
+			margin-left: 10px;
+		}
+		.main {
+			background-color: #000;
+			width: 100%;
+			height: 100vh;
+		}
+		.language {
+			position: absolute;
+			right: 20px;
+			height: 50px;
+			width: 50px;
+			margin-top: 5px;
+			margin-left: 10px;
+		}
+		.main-box {
+			border-radius: 15px;
+			margin: auto;
+			margin-top: 10px;
+			width: 60%;
+			height: 40vh;
+			background-color: #2a3950;
+		}
+		h2 {
+			font-family: 'Bebas Neue', sans-serif;
+			color: #fff;
+		}
+		h4 {
+			margin-top: 17px;
+			color: #fff;
+		}
+		h1 {
+			font-family: 'Bebas Neue', sans-serif;
+			margin-top: 5px;
+			color: #fff;
+		}
+	</style>
 </head>
 <body>
-
-<div id="chat"></div>
-<input type="text" id="inputMessage" placeholder="Введите сообщение...">
-<button onclick="sendMessage()">Отправить</button>
-
-<script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.1.2/socket.io.js"></script>
-<script>
-    var socket = io();
-
-    socket.on('message', function(message) {
-        appendMessage(message);
-    });
-
-    function sendMessage() {
-        var messageInput = document.getElementById('inputMessage');
-        var message = messageInput.value;
-
-        if (message.trim() !== '') {
-            socket.emit('message', 'Вы: ' + message);
-            messageInput.value = '';
-        }
-    }
-
-    function appendMessage(message) {
-        var chatDiv = document.getElementById('chat');
-        var messageDiv = document.createElement('div');
-        messageDiv.textContent = message;
-        chatDiv.appendChild(messageDiv);
-
-        // Прокрутка вниз, чтобы видеть последнее сообщение
-        chatDiv.scrollTop = chatDiv.scrollHeight;
-    }
-</script>
-<script>
-    var io = require('socket.io')();
-
-    io.on('connection', function(socket){
-        console.log('a user connected');
-        socket.on('message', function(message){
-            io.emit('message', message);
-        });
-        socket.on('disconnect', function(){
-            console.log('user disconnected');
-        });
-    });
-
-    io.listen(3000);
-</script>
+	<div class="header">
+		<div class="logo">
+			<h1>LOGO</h1>
+		</div>
+		<div class="corpus">
+			<h4>Корпус</h4>
+		</div>
+		<div class="analogy">
+			<h4>Анталогия</h4>
+		</div>
+		<div class="data-base">
+			<h4>База Знаний</h4>
+		</div>
+		<div class="language">
+			<h4>English</h4>
+		</div>
+	</div>
+	<div class="main-box">
+		<h2>PROJECT NAME</h2>
+	</div>
 </body>
 </html>
