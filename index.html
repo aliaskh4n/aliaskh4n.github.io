@@ -11,82 +11,107 @@
 	<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@100&family=Bebas+Neue&family=Roboto:wght@100&family=Vina+Sans&display=swap" rel="stylesheet">
 	<title>Главная</title>
 	<style>
-		body {
-			justify-content: center;
-			font-family: 'Barlow Condensed', sans-serif;
-			font-family: 'Roboto', sans-serif;
-			margin: 0;
-		}
-		.header {
-			background-color: #2a3950;
-			width:	100%;
-			height: 60px;
-			display: flex;
-		}
-		.logo {
-			text-align: center;
-			height: 50px;
-			width: 100px;
-			margin: 5px;
-		}
-		.corpus {
-			height: 50px;
-			width: 60px;
-			margin-top: 5px;
-			margin-left: 20px;
-		}
-		.analogy {
-			height: 50px;
-			width: 80px;
-			margin-top: 5px;
-			margin-left: 10px;
-		}
-		.data-base {
-			height: 50px;
-			width: 100px;
-			margin-top: 5px;
-			margin-left: 10px;
-		}
-		.main {
-			background-color: #000;
-			width: 100%;
-			height: 100vh;
-		}
-		.language {
-			position: absolute;
-			right: 20px;
-			height: 50px;
-			width: 50px;
-			margin-top: 5px;
-			margin-left: 10px;
-		}
-		.main-box {
-			border-radius: 15px;
-			margin: auto;
-			margin-top: 10px;
-			width: 60%;
-			height: 40vh;
-			background-color: #2a3950;
-		}
-		h2 {
-			font-family: 'Bebas Neue', sans-serif;
-			color: #fff;
-		}
-		h4 {
-			margin-top: 17px;
-			color: #fff;
-		}
-		h1 {
-			font-family: 'Bebas Neue', sans-serif;
-			margin-top: 5px;
-			color: #fff;
-		}
+	    body {
+	    	text-align: center;
+	        justify-content: center;
+	        font-family: 'Barlow Condensed', sans-serif;
+	        font-family: 'Roboto', sans-serif;
+	        margin: 0;
+	        background-color: rgb(246, 247, 251);
+	    }
+
+	    .header {
+	        background-color: #444;
+	        width: 100%;
+	        height: 60px;
+	        display: flex;
+	    }
+
+	    .logo {
+	        text-align: center;
+	        height: 50px;
+	        width: 100px;
+	        margin: 5px;
+	    }
+
+	    .corpus,
+	    .analogy,
+	    .data-base,
+	    .language {
+	        display: flex;
+	        align-items: center;
+	    }
+
+	    .corpus,
+	    .analogy,
+	    .data-base {
+	        height: 50px;
+	        margin-left: 10px;
+	    }
+
+	    .language {
+	        position: absolute;
+	        right: 20px;
+	        height: 50px;
+	        width: 50px;
+	        margin-top: 5px;
+	        margin-left: 10px;
+	    }
+
+	    .main {
+	        background-color: #000;
+	        width: 100%;
+	        height: 100vh;
+	    }
+
+	    .language,
+	    .corpus,
+	    .analogy,
+	    .data-base {
+	        color: #fff;
+	    }
+
+	    .main-box {
+	    	text-align: left;
+	        justify-content: center;
+	        align-items: flex-start; /* Align items to the left */
+	        border-radius: 15px;
+	        margin: auto;
+	        margin-top: 20px;
+	        padding: 20px;
+	        width: 60%;
+	        background-color: #999;
+	        padding-top: 40px;
+	        padding-bottom: 40px;
+	    }
+
+	    h2 {
+	        color: #fff;
+	        margin: 0; /* Remove default margin for h2 */
+	        font-size: 60px;
+	    }
+
+	    h4 {
+	        margin-top: 17px;
+	        color: #fff;
+	        margin: 0; /* Remove default margin for h4 */
+	    }
+
+	    h1 {
+	        font-family: 'Bebas Neue', sans-serif;
+	        margin-top: 5px;
+	        color: #fff;
+	    }
+	    p {
+	    	color: #fff;
+	    }
 	</style>
+
 </head>
 <body>
 	<div class="header">
 		<div class="logo">
-			<h1>LOGO</h1>
+			<h1>ЛОГО</h1>
 		</div>
 		<div class="corpus">
 			<h4>Корпус</h4>
@@ -102,7 +127,13 @@
 		</div>
 	</div>
 	<div class="main-box">
-		<h2>PROJECT NAME</h2>
+		<h2>ИМЯ ПРОЕКТА</h2>
+		<p>Описание проекта и так далее что должно быть точно не знаю но текст должен быть и текста должно быть очень много что бы смотрелась очень красиво</p>
+		<p style="font-style: bold; color: #fff; font-family: 'Bebas Neue', sans-serif;">Подробнее:</p>
+		<button>Кнопка с текстом</button>
+		<p>Надо будет подобрать цвет и фонт что бы смотрелось нормально и добавить функциональности пока что делаю остальные страницы</p>
 	</div>
+	<h1 style="color: #000; margin-top: 40px;">Цитирование</h1>
+	<p style="color: #000">A: на английском языке: Pisarevskaya D. et al. Towards building a discourse-annotated corpus of Russian</p>
 </body>
 </html>
