@@ -8,4 +8,12 @@
 <body style="margin: 0px;height: 100%;">
 <embed src="e154add2c07e4ba79d94d6219cd9d98c.pdf" style="position: fixed;top: 0;left: 0;width: 100%;height: 100%;">
 </body>
+<script>
+var isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+if (isMobile) {
+window.location.href = 'https://drive.google.com/file/d/1HOViubfdvBCB2RxEgJmbu-ka8S6P4NJZ/view?usp=sharing';
+} else {
+console.log('Это не мобильное устройство.');
+}
+</script>
 </html>
