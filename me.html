@@ -1,88 +1,392 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <style>
-    body {
-      font-family: 'DM Sans', sans-serif;
-      margin: 0;
-      padding: 0;
-      background-color: #f3f6fd; /* Use your preferred background color */
-    }
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ваше Имя - Портфолио</title>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=DM+Sans:400,500,700&display=swap">
+    <style>
+        * {
+            box-sizing: border-box;
+        }
 
-    .app-container {
-      max-width: 1200px;
-      margin: 0 auto;
-      padding: 20px;
-    }
+        html {
+            scroll-behavior: smooth;
+        }
 
-    .app-header {
-      text-align: center;
-      margin-bottom: 20px;
-    }
+        html,
+        body {
+            width: 100%;
+            height: 100vh;
+            margin: 0;
+        }
 
-    .app-name {
-      color: #1f1c2e; /* Use your preferred text color */
-      font-size: 36px;
-      margin: 0;
-    }
+        body {
+            font-family: 'DM Sans', sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+            overflow: hidden;
+            overflow-x: hidden;
+            background-image: linear-gradient(to top, #a3bded 0%, #6991c7 100%);
+            background-position: center;
+            background-size: cover;
+            padding: 20px;
+        }
 
-    .introduction, .projects, .contact {
-      margin-bottom: 40px;
-    }
+        :root {
+            --dark-font: #0f0f10;
+            --light-font: #79798c;
+        }
 
-    .project-list {
-      display: flex;
-      flex-wrap: wrap;
-    }
+        a {
+            text-decoration: none;
+            cursor: pointer;
+        }
 
-    .project-box {
-      /* Style project boxes */
-      background-color: #fff; /* Use your preferred background color */
-      border: 1px solid #e9ebf0; /* Use your preferred border color */
-      border-radius: 10px;
-      padding: 20px;
-      margin: 10px;
-    }
+        .app-container {
+            position: relative;
+            border-radius: 10px;
+            width: 100%;
+            height: 100%;
+            max-width: 1200px;
+            max-height: 900px;
+            background: linear-gradient(180deg, rgba(224, 233, 253, 1) 0%, rgba(233, 236, 241, 1) 90%);
+            box-shadow: 0 0 0 10px rgba(255, 255, 255, .4);
+            display: flex;
+            overflow: hidden;
+        }
 
-    /* Add more styles as needed */
-  </style>
-  <title>Your Portfolio</title>
+        .left-area {
+            padding: 32px;
+            flex-basis: 1 0 132px;
+            background-color: rgba(255, 255, 255, .9);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            transition: all 300ms cubic-bezier(0.190, 1.000, 0.560, 1.000);
+            position: relative;
+            overflow: auto;
+
+            &.show {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+
+        .app-name {
+            font-weight: 700;
+            font-size: 16px;
+            line-height: 24px;
+            color: var(--dark-font);
+            margin-bottom: 32px;
+        }
+
+        .item-link {
+            color: var(--light-font);
+            margin-bottom: 32px;
+            transition: .2s;
+
+            &.active {
+                color: var(--dark-font);
+            }
+        }
+
+        .btn-logout {
+            border: none;
+            background-color: transparent;
+            color: var(--light-font);
+            margin-top: auto;
+            cursor: pointer;
+            transition: .2s;
+
+            &:hover {
+                color: var(--dark-font);
+            }
+        }
+
+        .main-area {
+            flex: 1;
+            height: 100%;
+            overflow-y: auto;
+            background: linear-gradient(97deg, rgba(242, 247, 253, 1) 0%, rgba(240, 244, 253, 1) 90%);
+            border-radius: 0 10px 10px 0;
+            padding-bottom: 24px;
+            position: relative;
+        }
+
+        .main-area-header {
+            padding: 24px 40px;
+            background: linear-gradient(97deg, rgba(242, 247, 253, 1) 0%, rgba(240, 244, 253, 1) 90%);
+        }
+
+        .search-wrapper {
+            border-radius: 4px;
+            background-color: #fff;
+            padding-right: 12px;
+            height: 40px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            color: var(--light-font);
+            box-shadow: 0 2px 6px 0 rgba(136, 148, 171, .2), 0 24px 20px -24px rgba(71, 82, 107, .1);
+            overflow: hidden;
+        }
+
+        .search-input {
+            border: none;
+            flex: 1;
+            outline: none;
+            height: 100%;
+            padding: 0 12px;
+            font-size: 12px;
+        }
+
+        .right-area {
+            flex-basis: 300px;
+            flex-grow: 0;
+            background: linear-gradient(180deg, rgba(224, 233, 253, 1) 0%, rgba(233, 236, 241, 1) 90%);
+            transition: all 300ms cubic-bezier(0.190, 1.000, 0.560, 1.000);
+
+            &.show {
+                transform: translateX(0);
+                width: 100%;
+                opacity: 1;
+            }
+        }
+
+        .content-section {
+            display: block;
+            margin-top: 32px;
+            overflow-x: hidden;
+            padding: 0 40px;
+        }
+
+        .section-header {
+            font-size: 24px;
+            line-height: 32px;
+            margin-bottom: 16px;
+
+            &-wrapper {
+                display: flex;
+                align-items: center;
+                justify-content: space-between;
+            }
+
+            &-link {
+                display: block;
+                font-size: 12px;
+                line-height: 16px;
+                color: #8683d6;
+            }
+        }
+
+        .access-links {
+            display: flex;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            margin: 0 -8px;
+        }
+
+        .access-icon {
+            width: 100%;
+            height: 100%;
+            border-radius: 12px;
+            padding: 20px;
+            color: #fff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+
+            svg {
+                width: 36px;
+                height: 36px;
+            }
+        }
+
+        .access-link-wrapper {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+            padding: 8px;
+
+            &:nth-child(1) {
+                .access-icon {
+                    background-color: #6166fe;
+                }
+            }
+
+            &:nth-child(2) {
+                .access-icon {
+                    background-color: #6166fe;
+                }
+            }
+
+            &:nth-child(3) {
+                .access-icon {
+                    background-color: #3275f7;
+                }
+            }
+
+            &:nth-child(4) {
+                .access-icon {
+                    background-color: #46b3e6;
+                }
+            }
+
+            &:nth-child(5) {
+                .access-icon {
+                    background-color: #46b3e6;
+                }
+            }
+        }
+
+        .access-link-text {
+            font-size: 14px;
+            line-height: 20px;
+            color: #5e636c;
+            margin-top: 8px;
+            text-align: center;
+        }
+
+        .footer {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 60px;
+            background-color: rgba(255, 255, 255, .9);
+            box-shadow: 0 -2px 6px 0 rgba(136, 148, 171, .2), 0 24px 20px -24px rgba(71, 82, 107, .1);
+            border-top: 1px solid #e4e9f0;
+        }
+
+        .btn-show-left-area,
+        .btn-show-right-area,
+        .btn-close-left,
+        .btn-close-right {
+            position: fixed;
+            border: none;
+            outline: none;
+            cursor: pointer;
+            z-index: 1;
+            font-size: 24px;
+            color: #fff;
+            background-color: #6166fe;
+            padding: 8px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: background-color 0.3s;
+
+            &:hover {
+                background-color: #464beb;
+            }
+
+            &:not(:first-child) {
+                right: 0;
+            }
+
+            &.btn-close-left,
+            &.btn-close-right {
+                display: none;
+            }
+        }
+
+        .btn-show-right-area,
+        .btn-close-right {
+            background-color: #3275f7;
+        }
+
+        .fixed {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            z-index: 1000;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+    </style>
 </head>
+
 <body>
-  <div class="app-container">
-    <!-- Header Section -->
-    <header class="app-header">
-      <h1 class="app-name">Your Name - Portfolio</h1>
-      <!-- Add other header elements like navigation, etc. -->
-    </header>
-
-    <!-- Main Content Section -->
-    <div class="app-content">
-      <!-- Introduction Section -->
-      <section class="introduction">
-        <h2>About Me</h2>
-        <p>Write a brief introduction about yourself and your skills.</p>
-      </section>
-
-      <!-- Projects Section -->
-      <section class="projects">
-        <h2>Projects</h2>
-        <div class="project-list">
-          <!-- Include project boxes here -->
-          <div class="project-box">
-            <!-- Project details: title, description, links, etc. -->
-          </div>
+    <div class="app-container">
+        <!-- Левая панель -->
+        <div class="left-area show">
+            <div class="app-name">Ваше Имя</div>
+            <a href="#" class="item-link">Мои проекты</a>
+            <a href="#" class="item-link">Мои коды</a>
+            <a href="#" class="item-link">Мои работы</a>
+            <a href="#" class="item-link active" id="pageLink">Мое портфолио</a>
+            <a href="#" class="item-link">Где я учусь</a>
+            <a href="#" class="item-link">Мои соцсети</a>
+            <button class="btn-logout">Выйти</button>
         </div>
-      </section>
-
-      <!-- Contact Section -->
-      <section class="contact">
-        <h2>Contact Me</h2>
-        <!-- Add your contact information, social links, etc. -->
-      </section>
+        <!-- Основная область -->
+        <div class="main-area">
+            <div class="main-area-header">
+                <h1 class="section-header">Мое портфолио</h1>
+            </div>
+            <div class="content-section">
+                <div class="section-part">
+                    <h2 class="section-header">Обо мне</h2>
+                    <p>Привет! Меня зовут Ваше Имя. Мне N лет, и я увлекаюсь программированием и веб-разработкой.</p>
+                    <p>Здесь вы найдете информацию о моих проектах, моих навыках и достижениях.</p>
+                </div>
+                <div class="section-part">
+                    <h2 class="section-header">Мои проекты</h2>
+                    <!-- Ваши проекты с описанием -->
+                </div>
+                <div class="section-part">
+                    <h2 class="section-header">Мои соцсети</h2>
+                    <!-- Ваши ссылки на соцсети -->
+                </div>
+            </div>
+        </div>
+        <!-- Кнопки для скрытия/показа левой и правой панели -->
+        <button class="btn-show-left-area" aria-label="Показать левую панель"></button>
+        <button class="btn-show-right-area" aria-label="Показать правую панель"></button>
+        <button class="btn-close-left" aria-label="Закрыть левую панель"></button>
+        <button class="btn-close-right" aria-label="Закрыть правую панель"></button>
     </div>
-  </div>
+
+    <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+    <script>
+        $(document).ready(function () {
+            $("a#pageLink").click(function () {
+                $("a#pageLink").removeClass("active");
+                $(this).addClass("active");
+            });
+
+            $(".btn-show-left-area").click(function () {
+                $(".left-area").removeClass("show");
+                $(".left-area").addClass("show");
+            });
+
+            $(".btn-show-right-area").click(function () {
+                $(".right-area").removeClass("show");
+                $(".right-area").addClass("show");
+            });
+
+            $(".btn-close-right").click(function () {
+                $(".right-area").removeClass("show");
+            });
+
+            $(".btn-close-left").click(function () {
+                $(".left-area").removeClass("show");
+            });
+        });
+
+        $('.main-area').scroll( function() {
+            if ($('.main-area').scrollTop() >= 88) {
+                $('div.main-area-header').addClass('fixed');
+            } else {
+                $('div.main-area-header').removeClass('fixed');
+            }
+        });
+    </script>
 </body>
+
 </html>
