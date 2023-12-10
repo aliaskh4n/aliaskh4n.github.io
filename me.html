@@ -1,120 +1,88 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Портфолио - [Ваше Имя] [Ваша Фамилия]</title>
-    <style>
-        body {
-            font-family: 'Arial', sans-serif;
-            background: linear-gradient(to right, #2980B9, #6DD5FA);
-            color: #fff;
-            margin: 0;
-            padding: 0;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            height: 100vh;
-        }
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <style>
+    body {
+      font-family: 'DM Sans', sans-serif;
+      margin: 0;
+      padding: 0;
+      background-color: #f3f6fd; /* Use your preferred background color */
+    }
 
-        header {
-            text-align: center;
-        }
+    .app-container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 20px;
+    }
 
-        h1 {
-            color: #fff;
-            margin-bottom: 20px;
-        }
+    .app-header {
+      text-align: center;
+      margin-bottom: 20px;
+    }
 
-        h2 {
-            color: #fff;
-        }
+    .app-name {
+      color: #1f1c2e; /* Use your preferred text color */
+      font-size: 36px;
+      margin: 0;
+    }
 
-        section {
-            background: rgba(255, 255, 255, 0.9);
-            border-radius: 10px;
-            padding: 20px;
-            margin: 20px 0;
-            width: 80%;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-        }
+    .introduction, .projects, .contact {
+      margin-bottom: 40px;
+    }
 
-        ul {
-            list-style-type: none;
-            padding: 0;
-        }
+    .project-list {
+      display: flex;
+      flex-wrap: wrap;
+    }
 
-        li {
-            margin-bottom: 10px;
-        }
+    .project-box {
+      /* Style project boxes */
+      background-color: #fff; /* Use your preferred background color */
+      border: 1px solid #e9ebf0; /* Use your preferred border color */
+      border-radius: 10px;
+      padding: 20px;
+      margin: 10px;
+    }
 
-        a {
-            color: #007BFF;
-            text-decoration: none;
-        }
-    </style>
+    /* Add more styles as needed */
+  </style>
+  <title>Your Portfolio</title>
 </head>
-
 <body>
-
-    <header>
-        <h1>Портфолио - [Ваше Имя] [Ваша Фамилия]</h1>
+  <div class="app-container">
+    <!-- Header Section -->
+    <header class="app-header">
+      <h1 class="app-name">Your Name - Portfolio</h1>
+      <!-- Add other header elements like navigation, etc. -->
     </header>
 
-    <section id="about">
-        <h2>О себе</h2>
-        <p>Меня зовут [Ваше Имя] [Ваше Отчество], и я являюсь [Ваша Профессия]. В настоящее время учусь в [Название вашего учебного заведения], где изучаю [Ваша Специальность]. Я активно занимаюсь [Дополнительные активности или увлечения].</p>
-    </section>
+    <!-- Main Content Section -->
+    <div class="app-content">
+      <!-- Introduction Section -->
+      <section class="introduction">
+        <h2>About Me</h2>
+        <p>Write a brief introduction about yourself and your skills.</p>
+      </section>
 
-    <section id="experience">
-        <h2>Опыт работы</h2>
-        <ul>
-            <li>
-                <strong>[Название Компании или Проекта] - [Ваша Должность]</strong>
-                <p>Период работы: [Месяц Год] - [Месяц Год]</p>
-                <p>Здесь вы можете описать свою роль, обязанности и достижения в рамках данной работы. Укажите использованные языки программирования, технологии и модули.</p>
-            </li>
-            <!-- Добавьте другие места работы по аналогии -->
-        </ul>
-    </section>
+      <!-- Projects Section -->
+      <section class="projects">
+        <h2>Projects</h2>
+        <div class="project-list">
+          <!-- Include project boxes here -->
+          <div class="project-box">
+            <!-- Project details: title, description, links, etc. -->
+          </div>
+        </div>
+      </section>
 
-    <section id="skills">
-        <h2>Навыки и Языки программирования</h2>
-        <ul>
-            <li>[Язык программирования 1]</li>
-            <li>[Язык программирования 2]</li>
-            <li>[Язык программирования 3]</li>
-        </ul>
-    </section>
-
-    <section id="projects">
-        <h2>Проекты и Кейсы</h2>
-        <ul>
-            <li>
-                <strong>[Название Проекта 1]</strong>
-                <p>Описание проекта и ваш вклад в него. Укажите использованные технологии, сложности, и результаты.</p>
-            </li>
-            <!-- Добавьте другие проекты по аналогии -->
-        </ul>
-    </section>
-
-    <section id="education">
-        <h2>Образование</h2>
-        <p>[Название Вашего Учебного Заведения] - [Степень и Специальность] (Год начала - Год окончания)</p>
-    </section>
-
-    <section id="contact">
-        <h2>Контактная Информация</h2>
-        <ul>
-            <li>Email: [Ваш Email]</li>
-            <li>LinkedIn: <a href="[Ссылка на профиль LinkedIn]">[Ваш профиль LinkedIn]</a></li>
-            <li>GitHub: <a href="[Ссылка на профиль GitHub]">[Ваш профиль GitHub]</a></li>
-            <!-- Добавьте другие контактные данные по аналогии -->
-        </ul>
-    </section>
-
+      <!-- Contact Section -->
+      <section class="contact">
+        <h2>Contact Me</h2>
+        <!-- Add your contact information, social links, etc. -->
+      </section>
+    </div>
+  </div>
 </body>
-
 </html>
