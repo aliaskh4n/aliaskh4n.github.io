@@ -1,0 +1,87 @@
+[
+    {
+      "type": "hotel",
+      "coordinates": [69.132283, 52.943723],
+      "title": {
+        "ru": "Гостиничный комплекс DANEL",
+        "kk": "DANEL қонақ үй кешені",
+        "en": "Hotel complex Danel"
+      },
+      "phone": "+7 (747) 242 01 08",
+      "address": {
+        "ru": "п. Зеренда, Объездная дорога, 3",
+        "kk": "Зеренді ауылы, айналма жол, 3",
+        "en": "Zerenda village, Bypass road, 3"
+      },
+      "instagramPost": "https://www.instagram.com/p/Cv6yJvCMQMf",
+      "icon": "danel.jpg"
+    },
+    {
+      "type": "hotel",
+      "coordinates": [69.135915, 52.900721],
+      "title": {
+        "ru": "Загородный дом Жаксы су",
+        "kk": "Жақсы су саяжайы",
+        "en": "Country house Zhaksy su"
+      },
+      "phone": "+7 (702) 754 96 66",
+      "address": {
+        "ru": "Улица Максима Горького, 100 с. Зеренда, Зерендинский район, Акмолинская область 1 этаж",
+        "kk": "Максим Горький көшесі, 100 Зеренді, Зеренді ауданы, Ақмола 1 қабат",
+        "en": "Maksima Gorkogo Street, 100 s. Zerenda, Zerendinsky district, Akmola region 1 floor"
+      },
+      "instagramPost": "https://www.instagram.com/p/CeYPBvKshuu",
+      "icon": "zhaksy.jpg"
+    },
+    {
+      "type": "hotel",
+      "coordinates": [69.122663, 52.904946],
+      "title": {
+        "ru": "Парк отдыха Ак Данат",
+        "kk": "DANEL қонақ үй кешені",
+        "en": "Ақ Данат демалыс саябағы"
+      },
+      "phone": "+7 (705) 534 56 56 ",
+      "address": {
+        "ru": "Юго-западный берег Зерендинского озера, 3 с. Зеренда, Зерендинский район, Акмолинская область 1 этаж",
+        "kk": "Зеренді өзенінің оңтүстік-батыс жағалауы, 3 Зеренді, Зеренді ауданы, Ақмола 1 қабат",
+        "en": "South-western shore of Zerendinskogo lake, 3 s. Zerenda, Zerendinsky district, Akmola region 1 floor"
+      },
+      "instagramPost": "https://www.instagram.com/p/Cv9o51qohmX",
+      "icon": "ak.jpg"
+    },
+    {
+      "type": "hotel",
+      "coordinates": [69.091483, 52.917299],
+      "title": {
+        "ru": "Aurora Garden",
+        "kk": "Aurora Garden",
+        "en": "Aurora Garden"
+      },
+      "phone": "+7 (777) 888 19 70",
+      "address": {
+        "ru": "Юго-западный берег Зерендинского озера, 7 с. Зеренда, Зерендинский район, Акмолинская область",
+        "kk": "Зеренді өзенінің оңтүстік-батыс жағалауы, 7 Зеренді, Зеренді ауданы, Ақмола",
+        "en": "Southwestern shore of Lake Zerenda, 7 With. Zerenda, Zerenda district, Akmola region"
+      },
+      "instagramPost": "https://www.instagram.com/p/CxYOo2SL5uJ",
+      "icon": "ga.jpg"
+    },
+    {
+      "type": "hotel",
+      "coordinates": [69.154500, 52.922724],
+      "title": {
+        "ru": "Zerenda Park",
+        "kk": "Zerenda Park",
+        "en": "Zerenda Park"
+      },
+      "phone": "+7 (701) 798 76 69",
+      "address": {
+        "ru": "Улица Садовая, 5д с. Зеренда, Зерендинский район, Акмолинская область 2 этажа",
+        "kk": "Садовая көшесі, 5д Зеренді, Зеренді ауданы, Ақмола 2 қабат",
+        "en": "Sadovaya street, 5d village. Zerenda, Zerenda district, Akmola region 2 floors"
+      },
+      "instagramPost": "https://www.instagram.com/p/CuhP4JLohVd",
+      "icon": "ze.jpg"
+    }
+  ]
