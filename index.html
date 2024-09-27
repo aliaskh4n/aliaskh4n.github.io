@@ -2,7 +2,7 @@
 <html>
   <head>
     <title>Карта Зеренда с поиском</title>
-    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyB3dxm0IC7PBvtr0z_kj64YBk9QdvNls9c&libraries=places&callback=initMap" async defer></script>
+    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyB3dxm0IC7PBvtr0z_kj64YBk9QdvNls9c&libraries=places"></script>
     <style>
       #map {
         height: 600px;
@@ -25,33 +25,38 @@
     <div id="map"></div>
 
     <script>
-      let map;
-      let searchBox;
-
       function initMap() {
-        const zerendaBounds = new google.maps.LatLngBounds(
-          new google.maps.LatLng(52.8800, 69.1080),
-          new google.maps.LatLng(52.9547, 69.1718)
+        // Точные границы для района Зеренда
+        const zerenadaBounds = new google.maps.LatLngBounds(
+          new google.maps.LatLng(52.3760, 69.0978), // юго-западная точка
+          new google.maps.LatLng(52.4100, 69.2150)  // северо-восточная точка
         );
 
-        map = new google.maps.Map(document.getElementById("map"), {
-          center: { lat: 52.9174, lng: 69.1399 },
+        // Настройка карты
+        const map = new google.maps.Map(document.getElementById("map"), {
+          center: { lat: 52.3895, lng: 69.1916 }, // центр Зеренды
           zoom: 13,
           restriction: {
-            latLngBounds: zerendaBounds,
-            strictBounds: true,
+            latLngBounds: zerenadaBounds,
+            strictBounds: true, // строгие границы карты
           },
         });
 
+        // Поле поиска
         const input = document.getElementById("search-input");
-        searchBox = new google.maps.places.SearchBox(input);
+        const searchBox = new google.maps.places.SearchBox(input);
 
-        searchBox.setBounds(zerendaBounds);
+        // Ограничиваем результаты поиска только внутри области
+        searchBox.setBounds(zerenadaBounds);
 
+        // Отслеживание изменения на карте
         map.addListener("bounds_changed", () => {
           searchBox.setBounds(map.getBounds());
         });
 
+        let markers = [];
+
+        // Прослушивание события выбора в поле поиска
         searchBox.addListener("places_changed", () => {
           const places = searchBox.getPlaces();
 
@@ -59,6 +64,11 @@
             return;
           }
 
+          // Удаление старых маркеров
+          markers.forEach((marker) => marker.setMap(null));
+          markers = [];
+
+          // Получение границ карты для фокуса
           const bounds = new google.maps.LatLngBounds();
 
           places.forEach((place) => {
@@ -67,11 +77,14 @@
               return;
             }
 
-            new google.maps.Marker({
+            // Создание маркера для каждого найденного места
+            const marker = new google.maps.Marker({
               map,
               title: place.name,
               position: place.geometry.location,
             });
+
+            markers.push(marker);
 
             if (place.geometry.viewport) {
               bounds.union(place.geometry.viewport);
@@ -83,6 +96,9 @@
           map.fitBounds(bounds);
         });
       }
+
+      // Инициализация карты
+      google.maps.event.addDomListener(window, "load", initMap);
     </script>
   </body>
 </html>
