@@ -26,9 +26,9 @@
       },
       "phone": "+7 (702) 754 96 66",
       "address": {
-        "ru": "Улица Максима Горького, 100 с. Зеренда, Зерендинский район, Акмолинская область",
-        "kk": "Максим Горький көшесі, 100 Зеренді, Зеренді ауданы, Ақмола",
-        "en": "Maksima Gorkogo Street, 100 s. Zerenda, Zerendinsky district, Akmola region"
+        "ru": "Улица Максима Горького, 100 с. Зеренда, Зерендинский район, Акмолинская область 1 этаж",
+        "kk": "Максим Горький көшесі, 100 Зеренді, Зеренді ауданы, Ақмола 1 қабат",
+        "en": "Maksima Gorkogo Street, 100 s. Zerenda, Zerendinsky district, Akmola region 1 floor"
       },
       "instagramPost": "https://www.instagram.com/p/CeYPBvKshuu",
       "icon": "zhaksy.jpg"
@@ -38,14 +38,14 @@
       "coordinates": [69.122663, 52.904946],
       "title": {
         "ru": "Парк отдыха Ак Данат",
-        "kk": "Ақ Данат демалыс саябағы",
-        "en": "Ak Danat Recreation Park"
+        "kk": "DANEL қонақ үй кешені",
+        "en": "Ақ Данат демалыс саябағы"
       },
       "phone": "+7 (705) 534 56 56 ",
       "address": {
-        "ru": "Юго-западный берег Зерендинского озера, 3 с. Зеренда, Зерендинский район, Акмолинская область",
-        "kk": "Зеренді өзенінің оңтүстік-батыс жағалауы, 3 Зеренді, Зеренді ауданы, Ақмола",
-        "en": "South-western shore of Zerendinskogo lake, 3 s. Zerenda, Zerendinsky district, Akmola region"
+        "ru": "Юго-западный берег Зерендинского озера, 3 с. Зеренда, Зерендинский район, Акмолинская область 1 этаж",
+        "kk": "Зеренді өзенінің оңтүстік-батыс жағалауы, 3 Зеренді, Зеренді ауданы, Ақмола 1 қабат",
+        "en": "South-western shore of Zerendinskogo lake, 3 s. Zerenda, Zerendinsky district, Akmola region 1 floor"
       },
       "instagramPost": "https://www.instagram.com/p/Cv9o51qohmX",
       "icon": "ak.jpg"
@@ -77,11 +77,59 @@
       },
       "phone": "+7 (701) 798 76 69",
       "address": {
-        "ru": "Улица Садовая, 5д с. Зеренда, Зерендинский район, Акмолинская область",
-        "kk": "Садовая көшесі, 5д Зеренді, Зеренді ауданы, Ақмола",
-        "en": "Sadovaya street, 5d village. Zerenda, Zerenda district, Akmola region"
+        "ru": "Улица Садовая, 5д с. Зеренда, Зерендинский район, Акмолинская область 2 этажа",
+        "kk": "Садовая көшесі, 5д Зеренді, Зеренді ауданы, Ақмола 2 қабат",
+        "en": "Sadovaya street, 5d village. Zerenda, Zerenda district, Akmola region 2 floors"
       },
       "instagramPost": "https://www.instagram.com/p/CuhP4JLohVd",
       "icon": "ze.jpg"
+    },
+    {
+      "title": {
+        "ru": "Озеро Зеренды",
+        "kk": "Зеренді көлі",
+        "en": "Lake Zerendi"
+      },
+      "coordinates": [69.1500, 52.9000],
+      "icon": "lake.svg",
+      "phone": "+7 (71632) 21234",
+      "address": {
+        "ru": "Зерендинский район, Акмолинская область",
+        "kk": "Зеренді ауданы, Ақмола облысы",
+        "en": "Zerendi District, Akmola Region"
+      },
+      "instagramPost": "https://www.instagram.com/p/CXxxxxxxxx/"
+    },
+    {
+      "title": {
+        "ru": "Зерендинский лес",
+        "kk": "Зеренді орманы",
+        "en": "Zerendi Forest"
+      },
+      "coordinates": [69.1700, 52.9200],
+      "icon": "forest.svg",
+      "phone": "+7 (71632) 21235",
+      "address": {
+        "ru": "Зерендинский район, Акмолинская область",
+        "kk": "Зеренді ауданы, Ақмола облысы",
+        "en": "Zerendi District, Akmola Region"
+      },
+      "instagramPost": "https://www.instagram.com/p/CYxxxxxxxx/"
+    },
+    {
+      "title": {
+        "ru": "Санаторий 'Зеренда'",
+        "kk": "'Зеренда' санаторийі",
+        "en": "Zerenda Sanatorium"
+      },
+      "coordinates": [69.1600, 52.9100],
+      "icon": "sanatorium.svg",
+      "phone": "+7 (71632) 21236",
+      "address": {
+        "ru": "ул. Санаторная 1, Зеренда",
+        "kk": "Санаторная көш. 1, Зеренді",
+        "en": "1 Sanatornaya St., Zerenda"
+      },
+      "instagramPost": "https://www.instagram.com/p/CZxxxxxxxx/"
     }
   ]
