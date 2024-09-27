@@ -26,21 +26,19 @@
 
     <script>
       function initMap() {
-        // Ограничение области карты на район Зеренда
-        const zerenadaBounds = {
-          north: 52.5,
-          south: 52.3,
-          east: 69.3,
-          west: 69.0
-        };
+        // Точные границы для района Зеренда
+        const zerenadaBounds = new google.maps.LatLngBounds(
+          new google.maps.LatLng(52.3760, 69.0978), // юго-западная точка
+          new google.maps.LatLng(52.4100, 69.2150)  // северо-восточная точка
+        );
 
         // Настройка карты
         const map = new google.maps.Map(document.getElementById("map"), {
-          center: { lat: 52.3895, lng: 69.1916 },
+          center: { lat: 52.3895, lng: 69.1916 }, // центр Зеренды
           zoom: 13,
           restriction: {
             latLngBounds: zerenadaBounds,
-            strictBounds: true,
+            strictBounds: true, // строгие границы карты
           },
         });
 
