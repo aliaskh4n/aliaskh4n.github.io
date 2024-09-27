@@ -47,7 +47,7 @@
         const searchBox = new google.maps.places.SearchBox(input);
 
         // Ограничиваем результаты поиска только внутри области
-        searchBox.setBounds(zerenadaBounds);
+        searchBox.setBounds(zerendaBounds); // Исправлено с zerenadaBounds на zerendaBounds
 
         // Отслеживание изменения на карте
         map.addListener("bounds_changed", () => {
@@ -98,7 +98,7 @@
       }
 
       // Инициализация карты
-      google.maps.event.addDomListener(window, "load", initMap);
+      window.onload = initMap; // Изменено с google.maps.event.addDomListener на window.onload
     </script>
   </body>
 </html>
