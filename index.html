@@ -2,7 +2,7 @@
 <html>
   <head>
     <title>Карта Зеренда с поиском</title>
-    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyB3dxm0IC7PBvtr0z_kj64YBk9QdvNls9c&libraries=places"></script>
+    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyB3dxm0IC7PBvtr0z_kj64YBk9QdvNls9c&libraries=places&callback=initMap" async defer></script>
     <style>
       #map {
         height: 600px;
@@ -25,38 +25,33 @@
     <div id="map"></div>
 
     <script>
+      let map;
+      let searchBox;
+
       function initMap() {
-        // Обновленные границы для района Зеренда
         const zerendaBounds = new google.maps.LatLngBounds(
-          new google.maps.LatLng(52.8800, 69.1080), // юго-западная точка
-          new google.maps.LatLng(52.9547, 69.1718)  // северо-восточная точка
+          new google.maps.LatLng(52.8800, 69.1080),
+          new google.maps.LatLng(52.9547, 69.1718)
         );
 
-        // Настройка карты
-        const map = new google.maps.Map(document.getElementById("map"), {
-          center: { lat: 52.9174, lng: 69.1399 }, // центр района Зеренда
+        map = new google.maps.Map(document.getElementById("map"), {
+          center: { lat: 52.9174, lng: 69.1399 },
           zoom: 13,
           restriction: {
             latLngBounds: zerendaBounds,
-            strictBounds: true, // строгие границы карты
+            strictBounds: true,
           },
         });
 
-        // Поле поиска
         const input = document.getElementById("search-input");
-        const searchBox = new google.maps.places.SearchBox(input);
+        searchBox = new google.maps.places.SearchBox(input);
 
-        // Ограничиваем результаты поиска только внутри области
-        searchBox.setBounds(zerendaBounds); // Исправлено с zerenadaBounds на zerendaBounds
+        searchBox.setBounds(zerendaBounds);
 
-        // Отслеживание изменения на карте
         map.addListener("bounds_changed", () => {
           searchBox.setBounds(map.getBounds());
         });
 
-        let markers = [];
-
-        // Прослушивание события выбора в поле поиска
         searchBox.addListener("places_changed", () => {
           const places = searchBox.getPlaces();
 
@@ -64,11 +59,6 @@
             return;
           }
 
-          // Удаление старых маркеров
-          markers.forEach((marker) => marker.setMap(null));
-          markers = [];
-
-          // Получение границ карты для фокуса
           const bounds = new google.maps.LatLngBounds();
 
           places.forEach((place) => {
@@ -77,14 +67,11 @@
               return;
             }
 
-            // Создание маркера для каждого найденного места
-            const marker = new google.maps.Marker({
+            new google.maps.Marker({
               map,
               title: place.name,
               position: place.geometry.location,
             });
-
-            markers.push(marker);
 
             if (place.geometry.viewport) {
               bounds.union(place.geometry.viewport);
@@ -96,9 +83,6 @@
           map.fitBounds(bounds);
         });
       }
-
-      // Инициализация карты
-      window.onload = initMap; // Изменено с google.maps.event.addDomListener на window.onload
     </script>
   </body>
 </html>
