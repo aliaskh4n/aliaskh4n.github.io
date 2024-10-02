@@ -280,11 +280,14 @@
                             .setPopup(popup)
                             .addTo(map);
 
-                        markerElement.addEventListener('click', () => {
-                            getUserLocation((userCoords) => {
-                                getRoute(map, userCoords, markerData.coordinates);
+                        // Проверяем, не является ли маркер Озером Зеренди или Лесом Зеренди
+                        if (!['Озеро Зеренди', 'Лес Зеренди'].includes(markerData.title.ru)) {
+                            markerElement.addEventListener('click', () => {
+                                getUserLocation((userCoords) => {
+                                    getRoute(map, userCoords, markerData.coordinates);
+                                });
                             });
-                        });
+                        }
 
                         markerData.mapboxMarker = mapboxMarker; // Сохраняем ссылку на маркер
                     });
