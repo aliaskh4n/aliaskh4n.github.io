@@ -115,21 +115,5 @@
         "en": "Zerendi District, Akmola Region"
       },
       "instagramPost": "https://www.instagram.com/p/CYxxxxxxxx/"
-    },
-    {
-      "title": {
-        "ru": "Санаторий 'Зеренда'",
-        "kk": "'Зеренда' санаторийі",
-        "en": "Zerenda Sanatorium"
-      },
-      "coordinates": [69.1600, 52.9100],
-      "icon": "sanatorium.svg",
-      "phone": "+7 (71632) 21236",
-      "address": {
-        "ru": "ул. Санаторная 1, Зеренда",
-        "kk": "Санаторная көш. 1, Зеренді",
-        "en": "1 Sanatornaya St., Zerenda"
-      },
-      "instagramPost": "https://www.instagram.com/p/CZxxxxxxxx/"
     }
   ]
