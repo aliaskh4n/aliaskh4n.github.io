@@ -83,37 +83,5 @@
       },
       "instagramPost": "https://www.instagram.com/p/CuhP4JLohVd",
       "icon": "ze.jpg"
-    },
-    {
-      "title": {
-        "ru": "Озеро Зеренды",
-        "kk": "Зеренді көлі",
-        "en": "Lake Zerendi"
-      },
-      "coordinates": [69.1500, 52.9000],
-      "icon": "lake.svg",
-      "phone": "+7 (71632) 21234",
-      "address": {
-        "ru": "Зерендинский район, Акмолинская область",
-        "kk": "Зеренді ауданы, Ақмола облысы",
-        "en": "Zerendi District, Akmola Region"
-      },
-      "instagramPost": "https://www.instagram.com/p/CXxxxxxxxx/"
-    },
-    {
-      "title": {
-        "ru": "Зерендинский лес",
-        "kk": "Зеренді орманы",
-        "en": "Zerendi Forest"
-      },
-      "coordinates": [69.1700, 52.9200],
-      "icon": "forest.svg",
-      "phone": "+7 (71632) 21235",
-      "address": {
-        "ru": "Зерендинский район, Акмолинская область",
-        "kk": "Зеренді ауданы, Ақмола облысы",
-        "en": "Zerendi District, Akmola Region"
-      },
-      "instagramPost": "https://www.instagram.com/p/CYxxxxxxxx/"
     }
   ]
