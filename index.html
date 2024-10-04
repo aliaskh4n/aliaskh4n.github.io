@@ -249,16 +249,26 @@
                     })
                     .catch(error => console.error('Ошибка при загрузке маркеров:', error));
 
-                // Функция для создания HTML-содержимого попапа с учетом языка
+                // Функция для создания HTML-содержимого попапа с учетом языка и типа маркера
                 function createPopupContent(marker) {
-                    return `
-                        <div class="popup-content">
-                            <h3>${marker.title[currentLang]}</h3>
-                            ${marker.phone ? `<p><strong>${translations[currentLang].phone}</strong> <a href='tel:${marker.phone}'>${marker.phone}</a></p>` : ''}
-                            <p><strong>${translations[currentLang].address}</strong> ${marker.address[currentLang]}</p>
-                            <iframe src="${marker.instagramPost}/embed" allowtransparency="true" allowfullscreen="true" frameborder="0" scrolling="no"></iframe>
-                        </div>
-                    `;
+                    if (marker.type === 'info') {
+                        return `
+                            <div class="popup-content">
+                                <h3>${marker.title[currentLang]}</h3>
+                                ${marker.info ? `<p>${marker.info[currentLang]}</p>` : ''}
+                                <img src="${marker.image}" alt="${marker.title[currentLang]}" style="width: 100%; height: auto;">
+                            </div>
+                        `;
+                    } else {
+                        return `
+                            <div class="popup-content">
+                                <h3>${marker.title[currentLang]}</h3>
+                                ${marker.phone ? `<p><strong>${translations[currentLang].phone}</strong> <a href='tel:${marker.phone}'>${marker.phone}</a></p>` : ''}
+                                ${marker.address ? `<p><strong>${translations[currentLang].address}</strong> ${marker.address[currentLang]}</p>` : ''}
+                                ${marker.instagramPost ? `<iframe src="${marker.instagramPost}/embed" allowtransparency="true" allowfullscreen="true" frameborder="0" scrolling="no"></iframe>` : ''}
+                            </div>
+                        `;
+                    }
                 }
 
                 // Функция для получения иконки маркера в зависимости от типа
@@ -274,20 +284,18 @@
                         markerElement.style.backgroundImage = `url('${getMarkerIcon(markerData)}')`;
 
                         const popup = new mapboxgl.Popup().setHTML(createPopupContent(markerData));
+                        console.log('Челик');
 
                         const mapboxMarker = new mapboxgl.Marker(markerElement)
                             .setLngLat(markerData.coordinates)
                             .setPopup(popup)
                             .addTo(map);
 
-                        // Проверяем, не является ли маркер Озером Зеренди или Лесом Зеренди
-                        if (!['Озеро Зеренди', 'Лес Зеренди'].includes(markerData.title.ru)) {
-                            markerElement.addEventListener('click', () => {
-                                getUserLocation((userCoords) => {
-                                    getRoute(map, userCoords, markerData.coordinates);
-                                });
+                        markerElement.addEventListener('click', () => {
+                            getUserLocation((userCoords) => {
+                                getRoute(map, userCoords, markerData.coordinates);
                             });
-                        }
+                        });
 
                         markerData.mapboxMarker = mapboxMarker; // Сохраняем ссылку на маркер
                     });
@@ -340,14 +348,57 @@
 
                 // Функция для поиска маркеров
                 function searchMarkers(query) {
-                    return markers.filter(marker => 
-                        Object.values(marker.title).some(title => title.toLowerCase().includes(query.toLowerCase())) ||
-                        Object.values(marker.address).some(address => address.toLowerCase().includes(query.toLowerCase()))
-                    ).map(marker => ({
-                        ...marker,
-                        name: marker.title[currentLang],
-                        type: 'marker'
-                    }));
+                    console.log('Начало поиска маркеров. Query:', query);
+                    console.log('Текущее состояние markers:', markers);
+
+                    if (!markers) {
+                        console.warn('Массив маркеров не определен');
+                        return [];
+                    }
+
+                    if (!Array.isArray(markers)) {
+                        console.warn('markers не является массивом');
+                        return [];
+                    }
+
+                    if (markers.length === 0) {
+                        console.warn('Массив маркеров пуст');
+                        return [];
+                    }
+
+                    return markers.filter(marker => {
+                        if (!marker) {
+                            console.warn('Обнаружен пустой маркер');
+                            return false;
+                        }
+
+                        console.log('Проверка маркера:', marker);
+
+                        const hasTitle = marker.title && typeof marker.title === 'object';
+                        const hasAddress = marker.address && typeof marker.address === 'object';
+
+                        if (!hasTitle && !hasAddress) {
+                            console.warn('У маркера отсутствуют title и address');
+                            return false;
+                        }
+
+                        const titleMatch = hasTitle && Object.values(marker.title).some(title => 
+                            title && typeof title === 'string' && title.toLowerCase().includes(query.toLowerCase())
+                        );
+
+                        const addressMatch = hasAddress && Object.values(marker.address).some(address => 
+                            address && typeof address === 'string' && address.toLowerCase().includes(query.toLowerCase())
+                        );
+
+                        return titleMatch || addressMatch;
+                    }).map(marker => {
+                        console.log('Маркер прошел фильтрацию:', marker);
+                        return {
+                            ...marker,
+                            name: marker.title && marker.title[currentLang] ? marker.title[currentLang] : 'Без названия',
+                            type: 'marker'
+                        };
+                    });
                 }
 
                 // Функция для поиска улиц
@@ -399,11 +450,22 @@
                 // Обновленный обработчик события ввода в поисковую строку
                 const searchBar = document.getElementById('marker-search');
                 searchBar.addEventListener('ionInput', async (ev) => {
+                    console.log('Событие ionInput сработало');
                     const query = ev.target.value;
+                    console.log('Текущий запрос:', query);
+
                     if (query && query.trim() !== '') {
-                        const markerResults = searchMarkers(query);
-                        const streetResults = await searchStreets(query);
-                        displaySearchResults([...markerResults, ...streetResults]);
+                        try {
+                            console.log('Начало поиска');
+                            const markerResults = searchMarkers(query);
+                            console.log('Результаты поиска маркеров:', markerResults);
+                            const streetResults = await searchStreets(query);
+                            console.log('Результаты поиска улиц:', streetResults);
+                            displaySearchResults([...markerResults, ...streetResults]);
+                        } catch (error) {
+                            console.error('Ошибка при поиске:', error);
+                            displaySearchResults([]);
+                        }
                     } else {
                         document.getElementById('search-results').innerHTML = '';
                     }
