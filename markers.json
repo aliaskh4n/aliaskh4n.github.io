@@ -1,87 +1,185 @@
 [
-    {
-      "type": "hotel",
-      "coordinates": [69.132283, 52.943723],
-      "title": {
-        "ru": "Гостиничный комплекс DANEL",
-        "kk": "DANEL қонақ үй кешені",
-        "en": "Hotel complex Danel"
-      },
-      "phone": "+7 (747) 242 01 08",
-      "address": {
-        "ru": "п. Зеренда, Объездная дорога, 3",
-        "kk": "Зеренді ауылы, айналма жол, 3",
-        "en": "Zerenda village, Bypass road, 3"
-      },
-      "instagramPost": "https://www.instagram.com/p/Cv6yJvCMQMf",
-      "icon": "danel.jpg"
+  {
+    "type": "hotel",
+    "coordinates": [69.132283, 52.943723],
+    "title": {
+      "ru": "Гостиничный комплекс DANEL",
+      "kk": "DANEL қонақ үй кешені",
+      "en": "Hotel complex Danel"
     },
-    {
-      "type": "hotel",
-      "coordinates": [69.135915, 52.900721],
-      "title": {
-        "ru": "Загородный дом Жаксы су",
-        "kk": "Жақсы су саяжайы",
-        "en": "Country house Zhaksy su"
-      },
-      "phone": "+7 (702) 754 96 66",
-      "address": {
-        "ru": "Улица Максима Горького, 100 с. Зеренда, Зерендинский район, Акмолинская область",
-        "kk": "Максим Горький көшесі, 100 Зеренді, Зеренді ауданы, Ақмола",
-        "en": "Maksima Gorkogo Street, 100 s. Zerenda, Zerendinsky district, Akmola region"
-      },
-      "instagramPost": "https://www.instagram.com/p/CeYPBvKshuu",
-      "icon": "zhaksy.jpg"
+    "phone": "+7 (747) 242 01 08",
+    "address": {
+      "ru": "п. Зеренда, Объездная дорога, 3",
+      "kk": "Зеренді ауылы, айналма жол, 3",
+      "en": "Zerenda village, Bypass road, 3"
     },
-    {
-      "type": "hotel",
-      "coordinates": [69.122663, 52.904946],
-      "title": {
-        "ru": "Парк отдыха Ак Данат",
-        "kk": "DANEL қонақ үй кешені",
-        "en": "Ақ Данат демалыс саябағы"
-      },
-      "phone": "+7 (705) 534 56 56 ",
-      "address": {
-        "ru": "Юго-западный берег Зерендинского озера, 3 с. Зеренда, Зерендинский район, Акмолинская область",
-        "kk": "Зеренді өзенінің оңтүстік-батыс жағалауы, 3 Зеренді, Зеренді ауданы, Ақмола",
-        "en": "South-western shore of Zerendinskogo lake, 3 s. Zerenda, Zerendinsky district, Akmola region"
-      },
-      "instagramPost": "https://www.instagram.com/p/Cv9o51qohmX",
-      "icon": "ak.jpg"
+    "instagramPost": "https://www.instagram.com/p/Cv6yJvCMQMf",
+    "icon": "danel.jpg"
+  },
+  {
+    "type": "hotel",
+    "coordinates": [69.135915, 52.900721],
+    "title": {
+      "ru": "Загородный дом Жаксы су",
+      "kk": "Жақсы су саяжайы",
+      "en": "Country house Zhaksy su"
     },
-    {
-      "type": "hotel",
-      "coordinates": [69.091483, 52.917299],
-      "title": {
-        "ru": "Aurora Garden",
-        "kk": "Aurora Garden",
-        "en": "Aurora Garden"
-      },
-      "phone": "+7 (777) 888 19 70",
-      "address": {
-        "ru": "Юго-западный берег Зерендинского озера, 7 с. Зеренда, Зерендинский район, Акмолинская область",
-        "kk": "Зеренді өзенінің оңтүстік-батыс жағалауы, 7 Зеренді, Зеренді ауданы, Ақмола",
-        "en": "Southwestern shore of Lake Zerenda, 7 With. Zerenda, Zerenda district, Akmola region"
-      },
-      "instagramPost": "https://www.instagram.com/p/CxYOo2SL5uJ",
-      "icon": "ga.jpg"
+    "phone": "+7 (702) 754 96 66",
+    "address": {
+      "ru": "Улица Максима Горького, 100 с. Зеренда, Зерендинский район, Акмолинская область",
+      "kk": "Максим Горький көшесі, 100 Зеренді, Зеренді ауданы, Ақмола",
+      "en": "Maksima Gorkogo Street, 100 s. Zerenda, Zerendinsky district, Akmola region"
     },
-    {
-      "type": "hotel",
-      "coordinates": [69.154500, 52.922724],
-      "title": {
-        "ru": "Zerenda Park",
-        "kk": "Zerenda Park",
-        "en": "Zerenda Park"
-      },
-      "phone": "+7 (701) 798 76 69",
-      "address": {
-        "ru": "Улица Садовая, 5д с. Зеренда, Зерендинский район, Акмолинская область",
-        "kk": "Садовая көшесі, 5д Зеренді, Зеренді ауданы, Ақмола",
-        "en": "Sadovaya street, 5d village. Zerenda, Zerenda district, Akmola region"
-      },
-      "instagramPost": "https://www.instagram.com/p/CuhP4JLohVd",
-      "icon": "ze.jpg"
-    }
-  ]
+    "instagramPost": "https://www.instagram.com/p/CeYPBvKshuu",
+    "icon": "zhaksy.jpg"
+  },
+  {
+    "type": "hotel",
+    "coordinates": [69.122663, 52.904946],
+    "title": {
+      "ru": "Парк отдыха Ак Данат",
+      "kk": "DANEL қонақ үй кешені",
+      "en": "Ақ Данат демалыс саябағы"
+    },
+    "phone": "+7 (705) 534 56 56 ",
+    "address": {
+      "ru": "Юго-западный берег Зерендинского озера, 3 с. Зеренда, Зерендинский район, Акмолинская область",
+      "kk": "Зеренді өзенінің оңтүстік-батыс жағалауы, 3 Зеренді, Зеренді ауданы, Ақмола",
+      "en": "South-western shore of Zerendinskogo lake, 3 s. Zerenda, Zerendinsky district, Akmola region"
+    },
+    "instagramPost": "https://www.instagram.com/p/Cv9o51qohmX",
+    "icon": "ak.jpg"
+  },
+  {
+    "type": "hotel",
+    "coordinates": [69.091483, 52.917299],
+    "title": {
+      "ru": "Aurora Garden",
+      "kk": "Aurora Garden",
+      "en": "Aurora Garden"
+    },
+    "phone": "+7 (777) 888 19 70",
+    "address": {
+      "ru": "Юго-западный берег Зерендинского озера, 7 с. Зеренда, Зерендинский район, Акмолинская область",
+      "kk": "Зеренді өзенінің оңтүстік-батыс жағалауы, 7 Зеренді, Зеренді ауданы, Ақмола",
+      "en": "Southwestern shore of Lake Zerenda, 7 With. Zerenda, Zerenda district, Akmola region"
+    },
+    "instagramPost": "https://www.instagram.com/p/CxYOo2SL5uJ",
+    "icon": "ga.jpg"
+  },
+  {
+    "type": "hotel",
+    "coordinates": [69.154500, 52.922724],
+    "title": {
+      "ru": "Zerenda Park",
+      "kk": "Zerenda Park",
+      "en": "Zerenda Park"
+    },
+    "phone": "+7 (701) 798 76 69",
+    "address": {
+      "ru": "Улица Садовая, 5д с. Зеренда, Зерендинский район, Акмолинская область",
+      "kk": "Садовая көшесі, 5д Зеренді, Зеренді ауданы, Ақмола",
+      "en": "Sadovaya street, 5d village. Zerenda, Zerenda district, Akmola region"
+    },
+    "instagramPost": "https://www.instagram.com/p/CuhP4JLohVd",
+    "icon": "ze.jpg"
+  },
+  {
+    "type": "info",
+    "coordinates": [68.674778, 52.867662],
+    "title": {
+      "ru": "Улгили",
+      "kk": "Үлгілі",
+      "en": "Ulgili"
+    },
+    "info": {
+      "ru": "Водопад Аулие булак (Улгилинский) расположен в горах Жыланды Зерендинском районе Акмолинской области. По словам местного гида 20 лет ранее в этих горах кишело змеями отсюда и название гор Жыланды. Река протекающая среди этих гор называется Улгили которая впадает в Кокшетауское водохранилище. Самое бурное течение водопада выпадает на конец апреля и до середины мая.",
+      "kk": "Аулие булақ (Улгили) қоңырлары Жыланды Зеренді ауданының аймағында орналасқан. Жыланды ауданындағы жергілікті гидтің айтуынша, 20 жыл бұрын осы қоңырларда змеи кишеледі, сондықтан қоңырлар Жыланды деп аталады. Осы қоңырлардағы өзені Улгили деп аталады, ол Кокшетау өзенінің қоймасына ағып барады. Судың ең көп ағып кетуі аптасына бір рет қысқа аралықта апрельдің соңы мен маусымның ортасы аралығында болады.",
+      "en": "Aulie bulak (Ulgili) rocks are located in the mountains of Jylandy Zerendinsky district of the Akmola region. According to the local guide 20 years ago, snakes lived in these mountains, hence the name of the mountains Jylandy. The river flowing through these mountains is called Ulgili, which flows into the Koksheda reservoir. The most powerful flow of the waterfall occurs at the end of April and until the middle of May."
+    },
+    "image": "ulgili.jpeg",
+    "icon": "se.png"
+  },
+  {
+    "type": "info",
+    "coordinates": [68.753442, 52.876485],
+    "title": {
+      "ru": "Жыланды",
+      "kk": "Жыланды",
+      "en": "Jylandy"
+    },
+    "info": {
+      "ru": "Жыланды — хребет между горами Имантау и Зеренды. Зерендинский район Акмолинской области находится в 23 км к северо-западу от села Идабол, сейчас его площадь составляет 5 км. Абсолютная высота 609 м. Хребет состоит из нескольких небольших холмов. Южный склон крутой. Притоки реки Шагалалы берут начало с северо-запада. 20 лет назад в этих горах водилось много змей, поэтому их называли Змеиными горами.",
+      "kk": "Жыланды – Имантау және Зеренді тауларының аралығындағы жота. Ақмола облысы Зеренді ауданы Айдабол ауылының солтүстік-батысында 23 км-ге созылған, енді жері 5 км. Абсолюттiк биіктігі 609 м. Жота бірнеше ұсақ шоқылардан құралған. Оңтүстік беткейі тік жарқабақты келген. Солтүстік-батысынан Шағалалы өзенінің салалары бастау алады. осыдан 20 жыл бұрын бұл тауларда жыландар көп болған, сондықтан Жыланды таулары аталған.",
+      "en": "Zhylandy is a ridge between the mountains of Imantau and Zerendy. Zerendy district of Akmola region is 23 km north-west of Idabol village, now its area is 5 km. The absolute height is 609 m. The ridge consists of several small hills. The southern slope is steep. The tributaries of the Shagalaly river originate from the northwest. 20 years ago, there were a lot of snakes in these mountains, that's why they were called Snake Mountains."
+    },
+    "image": "zhylandy.jpeg",
+    "icon": "https://i8.photo.2gis.com/images/geo/0/30258560067889976_9972.jpg"
+  },
+  {
+    "type": "hotel",
+    "coordinates": [69.090138, 52.918661],
+    "title": {
+      "ru": "zerenhotel",
+      "kk": "zerenhotel",
+      "en": "zerenhotel"
+    },
+    "phone": "+7 (771) 162 42 64",
+    "address": {
+      "ru": "Юго-западный берег Зерендинского озера, 8 с. Зеренда, Зерендинский район, Акмолинская область",
+      "kk": "Зеренді өзенінің оңтүстік-батыс жағалауы, 8 Зеренді, Зеренді ауданы, Ақмола",
+      "en": "Southwestern shore of Lake Zerenda, 8 With. Zerenda, Zerenda district, Akmola region"
+    },
+    "instagramPost": "https://www.instagram.com/p/C_L18SlOCWJ",
+    "icon": "zeren.png"
+  },
+  {
+    "type": "hotel",
+    "coordinates": [69.07826, 52.923479],
+    "title": {
+      "ru": "tulparzeren",
+      "kk": "tulparzeren",
+      "en": "tulparzeren"
+    },
+    "phone": "+7 (716) 322 29 77",
+    "address": {
+      "ru": "Юго-западный берег Зерендинского озера, 9 с. Зеренда, Зерендинский район, Акмолинская область",
+      "kk": "Зеренді өзенінің оңтүстік-батыс жағалауы, 9 Зеренді, Зеренді ауданы, Ақмола",
+      "en": "Southwestern shore of Lake Zerenda, 9 With. Zerenda, Zerenda district, Akmola region"
+    },
+    "instagramPost": "https://www.instagram.com/p/ByUTc7fFOkC",
+    "icon": "tul.png"
+  },
+  {
+    "type": "info",
+    "coordinates": [69.117462, 52.924044],
+    "title": {
+      "ru": "Zerenda Park",
+      "kk": "Zerenda Park",
+      "en": "Zerenda Park"
+    },
+    "info": {
+      "ru": "Зеренда-тупиковое озеро в бассейне Ишим. Здесь рассказывается легенда о происхождении названия озера Зеренда. Казачий отряд ехал по маршруту Петропавловск-Павлодар, именуемому «горькая полоса», чтобы создать станицу, ночью выходил на берег воды, и никто не знал, озеро это или река. Рядом с их садом горит факел пастуха-казаха. Когда они хотят узнать, озеро это или река, они думают, что казахи ищут землю. Земля?«и просит ее руки: Земля анда!. Казаки подумали, что это за «Жеранда», а утром увидели озеро, лес – хорошее место для создания станицы. Тогда станицу называли Зерендой. Это было в 1824 году.",
+      "kk": "Зеренді – Есіл алабындағы тұйық көл. Мұнда Зеренді көлінің атауы қайдан шыққаны жөнінде аңыз айтылады. «Казак отряды станица құру үшін «ащы жолақ» деп аталатын Петропавл-Павлодар бағытымен келе жатады, түнде судың жағалауына шығып, бұл көл немесе өзен екенін ешкім де білмеді. Олардың бағына қарай жақын жерде малшы-қазақтың алауы жанып тұрады. Олар көл ме, өзен бе екенін білгілері келгенде, қазақ жерді іздеп жүр деп ойлайды. «Жер ме?» деп сұрайды да, қолын «Жер анда!» деп сілтейді. Казактар не қылған «Жеранда» деп ойлады, ал таңертең олар көлді көрді, орман – станица құру үшін жақсы жер болды. Содан станицаны Зеренді деп атап кеткен. Бұл 1824 жылы болған. ",
+      "en": "Zerenda is a closed Lake in the Ishim Basin. Here is a legend about where the name of Lake Zerenda came from. The Cossack detachment went along the Petropavlovsk-Pavlodar route, which is called the bitter Strip, to create a Stanitsa, went to the banks of the water at night, and no one knew whether it was a lake or a river. Near their garden, a herdsman-Kazakh torch is burning. When they want to know if it is a lake or a river, they think that the Kazakh is looking for land. Earth?and put his hand on the Earth anda! how to find out? What the Cossacks thought was on the land, and in the morning they saw the lake, the forest was a good place to create Stanitsa. Then Stanitsa was called Zerenda. This happened in 1824."
+    },
+    "image": "https://i7.photo.2gis.com/photo-gallery/42474ce4-72bb-42f4-96aa-dfdad4395a5a.jpg",
+    "icon": "https://i0.photo.2gis.com/photo-gallery/1f00ab6c-2937-4ccb-bbe0-f1eae31e8d23.jpg"
+  },
+  {
+    "type": "info",
+    "coordinates": [69.077034, 52.908736],
+    "title": {
+      "ru": "Zerenda Park",
+      "kk": "Zerenda Park",
+      "en": "Zerenda Park"
+    },
+    "info": {
+      "ru": "Зерендинская зона отдыха-природная достопримечательность Зерендинского района Акмолинской области.Холмисто-холмистая местность региона гармонично сочетается с холмами и гребнями. На их склонах образовался лес, где росли Береза, реликтовая шырша. Все они идеально подходят для развития индустрии туризма и создания санаториев и курортов, домов отдыха и оздоровления детей, горнолыжных курортов, природного национального парка. На территории Зерендинского отдыха сосредоточены спортивные оздоровительные лагеря» Карагайлы«,» Зерен Плюс«,» Сункар«,» Мыс земляники«, им.Малика Габдуллина и Евразийского университета, базы отдыха» санаторий Аккайын«,» Зеленый мыс«,» Искра«,» Шыгыс  и другие. К услугам отдыхающих кафе» Керемет«,» Нур ауыл«, кемпинг» Көмек«, мотель» Оазис«, гостиница» Калкаман  и другие. Для полноценного и эффективного времяпрепровождения для отдыхающих построены лыжные трассы, стадион. Также организовано 11 эколагических туристических маршрутов. По этим маршрутам встречаются скалы и скалы: разведка-Тобе, Шиели, Берик, Калкантас, Акшабулт, кус базар, Аюлы, Коянды, Сулутобе, Аулиешы, Койтас, Жекетау, Жайынауз и другие. Зерендинская зона отдыха расположена на территории Зерендинского природного зоологического заказника.[1]",
+      "kk": "Зеренді демалыс аймағы - Ақмола облысы Зеренді ауданының табиғаты көрікті жерінде орналасқан.Аймақтың қыратты-төбелі жер бедері шоқылар және қырқалармен үйлесім тапқан. Олардың баурайында қайың, реликті шырша өскен орман қалыптасқан. Бұлардың барлығы туризм индустриясын дамытуға және санаторийлер мен курорттар, демалыс үйлері мен балалардың денсаулығын сауықтыратын, таулы шаңғы базаларын, табиғи ұлттық парк құруға өте қолайлы. Зеренді демалыс аумағында «Қарағайлы», «Зерен Плюс», «Сұңқар», «Құлпынай мүйісі», Мәлік Ғабдуллин атындағы және Еуразия университетітінің спорттық сауықтыру лагерьлері, «Аққайың шипажайы», «Жасыл мүйіс», «Ұшқын», «Шығыс», тағы басқа демалыс базалары шоғырланған. Демалушыларға «Керемет», «Нұр ауыл», тағы басқа кафелері, «Көмек» кемпингі, «Оазис» мотелі, «Қалқаман» қонақ үйі, тағы басқа қызмет көрсетеді. Уақытты толық әрі тиімді өткізу үшін демалушыларға шаңғы трассалары, стадион салынған. Сонымен қатар 11 эколагиялық туристік маршрут ұйымдастырылған. Бұл маршруттар бойында Барлаутөбе, Шиелі, Беріктас, Жазықтөбе, Бөрік, Қалқантас, Ақшабұлт, Құс базары, Аюлы, Қоянды, Сұлутөбе, Әулиешың, Қойтас, Жекетау, Жайынауыз, тағы басқа шоқылар мен жартастар және балбалтастар кездеседі. Зеренді демалыс аймағында Зеренді табиғи зоологиялық қорықша аумағында орналасқан.[1] ",
+      "en": "Zerenda Recreation Area is located in a picturesque place of Zerenda District of Akmola region.The hilly terrain of the region is combined with hills and ridges. On their slopes, a forest is formed, overgrown with birch and relict spruce. All these are ideal for the development of the tourism industry and the creation of sanatoriums and resorts, holiday homes and children's health resorts, Mountain Ski Resorts, a natural National Park. Sports and Recreation camps named after Malik Gabdullin and Eurasian university named after Karagaily, Zeren Plus, Sunkar, Strawberry Cape, Akkayyn sanatorium, Green Cape, spark, Shygys, etc.are concentrated on the territory of zerenda recreation centers. Vacationers are provided with cafes miracle,Nur auyl, campsiteKomek, motel Oasis, Hotel Kalkaman, etc. For a full and efficient pastime, ski slopes and a stadium are built for vacationers. In addition, 11 ecolagic tourist routes are organized. Along these routes, Barlautobe, Shieli, Berkas, Dyazyobe, Berik, Kalkantas, Akshabult, bird market, Ayuly, Koyandy, Sulutobe, Aulyeshyn, Koytas, Zheketau, Zhaynauz, other hills and rocks and balbaltas are found. The zerenda Recreation Area is located on the territory of the Zerenda natural Zoological Reserve.[1]"
+    },
+    "image": "https://i5.photo.2gis.com/images/geo/0/30258560106149326_7f27.jpg",
+    "icon": "https://i4.photo.2gis.com/images/geo/0/30258560106149327_fb37.jpg"
+  }
+]
