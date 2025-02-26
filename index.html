@@ -2,25 +2,44 @@
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
     <title>📜 Правила магазина</title>
     <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <style>
         body {
             font-family: Arial, sans-serif;
-            max-width: 800px;
-            margin: 20px auto;
-            padding: 20px;
+            max-width: 90%;
+            margin: 10px auto;
+            padding: 15px;
             border-radius: 8px;
             background-color: var(--tg-theme-bg-color, #ffffff);
             color: var(--tg-theme-text-color, #000000);
+            word-wrap: break-word;
+            overflow-wrap: break-word;
+        }
+        h1 {
+            font-size: 1.5em;
+            text-align: center;
+        }
+        button {
+            display: block;
+            width: 100%;
+            padding: 12px;
+            margin-top: 20px;
+            border: none;
+            border-radius: 5px;
+            background-color: var(--tg-theme-button-color, #0088cc);
+            color: var(--tg-theme-button-text-color, #ffffff);
+            font-size: 16px;
+            cursor: pointer;
         }
     </style>
 </head>
 <body>
     <h1>📜 Правила магазина</h1>
     <div id="rules"></div>
+    <button id="closeWebApp">Закрыть</button>
     
     <script>
         const markdownContent = `# 🎉 Добро пожаловать в наш магазин!
@@ -40,15 +59,17 @@
 
 ## 🆘 Контакты
 
-Если у вас есть вопросы, обращайтесь в поддержку через [наш телеграм](https://t.me/support).
-
-✨ Спасибо за использование нашего сервиса и приятных покупок!`;
+Если у вас есть вопросы, обращайтесь в поддержку через WebApp.`;
 
         document.getElementById('rules').innerHTML = marked.parse(markdownContent);
         
         Telegram.WebApp.expand();
         document.body.style.backgroundColor = Telegram.WebApp.themeParams.bg_color || "#ffffff";
         document.body.style.color = Telegram.WebApp.themeParams.text_color || "#000000";
+        
+        document.getElementById('closeWebApp').addEventListener('click', () => {
+            Telegram.WebApp.close();
+        });
     </script>
 </body>
 </html>
