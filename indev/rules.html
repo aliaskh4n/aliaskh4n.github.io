@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
     <title>📜 Правила магазина</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/lottie-web/5.9.6/lottie.min.js"></script>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -27,6 +28,12 @@
             padding: 15px;
             border-radius: 8px;
             background-color: var(--tg-theme-bg-color, #ffffff);
+            text-align: center;
+        }
+        .animation-container {
+            width: 150px;
+            height: 150px;
+            margin: 0 auto 20px;
         }
         h1 {
             font-size: 1.8em;
@@ -42,9 +49,6 @@
             font-size: 1.2em;
             display: flex;
             align-items: center;
-        }
-        li::before {
-            margin-right: 10px;
         }
         button {
             display: block;
@@ -63,6 +67,7 @@
 </head>
 <body>
     <div class="container">
+        <div class="animation-container" id="tgs-animation"></div>
         <h1>📜 Правила магазина</h1>
         <ul>
             <li>🛑 Все покупки окончательны и не подлежат возврату.</li>
@@ -76,7 +81,7 @@
             <li>📜 Изменение условий возможно, следите за обновлениями.</li>
             <li>💬 Уважайте других пользователей, токсичное поведение недопустимо.</li>
         </ul>
-        <h2>🆘 Контакты</h2>
+        <h2>🟢 Контакты</h2>
         <p>Если у вас есть вопросы, обращайтесь в поддержку.</p>
         <button id="closeWebApp">Закрыть</button>
     </div>
@@ -88,6 +93,16 @@
         
         document.getElementById('closeWebApp').addEventListener('click', () => {
             Telegram.WebApp.close();
+        });
+        
+        // Анимация TGS (Lottie)
+        const animContainer = document.getElementById("tgs-animation");
+        lottie.loadAnimation({
+            container: animContainer,
+            renderer: "svg",
+            loop: true,
+            autoplay: true,
+            path: "animation.json" // Путь к файлу TGS, предварительно конвертированному в JSON
         });
     </script>
 </body>
