@@ -25,7 +25,7 @@ document.addEventListener('DOMContentLoaded', function() {
 // Function to set up Lottie animation
 function setupLottieAnimation() {
     // Default TGS animation for the emblem
-    const defaultTgsUrl = 'https://assets9.lottiefiles.com/packages/lf20_jR229r.json';
+    const defaultTgsUrl = '8_BROKEN_OUT.json';
     
     // Try to load a custom TGS file if provided
     const customTgsUrl = getParameterByName('tgs');
