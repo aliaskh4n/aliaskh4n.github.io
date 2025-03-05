@@ -66,14 +66,33 @@ async function saveData() {
     
     // Validate form
     if (!username || !handle || !date || !message) {
-        tg.showAlert('Пожалуйста, заполните все обязательные поля');
+        alert('Пожалуйста, заполните все обязательные поля');
         return;
     }
     
     try {
-        // Fetch current database
-        const response = await fetch('database.json');
-        const data = await response.json();
+        // Get current database from localStorage or create new one
+        let data;
+        const storedData = localStorage.getItem('database');
+        
+        if (storedData) {
+            data = JSON.parse(storedData);
+        } else {
+            // Initialize with default data
+            data = {
+                "users": [
+                    {
+                        "id": 1,
+                        "username": "Aliaskhan",
+                        "handle": "@al1askh4n",
+                        "date": "12 марта 2024 г.",
+                        "message": "У этого пользователя разбито сердце другом, потому что он лох. Анимация разбитого сердце символизирует его разбитое сердце и душевную боль.",
+                        "views": 922056,
+                        "animation": "8_BROKEN_OUT.json"
+                    }
+                ]
+            };
+        }
         
         // Generate new ID
         const newId = data.users.length > 0 
@@ -94,37 +113,27 @@ async function saveData() {
         // Add to database
         data.users.push(newUser);
         
-        // Save updated database
+        // Save updated database to localStorage
         await saveToDatabase(data);
         
         // Show success message
-        tg.showAlert('Запись успешно сохранена');
+        alert('Запись успешно сохранена');
         
         // Clear form
         clearForm();
         
     } catch (error) {
         console.error('Error saving data:', error);
-        tg.showAlert('Ошибка при сохранении данных');
+        alert('Ошибка при сохранении данных');
     }
 }
 
-// Save data to database.json file
+// Save data to localStorage
 async function saveToDatabase(data) {
     try {
-        const response = await fetch('save_data.php', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify(data)
-        });
-        
-        if (!response.ok) {
-            throw new Error('Network response was not ok');
-        }
-        
-        return await response.json();
+        // Save to localStorage
+        localStorage.setItem('database', JSON.stringify(data));
+        return { success: true };
     } catch (error) {
         console.error('Error saving to database:', error);
         throw error;
@@ -142,7 +151,7 @@ function previewData() {
     
     // Validate form
     if (!username || !handle || !date || !message) {
-        tg.showAlert('Пожалуйста, заполните все обязательные поля для предпросмотра');
+        alert('Пожалуйста, заполните все обязательные поля для предпросмотра');
         return;
     }
     

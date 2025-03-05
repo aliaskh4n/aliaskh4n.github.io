@@ -22,15 +22,37 @@ document.addEventListener('DOMContentLoaded', function() {
     setupReportLink();
 });
 
-// Function to load data from database.json
+// Function to load data from localStorage
 async function loadDataFromDatabase() {
     try {
         // Get user ID from URL parameter
         const userId = getParameterByName('id') || 1; // Default to first user if no ID provided
         
-        // Fetch database
-        const response = await fetch('database.json');
-        const data = await response.json();
+        // Get data from localStorage or use default
+        let data;
+        const storedData = localStorage.getItem('database');
+        
+        if (storedData) {
+            data = JSON.parse(storedData);
+        } else {
+            // Initialize with default data
+            data = {
+                "users": [
+                    {
+                        "id": 1,
+                        "username": "Aliaskhan",
+                        "handle": "@al1askh4n",
+                        "date": "12 марта 2024 г.",
+                        "message": "У этого пользователя разбито сердце другом, потому что он лох. Анимация разбитого сердце символизирует его разбитое сердце и душевную боль.",
+                        "views": 922056,
+                        "animation": "8_BROKEN_OUT.json"
+                    }
+                ]
+            };
+            
+            // Save default data to localStorage
+            localStorage.setItem('database', JSON.stringify(data));
+        }
         
         // Find user by ID
         const user = data.users.find(u => u.id == userId);
@@ -122,11 +144,15 @@ function setupReportLink() {
     const reportElement = document.querySelector('.report');
     if (reportElement) {
         reportElement.addEventListener('click', function() {
-            tg.showConfirm('Сообщить об ошибке в превью?', function(confirmed) {
-                if (confirmed) {
-                    tg.showAlert('Спасибо за сообщение об ошибке');
-                }
-            });
+            try {
+                tg.showConfirm('Сообщить об ошибке в превью?', function(confirmed) {
+                    if (confirmed) {
+                        alert('Спасибо за сообщение об ошибке');
+                    }
+                });
+            } catch (error) {
+                alert('Сообщить об ошибке в превью?');
+            }
         });
     }
 }

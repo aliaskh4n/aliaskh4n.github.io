@@ -1,58 +1,56 @@
 # Telegram Information System
 
-This is a simple system for displaying user information cards in a Telegram WebApp. It uses a JSON database to store user data and allows creating new entries.
+Это простая система для отображения информационных карточек пользователей в Telegram WebApp. Она использует localStorage браузера для хранения данных пользователей и позволяет создавать новые записи.
 
-## Features
+## Особенности
 
-- Display user information with custom animations
-- Create new user entries through a form
-- Store data in a JSON database
-- Preview entries before saving
-- Responsive design that works well in Telegram WebApp
+- Отображение информации о пользователе с пользовательскими анимациями
+- Создание новых записей пользователей через форму
+- Хранение данных в localStorage браузера
+- Предварительный просмотр записей перед сохранением
+- Адаптивный дизайн, который хорошо работает в Telegram WebApp
 
-## Files
+## Файлы
 
-- `index.html` - Main display page that shows user information
-- `create.html` - Form for creating new user entries
-- `script.js` - JavaScript for the main page
-- `create.js` - JavaScript for the creation form
-- `styles.css` - Styling for both pages
-- `database.json` - JSON database storing all user entries
-- `save_data.php` - PHP script for saving data to the database
+- `index.html` - Главная страница отображения, которая показывает информацию о пользователе
+- `create.html` - Форма для создания новых записей пользователей
+- `script.js` - JavaScript для главной страницы
+- `create.js` - JavaScript для формы создания
+- `styles.css` - Стили для обеих страниц
 
-## How to Use
+## Как использовать
 
-### Viewing User Information
+### Просмотр информации о пользователе
 
-1. Open `index.html` in a Telegram WebApp
-2. By default, it shows the first user in the database
-3. To view a specific user, add `?id=X` to the URL, where X is the user ID
+1. Откройте `index.html` в Telegram WebApp
+2. По умолчанию отображается первый пользователь в базе данных
+3. Чтобы просмотреть конкретного пользователя, добавьте `?id=X` к URL, где X - это ID пользователя
 
-### Creating New Entries
+### Создание новых записей
 
-1. Open `create.html` in a Telegram WebApp
-2. Fill in the form with the user's information
-3. You can preview the entry before saving
-4. Click "Save" to add the entry to the database
+1. Откройте `create.html` в Telegram WebApp
+2. Заполните форму информацией о пользователе
+3. Вы можете предварительно просмотреть запись перед сохранением
+4. Нажмите "Сохранить", чтобы добавить запись в базу данных
 
-### URL Parameters
+### Параметры URL
 
-- `id` - Specifies which user to display (e.g., `index.html?id=2`)
-- `tgs` - Specifies a custom animation file (e.g., `index.html?tgs=custom.json`)
+- `id` - Указывает, какого пользователя отображать (например, `index.html?id=2`)
+- `tgs` - Указывает пользовательский файл анимации (например, `index.html?tgs=custom.json`)
 
-## Requirements
+## Требования
 
-- Web server with PHP support for saving data
-- Telegram WebApp environment
+- Современный веб-браузер с поддержкой localStorage
+- Среда Telegram WebApp
 
-## Setup
+## Настройка
 
-1. Upload all files to your web server
-2. Make sure the server has write permissions for `database.json`
-3. Access the pages through Telegram WebApp
+1. Загрузите все файлы на ваш веб-сервер
+2. Доступ к страницам через Telegram WebApp
 
-## Notes
+## Примечания
 
-- The default animation is `8_BROKEN_OUT.json`
-- If a user doesn't specify an animation, the default will be used
-- Views are formatted according to Russian locale (e.g., "922 056") 
+- Анимация по умолчанию - `8_BROKEN_OUT.json`
+- Если пользователь не указывает анимацию, будет использоваться анимация по умолчанию
+- Просмотры форматируются в соответствии с русской локалью (например, "922 056")
+- Данные хранятся локально в браузере пользователя, поэтому они будут доступны только на том устройстве, где были созданы 
