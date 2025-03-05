@@ -1,0 +1,288 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>Проектирование сети GPON</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary-color: #3B82F6;
+            --secondary-color: #10B981;
+            --background-color: #F3F4F6;
+            --text-color: #1F2937;
+            --card-background: #FFFFFF;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, var(--background-color) 0%, #E5E7EB 100%);
+            color: var(--text-color);
+            line-height: 1.6;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .container {
+            background: var(--card-background);
+            border-radius: 16px;
+            box-shadow: 
+                0 25px 50px -12px rgba(0, 0, 0, 0.08),
+                0 10px 15px -3px rgba(0, 0, 0, 0.1);
+            max-width: 600px;
+            width: 100%;
+            padding: 40px;
+            transition: all 0.3s ease;
+        }
+
+        .container:hover {
+            transform: translateY(-5px);
+            box-shadow: 
+                0 30px 60px -15px rgba(0, 0, 0, 0.1),
+                0 15px 20px -5px rgba(0, 0, 0, 0.12);
+        }
+
+        .title {
+            text-align: center;
+            color: var(--primary-color);
+            margin-bottom: 30px;
+            font-weight: 700;
+            font-size: 2rem;
+            background: linear-gradient(90deg, var(--primary-color), var(--secondary-color));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: var(--text-color);
+        }
+
+        .form-input {
+            width: 100%;
+            padding: 12px 16px;
+            border: 2px solid #E5E7EB;
+            border-radius: 10px;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+            background-color: #F9FAFB;
+        }
+
+        .form-input:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2);
+        }
+
+        .calculate-btn {
+            width: 100%;
+            padding: 14px;
+            background: linear-gradient(90deg, var(--primary-color), var(--secondary-color));
+            color: white;
+            border: none;
+            border-radius: 12px;
+            font-weight: 600;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .calculate-btn:hover {
+            opacity: 0.9;
+            transform: scale(1.02);
+        }
+
+        #resultContainer {
+            margin-top: 30px;
+            background-color: #F3F4F6;
+            border-radius: 12px;
+            padding: 20px;
+        }
+
+        .result-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 10px 0;
+            border-bottom: 1px solid #E5E7EB;
+        }
+
+        .result-item:last-child {
+            border-bottom: none;
+        }
+
+        .result-label {
+            font-weight: 600;
+            color: var(--text-color);
+        }
+
+        .result-value {
+            color: var(--primary-color);
+            font-weight: 500;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 20px;
+                margin: 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1 class="title">Проектирование сети GPON</h1>
+        
+        <div class="form-group">
+            <label class="form-label">Название проекта</label>
+            <input type="text" id="projectName" class="form-input" placeholder="Введите название проекта">
+        </div>
+
+        <div class="form-group">
+            <label class="form-label">Тип населенного пункта</label>
+            <select id="settlementType" class="form-input">
+                <option value="suburban">Пригородный поселок</option>
+                <option value="urban">Городской район</option>
+                <option value="rural">Сельская местность</option>
+            </select>
+        </div>
+
+        <div class="form-group">
+            <label class="form-label">Количество домохозяйств</label>
+            <input type="number" id="householdsCount" class="form-input" placeholder="Введите количество домохозяйств">
+        </div>
+
+        <div class="form-group">
+            <label class="form-label">Топология сети</label>
+            <select id="networkTopology" class="form-input">
+                <option value="tree">Древовидная</option>
+                <option value="ring">Кольцевая</option>
+                <option value="mesh">Ячеистая</option>
+            </select>
+        </div>
+
+        <div class="form-group">
+            <label class="form-label">Максимальное расстояние до OLT (км)</label>
+            <input type="number" id="maxDistance" class="form-input" placeholder="Введите максимальное расстояние">
+        </div>
+
+        <div class="form-group">
+            <label class="form-label">Коэффициент сплиттера</label>
+            <select id="splitRatio" class="form-input">
+                <option value="1:32">1:32</option>
+                <option value="1:64">1:64</option>
+                <option value="1:128">1:128</option>
+            </select>
+        </div>
+
+        <button onclick="calculateNetworkParameters()" class="calculate-btn">Спроектировать сеть</button>
+
+        <div id="resultContainer" style="display: none;">
+            <div id="designResults"></div>
+        </div>
+    </div>
+
+    <script>
+        function calculateNetworkParameters() {
+            var projectName = document.getElementById('projectName').value || 'Проект GPON';
+            var settlementType = document.getElementById('settlementType').value;
+            var householdsCount = document.getElementById('householdsCount').value;
+            var networkTopology = document.getElementById('networkTopology').value;
+            var maxDistance = document.getElementById('maxDistance').value;
+            var splitRatio = document.getElementById('splitRatio').value;
+
+            householdsCount = householdsCount ? parseInt(householdsCount, 10) : 0;
+            maxDistance = maxDistance ? parseFloat(maxDistance) : 0;
+
+            if (householdsCount <= 0 || maxDistance <= 0) {
+                alert('Пожалуйста, введите корректные значения');
+                return;
+            }
+
+            var splitterValue = parseInt(splitRatio.split(':')[1], 10);
+            var numberOfONTs = Math.ceil(householdsCount / (splitterValue / 2));
+            var numberOfOpticalNodes = Math.ceil(numberOfONTs / splitterValue);
+
+            var baseLength = householdsCount * 0.05;
+            var topologyMultiplier = {
+                'tree': 1,
+                'ring': 1.2,
+                'mesh': 1.5
+            };
+            var estimatedCabling = Math.round(baseLength * topologyMultiplier[networkTopology]);
+
+            var baseONTCost = 2000;
+            var baseOLTCost = 50000;
+            var splitterCost = 5000;
+            var estimatedEquipmentCost = Math.round(
+                (numberOfONTs * baseONTCost) + 
+                baseOLTCost + 
+                (numberOfOpticalNodes * splitterCost)
+            );
+
+            var resultsContainer = document.getElementById('resultContainer');
+            var designResults = document.getElementById('designResults');
+
+            designResults.innerHTML = `
+                <div class="result-item">
+                    <span class="result-label">Название проекта</span>
+                    <span class="result-value">${projectName}</span>
+                </div>
+                <div class="result-item">
+                    <span class="result-label">Тип населенного пункта</span>
+                    <span class="result-value">${settlementType}</span>
+                </div>
+                <div class="result-item">
+                    <span class="result-label">Количество домохозяйств</span>
+                    <span class="result-value">${householdsCount}</span>
+                </div>
+                <div class="result-item">
+                    <span class="result-label">Топология сети</span>
+                    <span class="result-value">${networkTopology}</span>
+                </div>
+                <div class="result-item">
+                    <span class="result-label">Максимальное расстояние до OLT</span>
+                    <span class="result-value">${maxDistance} км</span>
+                </div>
+                <div class="result-item">
+                    <span class="result-label">Коэффициент сплиттера</span>
+                    <span class="result-value">${splitRatio}</span>
+                </div>
+                <div class="result-item">
+                    <span class="result-label">Количество ONT</span>
+                    <span class="result-value">${numberOfONTs}</span>
+                </div>
+                <div class="result-item">
+                    <span class="result-label">Количество оптических узлов</span>
+                    <span class="result-value">${numberOfOpticalNodes}</span>
+                </div>
+                <div class="result-item">
+                    <span class="result-label">Расчетная длина кабеля</span>
+                    <span class="result-value">${estimatedCabling} м</span>
+                </div>
+                <div class="result-item">
+                    <span class="result-label">Оценочная стоимость оборудования</span>
+                    <span class="result-value">${estimatedEquipmentCost} руб.</span>
+                </div>
+            `;
+
+            resultsContainer.style.display = 'block';
+        }
+    </script>
+</body>
+</html>
