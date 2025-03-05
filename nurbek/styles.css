@@ -1,0 +1,447 @@
+/* Telegram Theme Styles */
+:root {
+    --tg-theme-bg-color: #ffffff;
+    --tg-theme-text-color: #000000;
+    --tg-theme-hint-color: #999999;
+    --tg-theme-link-color: #2481cc;
+    --tg-theme-secondary-bg-color: #f0f0f0;
+    --tg-theme-button-color: #2481cc;
+    --tg-theme-button-text-color: #ffffff;
+}
+
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+    -webkit-tap-highlight-color: transparent;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+}
+
+body {
+    background-color: var(--tg-theme-bg-color);
+    color: var(--tg-theme-text-color);
+    font-size: 16px;
+    line-height: 1.5;
+    margin: 0;
+    padding: 0;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+}
+
+/* Content */
+.content {
+    max-width: 500px;
+    margin: 0 auto;
+    padding: 20px;
+    width: 100%;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+}
+
+/* Menu styles */
+.menu-header {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+.menu-title {
+    font-size: 24px;
+    font-weight: bold;
+    margin-top: 10px;
+    text-align: center;
+}
+
+.menu-section {
+    margin-bottom: 20px;
+}
+
+.section-title {
+    font-size: 18px;
+    font-weight: bold;
+    margin-bottom: 10px;
+    color: var(--tg-theme-hint-color);
+}
+
+.records-list {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.record-item {
+    background-color: var(--tg-theme-secondary-bg-color);
+    border-radius: 10px;
+    padding: 15px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.record-info {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+}
+
+.record-username {
+    font-weight: bold;
+    font-size: 16px;
+}
+
+.record-handle {
+    color: var(--tg-theme-hint-color);
+    font-size: 14px;
+}
+
+.record-date {
+    font-size: 14px;
+    color: var(--tg-theme-hint-color);
+}
+
+.record-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+
+.record-button {
+    background-color: var(--tg-theme-button-color);
+    color: var(--tg-theme-button-text-color);
+    border: none;
+    border-radius: 8px;
+    padding: 8px 12px;
+    font-size: 14px;
+    cursor: pointer;
+    flex: 1;
+    min-width: 80px;
+    text-align: center;
+}
+
+.record-button.edit {
+    background-color: var(--tg-theme-secondary-bg-color);
+    color: var(--tg-theme-text-color);
+}
+
+.record-button.copy {
+    background-color: var(--tg-theme-hint-color);
+}
+
+.menu-actions {
+    margin-top: 20px;
+    display: flex;
+    justify-content: center;
+}
+
+.action-button {
+    background-color: var(--tg-theme-button-color);
+    color: var(--tg-theme-button-text-color);
+    border: none;
+    border-radius: 10px;
+    padding: 12px 20px;
+    font-size: 16px;
+    cursor: pointer;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    transition: opacity 0.2s;
+}
+
+.action-button:hover {
+    opacity: 0.9;
+}
+
+.no-records {
+    text-align: center;
+    padding: 20px;
+    color: var(--tg-theme-hint-color);
+}
+
+/* Emblem */
+.emblem-container {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 20px;
+}
+
+.emblem-container.small {
+    margin-bottom: 10px;
+}
+
+.emblem {
+    width: 120px;
+    height: 120px;
+    position: relative;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+.emblem.loaded {
+    opacity: 1;
+}
+
+.emblem-container.small .emblem {
+    width: 80px;
+    height: 80px;
+}
+
+.info-title {
+    font-size: 20px;
+    font-weight: bold;
+    text-align: center;
+    margin-bottom: 15px;
+    color: var(--tg-theme-hint-color);
+}
+
+.user-info {
+    background-color: var(--tg-theme-secondary-bg-color);
+    border-radius: 12px;
+    padding: 15px;
+    margin-bottom: 15px;
+}
+
+.username {
+    font-size: 18px;
+    font-weight: bold;
+    margin-bottom: 5px;
+}
+
+.handle {
+    font-size: 16px;
+    color: var(--tg-theme-hint-color);
+    margin-bottom: 5px;
+}
+
+.date {
+    font-size: 14px;
+    color: var(--tg-theme-hint-color);
+    margin-bottom: 10px;
+}
+
+.message {
+    font-size: 16px;
+    margin-bottom: 15px;
+    white-space: pre-wrap;
+}
+
+.warning-text {
+    font-size: 16px;
+    margin-bottom: 15px;
+    white-space: pre-wrap;
+}
+
+.stats {
+    display: flex;
+    justify-content: flex-end;
+}
+
+.views {
+    font-size: 14px;
+    color: var(--tg-theme-hint-color);
+}
+
+.share-container {
+    display: flex;
+    justify-content: center;
+    margin-top: 20px;
+}
+
+/* Form styles */
+.form-container {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+}
+
+label {
+    font-size: 14px;
+    font-weight: bold;
+    color: var(--tg-theme-hint-color);
+}
+
+input, textarea {
+    padding: 10px;
+    border: 1px solid var(--tg-theme-hint-color);
+    border-radius: 8px;
+    background-color: var(--tg-theme-bg-color);
+    color: var(--tg-theme-text-color);
+    font-size: 16px;
+    width: 100%;
+}
+
+textarea {
+    min-height: 100px;
+    resize: vertical;
+}
+
+button {
+    background-color: var(--tg-theme-button-color);
+    color: var(--tg-theme-button-text-color);
+    border: none;
+    border-radius: 8px;
+    padding: 12px;
+    font-size: 16px;
+    cursor: pointer;
+    transition: opacity 0.2s;
+}
+
+button:hover {
+    opacity: 0.9;
+}
+
+.preview-container {
+    margin-top: 30px;
+    display: none;
+}
+
+.preview-title {
+    font-size: 18px;
+    font-weight: bold;
+    text-align: center;
+    margin-bottom: 15px;
+    color: var(--tg-theme-hint-color);
+}
+
+.file-input {
+    position: relative;
+    display: inline-block;
+}
+
+.file-input input[type=file] {
+    position: absolute;
+    left: 0;
+    top: 0;
+    opacity: 0;
+    width: 100%;
+    height: 100%;
+    cursor: pointer;
+}
+
+.file-input-label {
+    display: inline-block;
+    padding: 10px 15px;
+    background-color: var(--tg-theme-secondary-bg-color);
+    color: var(--tg-theme-text-color);
+    border-radius: 8px;
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+.file-input-label:hover {
+    background-color: var(--tg-theme-hint-color);
+    color: var(--tg-theme-bg-color);
+}
+
+/* Alert styles */
+.alert {
+    position: fixed;
+    bottom: 20px;
+    left: 50%;
+    transform: translateX(-50%) translateY(100px);
+    background-color: rgba(0, 0, 0, 0.8);
+    color: white;
+    padding: 12px 20px;
+    border-radius: 10px;
+    z-index: 1000;
+    transition: transform 0.3s ease;
+    text-align: center;
+    max-width: 90%;
+}
+
+.alert.show {
+    transform: translateX(-50%) translateY(0);
+}
+
+.link-alert {
+    padding: 15px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    width: 90%;
+    max-width: 400px;
+}
+
+.alert-message {
+    font-weight: bold;
+    margin-bottom: 5px;
+}
+
+.alert-link {
+    background-color: rgba(255, 255, 255, 0.1);
+    padding: 8px;
+    border-radius: 5px;
+    word-break: break-all;
+    font-size: 14px;
+}
+
+.alert-copy-button {
+    background-color: var(--tg-theme-button-color);
+    color: white;
+    border: none;
+    border-radius: 5px;
+    padding: 8px;
+    margin-top: 5px;
+    cursor: pointer;
+}
+
+/* Loading indicator */
+.loading {
+    text-align: center;
+    padding: 20px;
+    color: var(--tg-theme-hint-color);
+    animation: pulse 1.5s infinite;
+}
+
+.error {
+    text-align: center;
+    padding: 20px;
+    color: #ff3b30;
+}
+
+.telegram-theme {
+    transition: background-color 0.3s, color 0.3s;
+}
+
+@keyframes pulse {
+    0% { opacity: 0.6; }
+    50% { opacity: 1; }
+    100% { opacity: 0.6; }
+}
+
+@media (max-width: 480px) {
+    .emblem, .emblem-image {
+        width: 100px;
+        height: 100px;
+    }
+    
+    .info-title {
+        font-size: 18px;
+    }
+    
+    .warning-text {
+        font-size: 14px;
+    }
+}
+
+@media (prefers-color-scheme: dark) {
+    .telegram-theme {
+        background-color: #212121;
+        color: #ffffff;
+    }
+}
+
+@media (prefers-color-scheme: light) {
+    .telegram-theme {
+        background-color: #ffffff;
+        color: #000000;
+    }
+}

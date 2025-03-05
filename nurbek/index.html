@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Главное меню</title>
+    <link rel="stylesheet" href="styles.css">
+    <!-- Telegram WebApp API -->
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <!-- Lottie for TGS animations -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/lottie-web/5.9.6/lottie.min.js"></script>
+</head>
+<body class="telegram-theme">
+    <div class="content">
+        <div class="menu-header">
+            <div class="emblem-container small">
+                <div id="emblem-animation" class="emblem"></div>
+            </div>
+            <h1 class="menu-title">Информационная система</h1>
+        </div>
+        
+        <div class="menu-section">
+            <h2 class="section-title">Мои записи</h2>
+            <div id="user-records" class="records-list">
+                <div class="loading">Загрузка записей...</div>
+            </div>
+        </div>
+        
+        <div class="menu-actions">
+            <a href="create.html" class="action-button create">Создать новую запись</a>
+        </div>
+    </div>
+
+    <script src="menu.js"></script>
+</body>
+</html>

@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Просмотр записи</title>
+    <link rel="stylesheet" href="styles.css">
+    <!-- Telegram WebApp API -->
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <!-- Lottie for TGS animations -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/lottie-web/5.9.6/lottie.min.js"></script>
+</head>
+<body class="telegram-theme">
+    <div class="content">
+        <div class="emblem-container">
+            <div id="emblem-animation" class="emblem"></div>
+        </div>
+        
+        <div class="info-title">Информация о пользователе</div>
+        
+        <div id="user-data" class="user-info">
+            <div class="loading">Загрузка...</div>
+        </div>
+        
+        <div class="share-container">
+            <button id="copy-link-button" class="action-button">Копировать ссылку</button>
+        </div>
+    </div>
+
+    <script src="view.js"></script>
+</body>
+</html> 
