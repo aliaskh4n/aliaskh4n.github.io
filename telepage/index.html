@@ -81,26 +81,49 @@
 <body>
     <div id="animation-container"></div>
     <div class="container">
-        <h1>Какого черта я это читаю?</h1>
-        <div class="meta">Автор: <span id="author">Имя Автора</span> · <span id="date">7 марта 2025</span></div>
+        <h1 id="title">Загружается...</h1>
+        <div class="meta">Автор: <span id="author">...</span> · <span id="date">...</span></div>
         <div class="content">
-            <p class="quote">"Сарказм — это мой способ плакать, но красиво."</p>
+            <p class="quote" id="quote">...</p>
         </div>
-        <div class="stats">👁️ <span id="views">1 234</span> просмотров · ❤️ <span id="likes">567</span> лайков</div>
+        <div class="stats">👁️ <span id="views">...</span> просмотров · ❤️ <span id="likes">...</span> лайков</div>
     </div>
     <script>
         const tg = window.Telegram.WebApp;
         tg.expand();
-        if (tg.initDataUnsafe.user) {
-            document.getElementById("author").textContent = tg.initDataUnsafe.user.first_name;
+        
+        async function loadData(userId) {
+            try {
+                const response = await fetch("data.json");
+                const data = await response.json();
+                const userData = data[userId];
+                
+                if (userData) {
+                    document.getElementById("title").textContent = userData.title;
+                    document.getElementById("author").textContent = userData.author;
+                    document.getElementById("date").textContent = userData.date;
+                    document.getElementById("quote").textContent = userData.quote;
+                    document.getElementById("views").textContent = userData.views;
+                    document.getElementById("likes").textContent = userData.likes;
+
+                    lottie.loadAnimation({
+                        container: document.getElementById("animation-container"),
+                        renderer: "svg",
+                        loop: true,
+                        autoplay: true,
+                        path: userData.animation
+                    });
+                } else {
+                    document.getElementById("title").textContent = "Данные не найдены";
+                }
+            } catch (error) {
+                console.error("Ошибка загрузки данных:", error);
+            }
         }
-        lottie.loadAnimation({
-            container: document.getElementById("animation-container"),
-            renderer: "svg",
-            loop: true,
-            autoplay: true,
-            path: "anime.json"
-        });
+        
+        if (tg.initDataUnsafe.user) {
+            loadData(tg.initDataUnsafe.user.id);
+        }
     </script>
 </body>
 </html>
