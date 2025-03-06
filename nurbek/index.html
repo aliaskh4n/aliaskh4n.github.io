@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Название статьи</title>
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/lottie-web/5.9.6/lottie.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: var(--tg-font, 'Roboto', sans-serif);
+            color: var(--tg-theme-text-color, #23262f);
+        }
+        body {
+            background: var(--tg-theme-bg-color, #ffffff);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            width: 100%;
+        }
+        #animation-container {
+            width: 100%;
+            max-height: 50vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        .container {
+            max-width: 650px;
+            width: 100%;
+            padding: 20px;
+        }
+        h1 {
+            font-size: 26px;
+            font-weight: 700;
+            margin-bottom: 10px;
+        }
+        .meta {
+            font-size: 14px;
+            color: var(--tg-theme-hint-color, #8b8b8b);
+            margin-bottom: 15px;
+        }
+        .content p {
+            font-size: 18px;
+            line-height: 1.6;
+            font-weight: 400;
+            margin-bottom: 15px;
+        }
+        .quote {
+            font-size: 18px;
+            font-weight: 500;
+            font-style: italic;
+            color: var(--tg-theme-link-color, #0088cc);
+            margin-bottom: 20px;
+        }
+        .stats {
+            font-size: 14px;
+            color: var(--tg-theme-hint-color, #8b8b8b);
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+
+    <div id="animation-container"></div>
+
+    <div class="container">
+        <h1>Название статьи</h1>
+        <div class="meta">Автор: <span id="author">@nurbex</span> · <span id="date">7 марта 2025</span></div>
+        <div class="content">
+            <p class="quote">"Сарказм — это мой способ плакать, но красиво."</p>
+        </div>
+        <div class="stats">👁️ <span id="views">1 234</span> просмотров</div>
+    </div>
+
+    <script>
+        const tg = window.Telegram.WebApp;
+        tg.expand(); // Разворачиваем WebApp на весь экран
+
+        // Получаем данные о пользователе
+        if (tg.initDataUnsafe.user) {
+            document.getElementById("author").textContent = tg.initDataUnsafe.user.first_name;
+        }
+
+        // Подключаем Lottie-анимацию
+        lottie.loadAnimation({
+            container: document.getElementById("animation-container"),
+            renderer: "svg",
+            loop: true,
+            autoplay: true,
+            path: "anime.json" // Замени на свой JSON-файл
+        });
+    </script>
+
+</body>
+</html>
