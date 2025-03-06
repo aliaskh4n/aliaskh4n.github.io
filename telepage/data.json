@@ -6,7 +6,7 @@
         "quote": "Сарказм — это мой способ плакать, но красиво.",
         "views": "1 234",
         "likes": "567",
-        "animation": "animations/anime.json"
+        "animation": "animations/smoke.json"
     },
     "654321": {
         "title": "Вторая статья",
@@ -15,6 +15,6 @@
         "quote": "Будущее принадлежит тем, кто готов к нему сегодня.",
         "views": "2 345",
         "likes": "789",
-        "animation": "animations/future.json"
+        "animation": "animations/broken.json"
     }
 }
