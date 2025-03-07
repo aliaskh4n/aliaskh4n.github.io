@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Создать статью</title>
+    <title>Название статьи</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/lottie-web/5.9.6/lottie.min.js"></script>
     <style>
@@ -13,12 +13,12 @@
             --tg-hint: var(--tg-theme-hint-color, #8b8b8b);
             --tg-link: var(--tg-theme-link-color, #0088cc);
         }
-        
+
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
-            font-family: 'Roboto', sans-serif;
+            font-family: var(--tg-font, 'Roboto', sans-serif);
             color: var(--tg-text);
         }
         
@@ -28,14 +28,9 @@
             flex-direction: column;
             align-items: center;
             width: 100%;
-            padding: 20px;
+            overflow-x: hidden;
         }
-        
-        .container {
-            max-width: 600px;
-            width: 100%;
-        }
-        
+
         #animation-container {
             width: 100%;
             height: 45vh;
@@ -46,117 +41,89 @@
             align-items: center;
             overflow: hidden;
         }
-        
-        .editable {
+
+        .container {
+            max-width: 650px;
             width: 100%;
+            padding: 15px;
+        }
+        h1 {
             font-size: 24px;
             font-weight: 700;
-            text-align: center;
-            border: none;
-            background: transparent;
-            outline: none;
         }
-        
+        .meta {
+            font-size: 14px;
+            color: var(--tg-hint);
+            margin: 10px 0;
+        }
+        .content {
+            font-size: 16px;
+            line-height: 1.5;
+            margin-top: 10px;
+        }
         .quote {
             font-weight: 500;
             font-style: italic;
             color: var(--tg-link);
-            text-align: center;
         }
-        
-        .meta, .stats {
-            font-size: 14px;
+        .stats {
+            font-size: 13px;
             color: var(--tg-hint);
-            text-align: center;
-            margin: 10px 0;
+            margin-top: 15px;
         }
         
-        select {
-            width: 100%;
-            padding: 10px;
-            margin-top: 10px;
-            border: 1px solid var(--tg-hint);
-            border-radius: 5px;
-            font-size: 16px;
-            text-align: center;
-        }
-        
-        button {
-            width: 100%;
-            padding: 10px;
-            margin-top: 10px;
-            background-color: var(--tg-link);
-            color: #fff;
-            font-weight: bold;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
+        @media (max-width: 480px) {
+            #animation-container { height: 40vh; max-height: 250px; }
+            .container { width: 95%; }
         }
     </style>
 </head>
 <body>
     <div id="animation-container"></div>
     <div class="container">
-        <input type="text" id="title" class="editable" placeholder="Заголовок статьи" oninput="updatePreview()">
-        <div class="meta">Автор: <span id="author">Вы</span> · <span id="date"></span></div>
-        <input type="text" id="quote" class="quote editable" placeholder="Цитата" oninput="updatePreview()">
-        <select id="animation" onchange="updateAnimation()">
-            <option value="animations/anime.json">Анимация 1</option>
-            <option value="animations/future.json">Анимация 2</option>
-        </select>
-        <div class="stats">👁️ 0 просмотров · ❤️ 0 лайков</div>
-        <button id="save">Сохранить</button>
+        <h1 id="title">Загружается...</h1>
+        <div class="meta">Автор: <span id="author">...</span> · <span id="date">...</span></div>
+        <div class="content">
+            <p class="quote" id="quote">...</p>
+        </div>
+        <div class="stats">👁️ <span id="views">...</span> просмотров · ❤️ <span id="likes">...</span> лайков</div>
     </div>
-    
     <script>
         const tg = window.Telegram.WebApp;
         tg.expand();
-        const userId = tg.initDataUnsafe.user ? tg.initDataUnsafe.user.id : null;
-        document.getElementById("date").textContent = new Date().toLocaleDateString("ru-RU", { day: "numeric", month: "long", year: "numeric" });
         
-        function updateAnimation() {
-            const container = document.getElementById("animation-container");
-            container.innerHTML = ""; // Очищаем контейнер перед загрузкой новой анимации
-            lottie.loadAnimation({
-                container: container,
-                renderer: "svg",
-                loop: true,
-                autoplay: true,
-                path: document.getElementById("animation").value
-            });
+        async function loadData(userId) {
+            try {
+                const response = await fetch("data.json");
+                const data = await response.json();
+                const userData = data[userId];
+                
+                if (userData) {
+                    document.getElementById("title").textContent = userData.title;
+                    document.getElementById("author").textContent = userData.author;
+                    document.getElementById("date").textContent = userData.date;
+                    document.getElementById("quote").textContent = userData.quote;
+                    document.getElementById("views").textContent = userData.views;
+                    document.getElementById("likes").textContent = userData.likes;
+
+                    lottie.loadAnimation({
+                        container: document.getElementById("animation-container"),
+                        renderer: "svg",
+                        loop: true,
+                        autoplay: true,
+                        path: userData.animation
+                    });
+                } else {
+                    document.getElementById("title").textContent = "Данные не найдены";
+                }
+            } catch (error) {
+                console.error("Ошибка загрузки данных:", error);
+            }
         }
         
-        document.getElementById("save").addEventListener("click", async () => {
-            if (!userId) {
-                alert("Ошибка: пользователь не найден");
-                return;
-            }
-            
-            const article = {
-                title: document.getElementById("title").value,
-                author: "Вы",
-                date: document.getElementById("date").textContent,
-                quote: document.getElementById("quote").value,
-                views: "0",
-                likes: "0",
-                animation: document.getElementById("animation").value
-            };
-            
-            try {
-                const response = await fetch("save.php", {
-                    method: "POST",
-                    headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify({ userId, article })
-                });
-                
-                const result = await response.json();
-                alert(result.message);
-            } catch (error) {
-                console.error("Ошибка сохранения:", error);
-            }
-        });
-        
-        updateAnimation();
+        if (tg.initDataUnsafe.user) {
+            loadData(tg.initDataUnsafe.user.id);
+        }
     </script>
 </body>
 </html>
