@@ -1,20 +1,17 @@
 {
-    "6018068004": {
-        "title": "Какого черта я это читаю?",
-        "author": "Иван Петров",
-        "date": "7 марта 2025",
-        "quote": "Сарказм — это мой способ плакать, но красиво.",
-        "views": "1 234",
-        "likes": "567",
-        "animation": "animations/smoke.json"
-    },
-    "654321": {
-        "title": "Вторая статья",
-        "author": "Анна Смирнова",
-        "date": "6 марта 2025",
-        "quote": "Будущее принадлежит тем, кто готов к нему сегодня.",
-        "views": "2 345",
-        "likes": "789",
-        "animation": "animations/broken.json"
+    "users": {
+        "aliaskhan": {
+            "username": "Aliaskhan",
+            "articles": {
+                "2342": {
+                    "title": "Моя первая запись",
+                    "date": "7 марта 2025",
+                    "quote": "Простота — ключ к истинному мастерству.",
+                    "views": "1 234",
+                    "likes": "567",
+                    "animation": "animations/smoke.json"
+                }
+            }
+        }
     }
 }
