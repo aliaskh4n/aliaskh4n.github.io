@@ -5,7 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Telepage Article</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/lottie-web/5.9.6/lottie.min.js"></script>
     <style>
         :root {
             --tg-bg: var(--tg-theme-bg-color, #fff);
@@ -97,80 +96,98 @@
         </div>
     </div>
 
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/lottie-web/5.9.6/lottie.min.js"></script>
+    
     <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            // Parse URL to get username and article ID
-            const path = window.location.pathname;
-            const pathParts = path.split('/').filter(part => part.length > 0);
-            
-            // Check if we have enough parameters in URL (telepage/username/articleId)
-            if (pathParts.length < 3) {
-                displayError('Invalid URL format. Expected: /telepage/username/articleId');
-                return;
+        // Create a self-executing function to keep variables scoped
+        (function() {
+            // Function to load and display the article
+            function loadArticle() {
+                // Parse URL to get username and article ID
+                const path = window.location.pathname;
+                const pathParts = path.split('/').filter(part => part.length > 0);
+                
+                // Check if we have enough parameters in URL
+                if (pathParts.length < 3) {
+                    displayError('Invalid URL format. Expected: /telepage/username/articleId');
+                    return;
+                }
+                
+                const username = pathParts[1]; // username is the 2nd part after 'telepage'
+                const articleId = pathParts[2]; // article id is the 3rd part
+                
+                // Use a more specific path to data.json based on repository structure
+                fetch('../../data.json')
+                    .then(response => {
+                        if (!response.ok) {
+                            throw new Error('Failed to load data file. Status: ' + response.status);
+                        }
+                        return response.json();
+                    })
+                    .then(data => {
+                        // Check if user exists in data
+                        if (!data.users || !data.users[username]) {
+                            throw new Error(`User '${username}' not found`);
+                        }
+                        
+                        // Check if article exists for user
+                        const user = data.users[username];
+                        if (!user.articles || !user.articles[articleId]) {
+                            throw new Error(`Article '${articleId}' not found for user '${username}'`);
+                        }
+                        
+                        // Load article data
+                        const article = user.articles[articleId];
+                        displayArticle(article, user.username);
+                    })
+                    .catch(error => {
+                        displayError('Error: ' + error.message);
+                        console.error('Error loading article:', error);
+                    });
             }
             
-            const username = pathParts[1]; // username is the 2nd part after 'telepage'
-            const articleId = pathParts[2]; // article id is the 3rd part
-            
-            // Fetch the data.json file
-            fetch('/data.json')
-                .then(response => {
-                    if (!response.ok) {
-                        throw new Error('Failed to load data file');
+            function displayArticle(article, username) {
+                // Update page title
+                document.title = `${article.title} - ${username}`;
+                
+                // Update article elements
+                document.getElementById('article-title').textContent = article.title;
+                document.getElementById('article-date').textContent = article.date;
+                document.getElementById('article-views').textContent = `${article.views} просмотров`;
+                document.getElementById('article-likes').textContent = `${article.likes} лайков`;
+                document.getElementById('article-quote').textContent = article.quote;
+                
+                // Load animation if available
+                if (article.animation) {
+                    try {
+                        const animContainer = document.getElementById('animation-container');
+                        lottie.loadAnimation({
+                            container: animContainer,
+                            renderer: 'svg',
+                            loop: true,
+                            autoplay: true,
+                            path: '../../' + article.animation
+                        });
+                        animContainer.style.display = 'block';
+                    } catch (error) {
+                        console.error('Animation loading error:', error);
                     }
-                    return response.json();
-                })
-                .then(data => {
-                    // Check if user exists in data
-                    if (!data.users || !data.users[username]) {
-                        throw new Error(`User '${username}' not found`);
-                    }
-                    
-                    // Check if article exists for user
-                    const user = data.users[username];
-                    if (!user.articles || !user.articles[articleId]) {
-                        throw new Error(`Article '${articleId}' not found for user '${username}'`);
-                    }
-                    
-                    // Load article data
-                    const article = user.articles[articleId];
-                    displayArticle(article, user.username);
-                })
-                .catch(error => {
-                    displayError(error.message);
-                });
-        });
-        
-        function displayArticle(article, username) {
-            // Update page title
-            document.title = `${article.title} - ${username}`;
-            
-            // Update article elements
-            document.getElementById('article-title').textContent = article.title;
-            document.getElementById('article-date').textContent = article.date;
-            document.getElementById('article-views').textContent = `${article.views} просмотров`;
-            document.getElementById('article-likes').textContent = `${article.likes} лайков`;
-            document.getElementById('article-quote').textContent = article.quote;
-            
-            // Load animation if available
-            if (article.animation) {
-                const animContainer = document.getElementById('animation-container');
-                lottie.loadAnimation({
-                    container: animContainer,
-                    renderer: 'svg',
-                    loop: true,
-                    autoplay: true,
-                    path: article.animation
-                });
-                animContainer.style.display = 'block';
+                }
             }
-        }
-        
-        function displayError(message) {
-            document.getElementById('article-title').textContent = 'Ошибка';
-            document.getElementById('article-quote').textContent = message;
-            document.getElementById('animation-container').style.display = 'none';
-        }
+            
+            function displayError(message) {
+                document.getElementById('article-title').textContent = 'Ошибка';
+                document.getElementById('article-quote').innerHTML = `<p class="error">${message}</p>`;
+                document.getElementById('animation-container').style.display = 'none';
+            }
+            
+            // Run load article function when DOM is loaded
+            if (document.readyState === 'loading') {
+                document.addEventListener('DOMContentLoaded', loadArticle);
+            } else {
+                loadArticle();
+            }
+        })();
     </script>
 </body>
 </html>
