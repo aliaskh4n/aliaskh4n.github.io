@@ -126,26 +126,13 @@
         // Получение погоды по API
         async function fetchWeather() {
             try {
-                const response = await fetch(weatherApiUrl);
-                if (!response.ok) {
-                    throw new Error("Ошибка при получении данных о погоде");
-                }
-                const weatherData = await response.json();
-                const weatherDescription = weatherData.weather[0].description;
-                const temperature = Math.round(weatherData.main.temp);
-                const emoji = getWeatherEmoji(weatherData.weather[0].id);
-
-                data.weather = `${emoji} ${temperature} °C, ${weatherDescription}`;
-                renderJSON();
-
-                // Сохраняем данные о погоде в localStorage
-                localStorage.setItem('lastWeatherUpdate', Date.now().toString());
-                localStorage.setItem('cachedWeather', data.weather);
+                const response = await fetch(`https://wttr.in/${userCity}?format=%C+%t`);
+                const weatherText = await response.text();
+                data.weather = weatherText.trim();
             } catch (error) {
-                console.error("Ошибка при получении погоды:", error);
-                data.weather = "❌ Ошибка загрузки погоды";
-                renderJSON();
+                data.weather = "❌ Ошибка загрузки";
             }
+            renderJSON();
         }
 
         // Получение эмодзи для погоды
