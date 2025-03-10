@@ -129,7 +129,7 @@
             const condition = conditions[Math.floor(Math.random() * conditions.length)];
             const temp = Math.floor(Math.random() * 15) + 10;
             
-            data.weather = `${condition.emoji} ${temp} °C, ${condition.text}`;
+            data.weather = `${condition.emoji} ${temp} °C`;
             renderJSON();
             
             // Сохраняем время последнего обновления погоды
