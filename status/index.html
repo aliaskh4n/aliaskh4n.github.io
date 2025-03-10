@@ -169,59 +169,21 @@
     <div class="last-updated" id="last-updated"></div>
 
     <script>
-        // Конфигурация API
-        const API_URL = 'api.php'; // URL к API
-
-        // Функция для загрузки данных через API
+        // Функция для загрузки данных из файла data.json
         async function loadOrdersData() {
             try {
-                const response = await fetch(`${API_URL}?action=get_orders`);
+                const response = await fetch('data.json');
                 if (!response.ok) {
-                    throw new Error('Не удалось загрузить данные');
+                    throw new Error('Не удалось загрузить данные из data.json');
                 }
                 const data = await response.json();
                 return data;
             } catch (error) {
                 console.error('Ошибка при загрузке данных:', error);
-                // Если не удалось загрузить файл, используем демо-данные
-                return [
-                    {
-                        id: 1,
-                        name: "Корпоративный сайт",
-                        status: "completed",
-                        payment: "Оплачено полностью",
-                        link: "https://example.com/project1",
-                        tasks: [
-                            { id: 1, name: "Фронтенд", status: "completed" },
-                            { id: 2, name: "Авторизация", status: "completed" },
-                            { id: 3, name: "Админ-панель", status: "completed" }
-                        ]
-                    },
-                    {
-                        id: 2,
-                        name: "Интернет-магазин",
-                        status: "in-progress",
-                        payment: "Оплачен аванс 50%",
-                        link: "https://example.com/project2",
-                        tasks: [
-                            { id: 1, name: "Фронтенд", status: "completed" },
-                            { id: 2, name: "Интеграция платежей", status: "in-progress" },
-                            { id: 3, name: "Система заказов", status: "planned" }
-                        ]
-                    },
-                    {
-                        id: 3,
-                        name: "Лендинг-страница",
-                        status: "planned",
-                        payment: "Ожидается предоплата",
-                        link: "https://example.com/project3",
-                        tasks: [
-                            { id: 1, name: "Дизайн", status: "planned" },
-                            { id: 2, name: "Вёрстка", status: "planned" },
-                            { id: 3, name: "SEO-оптимизация", status: "planned" }
-                        ]
-                    }
-                ];
+                // Если файл не найден, показываем ошибку
+                document.getElementById('orders-list').innerHTML = 
+                    '<div class="loading">Ошибка загрузки данных. Файл data.json не найден или содержит ошибку.</div>';
+                return [];
             }
         }
 
@@ -229,6 +191,11 @@
         function renderOrders(ordersData) {
             const ordersList = document.getElementById('orders-list');
             ordersList.innerHTML = '';
+            
+            if (!ordersData || ordersData.length === 0) {
+                ordersList.innerHTML = '<div class="loading">Нет данных для отображения</div>';
+                return;
+            }
             
             ordersData.forEach(order => {
                 const orderElement = document.createElement('div');
