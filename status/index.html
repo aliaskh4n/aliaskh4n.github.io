@@ -194,7 +194,7 @@
             try {
                 // Добавляем случайный параметр для обхода кэширования
                 const cacheBuster = new Date().getTime();
-                const response = await fetch(`${API_URL}/get_orders?_=${cacheBuster}`, {
+                const response = await fetch(`${API_URL}/get_orders`, {
                     method: 'GET',
                     headers: {
                         'Accept': 'application/json',
