@@ -48,9 +48,41 @@
             0%, 100% { background: rgba(121, 184, 255, 0.1); }
             50% { background: rgba(121, 184, 255, 0.2); }
         }
+        
+        .shape {
+            position: absolute;
+            border-radius: 50%;
+            background: linear-gradient(45deg, #5151cf, #2d348e);
+            opacity: 0.15;
+            z-index: -1;
+        }
+        
+        .shape:nth-child(1) {
+            width: 300px;
+            height: 300px;
+            top: 20%;
+            left: 25%;
+            animation: float 15s infinite;
+        }
+        
+        .shape:nth-child(2) {
+            width: 250px;
+            height: 250px;
+            bottom: 15%;
+            right: 30%;
+            animation: float 20s infinite reverse;
+        }
+        
+        @keyframes float {
+            0%, 100% { transform: translate(0, 0) rotate(0deg); }
+            50% { transform: translate(-10px, 15px) rotate(5deg); }
+        }
     </style>
 </head>
 <body>
+    <div class="shape"></div>
+    <div class="shape"></div>
+    
     <div class="glass-container">
         <pre id="json-content" class="json-display"></pre>
     </div>
