@@ -1,1 +1,74 @@
-
+[
+  {
+    "id": 1,
+    "name": "Корпоративный сайт",
+    "status": "completed",
+    "payment": "Оплачено полностью",
+    "link": "https://example.com/project1",
+    "tasks": [
+      {
+        "id": 1,
+        "name": "Фронтенд",
+        "status": "completed"
+      },
+      {
+        "id": 2,
+        "name": "Авторизация",
+        "status": "completed"
+      },
+      {
+        "id": 3,
+        "name": "Админ-панель",
+        "status": "completed"
+      }
+    ]
+  },
+  {
+    "id": 2,
+    "name": "Интернет-магазин",
+    "status": "in-progress",
+    "payment": "Оплачен аванс 50%",
+    "link": "https://example.com/project2",
+    "tasks": [
+      {
+        "id": 1,
+        "name": "Фронтенд",
+        "status": "completed"
+      },
+      {
+        "id": 2,
+        "name": "Интеграция платежей",
+        "status": "in-progress"
+      },
+      {
+        "id": 3,
+        "name": "Система заказов",
+        "status": "planned"
+      }
+    ]
+  },
+  {
+    "id": 3,
+    "name": "Лендинг-страница",
+    "status": "planned",
+    "payment": "Ожидается предоплата",
+    "link": "https://example.com/project3",
+    "tasks": [
+      {
+        "id": 1,
+        "name": "Дизайн",
+        "status": "planned"
+      },
+      {
+        "id": 2,
+        "name": "Вёрстка",
+        "status": "planned"
+      },
+      {
+        "id": 3,
+        "name": "SEO-оптимизация",
+        "status": "planned"
+      }
+    ]
+  }
+]
