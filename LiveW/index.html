@@ -88,42 +88,18 @@
     </div>
 
     <script>
-        // Получаем параметры из URL
+        // Получение параметров из URL
         const urlParams = new URLSearchParams(window.location.search);
-        const name = urlParams.get('name') || "Aliaskhan";
-        const city = urlParams.get('city') || "Кокшетау";
+        const userName = urlParams.get('name') || 'Гость';
+        const userCity = urlParams.get('city') || 'Кокшетау';
 
-        // API ключ от OpenWeatherMap (замените на свой)
-        const apiKey = "ВАШ_API_КЛЮЧ";
-        const weatherApiUrl = `https://api.openweathermap.org/data/2.5/weather?q=${city}&appid=${apiKey}&units=metric&lang=ru`;
-
-        // Данные
         const data = {
-            city: city,
+            city: userCity,
             date: new Date().toLocaleDateString('ru-RU'),
             time: new Date().toLocaleTimeString('ru-RU'),
             weather: "⏳ Загрузка..."
         };
 
-        // Форматирование JSON с подсветкой
-        function formatJSON(json) {
-            return JSON.stringify(json, null, 4)
-                .replace(/"([^"]+)":/g, '<span class="json-key">"$1"</span><span class="json-colon">:</span>')
-                .replace(/: "([^"]+)"/g, ': <span class="json-string">"$1"</span>')
-                .replace(/,/g, '<span class="json-comma">,</span>')
-                .replace(/\{/g, '<span class="json-bracket">{</span>')
-                .replace(/\}/g, '<span class="json-bracket">}</span>')
-                .replace(/"time": <span class="json-string">"([^"]+)"<\/span>/g, 
-                    '"time": <span class="json-string time-container">"$1"</span>');
-        }
-
-        // Обновление времени
-        function updateTime() {
-            data.time = new Date().toLocaleTimeString('ru-RU');
-            renderJSON();
-        }
-
-        // Получение погоды по API
         async function fetchWeather() {
             try {
                 const response = await fetch(`https://wttr.in/${userCity}?format=%C+%t`);
@@ -135,57 +111,30 @@
             renderJSON();
         }
 
-        // Получение эмодзи для погоды
-        function getWeatherEmoji(weatherId) {
-            if (weatherId >= 200 && weatherId < 300) return "⛈️"; // Гроза
-            if (weatherId >= 300 && weatherId < 500) return "🌧️"; // Мелкий дождь
-            if (weatherId >= 500 && weatherId < 600) return "🌧️"; // Дождь
-            if (weatherId >= 600 && weatherId < 700) return "❄️"; // Снег
-            if (weatherId === 800) return "☀️"; // Ясно
-            if (weatherId > 800) return "☁️"; // Облачно
-            return "🌍"; // По умолчанию
-        }
-
-        // Рендеринг JSON
-        function renderJSON() {
-            const jsonData = {
-                [name]: {
-                    "data": data.date,
-                    "time": data.time,
-                    "weather": data.weather,
-                    "city": data.city
-                }
-            };
-            document.getElementById('json-content').innerHTML = formatJSON(jsonData);
-        }
-
-        // Инициализация
-        function init() {
-            // Обновляем время каждую секунду
-            setInterval(updateTime, 1000);
-            
-            // Проверяем, нужно ли обновить погоду
-            const lastUpdate = localStorage.getItem('lastWeatherUpdate');
-            if (!lastUpdate || (Date.now() - parseInt(lastUpdate) > 3600000)) {
-                fetchWeather();
-            } else {
-                // Загружаем сохраненную погоду, если она есть
-                const savedWeather = localStorage.getItem('cachedWeather');
-                if (savedWeather) {
-                    data.weather = savedWeather;
-                } else {
-                    fetchWeather();
-                }
-            }
-            
-            // Обновляем погоду каждый час
-            setInterval(fetchWeather, 3600000);
-            
-            // Первоначальный рендеринг
+        function updateTime() {
+            data.time = new Date().toLocaleTimeString('ru-RU');
             renderJSON();
         }
 
-        // Запуск
+        function renderJSON() {
+            const jsonData = {
+                [userName]: {
+                    date: data.date,
+                    time: data.time,
+                    weather: data.weather,
+                    city: data.city
+                }
+            };
+            document.getElementById('json-content').textContent = JSON.stringify(jsonData, null, 4);
+        }
+
+        function init() {
+            setInterval(updateTime, 1000);
+            fetchWeather();
+            setInterval(fetchWeather, 3600000);
+            renderJSON();
+        }
+
         init();
     </script>
 </body>
