@@ -88,9 +88,18 @@
     </div>
 
     <script>
+        // Получаем параметры из URL
+        const urlParams = new URLSearchParams(window.location.search);
+        const name = urlParams.get('name') || "Aliaskhan";
+        const city = urlParams.get('city') || "Кокшетау";
+
+        // API ключ от OpenWeatherMap (замените на свой)
+        const apiKey = "ВАШ_API_КЛЮЧ";
+        const weatherApiUrl = `https://api.openweathermap.org/data/2.5/weather?q=${city}&appid=${apiKey}&units=metric&lang=ru`;
+
         // Данные
         const data = {
-            city: "Кокшетау",
+            city: city,
             date: new Date().toLocaleDateString('ru-RU'),
             time: new Date().toLocaleTimeString('ru-RU'),
             weather: "⏳ Загрузка..."
@@ -114,32 +123,46 @@
             renderJSON();
         }
 
-        // Обновление погоды
-        function updateWeather() {
-            const conditions = [
-                { text: "ясно", emoji: "☀️" },
-                { text: "переменная облачность", emoji: "🌤️" },
-                { text: "облачно", emoji: "☁️" },
-                { text: "небольшой дождь", emoji: "🌧️" },
-                { text: "солнечно", emoji: "😎" },
-                { text: "туман", emoji: "🌫️" },
-                { text: "гроза", emoji: "⛈️" },
-                { text: "снег", emoji: "❄️" }
-            ];
-            const condition = conditions[Math.floor(Math.random() * conditions.length)];
-            const temp = Math.floor(Math.random() * 15) + 10;
-            
-            data.weather = `${condition.emoji} ${temp} °C`;
-            renderJSON();
-            
-            // Сохраняем время последнего обновления погоды
-            localStorage.setItem('lastWeatherUpdate', Date.now().toString());
+        // Получение погоды по API
+        async function fetchWeather() {
+            try {
+                const response = await fetch(weatherApiUrl);
+                if (!response.ok) {
+                    throw new Error("Ошибка при получении данных о погоде");
+                }
+                const weatherData = await response.json();
+                const weatherDescription = weatherData.weather[0].description;
+                const temperature = Math.round(weatherData.main.temp);
+                const emoji = getWeatherEmoji(weatherData.weather[0].id);
+
+                data.weather = `${emoji} ${temperature} °C, ${weatherDescription}`;
+                renderJSON();
+
+                // Сохраняем данные о погоде в localStorage
+                localStorage.setItem('lastWeatherUpdate', Date.now().toString());
+                localStorage.setItem('cachedWeather', data.weather);
+            } catch (error) {
+                console.error("Ошибка при получении погоды:", error);
+                data.weather = "❌ Ошибка загрузки погоды";
+                renderJSON();
+            }
+        }
+
+        // Получение эмодзи для погоды
+        function getWeatherEmoji(weatherId) {
+            if (weatherId >= 200 && weatherId < 300) return "⛈️"; // Гроза
+            if (weatherId >= 300 && weatherId < 500) return "🌧️"; // Мелкий дождь
+            if (weatherId >= 500 && weatherId < 600) return "🌧️"; // Дождь
+            if (weatherId >= 600 && weatherId < 700) return "❄️"; // Снег
+            if (weatherId === 800) return "☀️"; // Ясно
+            if (weatherId > 800) return "☁️"; // Облачно
+            return "🌍"; // По умолчанию
         }
 
         // Рендеринг JSON
         function renderJSON() {
             const jsonData = {
-                "Aliaskhan": {
+                [name]: {
                     "data": data.date,
                     "time": data.time,
                     "weather": data.weather,
@@ -157,19 +180,19 @@
             // Проверяем, нужно ли обновить погоду
             const lastUpdate = localStorage.getItem('lastWeatherUpdate');
             if (!lastUpdate || (Date.now() - parseInt(lastUpdate) > 3600000)) {
-                updateWeather();
+                fetchWeather();
             } else {
-                // Загружаем сохраненную погоду если она есть
+                // Загружаем сохраненную погоду, если она есть
                 const savedWeather = localStorage.getItem('cachedWeather');
                 if (savedWeather) {
                     data.weather = savedWeather;
                 } else {
-                    updateWeather();
+                    fetchWeather();
                 }
             }
             
             // Обновляем погоду каждый час
-            setInterval(updateWeather, 3600000);
+            setInterval(fetchWeather, 3600000);
             
             // Первоначальный рендеринг
             renderJSON();
