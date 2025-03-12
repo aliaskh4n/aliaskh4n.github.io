@@ -133,6 +133,13 @@
         let isLikeAnimationPlaying = false;
         
         document.addEventListener("DOMContentLoaded", function () {
+            // Получаем стартовые данные из Telegram Mini App, если доступны
+            let startParam = '';
+            if (tg.initDataUnsafe && tg.initDataUnsafe.start_param) {
+                startParam = tg.initDataUnsafe.start_param;
+                console.log('Start param from Telegram:', startParam);
+            }
+            
             // Проверяем наличие параметров URL и хэша
             const urlParams = new URLSearchParams(window.location.search);
             
@@ -140,7 +147,30 @@
             if (urlParams.has('username') && urlParams.has('id')) {
                 username = urlParams.get('username');
                 articleId = urlParams.get('id');
+                console.log('Params from URL:', username, articleId);
             } 
+            // Затем проверяем start_param из Telegram Mini App (если есть)
+            else if (startParam) {
+                try {
+                    // Если startParam в формате JSON-строки
+                    const paramData = JSON.parse(startParam);
+                    if (paramData.username && paramData.id) {
+                        username = paramData.username;
+                        articleId = paramData.id;
+                        console.log('Params from JSON start_param:', username, articleId);
+                    }
+                } catch (e) {
+                    // Если не JSON, проверяем другие форматы
+                    // Например, username-id или username/id
+                    if (startParam.includes('-')) {
+                        [username, articleId] = startParam.split('-');
+                        console.log('Params from hyphen start_param:', username, articleId);
+                    } else if (startParam.includes('/')) {
+                        [username, articleId] = startParam.split('/');
+                        console.log('Params from slash start_param:', username, articleId);
+                    }
+                }
+            }
             // Затем проверяем хэш (старый формат)
             else if (window.location.hash) {
                 const hash = window.location.hash.substring(1); // Убираем #
@@ -149,6 +179,7 @@
                 if (pathParts.length >= 2) {
                     username = pathParts[0];
                     articleId = pathParts[1];
+                    console.log('Params from hash:', username, articleId);
                 }
             }
             
@@ -165,6 +196,7 @@
             }
 
             const apiUrl = `${API_BASE_URL}/${username}/${articleId}`;
+            console.log('Fetching data from:', apiUrl);
 
             fetch(apiUrl)
                 .then(response => {
