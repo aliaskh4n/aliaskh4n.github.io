@@ -101,6 +101,8 @@
         
         // API URL - замените на URL вашего API
         const API_BASE_URL = 'http://127.0.0.1:5000';
+        // GitHub Pages URL - используется для загрузки анимаций
+        const GITHUB_PAGES_URL = 'https://aliaskh4n.github.io/telepage';
         
         document.addEventListener("DOMContentLoaded", function () {
             // Проверяем наличие параметров URL и хэша
@@ -150,12 +152,17 @@
 
                     // Загружаем анимацию
                     if (data.animation) {
+                        // Проверяем, если путь к анимации уже содержит полный URL
+                        const animationPath = data.animation.includes('http') 
+                            ? data.animation 
+                            : `${GITHUB_PAGES_URL}/${data.animation.replace('animations/', 'animations/')}`;
+                        
                         lottie.loadAnimation({
                             container: document.getElementById("animation-container"),
                             renderer: "svg",
                             loop: true,
                             autoplay: true,
-                            path: data.animation
+                            path: animationPath
                         });
                     }
                 })
