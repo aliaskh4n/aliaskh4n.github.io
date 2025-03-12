@@ -103,6 +103,8 @@
         const API_BASE_URL = 'http://127.0.0.1:5000';
         // URL для просмотра статьи (на GitHub Pages)
         const VIEW_URL_BASE = 'https://aliaskh4n.github.io/telepage/index.html';
+        // URL для анимаций на GitHub Pages
+        const GITHUB_PAGES_URL = 'https://aliaskh4n.github.io/telepage';
         
         // Получаем информацию о пользователе из Telegram WebApp
         const telegramUser = tg.initDataUnsafe.user;
@@ -122,6 +124,7 @@
 
         async function loadAnimations() {
             try {
+                // Загружаем список анимаций с API
                 const response = await fetch(`${API_BASE_URL}/animations`);
                 animations = await response.json();
                 updateAnimation();
@@ -135,12 +138,14 @@
             
             const container = document.getElementById("animation-container");
             container.innerHTML = "";
+            
+            // Теперь загружаем анимацию с GitHub Pages
             animationInstance = lottie.loadAnimation({
                 container: container,
                 renderer: "svg",
                 loop: true,
                 autoplay: true,
-                path: `${API_BASE_URL}/animations/${animations[selectedAnimation]}`
+                path: `${GITHUB_PAGES_URL}/animations/${animations[selectedAnimation]}`
             });
         }
 
