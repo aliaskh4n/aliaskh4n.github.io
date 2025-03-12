@@ -82,6 +82,24 @@
             #animation-container { height: 40vh; max-height: 250px; }
             .container { width: 95%; }
         }
+        
+        /* Анимация сердечка */
+        @keyframes heartBeat {
+            0% { transform: translate(-50%, -50%) scale(0); opacity: 0; }
+            50% { transform: translate(-50%, -50%) scale(1.5); opacity: 1; }
+            100% { transform: translate(-50%, -50%) scale(1); opacity: 0; }
+        }
+        
+        .heart-animation {
+            position: fixed;
+            left: 50%;
+            top: 50%;
+            font-size: 100px;
+            color: #ff5252;
+            z-index: 9999;
+            pointer-events: none;
+            animation: heartBeat 1s ease-in-out forwards;
+        }
     </style>
 </head>
 <body>
@@ -93,6 +111,9 @@
             <p class="quote" id="quote">"Здесь будет цитата"</p>
         </div>
         <div class="stats">👁️ <span id="views">0</span> просмотров · ❤️ <span id="likes">0</span> лайков</div>
+        <div style="text-align: center; margin-top: 10px; font-size: 12px; color: var(--tg-hint);">
+            Дважды тапните по экрану, чтобы поставить лайк
+        </div>
     </div>
     <script>
         // Инициализация Telegram WebApp
@@ -114,7 +135,6 @@
         document.addEventListener("DOMContentLoaded", function () {
             // Проверяем наличие параметров URL и хэша
             const urlParams = new URLSearchParams(window.location.search);
-            let username, articleId;
             
             // Сначала проверяем параметры URL (новый формат)
             if (urlParams.has('username') && urlParams.has('id')) {
@@ -133,9 +153,10 @@
             }
             
             // Добавляем обработчик двойного тапа для всей страницы
-            document.body.addEventListener('touchstart', handleTap);
+            // Важно: используем {passive: false} для возможности вызова preventDefault()
+            document.body.addEventListener('touchstart', handleTap, {passive: false});
             document.body.addEventListener('click', handleTap);
-            
+
             // Если не удалось получить данные ни из одного источника
             if (!username || !articleId) {
                 document.getElementById("title").textContent = "Ошибка: Некорректный URL";
@@ -195,8 +216,12 @@
                 // Двойной тап обнаружен
                 if (!isLikeAnimationPlaying && username && articleId) {
                     likeArticle();
+                    
+                    // Предотвращаем дефолтное поведение только для двойного тапа
+                    if (e.cancelable) {
+                        e.preventDefault();
+                    }
                 }
-                e.preventDefault();
             } else {
                 // Одиночный тап
                 tapTimeout = setTimeout(() => {
@@ -213,34 +238,17 @@
             
             isLikeAnimationPlaying = true;
             
-            // Создаем и показываем анимацию сердечка
+            // Создаем и показываем анимацию сердечка с использованием CSS-анимации
             const heart = document.createElement('div');
             heart.innerHTML = '❤️';
-            heart.style.position = 'fixed';
-            heart.style.left = '50%';
-            heart.style.top = '50%';
-            heart.style.transform = 'translate(-50%, -50%)';
-            heart.style.fontSize = '0px';
-            heart.style.opacity = '0';
-            heart.style.zIndex = '9999';
-            heart.style.transition = 'all 0.8s ease-in-out';
+            heart.className = 'heart-animation';
             document.body.appendChild(heart);
             
-            // Появление и исчезновение сердечка
-            setTimeout(() => {
-                heart.style.fontSize = '100px';
-                heart.style.opacity = '1';
-            }, 10);
-            
-            setTimeout(() => {
-                heart.style.fontSize = '150px';
-                heart.style.opacity = '0';
-            }, 500);
-            
+            // Удаляем элемент после окончания анимации
             setTimeout(() => {
                 document.body.removeChild(heart);
                 isLikeAnimationPlaying = false;
-            }, 1300);
+            }, 1000);
             
             // Отправляем запрос на лайк на сервер
             fetch(`${API_BASE_URL}/${username}/${articleId}/like`, {
