@@ -238,22 +238,19 @@
                     // Создаем URL для просмотра статьи на GitHub Pages
                     const viewUrl = `${VIEW_URL_BASE}?username=${username}&id=${result.article_id}`;
                     
-                    // Для Telegram WebApp - отправляем результат и закрываем
+                    // Создаем и показываем сообщение об успехе
+                    alert(`Статья создана успешно! Перенаправление...`);
+                    
+                    // Перенаправляем на страницу просмотра для всех пользователей
+                    window.location.href = viewUrl;
+                    
+                    // Также отправляем данные в Telegram WebApp для обработки ботом, если мы в нём
                     if (tg.initDataUnsafe.user) {
                         tg.sendData(JSON.stringify({
                             success: true,
                             article_id: result.article_id,
                             url: viewUrl
                         }));
-                        
-                        // Закрываем WebApp Telegram (для веб-версии)
-                        setTimeout(() => {
-                            tg.close();
-                        }, 500);
-                    } else {
-                        // Для браузерного тестирования - перенаправляем без запроса
-                        alert(`Статья создана успешно! Перенаправление...`);
-                        window.location.href = viewUrl;
                     }
                 } else {
                     // Скрываем индикатор загрузки в случае ошибки
