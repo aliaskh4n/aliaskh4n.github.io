@@ -99,6 +99,11 @@
         const tg = window.Telegram.WebApp;
         tg.expand();
         
+        // API URL - замените на URL вашего API
+        const API_BASE_URL = 'http://127.0.0.1:5000';
+        // URL для просмотра статьи (на GitHub Pages)
+        const VIEW_URL_BASE = 'https://aliaskh4n.github.io/telepage/index.html';
+        
         // Получаем информацию о пользователе из Telegram WebApp
         const telegramUser = tg.initDataUnsafe.user;
         const userId = telegramUser ? telegramUser.id : null;
@@ -117,7 +122,7 @@
 
         async function loadAnimations() {
             try {
-                const response = await fetch("http://127.0.0.1:5000/animations");
+                const response = await fetch(`${API_BASE_URL}/animations`);
                 animations = await response.json();
                 updateAnimation();
             } catch (error) {
@@ -135,7 +140,7 @@
                 renderer: "svg",
                 loop: true,
                 autoplay: true,
-                path: `animations/${animations[selectedAnimation]}`
+                path: `${API_BASE_URL}/animations/${animations[selectedAnimation]}`
             });
         }
 
@@ -183,7 +188,7 @@
             };
             
             try {
-                const response = await fetch("http://127.0.0.1:5000/create", {
+                const response = await fetch(`${API_BASE_URL}/create`, {
                     method: "POST",
                     headers: { "Content-Type": "application/json" },
                     body: JSON.stringify({ 
@@ -195,18 +200,22 @@
                 
                 const result = await response.json();
                 if (result.success) {
-                    alert(`Статья создана успешно!`);
+                    // Создаем URL для просмотра статьи на GitHub Pages
+                    const viewUrl = `${VIEW_URL_BASE}?username=${username}&id=${result.article_id}`;
                     
-                    // Закрываем Telegram WebApp и передаем результат
-                    tg.sendData(JSON.stringify({
-                        success: true,
-                        article_id: result.article_id,
-                        url: result.url
-                    }));
-                    
-                    // Для браузерного тестирования
-                    if (confirm("Хотите перейти к созданной статье?")) {
-                        window.location.href = `/index.html#${result.url.substring(1)}`;
+                    // Для Telegram WebApp - отправляем результат
+                    if (tg.initDataUnsafe.user) {
+                        tg.sendData(JSON.stringify({
+                            success: true,
+                            article_id: result.article_id,
+                            url: viewUrl
+                        }));
+                    } else {
+                        // Для браузерного тестирования
+                        alert(`Статья создана успешно!\nURL: ${viewUrl}`);
+                        if (confirm("Хотите перейти к созданной статье?")) {
+                            window.location.href = viewUrl;
+                        }
                     }
                 } else {
                     alert(`Ошибка: ${result.message}`);
@@ -218,9 +227,12 @@
         });
         
         // Настраиваем кнопку "Отмена" в Telegram WebApp
-        tg.BackButton.onClick(() => {
-            tg.close();
-        });
+        if (tg.initDataUnsafe.user) {
+            tg.BackButton.onClick(() => {
+                tg.close();
+            });
+            tg.BackButton.show();
+        }
         
         // Запускаем загрузку анимаций
         loadAnimations();
