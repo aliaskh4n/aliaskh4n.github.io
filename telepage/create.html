@@ -83,28 +83,6 @@
             border-radius: 5px;
             cursor: pointer;
         }
-        
-        /* Индикатор загрузки */
-        .loader {
-            display: none;
-            text-align: center;
-            margin-top: 10px;
-        }
-        
-        .loader-spinner {
-            border: 4px solid rgba(0, 0, 0, 0.1);
-            border-radius: 50%;
-            border-top: 4px solid var(--tg-link);
-            width: 30px;
-            height: 30px;
-            margin: 0 auto;
-            animation: spin 1s linear infinite;
-        }
-        
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
     </style>
 </head>
 <body>
@@ -115,10 +93,6 @@
         <input type="text" id="quote" class="quote editable" placeholder="Цитата">
         <div class="stats">👁️ 0 просмотров · ❤️ 0 лайков</div>
         <button id="save">Сохранить</button>
-        <div id="loader" class="loader">
-            <div class="loader-spinner"></div>
-            <p>Сохранение статьи...</p>
-        </div>
     </div>
     
     <script>
@@ -207,10 +181,6 @@
                 return;
             }
             
-            // Показываем индикатор загрузки
-            document.getElementById("save").disabled = true;
-            document.getElementById("loader").style.display = "block";
-            
             // Создание объекта статьи
             const article = {
                 title: title,
@@ -238,30 +208,24 @@
                     // Создаем URL для просмотра статьи на GitHub Pages
                     const viewUrl = `${VIEW_URL_BASE}?username=${username}&id=${result.article_id}`;
                     
-                    // Создаем и показываем сообщение об успехе
-                    alert(`Статья создана успешно! Перенаправление...`);
-                    
-                    // Перенаправляем на страницу просмотра для всех пользователей
-                    window.location.href = viewUrl;
-                    
-                    // Также отправляем данные в Telegram WebApp для обработки ботом, если мы в нём
+                    // Для Telegram WebApp - отправляем результат
                     if (tg.initDataUnsafe.user) {
                         tg.sendData(JSON.stringify({
                             success: true,
                             article_id: result.article_id,
                             url: viewUrl
                         }));
+                    } else {
+                        // Для браузерного тестирования
+                        alert(`Статья создана успешно!\nURL: ${viewUrl}`);
+                        if (confirm("Хотите перейти к созданной статье?")) {
+                            window.location.href = viewUrl;
+                        }
                     }
                 } else {
-                    // Скрываем индикатор загрузки в случае ошибки
-                    document.getElementById("save").disabled = false;
-                    document.getElementById("loader").style.display = "none";
                     alert(`Ошибка: ${result.message}`);
                 }
             } catch (error) {
-                // Скрываем индикатор загрузки в случае ошибки
-                document.getElementById("save").disabled = false;
-                document.getElementById("loader").style.display = "none";
                 console.error("Ошибка сохранения:", error);
                 alert("Произошла ошибка при сохранении статьи. Пожалуйста, попробуйте снова.");
             }
