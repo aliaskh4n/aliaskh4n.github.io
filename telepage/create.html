@@ -130,6 +130,8 @@
                 updateAnimation();
             } catch (error) {
                 console.error("Ошибка загрузки анимаций:", error);
+                // Используем showAlert вместо стандартного alert
+                tg.showAlert("Ошибка загрузки анимаций. Пожалуйста, повторите попытку позже.");
             }
         }
         
@@ -165,19 +167,19 @@
         
         document.getElementById("save").addEventListener("click", async () => {
             if (!userId) {
-                alert("Ошибка: Не удалось получить информацию о пользователе Telegram");
+                tg.showAlert("Ошибка: Не удалось получить информацию о пользователе Telegram");
                 return;
             }
             
             const title = document.getElementById("title").value.trim();
             if (!title) {
-                alert("Пожалуйста, введите заголовок статьи");
+                tg.showAlert("Пожалуйста, введите заголовок статьи");
                 return;
             }
             
             const quote = document.getElementById("quote").value.trim();
             if (!quote) {
-                alert("Пожалуйста, введите цитату");
+                tg.showAlert("Пожалуйста, введите цитату");
                 return;
             }
             
@@ -215,6 +217,19 @@
                             article_id: result.article_id,
                             url: viewUrl
                         }));
+                        
+                        // Спрашиваем пользователя, хочет ли он открыть статью
+                        tg.showAlert("Статья успешно создана!", () => {
+                            // После закрытия сообщения спрашиваем, хочет ли пользователь открыть статью
+                            tg.confirm("Хотите просмотреть созданную статью?", (confirmed) => {
+                                if (confirmed) {
+                                    // Используем openLink для открытия ссылки в браузере
+                                    tg.openLink(viewUrl, {
+                                        try_instant_view: true // Пытаемся открыть через Instant View если возможно
+                                    });
+                                }
+                            });
+                        });
                     } else {
                         // Для браузерного тестирования
                         alert(`Статья создана успешно!\nURL: ${viewUrl}`);
@@ -223,11 +238,11 @@
                         }
                     }
                 } else {
-                    alert(`Ошибка: ${result.message}`);
+                    tg.showAlert(`Ошибка: ${result.message}`);
                 }
             } catch (error) {
                 console.error("Ошибка сохранения:", error);
-                alert("Произошла ошибка при сохранении статьи. Пожалуйста, попробуйте снова.");
+                tg.showAlert("Произошла ошибка при сохранении статьи. Пожалуйста, попробуйте снова.");
             }
         });
         
