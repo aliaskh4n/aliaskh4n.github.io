@@ -133,6 +133,12 @@
         let isLikeAnimationPlaying = false;
         
         document.addEventListener("DOMContentLoaded", function () {
+            // Важно! Отладочная информация для поиска проблемы
+            console.log('URL:', window.location.href);
+            console.log('Search:', window.location.search);
+            console.log('Hash:', window.location.hash);
+            console.log('Pathname:', window.location.pathname);
+            
             // Получаем стартовые данные из Telegram Mini App, если доступны
             let startParam = '';
             if (tg.initDataUnsafe && tg.initDataUnsafe.start_param) {
@@ -143,13 +149,31 @@
             // Проверяем наличие параметров URL и хэша
             const urlParams = new URLSearchParams(window.location.search);
             
-            // Сначала проверяем параметры URL (новый формат)
+            // Выводим все параметры URL для отладки
+            console.log('All URL params:');
+            for (const [key, value] of urlParams.entries()) {
+                console.log(key, value);
+            }
+            
+            // Проверяем разные варианты извлечения параметров
+            
+            // 1. Сначала проверяем параметры URL (новый формат)
             if (urlParams.has('username') && urlParams.has('id')) {
                 username = urlParams.get('username');
                 articleId = urlParams.get('id');
-                console.log('Params from URL:', username, articleId);
+                console.log('Params from URL query:', username, articleId);
             } 
-            // Затем проверяем start_param из Telegram Mini App (если есть)
+            // 2. Проверяем index как часть пути
+            else if (window.location.pathname.includes('/index')) {
+                const indexPath = window.location.pathname;
+                const indexParams = new URLSearchParams(window.location.search);
+                if (indexParams.has('username') && indexParams.has('id')) {
+                    username = indexParams.get('username');
+                    articleId = indexParams.get('id');
+                    console.log('Params from index path:', username, articleId);
+                }
+            }
+            // 3. Затем проверяем start_param из Telegram Mini App (если есть)
             else if (startParam) {
                 try {
                     // Если startParam в формате JSON-строки
@@ -160,6 +184,7 @@
                         console.log('Params from JSON start_param:', username, articleId);
                     }
                 } catch (e) {
+                    console.log('Start param is not valid JSON:', e.message);
                     // Если не JSON, проверяем другие форматы
                     // Например, username-id или username/id
                     if (startParam.includes('-')) {
@@ -168,18 +193,50 @@
                     } else if (startParam.includes('/')) {
                         [username, articleId] = startParam.split('/');
                         console.log('Params from slash start_param:', username, articleId);
+                    } else {
+                        // Если это только ID, пробуем использовать как articleId
+                        console.log('Using start_param as articleId:', startParam);
+                        articleId = startParam;
+                        // Пробуем извлечь username из pathname, если он там есть
+                        const pathParts = window.location.pathname.split('/').filter(part => part);
+                        if (pathParts.length > 0) {
+                            username = pathParts[pathParts.length - 1];
+                            console.log('Extracted username from pathname:', username);
+                        }
                     }
                 }
             }
-            // Затем проверяем хэш (старый формат)
+            // 4. Затем проверяем хэш (старый формат)
             else if (window.location.hash) {
                 const hash = window.location.hash.substring(1); // Убираем #
-                const pathParts = hash.split('/');
+                console.log('Processing hash:', hash);
+                
+                // Проверяем разные варианты разделения
+                if (hash.includes('/')) {
+                    const pathParts = hash.split('/');
+                    if (pathParts.length >= 2) {
+                        username = pathParts[0];
+                        articleId = pathParts[1];
+                        console.log('Params from hash with slash:', username, articleId);
+                    }
+                } else if (hash.includes('-')) {
+                    const pathParts = hash.split('-');
+                    if (pathParts.length >= 2) {
+                        username = pathParts[0];
+                        articleId = pathParts[1];
+                        console.log('Params from hash with hyphen:', username, articleId);
+                    }
+                }
+            }
+            // 5. Проверяем путь URL (если формат /username/id)
+            else {
+                const pathParts = window.location.pathname.split('/').filter(part => part);
+                console.log('Path parts:', pathParts);
                 
                 if (pathParts.length >= 2) {
-                    username = pathParts[0];
-                    articleId = pathParts[1];
-                    console.log('Params from hash:', username, articleId);
+                    username = pathParts[pathParts.length - 2];
+                    articleId = pathParts[pathParts.length - 1];
+                    console.log('Params from pathname:', username, articleId);
                 }
             }
             
