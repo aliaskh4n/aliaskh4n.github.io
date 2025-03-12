@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Название статьи</title>
+    <title>Статья</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/lottie-web/5.9.6/lottie.min.js"></script>
     <style>
@@ -12,6 +12,8 @@
             --tg-text: var(--tg-theme-text-color, #23262f);
             --tg-hint: var(--tg-theme-hint-color, #8b8b8b);
             --tg-link: var(--tg-theme-link-color, #0088cc);
+            --tg-button: var(--tg-theme-button-color, #0088cc);
+            --tg-button-text: var(--tg-theme-button-text-color, #fff);
         }
 
         * {
@@ -40,6 +42,7 @@
             justify-content: center;
             align-items: center;
             overflow: hidden;
+            position: relative;
         }
 
         .container {
@@ -47,29 +50,37 @@
             width: 100%;
             padding: 15px;
         }
+        
         h1 {
             font-size: 24px;
             font-weight: 700;
         }
+        
         .meta {
             font-size: 14px;
             color: var(--tg-hint);
             margin: 10px 0;
         }
+        
         .content {
             font-size: 16px;
             line-height: 1.5;
             margin-top: 10px;
         }
+        
         .quote {
             font-weight: 500;
             font-style: italic;
             color: var(--tg-link);
         }
+        
         .stats {
             font-size: 13px;
             color: var(--tg-hint);
             margin-top: 15px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
         }
         
         .error-message {
@@ -100,213 +111,275 @@
             pointer-events: none;
             animation: heartBeat 1s ease-in-out forwards;
         }
+        
+        .like-hint {
+            text-align: center;
+            margin-top: 10px;
+            font-size: 12px;
+            color: var(--tg-hint);
+        }
+
+        .share-btn {
+            background-color: var(--tg-button);
+            color: var(--tg-button-text);
+            border: none;
+            border-radius: 4px;
+            padding: 6px 12px;
+            font-size: 14px;
+            cursor: pointer;
+            display: none;
+        }
+        
+        .loading-spinner {
+            width: 40px;
+            height: 40px;
+            border: 4px solid rgba(0, 0, 0, 0.1);
+            border-left-color: var(--tg-link);
+            border-radius: 50%;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            animation: spin 1s linear infinite;
+        }
+        
+        @keyframes spin {
+            0% { transform: translate(-50%, -50%) rotate(0deg); }
+            100% { transform: translate(-50%, -50%) rotate(360deg); }
+        }
     </style>
 </head>
 <body>
-    <div id="animation-container"></div>
+    <div id="animation-container">
+        <div class="loading-spinner"></div>
+    </div>
     <div class="container">
         <h1 id="title">Загрузка...</h1>
         <div class="meta">Автор: <span id="author">Имя Автора</span> · <span id="date">Дата</span></div>
         <div class="content">
             <p class="quote" id="quote">"Здесь будет цитата"</p>
         </div>
-        <div class="stats">👁️ <span id="views">0</span> просмотров · ❤️ <span id="likes">0</span> лайков</div>
-        <div style="text-align: center; margin-top: 10px; font-size: 12px; color: var(--tg-hint);">
-            Дважды тапните по экрану, чтобы поставить лайк
+        <div class="stats">
+            <span>👁️ <span id="views">0</span> просмотров · ❤️ <span id="likes">0</span> лайков</span>
+            <button id="share-btn" class="share-btn">Поделиться</button>
         </div>
+        <div class="like-hint">Дважды тапните по экрану, чтобы поставить лайк</div>
     </div>
+    
     <script>
         // Инициализация Telegram WebApp
         const tg = window.Telegram.WebApp;
         tg.expand();
+        tg.ready();
         
-        // API URL - замените на URL вашего API
+        // Константы
         const API_BASE_URL = 'http://127.0.0.1:5000';
-        // GitHub Pages URL - используется для загрузки анимаций
         const GITHUB_PAGES_URL = 'https://aliaskh4n.github.io/telepage';
+        const DOUBLE_TAP_DELAY = 300;
         
-        // Переменные для двойного тапа
+        // Переменные состояния
         let lastTap = 0;
         let tapTimeout;
-        const doubleTapDelay = 300; // миллисекунды
-        let username, articleId; // Переменные вынесены на глобальный уровень
+        let username, articleId;
         let isLikeAnimationPlaying = false;
+        let articleData = null;
         
-        document.addEventListener("DOMContentLoaded", function () {
-            // Важно! Отладочная информация для поиска проблемы
-            console.log('URL:', window.location.href);
-            console.log('Search:', window.location.search);
-            console.log('Hash:', window.location.hash);
-            console.log('Pathname:', window.location.pathname);
-            
-            // Получаем стартовые данные из Telegram Mini App, если доступны
-            let startParam = '';
-            if (tg.initDataUnsafe && tg.initDataUnsafe.start_param) {
-                startParam = tg.initDataUnsafe.start_param;
-                console.log('Start param from Telegram:', startParam);
-            }
-            
-            // Проверяем наличие параметров URL и хэша
+        // Извлечение параметров из URL
+        function parseUrlParams() {
             const urlParams = new URLSearchParams(window.location.search);
+            const startParam = tg.initDataUnsafe?.start_param || '';
             
-            // Выводим все параметры URL для отладки
-            console.log('All URL params:');
-            for (const [key, value] of urlParams.entries()) {
-                console.log(key, value);
-            }
-            
-            // Проверяем разные варианты извлечения параметров
-            
-            // 1. Сначала проверяем параметры URL (новый формат)
+            // 1. Проверка параметров URL
             if (urlParams.has('username') && urlParams.has('id')) {
-                username = urlParams.get('username');
-                articleId = urlParams.get('id');
-                console.log('Params from URL query:', username, articleId);
-            } 
-            // 2. Проверяем index как часть пути
-            else if (window.location.pathname.includes('/index')) {
-                const indexPath = window.location.pathname;
-                const indexParams = new URLSearchParams(window.location.search);
-                if (indexParams.has('username') && indexParams.has('id')) {
-                    username = indexParams.get('username');
-                    articleId = indexParams.get('id');
-                    console.log('Params from index path:', username, articleId);
-                }
+                return {
+                    username: urlParams.get('username'),
+                    articleId: urlParams.get('id'),
+                    source: 'URL query'
+                };
             }
-            // 3. Затем проверяем start_param из Telegram Mini App (если есть)
-            else if (startParam) {
+            
+            // 2. Проверка start_param из Telegram
+            if (startParam) {
                 try {
-                    // Если startParam в формате JSON-строки
+                    // Пробуем JSON формат
                     const paramData = JSON.parse(startParam);
                     if (paramData.username && paramData.id) {
-                        username = paramData.username;
-                        articleId = paramData.id;
-                        console.log('Params from JSON start_param:', username, articleId);
+                        return {
+                            username: paramData.username,
+                            articleId: paramData.id,
+                            source: 'JSON start_param'
+                        };
                     }
                 } catch (e) {
-                    console.log('Start param is not valid JSON:', e.message);
-                    // Если не JSON, проверяем другие форматы
-                    // Например, username-id или username/id
+                    // Проверяем разделители
                     if (startParam.includes('-')) {
-                        [username, articleId] = startParam.split('-');
-                        console.log('Params from hyphen start_param:', username, articleId);
+                        const [u, id] = startParam.split('-');
+                        return { username: u, articleId: id, source: 'hyphen start_param' };
                     } else if (startParam.includes('/')) {
-                        [username, articleId] = startParam.split('/');
-                        console.log('Params from slash start_param:', username, articleId);
+                        const [u, id] = startParam.split('/');
+                        return { username: u, articleId: id, source: 'slash start_param' };
                     } else {
-                        // Если это только ID, пробуем использовать как articleId
-                        console.log('Using start_param as articleId:', startParam);
-                        articleId = startParam;
-                        // Пробуем извлечь username из pathname, если он там есть
+                        // Только ID
                         const pathParts = window.location.pathname.split('/').filter(part => part);
                         if (pathParts.length > 0) {
-                            username = pathParts[pathParts.length - 1];
-                            console.log('Extracted username from pathname:', username);
+                            return {
+                                username: pathParts[pathParts.length - 1],
+                                articleId: startParam,
+                                source: 'start_param as ID'
+                            };
                         }
                     }
                 }
             }
-            // 4. Затем проверяем хэш (старый формат)
-            else if (window.location.hash) {
-                const hash = window.location.hash.substring(1); // Убираем #
-                console.log('Processing hash:', hash);
+            
+            // 3. Проверка хэша
+            if (window.location.hash) {
+                const hash = window.location.hash.substring(1);
                 
-                // Проверяем разные варианты разделения
                 if (hash.includes('/')) {
                     const pathParts = hash.split('/');
                     if (pathParts.length >= 2) {
-                        username = pathParts[0];
-                        articleId = pathParts[1];
-                        console.log('Params from hash with slash:', username, articleId);
+                        return {
+                            username: pathParts[0],
+                            articleId: pathParts[1],
+                            source: 'hash with slash'
+                        };
                     }
                 } else if (hash.includes('-')) {
                     const pathParts = hash.split('-');
                     if (pathParts.length >= 2) {
-                        username = pathParts[0];
-                        articleId = pathParts[1];
-                        console.log('Params from hash with hyphen:', username, articleId);
+                        return {
+                            username: pathParts[0],
+                            articleId: pathParts[1],
+                            source: 'hash with hyphen'
+                        };
                     }
-                }
-            }
-            // 5. Проверяем путь URL (если формат /username/id)
-            else {
-                const pathParts = window.location.pathname.split('/').filter(part => part);
-                console.log('Path parts:', pathParts);
-                
-                if (pathParts.length >= 2) {
-                    username = pathParts[pathParts.length - 2];
-                    articleId = pathParts[pathParts.length - 1];
-                    console.log('Params from pathname:', username, articleId);
                 }
             }
             
-            // Добавляем обработчик двойного тапа для всей страницы
-            // Важно: используем {passive: false} для возможности вызова preventDefault()
-            document.body.addEventListener('touchstart', handleTap, {passive: false});
-            document.body.addEventListener('click', handleTap);
-
-            // Если не удалось получить данные ни из одного источника
-            if (!username || !articleId) {
-                document.getElementById("title").textContent = "Ошибка: Некорректный URL";
-                document.getElementById("quote").innerHTML = '<span class="error-message">Статья не найдена. Проверьте ссылку.</span>';
-                return;
+            // 4. Проверка пути URL
+            const pathParts = window.location.pathname.split('/').filter(part => part);
+            if (pathParts.length >= 2) {
+                return {
+                    username: pathParts[pathParts.length - 2],
+                    articleId: pathParts[pathParts.length - 1],
+                    source: 'pathname'
+                };
             }
-
-            const apiUrl = `${API_BASE_URL}/${username}/${articleId}`;
-            console.log('Fetching data from:', apiUrl);
-
-            fetch(apiUrl)
-                .then(response => {
-                    if (!response.ok) {
-                        throw new Error('Статья не найдена');
-                    }
-                    return response.json();
-                })
-                .then(data => {
-                    document.title = data.title;
-                    document.getElementById("title").textContent = data.title;
-                    document.getElementById("author").textContent = data.author || username;
-                    document.getElementById("date").textContent = data.date;
-                    document.getElementById("quote").textContent = `"${data.quote}"`;
-                    document.getElementById("views").textContent = data.views;
-                    document.getElementById("likes").textContent = data.likes;
-
-                    // Загружаем анимацию
-                    if (data.animation) {
-                        // Проверяем, если путь к анимации уже содержит полный URL
-                        const animationPath = data.animation.includes('http') 
-                            ? data.animation 
-                            : `${GITHUB_PAGES_URL}/${data.animation.replace('animations/', 'animations/')}`;
-                        
-                        lottie.loadAnimation({
-                            container: document.getElementById("animation-container"),
-                            renderer: "svg",
-                            loop: true,
-                            autoplay: true,
-                            path: animationPath
-                        });
-                    }
-                })
-                .catch(error => {
-                    console.error('Ошибка:', error);
-                    document.getElementById("title").textContent = "Ошибка загрузки статьи";
-                    document.getElementById("quote").innerHTML = '<span class="error-message">Не удалось загрузить статью. Пожалуйста, попробуйте позже.</span>';
-                });
-        });
+            
+            return { username: null, articleId: null, source: 'not found' };
+        }
         
-        // Функция для обработки тапов
+        // Загрузка данных статьи
+        async function loadArticle(username, articleId) {
+            try {
+                const apiUrl = `${API_BASE_URL}/${username}/${articleId}`;
+                console.log('Загрузка данных с:', apiUrl);
+                
+                const response = await fetch(apiUrl);
+                if (!response.ok) {
+                    throw new Error('Статья не найдена');
+                }
+                
+                const data = await response.json();
+                articleData = data; // Сохраняем данные для возможного использования
+                
+                // Обновляем DOM
+                document.title = data.title;
+                document.getElementById("title").textContent = data.title;
+                document.getElementById("author").textContent = data.author || username;
+                document.getElementById("date").textContent = data.date;
+                document.getElementById("quote").textContent = `"${data.quote}"`;
+                document.getElementById("views").textContent = data.views;
+                document.getElementById("likes").textContent = data.likes;
+                
+                // Удаляем индикатор загрузки
+                const loadingSpinner = document.querySelector('.loading-spinner');
+                if (loadingSpinner) loadingSpinner.remove();
+                
+                // Загружаем анимацию
+                if (data.animation) {
+                    const animationPath = data.animation.includes('http') 
+                        ? data.animation 
+                        : `${GITHUB_PAGES_URL}/${data.animation.replace('animations/', 'animations/')}`;
+                    
+                    lottie.loadAnimation({
+                        container: document.getElementById("animation-container"),
+                        renderer: "svg",
+                        loop: true,
+                        autoplay: true,
+                        path: animationPath
+                    });
+                }
+                
+                // Показываем кнопку "Поделиться", если это Telegram WebApp
+                if (window.Telegram?.WebApp?.initDataUnsafe?.user) {
+                    const shareBtn = document.getElementById('share-btn');
+                    shareBtn.style.display = 'block';
+                    shareBtn.addEventListener('click', shareArticle);
+                }
+            } catch (error) {
+                console.error('Ошибка загрузки статьи:', error);
+                document.getElementById("title").textContent = "Ошибка загрузки статьи";
+                document.getElementById("quote").innerHTML = '<span class="error-message">Не удалось загрузить статью. Пожалуйста, попробуйте позже.</span>';
+                
+                // Удаляем индикатор загрузки
+                const loadingSpinner = document.querySelector('.loading-spinner');
+                if (loadingSpinner) loadingSpinner.remove();
+            }
+        }
+        
+        // Функция для шаринга статьи
+        function shareArticle() {
+            if (!articleData) return;
+            
+            const shareUrl = `${window.location.origin}${window.location.pathname}?username=${username}&id=${articleId}`;
+            const shareText = `${articleData.title}\n\n"${articleData.quote}"\n\n${shareUrl}`;
+            
+            if (window.Telegram?.WebApp) {
+                // Используем встроенный метод Telegram для шаринга
+                if (tg.version && tg.isVersionAtLeast('7.8')) {
+                    tg.shareToStory(shareUrl, {
+                        text: shareText
+                    });
+                } else if (tg.version && tg.isVersionAtLeast('8.0')) {
+                    // В Bot API 8.0 появился более удобный метод для шаринга
+                    tg.shareData({
+                        text: shareText
+                    });
+                } else {
+                    // Для старых версий просто открываем ссылку
+                    tg.openTelegramLink(`https://t.me/share/url?url=${encodeURIComponent(shareUrl)}&text=${encodeURIComponent(shareText)}`);
+                }
+            } else {
+                // Fallback для браузера
+                if (navigator.share) {
+                    navigator.share({
+                        title: articleData.title,
+                        text: `"${articleData.quote}"`,
+                        url: shareUrl
+                    }).catch(err => console.error('Error sharing:', err));
+                } else {
+                    prompt('Скопируйте ссылку для шаринга:', shareUrl);
+                }
+            }
+        }
+        
+        // Оптимистичное обновление счетчика лайков с защитой от дублирования
+        let likeDebounce = false;
+        
+        // Обработка тапа
         function handleTap(e) {
             const currentTime = new Date().getTime();
             const tapLength = currentTime - lastTap;
             
             clearTimeout(tapTimeout);
             
-            if (tapLength < doubleTapDelay && tapLength > 0) {
-                // Двойной тап обнаружен
-                if (!isLikeAnimationPlaying && username && articleId) {
+            if (tapLength < DOUBLE_TAP_DELAY && tapLength > 0) {
+                // Двойной тап
+                if (!isLikeAnimationPlaying && username && articleId && !likeDebounce) {
                     likeArticle();
                     
-                    // Предотвращаем дефолтное поведение только для двойного тапа
                     if (e.cancelable) {
                         e.preventDefault();
                     }
@@ -314,55 +387,111 @@
             } else {
                 // Одиночный тап
                 tapTimeout = setTimeout(() => {
-                    // Здесь можно добавить действия для одиночного тапа, если нужно
-                }, doubleTapDelay);
+                    // Для одиночного тапа действий нет
+                }, DOUBLE_TAP_DELAY);
             }
             
             lastTap = currentTime;
         }
         
-        // Функция отправки лайка
-        function likeArticle() {
-            if (isLikeAnimationPlaying) return;
+        // Функция лайка статьи
+        async function likeArticle() {
+            if (isLikeAnimationPlaying || likeDebounce) return;
             
             isLikeAnimationPlaying = true;
+            likeDebounce = true;
             
-            // Создаем и показываем анимацию сердечка с использованием CSS-анимации
+            // Оптимистичное обновление UI
+            const likesElement = document.getElementById('likes');
+            const currentLikes = parseInt(likesElement.textContent);
+            likesElement.textContent = (currentLikes + 1).toString();
+            
+            // Анимация сердечка
             const heart = document.createElement('div');
             heart.innerHTML = '❤️';
             heart.className = 'heart-animation';
             document.body.appendChild(heart);
             
-            // Удаляем элемент после окончания анимации
+            // Удаляем элемент после анимации
             setTimeout(() => {
                 document.body.removeChild(heart);
                 isLikeAnimationPlaying = false;
             }, 1000);
             
-            // Отправляем запрос на лайк на сервер
-            fetch(`${API_BASE_URL}/${username}/${articleId}/like`, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' }
-            })
-            .then(response => response.json())
-            .then(data => {
+            // Отправляем запрос на сервер
+            try {
+                const response = await fetch(`${API_BASE_URL}/${username}/${articleId}/like`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' }
+                });
+                
+                const data = await response.json();
                 if (data.success) {
-                    // Обновляем счетчик лайков
-                    document.getElementById('likes').textContent = data.likes;
+                    // Обновляем счетчик лайков с точным значением с сервера
+                    likesElement.textContent = data.likes;
                 }
-            })
-            .catch(error => {
+            } catch (error) {
                 console.error('Ошибка при отправке лайка:', error);
-            });
+                // В случае ошибки возвращаем предыдущее значение
+                likesElement.textContent = currentLikes.toString();
+            }
+            
+            // Сбрасываем дебаунс через небольшую задержку
+            setTimeout(() => {
+                likeDebounce = false;
+            }, 2000);
         }
         
-        // Если мы в Telegram WebApp, настраиваем кнопку "Назад"
-        if (tg.initDataUnsafe && tg.initDataUnsafe.user) {
-            tg.BackButton.onClick(() => {
-                tg.close();
+        // Добавляем обработку ошибок загрузки анимаций
+        window.addEventListener('error', function(e) {
+            if (e.target.tagName === 'SCRIPT' || e.target.tagName === 'IMG' || e.target.tagName === 'LINK') {
+                console.error('Ошибка загрузки ресурса:', e.target.src || e.target.href);
+            }
+        }, true);
+        
+        // Инициализация приложения
+        document.addEventListener("DOMContentLoaded", function() {
+            // Настраиваем кнопку "Назад" для Telegram
+            if (tg.initDataUnsafe && tg.initDataUnsafe.user) {
+                tg.BackButton.onClick(() => tg.close());
+                tg.BackButton.show();
+            }
+            
+            // Получаем параметры из URL
+            const params = parseUrlParams();
+            username = params.username;
+            articleId = params.articleId;
+            
+            console.log('Параметры:', username, articleId, 'Источник:', params.source);
+            
+            // Добавляем обработчики событий для двойного тапа
+            document.body.addEventListener('touchstart', handleTap, {passive: false});
+            document.body.addEventListener('click', handleTap);
+            
+            // Если параметры не найдены
+            if (!username || !articleId) {
+                document.getElementById("title").textContent = "Ошибка: Некорректный URL";
+                document.getElementById("quote").innerHTML = '<span class="error-message">Статья не найдена. Проверьте ссылку.</span>';
+                
+                // Удаляем индикатор загрузки
+                const loadingSpinner = document.querySelector('.loading-spinner');
+                if (loadingSpinner) loadingSpinner.remove();
+                return;
+            }
+            
+            // Загружаем данные статьи
+            loadArticle(username, articleId);
+            
+            // Устанавливаем тему в соответствии с Telegram
+            if (tg.colorScheme) {
+                document.documentElement.dataset.theme = tg.colorScheme;
+            }
+            
+            // Обрабатываем изменение темы
+            tg.onEvent('themeChanged', () => {
+                document.documentElement.dataset.theme = tg.colorScheme;
             });
-            tg.BackButton.show();
-        }
+        });
     </script>
 </body>
 </html>
