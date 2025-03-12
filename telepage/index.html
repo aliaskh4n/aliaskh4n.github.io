@@ -104,6 +104,13 @@
         // GitHub Pages URL - используется для загрузки анимаций
         const GITHUB_PAGES_URL = 'https://aliaskh4n.github.io/telepage';
         
+        // Переменные для двойного тапа
+        let lastTap = 0;
+        let tapTimeout;
+        const doubleTapDelay = 300; // миллисекунды
+        let username, articleId; // Переменные вынесены на глобальный уровень
+        let isLikeAnimationPlaying = false;
+        
         document.addEventListener("DOMContentLoaded", function () {
             // Проверяем наличие параметров URL и хэша
             const urlParams = new URLSearchParams(window.location.search);
@@ -124,6 +131,10 @@
                     articleId = pathParts[1];
                 }
             }
+            
+            // Добавляем обработчик двойного тапа для всей страницы
+            document.body.addEventListener('touchstart', handleTap);
+            document.body.addEventListener('click', handleTap);
             
             // Если не удалось получить данные ни из одного источника
             if (!username || !articleId) {
@@ -172,6 +183,81 @@
                     document.getElementById("quote").innerHTML = '<span class="error-message">Не удалось загрузить статью. Пожалуйста, попробуйте позже.</span>';
                 });
         });
+        
+        // Функция для обработки тапов
+        function handleTap(e) {
+            const currentTime = new Date().getTime();
+            const tapLength = currentTime - lastTap;
+            
+            clearTimeout(tapTimeout);
+            
+            if (tapLength < doubleTapDelay && tapLength > 0) {
+                // Двойной тап обнаружен
+                if (!isLikeAnimationPlaying && username && articleId) {
+                    likeArticle();
+                }
+                e.preventDefault();
+            } else {
+                // Одиночный тап
+                tapTimeout = setTimeout(() => {
+                    // Здесь можно добавить действия для одиночного тапа, если нужно
+                }, doubleTapDelay);
+            }
+            
+            lastTap = currentTime;
+        }
+        
+        // Функция отправки лайка
+        function likeArticle() {
+            if (isLikeAnimationPlaying) return;
+            
+            isLikeAnimationPlaying = true;
+            
+            // Создаем и показываем анимацию сердечка
+            const heart = document.createElement('div');
+            heart.innerHTML = '❤️';
+            heart.style.position = 'fixed';
+            heart.style.left = '50%';
+            heart.style.top = '50%';
+            heart.style.transform = 'translate(-50%, -50%)';
+            heart.style.fontSize = '0px';
+            heart.style.opacity = '0';
+            heart.style.zIndex = '9999';
+            heart.style.transition = 'all 0.8s ease-in-out';
+            document.body.appendChild(heart);
+            
+            // Появление и исчезновение сердечка
+            setTimeout(() => {
+                heart.style.fontSize = '100px';
+                heart.style.opacity = '1';
+            }, 10);
+            
+            setTimeout(() => {
+                heart.style.fontSize = '150px';
+                heart.style.opacity = '0';
+            }, 500);
+            
+            setTimeout(() => {
+                document.body.removeChild(heart);
+                isLikeAnimationPlaying = false;
+            }, 1300);
+            
+            // Отправляем запрос на лайк на сервер
+            fetch(`${API_BASE_URL}/${username}/${articleId}/like`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' }
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    // Обновляем счетчик лайков
+                    document.getElementById('likes').textContent = data.likes;
+                }
+            })
+            .catch(error => {
+                console.error('Ошибка при отправке лайка:', error);
+            });
+        }
         
         // Если мы в Telegram WebApp, настраиваем кнопку "Назад"
         if (tg.initDataUnsafe && tg.initDataUnsafe.user) {
