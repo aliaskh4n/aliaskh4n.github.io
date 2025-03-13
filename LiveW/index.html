@@ -3,244 +3,96 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Погодные данные | Живые обои</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+    <title>Темная страница с JSON данными</title>
     <style>
-        :root {
-            --bg-color: #0f1119;
-            --card-bg: rgba(30, 34, 51, 0.6);
-            --border-color: rgba(255, 255, 255, 0.1);
-            --key-color: #73c990;
-            --string-color: #ff98a4;
-            --bracket-color: #c39ac9;
-            --colon-color: #79b8ff;
-            --number-color: #f1c40f;
-            --accent-gradient: linear-gradient(45deg, #5151cf, #2d348e);
-            --accent-blur: rgba(121, 184, 255, 0.15);
-        }
-
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-        }
-
         body {
-            background: var(--bg-color);
+            background: #0f1119;
             margin: 0;
             display: flex;
             justify-content: center;
             align-items: center;
-            min-height: 100vh;
-            font-family: 'JetBrains Mono', monospace;
+            height: 100vh;
+            font-family: monospace;
             color: #e0e0e0;
-            overflow-x: hidden;
-            position: relative;
+            overflow: hidden;
         }
-
+        
         .glass-container {
-            width: 100%;
-            max-width: 500px;
-            background: var(--card-bg);
-            border-radius: 20px;
+            width: 450px;
+            background: rgba(30, 34, 51, 0.4);
+            border-radius: 15px;
             backdrop-filter: blur(12px);
             -webkit-backdrop-filter: blur(12px);
-            border: 1px solid var(--border-color);
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4),
-                        inset 0 1px 1px rgba(255, 255, 255, 0.07);
-            padding: 30px;
-            transition: transform 0.3s, box-shadow 0.3s;
-            margin: 20px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.37);
+            padding: 25px;
         }
-
-        .header {
-            margin-bottom: 20px;
-            display: flex;
-            align-items: center;
-        }
-
-        .user-info {
-            display: flex;
-            align-items: center;
-        }
-
-        .avatar {
-            width: 40px;
-            height: 40px;
-            border-radius: 50%;
-            background: var(--accent-gradient);
-            margin-right: 12px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-weight: bold;
-            color: white;
-            border: 2px solid var(--border-color);
-        }
-
-        .username {
-            font-size: 20px;
-            font-weight: bold;
-            background: linear-gradient(45deg, #73c990, #79b8ff);
-            -webkit-background-clip: text;
-            background-clip: text;
-            color: transparent;
-        }
-
+        
         .json-display {
             width: 100%;
-            line-height: 1.8;
+            line-height: 1.6;
             font-size: 16px;
-            background: rgba(15, 17, 25, 0.5);
-            border-radius: 10px;
-            padding: 20px;
             margin: 0;
             white-space: pre-wrap;
             color: #bdc7d8;
-            overflow: auto;
-            max-height: 500px;
-            border: 1px solid rgba(255, 255, 255, 0.05);
+            overflow: hidden;
         }
-
-        .json-key { 
-            color: var(--key-color);
-            font-weight: bold;
-        }
-        .json-string { color: var(--string-color); }
-        .json-number { color: var(--number-color); }
-        .json-boolean { color: #56b6c2; }
-        .json-null { color: #e06c75; }
-        .json-bracket { color: var(--bracket-color); }
-        .json-colon { 
-            color: var(--colon-color); 
-            margin-right: 8px;
-        }
-        .json-comma { color: var(--colon-color); }
-
+        
+        .json-key { color: #73c990; }
+        .json-string { color: #ff98a4; }
+        .json-bracket { color: #c39ac9; }
+        .json-colon { color: #79b8ff; margin-right: 8px; }
+        .json-comma { color: #79b8ff; }
+        
         .time-container {
             display: inline-block;
-            padding: 3px 6px;
-            background: var(--accent-blur);
+            padding: 2px 4px;
+            background: rgba(121, 184, 255, 0.1);
             border-radius: 4px;
             animation: pulse 2s infinite;
         }
-
-        .weather-icon {
-            font-size: 20px;
-            margin-right: 5px;
-            vertical-align: middle;
+        
+        @keyframes pulse {
+            0%, 100% { background: rgba(121, 184, 255, 0.1); }
+            50% { background: rgba(121, 184, 255, 0.2); }
         }
-
+        
         .shape {
             position: absolute;
             border-radius: 50%;
-            background: var(--accent-gradient);
+            background: linear-gradient(45deg, #5151cf, #2d348e);
             opacity: 0.15;
             z-index: -1;
-            filter: blur(20px);
         }
         
         .shape:nth-child(1) {
-            width: 400px;
-            height: 400px;
-            top: -100px;
-            left: -100px;
-            animation: float 25s infinite;
+            width: 300px;
+            height: 300px;
+            top: 20%;
+            left: 25%;
+            animation: float 15s infinite;
         }
         
         .shape:nth-child(2) {
-            width: 300px;
-            height: 300px;
-            bottom: -50px;
-            right: -50px;
+            width: 250px;
+            height: 250px;
+            bottom: 15%;
+            right: 30%;
             animation: float 20s infinite reverse;
-        }
-
-        .shape:nth-child(3) {
-            width: 200px;
-            height: 200px;
-            top: 50%;
-            left: 30%;
-            animation: float 15s infinite 2s;
-            opacity: 0.1;
         }
         
         @keyframes float {
             0%, 100% { transform: translate(0, 0) rotate(0deg); }
-            25% { transform: translate(-20px, 25px) rotate(5deg); }
-            50% { transform: translate(10px, 40px) rotate(10deg); }
-            75% { transform: translate(30px, 15px) rotate(5deg); }
-        }
-        
-        @keyframes pulse {
-            0%, 100% { background: rgba(121, 184, 255, 0.15); }
-            50% { background: rgba(121, 184, 255, 0.3); }
-        }
-
-        .loading {
-            display: inline-block;
-            width: 16px;
-            height: 16px;
-            border: 2px solid rgba(121, 184, 255, 0.3);
-            border-radius: 50%;
-            border-top-color: #79b8ff;
-            animation: spin 1s linear infinite;
-            margin-left: 5px;
-        }
-
-        @keyframes spin {
-            to { transform: rotate(360deg); }
-        }
-
-        #mouseMoveAnimation {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            z-index: -2;
-            opacity: 0.1;
-        }
-
-        @media (max-width: 600px) {
-            .glass-container {
-                padding: 20px;
-            }
-            .json-display {
-                font-size: 14px;
-                padding: 15px;
-            }
-            .header {
-                flex-direction: column;
-                align-items: flex-start;
-                gap: 15px;
-            }
-            .user-info {
-                width: 100%;
-                justify-content: space-between;
-            }
+            50% { transform: translate(-10px, 15px) rotate(5deg); }
         }
     </style>
 </head>
 <body>
     <div class="shape"></div>
     <div class="shape"></div>
-    <div class="shape"></div>
-    
-    <canvas id="mouseMoveAnimation"></canvas>
     
     <div class="glass-container">
-        <div class="header">
-            <div class="user-info">
-                <div class="avatar" id="avatar"></div>
-                <div class="username" id="username"></div>
-            </div>
-        </div>
-        <div class="json-wrapper">
-            <pre id="json-content" class="json-display"></pre>
-        </div>
+        <pre id="json-content" class="json-display"></pre>
     </div>
 
     <script>
@@ -249,27 +101,12 @@
         const userName = urlParams.get('username') || 'Гость';
         const userCity = urlParams.get('city') || 'Кокшетау';
 
-        // Настройка аватара
-        document.getElementById('avatar').textContent = userName.charAt(0).toUpperCase();
-        document.getElementById('username').textContent = userName;
-
-        // Основные данные
+        // Данные
         const data = {
             city: userCity,
-            date: new Date().toLocaleDateString('ru-RU', {
-                weekday: 'long',
-                year: 'numeric',
-                month: 'long',
-                day: 'numeric'
-            }),
+            date: new Date().toLocaleDateString('ru-RU'),
             time: new Date().toLocaleTimeString('ru-RU'),
-            weather: {
-                status: "загрузка...",
-                temperature: "—",
-                feels_like: "—",
-                humidity: "—",
-                wind: "—"
-            }
+            weather: "⏳ Загрузка..."
         };
 
         // Кэширование данных
@@ -291,24 +128,25 @@
             }
         }
 
-        // Определение погодных иконок
+        // Определение погодной иконки
         function getWeatherEmoji(condition) {
+            if (!condition) return '';
+            
             condition = condition.toLowerCase();
             
-            if (condition.includes('ясно') || condition.includes('солнечно')) return '☀️';
-            if (condition.includes('облачно') && condition.includes('переменная')) return '🌤️';
-            if (condition.includes('облачно')) return '☁️';
-            if (condition.includes('дождь') && condition.includes('гроза')) return '⛈️';
-            if (condition.includes('дождь')) return '🌧️';
-            if (condition.includes('снег')) return '❄️';
-            if (condition.includes('туман')) return '🌫️';
-            if (condition.includes('гроза')) return '🌩️';
-            if (condition.includes('ветер') || condition.includes('ветрено')) return '💨';
+            if (condition.includes('ясно') || condition.includes('солнечно')) return '☀️ ';
+            if (condition.includes('облачно') && condition.includes('переменная')) return '🌤️ ';
+            if (condition.includes('облачно')) return '☁️ ';
+            if (condition.includes('дождь') && condition.includes('гроза')) return '⛈️ ';
+            if (condition.includes('дождь')) return '🌧️ ';
+            if (condition.includes('снег')) return '❄️ ';
+            if (condition.includes('туман')) return '🌫️ ';
+            if (condition.includes('гроза')) return '🌩️ ';
             
-            return '🌡️'; // Иконка по умолчанию
+            return '';
         }
 
-        // Оптимизированная функция получения погоды
+        // Получение погоды
         async function fetchWeather() {
             try {
                 // Проверка кэша
@@ -323,7 +161,7 @@
                     return;
                 }
                 
-                // Используем wttr.in как источник погодных данных
+                // Используем wttr.in для получения данных
                 const response = await fetch(`https://wttr.in/${encodeURIComponent(userCity)}?format=j1`);
                 
                 if (!response.ok) {
@@ -332,35 +170,39 @@
                 
                 const weatherData = await response.json();
                 
-                // Парсинг данных из wttr.in
+                // Парсинг данных
                 const current = weatherData.current_condition[0];
-                const weatherInfo = {
-                    status: current.weatherDesc[0].value,
-                    temperature: `${current.temp_C}°C`,
-                    feels_like: `${current.FeelsLikeC}°C`,
-                    humidity: `${current.humidity}%`,
-                    wind: `${current.windspeedKmph} км/ч`
-                };
+                const weatherDesc = current.weatherDesc[0].value;
+                const temp = current.temp_C;
                 
-                data.weather = weatherInfo;
+                // Форматирование с эмодзи
+                const emoji = getWeatherEmoji(weatherDesc);
+                const weatherString = `${emoji}${weatherDesc}, ${temp}°C`;
                 
-                // Кэширование полученных данных
+                data.weather = weatherString;
+                
+                // Кэширование данных
                 saveToCache(cacheKey, {
                     timestamp: now,
-                    data: weatherInfo
+                    data: weatherString
                 });
                 
             } catch (error) {
                 console.error('Ошибка получения погоды:', error);
                 
                 // Генерация случайных данных при ошибке
-                data.weather = {
-                    status: ["Ясно", "Переменная облачность", "Облачно", "Дождь", "Снег"][Math.floor(Math.random() * 5)],
-                    temperature: `${Math.floor(Math.random() * 35 - 10)}°C`,
-                    feels_like: `${Math.floor(Math.random() * 35 - 10)}°C`,
-                    humidity: `${Math.floor(Math.random() * 100)}%`,
-                    wind: `${Math.floor(Math.random() * 20)} км/ч`
-                };
+                const conditions = [
+                    { text: "ясно", emoji: "☀️" },
+                    { text: "переменная облачность", emoji: "🌤️" },
+                    { text: "облачно", emoji: "☁️" },
+                    { text: "дождь", emoji: "🌧️" },
+                    { text: "снег", emoji: "❄️" }
+                ];
+                
+                const randomCondition = conditions[Math.floor(Math.random() * conditions.length)];
+                const randomTemp = Math.floor(Math.random() * 35 - 10);
+                
+                data.weather = `${randomCondition.emoji} ${randomCondition.text}, ${randomTemp}°C`;
             } finally {
                 renderJSON();
             }
@@ -369,16 +211,10 @@
         // Обновление времени
         function updateTime() {
             data.time = new Date().toLocaleTimeString('ru-RU');
-            data.date = new Date().toLocaleDateString('ru-RU', {
-                weekday: 'long',
-                year: 'numeric',
-                month: 'long',
-                day: 'numeric'
-            });
             renderJSON();
         }
 
-        // Форматирование JSON с подсветкой синтаксиса
+        // Форматирование JSON с подсветкой
         function formatJSON(obj) {
             const json = JSON.stringify(obj, null, 4);
             
@@ -395,21 +231,11 @@
                         } else {
                             cls = 'json-string';
                             
-                            // Замена погодного статуса на эмодзи
-                            if (match.includes(data.weather.status)) {
-                                const emoji = getWeatherEmoji(data.weather.status);
-                                match = match.replace(`"${data.weather.status}"`, `"<span class="weather-icon">${emoji}</span>${data.weather.status}"`);
-                            }
-                            
                             // Анимация для времени
                             if (match.includes(data.time)) {
                                 match = match.replace(`"${data.time}"`, `"<span class="time-container">${data.time}</span>"`);
                             }
                         }
-                    } else if (/true|false/.test(match)) {
-                        cls = 'json-boolean';
-                    } else if (/null/.test(match)) {
-                        cls = 'json-null';
                     }
                     return '<span class="' + cls + '">' + match + '</span>';
                 })
@@ -418,146 +244,28 @@
                 .replace(/,/g, '<span class="json-comma">,</span>');
         }
 
-        // Рендеринг JSON данных
+        // Рендеринг JSON
         function renderJSON() {
             const jsonData = {
                 [userName]: {
-                    информация: {
-                        город: data.city,
-                        дата: data.date,
-                        время: data.time
-                    },
-                    погода: data.weather
+                    date: data.date,
+                    time: data.time,
+                    weather: data.weather,
+                    city: data.city
                 }
             };
             
             document.getElementById('json-content').innerHTML = formatJSON(jsonData);
         }
 
-        // Анимация при движении мыши
-        const canvas = document.getElementById('mouseMoveAnimation');
-        const ctx = canvas.getContext('2d');
-        let width, height;
-        let mouseX = 0, mouseY = 0;
-        let dots = [];
-
-        function resizeCanvas() {
-            width = window.innerWidth;
-            height = window.innerHeight;
-            canvas.width = width;
-            canvas.height = height;
-            
-            // Пересоздаем точки
-            createDots();
-        }
-
-        function createDots() {
-            dots = [];
-            const count = Math.floor(width * height / 15000); // Адаптивное количество точек
-            
-            for (let i = 0; i < count; i++) {
-                dots.push({
-                    x: Math.random() * width,
-                    y: Math.random() * height,
-                    radius: Math.random() * 2 + 1,
-                    vx: Math.random() * 0.5 - 0.25,
-                    vy: Math.random() * 0.5 - 0.25
-                });
-            }
-        }
-
-        function drawDots() {
-            ctx.clearRect(0, 0, width, height);
-            
-            // Рисуем подсветку от курсора
-            const gradient = ctx.createRadialGradient(mouseX, mouseY, 5, mouseX, mouseY, 200);
-            gradient.addColorStop(0, 'rgba(121, 184, 255, 0.2)');
-            gradient.addColorStop(1, 'rgba(121, 184, 255, 0)');
-            
-            ctx.fillStyle = gradient;
-            ctx.beginPath();
-            ctx.arc(mouseX, mouseY, 200, 0, Math.PI * 2);
-            ctx.fill();
-            
-            // Рисуем точки и соединения
-            ctx.fillStyle = 'rgba(121, 184, 255, 0.5)';
-            ctx.strokeStyle = 'rgba(121, 184, 255, 0.15)';
-            
-            dots.forEach((dot, i) => {
-                // Двигаем точки
-                dot.x += dot.vx;
-                dot.y += dot.vy;
-                
-                // Отражаем от краев
-                if (dot.x < 0 || dot.x > width) dot.vx *= -1;
-                if (dot.y < 0 || dot.y > height) dot.vy *= -1;
-                
-                // Влияние движения мыши
-                const dx = mouseX - dot.x;
-                const dy = mouseY - dot.y;
-                const dist = Math.sqrt(dx * dx + dy * dy);
-                
-                if (dist < 200) {
-                    const forceX = dx / dist * 0.2;
-                    const forceY = dy / dist * 0.2;
-                    dot.vx += forceX;
-                    dot.vy += forceY;
-                }
-                
-                // Ограничиваем скорость
-                const speed = Math.sqrt(dot.vx * dot.vx + dot.vy * dot.vy);
-                if (speed > 2) {
-                    dot.vx = (dot.vx / speed) * 2;
-                    dot.vy = (dot.vy / speed) * 2;
-                }
-                
-                // Рисуем точку
-                ctx.beginPath();
-                ctx.arc(dot.x, dot.y, dot.radius, 0, Math.PI * 2);
-                ctx.fill();
-                
-                // Соединяем с ближайшими точками
-                for (let j = i + 1; j < dots.length; j++) {
-                    const dot2 = dots[j];
-                    const dx2 = dot.x - dot2.x;
-                    const dy2 = dot.y - dot2.y;
-                    const dist2 = Math.sqrt(dx2 * dx2 + dy2 * dy2);
-                    
-                    if (dist2 < 100) {
-                        ctx.beginPath();
-                        ctx.moveTo(dot.x, dot.y);
-                        ctx.lineTo(dot2.x, dot2.y);
-                        ctx.stroke();
-                    }
-                }
-            });
-            
-            requestAnimationFrame(drawDots);
-        }
-
-        // Обработка движения мыши
-        document.addEventListener('mousemove', (e) => {
-            mouseX = e.clientX;
-            mouseY = e.clientY;
-        });
-
         // Инициализация
         function init() {
-            // Настройка анимации
-            resizeCanvas();
-            window.addEventListener('resize', resizeCanvas);
-            drawDots();
-            
-            // Настройка интервалов обновления
             setInterval(updateTime, 1000);
             fetchWeather();
-            // Периодическое обновление погоды каждые 30 минут
-            setInterval(fetchWeather, 30 * 60 * 1000);
-            
+            setInterval(fetchWeather, 30 * 60 * 1000); // Обновление погоды каждые 30 минут
             renderJSON();
         }
 
-        // Запуск
         init();
     </script>
 </body>
