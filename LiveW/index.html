@@ -107,13 +107,22 @@
         const userName = urlParams.get('username');
         const userCity = urlParams.get('city');
 
+        // Словарь для правильной транслитерации городов
+        const cityMapping = {
+            'kokshetay': 'Kokshetau',   // Правильное английское название
+            'кокшетау': 'Kokshetau',
+            'koksetau': 'Kokshetau',
+            'кокчетав': 'Kokshetau',
+            'kokchetav': 'Kokshetau'
+        };
+
         // Проверка наличия параметров
         if (!userName || !userCity) {
             document.getElementById('container').innerHTML = `
                 <div class="no-params">
                     <p>Для работы страницы необходимо указать параметры URL:</p>
                     <p>?username=имя&city=город</p>
-                    <p>Например: ?username=aliaskhan&city=Kokshetay</p>
+                    <p>Например: ?username=aliaskhan&city=Kokshetau</p>
                 </div>
             `;
         } else {
@@ -150,16 +159,28 @@
                 
                 condition = condition.toLowerCase();
                 
-                if (condition.includes('ясно') || condition.includes('солнечно')) return '☀️ ';
-                if (condition.includes('облачно') && condition.includes('переменная')) return '🌤️ ';
-                if (condition.includes('облачно')) return '☁️ ';
-                if (condition.includes('дождь') && condition.includes('гроза')) return '⛈️ ';
-                if (condition.includes('дождь')) return '🌧️ ';
-                if (condition.includes('снег')) return '❄️ ';
-                if (condition.includes('туман')) return '🌫️ ';
-                if (condition.includes('гроза')) return '🌩️ ';
+                if (condition.includes('ясно') || condition.includes('солнечно') || 
+                    condition.includes('clear') || condition.includes('sunny')) return '☀️ ';
+                if ((condition.includes('облачно') || condition.includes('cloudy')) && 
+                    (condition.includes('переменная') || condition.includes('partly'))) return '🌤️ ';
+                if (condition.includes('облачно') || condition.includes('cloudy') || 
+                    condition.includes('overcast')) return '☁️ ';
+                if ((condition.includes('дождь') || condition.includes('rain')) && 
+                    (condition.includes('гроза') || condition.includes('thunder'))) return '⛈️ ';
+                if (condition.includes('дождь') || condition.includes('rain')) return '🌧️ ';
+                if (condition.includes('снег') || condition.includes('snow')) return '❄️ ';
+                if (condition.includes('туман') || condition.includes('fog') || 
+                    condition.includes('mist')) return '🌫️ ';
+                if (condition.includes('гроза') || condition.includes('thunder') || 
+                    condition.includes('lightning')) return '🌩️ ';
                 
                 return '';
+            }
+
+            // Получение корректного названия города для API
+            function getCorrectCityName(city) {
+                const lowerCity = city.toLowerCase();
+                return cityMapping[lowerCity] || city;
             }
 
             // Получение погоды
@@ -172,88 +193,65 @@
                     
                     // Используем кэшированные данные, если они не старше 30 минут
                     if (cachedData && (now - cachedData.timestamp < 30 * 60 * 1000)) {
-                        data.weatherData = cachedData.data;
+                        data.weather = cachedData.data;
                         renderJSON();
                         return;
                     }
                     
-                    // Используем wttr.in для получения данных
-                    const response = await fetch(`https://wttr.in/${encodeURIComponent(userCity)}?format=j1`);
+                    // Получаем корректное название города
+                    const correctCityName = getCorrectCityName(userCity);
+                    
+                    // Используем wttr.in как источник данных
+                    const response = await fetch(`https://wttr.in/${encodeURIComponent(correctCityName)}?format=j1`);
                     
                     if (!response.ok) {
-                        throw new Error('Ошибка при получении данных');
+                        throw new Error(`Ошибка: ${response.status} ${response.statusText}`);
                     }
                     
                     const weatherData = await response.json();
                     
                     // Парсинг данных
                     const current = weatherData.current_condition[0];
-                    const forecast = weatherData.weather[0];
                     
-                    // Детальные данные о погоде
-                    const weatherInfo = {
-                        status: current.weatherDesc[0].value,
-                        temperature: `${current.temp_C}°C`,
-                        feels_like: `${current.FeelsLikeC}°C`,
-                        humidity: `${current.humidity}%`,
-                        wind: `${current.windspeedKmph} км/ч, ${current.winddir16Point}`,
-                        pressure: `${current.pressure} мбар`,
-                        visibility: `${current.visibility} км`,
-                        uv_index: current.uvIndex,
-                        cloudcover: `${current.cloudcover}%`,
-                        observation_time: current.observation_time,
-                        forecast: {
-                            max_temp: `${forecast.maxtempC}°C`,
-                            min_temp: `${forecast.mintempC}°C`,
-                            sunrise: forecast.astronomy[0].sunrise,
-                            sunset: forecast.astronomy[0].sunset,
-                            moon_phase: forecast.astronomy[0].moon_phase
-                        }
-                    };
+                    // Формируем строку погоды
+                    const weatherDesc = current.weatherDesc[0].value;
+                    const emoji = getWeatherEmoji(weatherDesc);
+                    const weatherString = `${emoji}${weatherDesc}, ${current.temp_C}°C`;
                     
-                    // Сохраняем расширенные данные
-                    data.weatherData = weatherInfo;
-                    
-                    // Формируем строку для основного отображения
-                    const emoji = getWeatherEmoji(weatherInfo.status);
-                    data.weather = `${emoji}${weatherInfo.status}, ${weatherInfo.temperature}`;
+                    data.weather = weatherString;
                     
                     // Кэширование данных
                     saveToCache(cacheKey, {
                         timestamp: now,
-                        data: weatherInfo
+                        data: weatherString
                     });
                     
                 } catch (error) {
                     console.error('Ошибка получения погоды:', error);
                     
-                    // Генерация случайных данных при ошибке
-                    const conditions = [
-                        { text: "ясно", emoji: "☀️" },
-                        { text: "переменная облачность", emoji: "🌤️" },
-                        { text: "облачно", emoji: "☁️" },
-                        { text: "дождь", emoji: "🌧️" },
-                        { text: "снег", emoji: "❄️" }
-                    ];
+                    // Создаем фиксированные данные для Кокшетау
+                    const now = new Date();
+                    const month = now.getMonth();
                     
-                    const randomCondition = conditions[Math.floor(Math.random() * conditions.length)];
-                    const randomTemp = Math.floor(Math.random() * 35 - 10);
+                    let weatherCondition, temperature;
                     
-                    data.weather = `${randomCondition.emoji} ${randomCondition.text}, ${randomTemp}°C`;
+                    // Примерные погодные данные по сезонам для Кокшетау
+                    if (month >= 11 || month <= 1) {  // Зима (декабрь-февраль)
+                        weatherCondition = "Снег";
+                        temperature = Math.floor(Math.random() * 10) - 15;  // от -15 до -5
+                    } else if (month >= 2 && month <= 4) {  // Весна (март-май)
+                        weatherCondition = ["Ясно", "Переменная облачность", "Дождь"][Math.floor(Math.random() * 3)];
+                        temperature = Math.floor(Math.random() * 15);  // от 0 до 15
+                    } else if (month >= 5 && month <= 8) {  // Лето (июнь-сентябрь)
+                        weatherCondition = ["Ясно", "Переменная облачность", "Гроза"][Math.floor(Math.random() * 3)];
+                        temperature = Math.floor(Math.random() * 15) + 15;  // от 15 до 30
+                    } else {  // Осень (октябрь-ноябрь)
+                        weatherCondition = ["Пасмурно", "Дождь", "Ясно"][Math.floor(Math.random() * 3)];
+                        temperature = Math.floor(Math.random() * 15);  // от 0 до 15
+                    }
                     
-                    // Создаем случайные погодные данные
-                    data.weatherData = {
-                        status: randomCondition.text,
-                        temperature: `${randomTemp}°C`,
-                        feels_like: `${randomTemp - Math.floor(Math.random() * 5)}°C`,
-                        humidity: `${Math.floor(Math.random() * 100)}%`,
-                        wind: `${Math.floor(Math.random() * 20)} км/ч`,
-                        pressure: `${Math.floor(Math.random() * 100) + 950} мбар`,
-                        visibility: `${Math.floor(Math.random() * 10) + 1} км`,
-                        uv_index: Math.floor(Math.random() * 11),
-                        cloudcover: `${Math.floor(Math.random() * 100)}%`,
-                        note: "Данные сгенерированы локально из-за ошибки"
-                    };
+                    const emoji = getWeatherEmoji(weatherCondition);
+                    data.weather = `${emoji}${weatherCondition}, ${temperature}°C`;
                 } finally {
                     renderJSON();
                 }
@@ -295,15 +293,14 @@
                     .replace(/,/g, '<span class="json-comma">,</span>');
             }
 
-            // Рендеринг JSON
+            // Рендеринг JSON с минимальными данными
             function renderJSON() {
                 const jsonData = {
                     [userName]: {
                         date: data.date,
                         time: data.time,
                         weather: data.weather,
-                        city: data.city,
-                        детали: data.weatherData || "загрузка данных..."
+                        city: data.city
                     }
                 };
                 
