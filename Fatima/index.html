@@ -1,0 +1,407 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="utf-8" />
+    <title>Карта Шиели - Интерактивный путеводитель</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <script src="https://api.mapbox.com/mapbox-gl-js/v2.15.0/mapbox-gl.js"></script>
+    <link href="https://api.mapbox.com/mapbox-gl-js/v2.15.0/mapbox-gl.css" rel="stylesheet" />
+    <script src="https://api.mapbox.com/mapbox-gl-js/plugins/mapbox-gl-directions/v4.1.0/mapbox-gl-directions.js"></script>
+    <link href="https://api.mapbox.com/mapbox-gl-js/plugins/mapbox-gl-directions/v4.1.0/mapbox-gl-directions.css" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body { 
+            font-family: 'Inter', sans-serif; 
+            height: 100vh;
+            overflow: hidden;
+        }
+        .mapboxgl-ctrl-top-left { display: none !important; }
+        
+        #map {
+            width: 100%;
+            height: 100vh;
+            position: absolute;
+            transition: all 0.3s ease;
+        }
+        
+        #info-panel {
+            position: absolute;
+            top: 80px;
+            right: 20px;
+            max-width: 400px;
+            width: 90%;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+            z-index: 10;
+            overflow: hidden;
+            transition: all 0.3s ease;
+            transform: translateY(-150%);
+            opacity: 0;
+        }
+        
+        #info-panel.active {
+            transform: translateY(0);
+            opacity: 1;
+        }
+        
+        #search-panel {
+            position: absolute;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 90%;
+            max-width: 500px;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+            z-index: 10;
+            overflow: hidden;
+            transition: all 0.3s ease;
+        }
+        
+        #search-panel.hidden {
+            transform: translateX(-50%) translateY(-150%);
+            opacity: 0;
+        }
+        
+        .place-item {
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        
+        .place-item:hover {
+            background-color: rgba(0, 0, 0, 0.05);
+        }
+        
+        .tab {
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        
+        .tab.active {
+            border-bottom: 3px solid #3b82f6;
+            color: #1e3a8a;
+        }
+        
+        video {
+            width: 100%;
+            border-radius: 8px;
+            margin-top: 10px;
+        }
+        
+        .custom-scrollbar {
+            scrollbar-width: thin;
+            scrollbar-color: #cbd5e1 #f1f5f9;
+        }
+        
+        .custom-scrollbar::-webkit-scrollbar {
+            width: 6px;
+        }
+        
+        .custom-scrollbar::-webkit-scrollbar-track {
+            background: #f1f5f9;
+        }
+        
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+            background-color: #cbd5e1;
+            border-radius: 6px;
+        }
+        
+        @media (max-width: 640px) {
+            #info-panel {
+                width: 100%;
+                max-width: 100%;
+                bottom: 0;
+                top: auto;
+                right: 0;
+                border-radius: 16px 16px 0 0;
+                max-height: 80vh;
+            }
+        }
+    </style>
+</head>
+<body class="bg-gray-50">
+    <div id="search-panel">
+        <div class="p-4">
+            <div class="relative">
+                <input type="text" id="search-input" placeholder="Поиск мест..." class="w-full p-3 pl-10 rounded-lg border border-gray-300 focus:border-blue-500 focus:ring focus:ring-blue-200 focus:ring-opacity-50">
+                <svg class="w-5 h-5 text-gray-400 absolute left-3 top-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+                </svg>
+            </div>
+        </div>
+        <div id="search-results" class="max-h-60 overflow-y-auto custom-scrollbar border-t border-gray-100"></div>
+    </div>
+    
+    <div id="info-panel">
+        <div class="flex justify-between items-center p-4 border-b">
+            <h2 id="place-title" class="text-xl font-semibold text-gray-800"></h2>
+            <button id="close-info" class="text-gray-500 hover:text-gray-700">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                </svg>
+            </button>
+        </div>
+        
+        <div class="p-4">
+            <div class="flex border-b mb-4">
+                <div class="tab active px-4 py-2 text-blue-800 font-medium" data-tab="info">Информация</div>
+                <div class="tab px-4 py-2 text-gray-600 font-medium" data-tab="media">Фото и видео</div>
+            </div>
+            
+            <div id="tab-info" class="tab-content">
+                <img id="place-image" alt="" class="w-full h-48 object-cover rounded-lg">
+                <p id="place-description" class="text-gray-600 mt-4"></p>
+                
+                <div class="mt-6">
+                    <h3 class="text-lg font-medium text-gray-800 mb-2">Как добраться</h3>
+                    <div class="flex space-x-2">
+                        <button id="route-button" class="flex-1 px-4 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition flex items-center justify-center">
+                            <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l5.447-2.724A1 1 0 0021 13.382V2.618a1 1 0 00-1.447-.894L15 4m0 13l-6-3"></path>
+                            </svg>
+                            Построить маршрут
+                        </button>
+                        <button id="view-button" class="flex-1 px-4 py-3 bg-gray-600 text-white rounded-lg hover:bg-gray-700 transition flex items-center justify-center">
+                            <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.752 11.168l-3.197-2.2A1 1 0 0010 9.768v4.464a1 1 0 001.555.832l3.197-2.2a1 1 0 000-1.664z"></path>
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                            </svg>
+                            Обзор 360°
+                        </button>
+                    </div>
+                </div>
+            </div>
+            
+            <div id="tab-media" class="tab-content hidden">
+                <div class="grid grid-cols-2 gap-2">
+                    <img id="place-image-media" alt="" class="w-full h-24 object-cover rounded-lg">
+                    <div id="video-container" class="w-full h-24 bg-gray-200 rounded-lg flex items-center justify-center">
+                        <svg class="w-10 h-10 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.752 11.168l-3.197-2.2A1 1 0 0010 9.768v4.464a1 1 0 001.555.832l3.197-2.2a1 1 0 000-1.664z"></path>
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                        </svg>
+                    </div>
+                </div>
+                <div id="video-list" class="mt-4 space-y-4"></div>
+            </div>
+        </div>
+    </div>
+
+    <div id="route-control" class="fixed bottom-4 left-4 hidden z-10">
+        <button id="cancel-route" class="px-4 py-2 bg-red-600 text-white rounded-lg shadow-lg hover:bg-red-700 transition-transform transform hover:scale-105 flex items-center">
+            <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+            </svg>
+            Отменить маршрут
+        </button>
+    </div>
+    
+    <div id="map"></div>
+
+    <script>
+        mapboxgl.accessToken = 'pk.eyJ1IjoiYWxpYXNraGFuIiwiYSI6ImNtMWV2aWt6bzJqeWsybHF4YXFkc2Q1eDgifQ.XwvA2nbcCI_nqiu9VYetWg';
+        const map = new mapboxgl.Map({
+            container: 'map',
+            style: 'mapbox://styles/mapbox/streets-v12',
+            center: [66.7337284, 44.1689119],
+            zoom: 12,
+            maxBounds: [[66.4, 44.1], [66.8, 44.4]]
+        });
+        
+        const directions = new MapboxDirections({
+            accessToken: mapboxgl.accessToken,
+            unit: 'metric',
+            profile: 'mapbox/walking',
+            interactive: false,
+            controls: { inputs: false }
+        });
+        map.addControl(directions, 'top-left');
+        
+        let places = [];
+        let activePlaceId = null;
+        let markers = [];
+        
+        fetch('database.json')
+            .then(response => {
+                if (!response.ok) throw new Error('Ошибка загрузки данных');
+                return response.json();
+            })
+            .then(data => {
+                places = data;
+                displaySearchResults(places);
+                addMarkers(places);
+            })
+            .catch(error => {
+                console.error('Ошибка:', error);
+                document.getElementById('search-results').innerHTML = '<p class="text-red-600 p-4">Не удалось загрузить места</p>';
+            });
+        
+        function addMarkers(places) {
+            markers.forEach(marker => marker.remove());
+            markers = [];
+            
+            places.forEach(place => {
+                const el = document.createElement('div');
+                el.className = 'marker';
+                el.style.width = '30px';
+                el.style.height = '30px';
+                el.style.backgroundImage = 'url(https://cdn-icons-png.flaticon.com/512/684/684908.png)';
+                el.style.backgroundSize = 'cover';
+                el.style.cursor = 'pointer';
+                
+                const marker = new mapboxgl.Marker(el)
+                    .setLngLat([place.longitude, place.latitude])
+                    .addTo(map);
+                
+                el.addEventListener('click', () => {
+                    showPlaceInfo(place);
+                });
+                
+                markers.push(marker);
+            });
+        }
+        
+        function displaySearchResults(places) {
+            const resultsDiv = document.getElementById('search-results');
+            resultsDiv.innerHTML = '';
+            
+            if (places.length === 0) {
+                resultsDiv.innerHTML = '<p class="p-4 text-gray-500">Ничего не найдено</p>';
+                return;
+            }
+            
+            places.forEach(place => {
+                const div = document.createElement('div');
+                div.className = 'place-item p-3 border-b border-gray-100 flex items-center';
+                div.innerHTML = `
+                    <div class="h-10 w-10 rounded-full bg-blue-100 flex items-center justify-center mr-3">
+                        <svg class="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path>
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                        </svg>
+                    </div>
+                    <div>
+                        <div class="font-medium">${place.name}</div>
+                        <div class="text-sm text-gray-500">${place.type}</div>
+                    </div>
+                `;
+                
+                div.addEventListener('click', () => {
+                    showPlaceInfo(place);
+                    map.flyTo({
+                        center: [place.longitude, place.latitude],
+                        zoom: 15,
+                        essential: true
+                    });
+                });
+                
+                resultsDiv.appendChild(div);
+            });
+        }
+        
+        function showPlaceInfo(place) {
+            activePlaceId = place.id;
+            document.getElementById('search-panel').classList.add('hidden');
+            
+            document.getElementById('place-title').textContent = place.name;
+            document.getElementById('place-image').src = place.photo_url;
+            document.getElementById('place-image').alt = place.name;
+            document.getElementById('place-description').textContent = place.description;
+            
+            document.getElementById('place-image-media').src = place.photo_url;
+            document.getElementById('place-image-media').alt = place.name;
+            
+            const videoList = document.getElementById('video-list');
+            videoList.innerHTML = '';
+            
+            if (place.videos && place.videos.length > 0) {
+                place.videos.forEach((videoSrc, index) => {
+                    const videoElement = document.createElement('video');
+                    videoElement.controls = true;
+                    videoElement.className = 'w-full rounded-lg';
+                    videoElement.innerHTML = `<source src="${videoSrc}" type="video/mp4">Ваш браузер не поддерживает видео.`;
+                    videoList.appendChild(videoElement);
+                });
+                
+                document.getElementById('video-container').addEventListener('click', () => {
+                    document.querySelector('.tab[data-tab="media"]').click();
+                    videoList.querySelector('video').play();
+                }, { once: true });
+            } else {
+                document.getElementById('video-container').innerHTML = '<p class="text-gray-500 text-center">Видео отсутствует</p>';
+            }
+            
+            const routeButton = document.getElementById('route-button');
+            routeButton.setAttribute('data-lng', place.longitude);
+            routeButton.setAttribute('data-lat', place.latitude);
+            
+            const viewButton = document.getElementById('view-button');
+            viewButton.setAttribute('data-id', place.id);
+            
+            document.getElementById('info-panel').classList.add('active');
+        }
+        
+        document.getElementById('search-input').addEventListener('input', (e) => {
+            const searchTerm = e.target.value.toLowerCase();
+            
+            if (searchTerm === '') {
+                displaySearchResults(places);
+                return;
+            }
+            
+            const filtered = places.filter(place => 
+                place.name.toLowerCase().includes(searchTerm) || 
+                place.description.toLowerCase().includes(searchTerm)
+            );
+            
+            displaySearchResults(filtered);
+        });
+        
+        document.addEventListener('click', (e) => {
+            if (e.target.id === 'close-info') {
+                document.getElementById('info-panel').classList.remove('active');
+                document.getElementById('search-panel').classList.remove('hidden');
+            }
+            
+            if (e.target.classList.contains('tab')) {
+                const tabName = e.target.getAttribute('data-tab');
+                
+                document.querySelectorAll('.tab').forEach(tab => {
+                    tab.classList.remove('active');
+                });
+                e.target.classList.add('active');
+                
+                document.querySelectorAll('.tab-content').forEach(content => {
+                    content.classList.add('hidden');
+                });
+                document.getElementById(`tab-${tabName}`).classList.remove('hidden');
+            }
+            
+            if (e.target.id === 'route-button' || e.target.closest('#route-button')) {
+                const button = e.target.id === 'route-button' ? e.target : e.target.closest('#route-button');
+                const lng = parseFloat(button.getAttribute('data-lng'));
+                const lat = parseFloat(button.getAttribute('data-lat'));
+                
+                directions.setOrigin([66.7337284, 44.1689119]);
+                directions.setDestination([lng, lat]);
+                
+                document.getElementById('route-control').classList.remove('hidden');
+            }
+            
+            if (e.target.id === 'cancel-route' || e.target.closest('#cancel-route')) {
+                directions.removeRoutes();
+                document.getElementById('route-control').classList.add('hidden');
+            }
+            
+            if (e.target.id === 'view-button' || e.target.closest('#view-button')) {
+                const button = e.target.id === 'view-button' ? e.target : e.target.closest('#view-button');
+                const placeId = button.getAttribute('data-id');
+                window.location.href = `view.html?place_id=${placeId}`;
+            }
+        });
+    </script>
+</body>
+</html>
