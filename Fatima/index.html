@@ -159,7 +159,7 @@
         /* Info Panel */
         .info-panel {
             position: absolute;
-            top: 200px;
+            top: 100px;
             right: 20px;
             width: 320px;
             background: white;
@@ -230,6 +230,42 @@
             line-height: 1.5;
             color: #6b7280;
             margin-bottom: 20px;
+        }
+        
+        /* Videos Section */
+        .videos-section {
+            margin-bottom: 20px;
+        }
+        
+        .videos-section.hidden {
+            display: none;
+        }
+        
+        .videos-title {
+            font-size: 16px;
+            font-weight: 600;
+            color: #1f2937;
+            margin-bottom: 12px;
+        }
+        
+        .videos-list {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+        
+        .video-item {
+            width: 100%;
+            height: 160px;
+            border-radius: 8px;
+            overflow: hidden;
+            background: #f3f4f6;
+        }
+        
+        .video-item video {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
         }
         
         .actions {
@@ -389,6 +425,10 @@
             .notification.show {
                 transform: translateY(0);
             }
+            
+            .video-item {
+                height: 140px;
+            }
         }
         
         .hidden {
@@ -427,6 +467,13 @@
         <div class="info-content">
             <img id="place-image" alt="" class="place-image">
             <p id="place-description" class="place-description"></p>
+            
+            <!-- Видео секция -->
+            <div id="videos-section" class="videos-section hidden">
+                <h3 class="videos-title">Видео</h3>
+                <div id="videos-list" class="videos-list"></div>
+            </div>
+            
             <div class="actions">
                 <button id="route-button" class="btn btn-primary">
                     <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -609,6 +656,9 @@
                     }
                 }
                 
+                // Обновляем видео
+                updateVideos(place.videos || []);
+                
                 // СНАЧАЛА показываем панель, ПОТОМ скрываем поиск
                 infoPanel.classList.add('active');
                 
@@ -752,6 +802,57 @@
                 routeControl.classList.remove('visible');
                 return false;
             }
+        }
+        
+        function updateVideos(videos) {
+            const videosSection = document.getElementById('videos-section');
+            const videosList = document.getElementById('videos-list');
+            
+            // Очищаем список видео
+            videosList.innerHTML = '';
+            
+            if (!videos || videos.length === 0) {
+                // Скрываем секцию если нет видео
+                videosSection.classList.add('hidden');
+                return;
+            }
+            
+            // Показываем секцию и добавляем видео
+            videosSection.classList.remove('hidden');
+            
+            videos.forEach((videoSrc, index) => {
+                const videoContainer = document.createElement('div');
+                videoContainer.className = 'video-item';
+                
+                const videoElement = document.createElement('video');
+                videoElement.controls = true;
+                videoElement.preload = 'metadata';
+                videoElement.style.borderRadius = '8px';
+                
+                // Создаем source элемент
+                const sourceElement = document.createElement('source');
+                sourceElement.src = videoSrc;
+                sourceElement.type = 'video/mp4';
+                
+                videoElement.appendChild(sourceElement);
+                
+                // Обработка ошибок загрузки видео
+                videoElement.onerror = function() {
+                    videoContainer.innerHTML = `
+                        <div style="display: flex; align-items: center; justify-content: center; height: 100%; color: #9ca3af; flex-direction: column; font-size: 14px;">
+                            <svg style="width: 24px; height: 24px; margin-bottom: 8px;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"></path>
+                            </svg>
+                            Видео недоступно
+                        </div>
+                    `;
+                };
+                
+                videoContainer.appendChild(videoElement);
+                videosList.appendChild(videoContainer);
+            });
+            
+            console.log(`Добавлено видео: ${videos.length}`);
         }
         
         function getTypeLabel(type) {
