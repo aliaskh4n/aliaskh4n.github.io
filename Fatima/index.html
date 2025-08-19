@@ -1,8 +1,8 @@
 <!DOCTYPE html>
-<html lang="ru">
+<html lang="kk">
 <head>
     <meta charset="utf-8" />
-    <title>Карта Шиели</title>
+    <title>Шиелі картасы</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     
     <script src="https://api.mapbox.com/mapbox-gl-js/v2.15.0/mapbox-gl.js"></script>
@@ -399,8 +399,6 @@
             opacity: 1;
         }
         
-        /* Markers - теперь используем стандартные Mapbox маркеры */
-        
         /* Mobile */
         @media (max-width: 768px) {
             .header {
@@ -467,14 +465,14 @@
 <body>
     <!-- Header -->
     <div class="header">
-        <h1>Карта Шиели</h1>
-        <p>Исторические места и памятники</p>
+        <h1>Шиелі картасы</h1>
+        <p>Тарихи орындар мен ескерткіштер</p>
     </div>
 
     <!-- Search -->
     <div class="search-container">
         <div style="position: relative;">
-            <input type="text" id="search-input" class="search-input" placeholder="Поиск мест...">
+            <input type="text" id="search-input" class="search-input" placeholder="Орынды іздеу...">
             <svg class="search-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
             </svg>
@@ -496,9 +494,9 @@
             <img id="place-image" alt="" class="place-image">
             <p id="place-description" class="place-description"></p>
             
-            <!-- Видео секция -->
+            <!-- Бейне секциясы -->
             <div id="videos-section" class="videos-section hidden">
-                <h3 class="videos-title">Видео</h3>
+                <h3 class="videos-title">Бейнелер</h3>
                 <div id="videos-list" class="videos-list"></div>
             </div>
             
@@ -525,7 +523,7 @@
             <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
             </svg>
-            Отменить маршрут
+            Маршрутты болдырмау
         </button>
     </div>
     
@@ -577,42 +575,38 @@
                 places = await response.json();
                 displayResults(places);
                 
-                // Простое добавление маркеров без сложной синхронизации
                 setTimeout(() => {
                     addMarkers(places);
                 }, 500);
                 
             } catch (error) {
-                console.error('Ошибка загрузки:', error);
-                searchResults.innerHTML = '<div style="padding: 16px; color: #ef4444;">Ошибка загрузки данных</div>';
+                console.error('Жүктеу қатесі:', error);
+                searchResults.innerHTML = '<div style="padding: 16px; color: #ef4444;">Деректерді жүктеу қатесі</div>';
                 searchResults.classList.remove('hidden');
             }
         }
         
         function addMarkers(places) {
-            // Очищаем старые маркеры
             markers.forEach(marker => marker.remove());
             markers = [];
             
-            // Создаем простые стандартные маркеры
             places.forEach(place => {
                 const marker = new mapboxgl.Marker()
                     .setLngLat([Number(place.longitude), Number(place.latitude)])
                     .addTo(map);
                 
-                // Простой обработчик клика (без автомаршрута для кликов по карте)
                 marker.getElement().onclick = () => showPlace(place, false);
                 marker.getElement().style.cursor = 'pointer';
                 
                 markers.push(marker);
             });
             
-            console.log(`Добавлено ${markers.length} маркеров`);
+            console.log(`${markers.length} маркер қосылды`);
         }
         
         function displayResults(places) {
             if (places.length === 0) {
-                searchResults.innerHTML = '<div style="padding: 16px; color: #6b7280;">Ничего не найдено</div>';
+                searchResults.innerHTML = '<div style="padding: 16px; color: #6b7280;">Ештеме табылмады</div>';
                 searchResults.classList.remove('hidden');
                 return;
             }
@@ -636,37 +630,33 @@
         
         function showPlace(place, autoRoute = false) {
             if (!place) {
-                console.error('Нет данных о месте');
+                console.error('Орын туралы деректер жоқ');
                 return;
             }
             
             activePlace = place;
             
             try {
-                // Обновляем заголовок
                 const titleElement = document.getElementById('place-title');
                 if (titleElement) {
-                    titleElement.textContent = place.name || 'Неизвестное место';
+                    titleElement.textContent = place.name || 'Белгісіз орын';
                 }
                 
-                // Обновляем изображение
                 const imageElement = document.getElementById('place-image');
                 if (imageElement && place.photo_url) {
                     imageElement.src = place.photo_url;
-                    imageElement.alt = place.name || 'Фото места';
+                    imageElement.alt = place.name || 'Орын суреті';
                     imageElement.onerror = function() {
                         this.src = 'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 24 24" fill="%23e5e7eb"%3E%3Cpath d="M21 19V5c0-1.1-.9-2-2-2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2zM8.5 13.5l2.5 3.01L14.5 12l4.5 6H5l3.5-4.5z"/%3E%3C/svg%3E';
-                        this.alt = 'Изображение недоступно';
+                        this.alt = 'Сурет қолжетімсіз';
                     };
                 }
                 
-                // Обновляем описание
                 const descriptionElement = document.getElementById('place-description');
                 if (descriptionElement) {
-                    descriptionElement.textContent = place.description || 'Описание недоступно';
+                    descriptionElement.textContent = place.description_kz || place.description || 'Сипаттама қолжетімсіз';
                 }
                 
-                // Настраиваем кнопки
                 const routeButton = document.getElementById('route-button');
                 if (routeButton && place.longitude && place.latitude) {
                     routeButton.dataset.lng = place.longitude;
@@ -676,7 +666,6 @@
                 const viewButton = document.getElementById('view-button');
                 if (viewButton && place.id) {
                     viewButton.dataset.id = place.id;
-                    // Скрываем кнопку 360° если нет панорамы или она равна "none"
                     if (!place.photo_360_url || place.photo_360_url === 'none' || place.photo_360_url === '') {
                         viewButton.style.display = 'none';
                     } else {
@@ -684,18 +673,14 @@
                     }
                 }
                 
-                // Обновляем видео
                 updateVideos(place.videos || []);
                 
-                // СНАЧАЛА показываем панель, ПОТОМ скрываем поиск
                 infoPanel.classList.add('active');
                 
-                // Небольшая задержка перед скрытием поиска
                 setTimeout(() => {
                     searchResults.classList.add('hidden');
                 }, 100);
                 
-                // Летим к месту на карте
                 if (place.longitude && place.latitude) {
                     map.flyTo({
                         center: [parseFloat(place.longitude), parseFloat(place.latitude)],
@@ -705,7 +690,6 @@
                     });
                 }
                 
-                // Автоматически строим маршрут если запрошено
                 if (autoRoute && place.longitude && place.latitude) {
                     setTimeout(() => {
                         try {
@@ -717,52 +701,37 @@
                                 directions.setDestination([lng, lat]);
                                 routeControl.classList.add('visible');
                                 
-                                // Показываем уведомление о построенном маршруте
-                                showNotification(`Маршрут до "${place.name}" построен`);
+                                showNotification(`"${place.name}" дейінгі маршрут құрылды`);
                             }
                         } catch (error) {
-                            console.error('Ошибка автопостроения маршрута:', error);
+                            console.error('Автомаршрут құру қатесі:', error);
                         }
-                    }, 1200); // Небольшая задержка после анимации полета к месту
+                    }, 1200);
                 }
                 
-                console.log('Панель должна быть видна:', infoPanel.classList.contains('active'));
-                
             } catch (error) {
-                console.error('Ошибка при показе места:', error);
+                console.error('Орынды көрсету қатесі:', error);
             }
         }
         
         function hideInfo() {
-            console.log('hideInfo вызвана');
-            console.log('Панель активна до закрытия:', infoPanel.classList.contains('active'));
-            console.log('Маршрут активен до закрытия:', routeControl.classList.contains('visible'));
-            
-            // Убираем все inline стили и возвращаем к CSS
             infoPanel.style.display = '';
             infoPanel.style.transform = '';
             infoPanel.style.opacity = '';
             
-            // Убираем активный класс
             infoPanel.classList.remove('active');
             
-            // Отменяем маршрут при закрытии панели
             const wasRouteVisible = routeControl.classList.contains('visible');
             
             if (wasRouteVisible) {
                 const routeCleared = clearRoute();
                 
-                // Показываем уведомление если маршрут был активен
                 if (activePlace) {
-                    showNotification(`Маршрут до "${activePlace.name}" отменен`);
+                    showNotification(`"${activePlace.name}" дейінгі маршрут болдырылмады`);
                 }
             }
             
             activePlace = null;
-            
-            console.log('Панель активна после закрытия:', infoPanel.classList.contains('active'));
-            console.log('Маршрут активен после закрытия:', routeControl.classList.contains('visible'));
-            console.log('Панель скрыта');
         }
         
         function filterPlaces(query) {
@@ -775,7 +744,8 @@
             const filtered = places.filter(place => 
                 place.name.toLowerCase().includes(query.toLowerCase()) ||
                 place.description.toLowerCase().includes(query.toLowerCase()) ||
-                (place.name_kz && place.name_kz.toLowerCase().includes(query.toLowerCase()))
+                (place.name_kz && place.name_kz.toLowerCase().includes(query.toLowerCase())) ||
+                (place.description_kz && place.description_kz.toLowerCase().includes(query.toLowerCase()))
             );
             
             displayResults(filtered);
@@ -783,20 +753,16 @@
         }
         
         function showNotification(message) {
-            // Создаем элемент уведомления
             const notification = document.createElement('div');
             notification.className = 'notification';
             notification.textContent = message;
             
-            // Добавляем в body
             document.body.appendChild(notification);
             
-            // Показываем уведомление
             setTimeout(() => {
                 notification.classList.add('show');
             }, 100);
             
-            // Убираем уведомление через 3 секунды
             setTimeout(() => {
                 notification.classList.remove('show');
                 setTimeout(() => {
@@ -809,12 +775,10 @@
         
         function clearRoute() {
             try {
-                // Множественные попытки очистки маршрута
                 directions.removeRoutes();
                 directions.setOrigin(null);
                 directions.setDestination(null);
                 
-                // Принудительно скрываем контрол
                 routeControl.classList.remove('visible');
                 routeControl.style.display = 'none';
                 
@@ -822,11 +786,10 @@
                     routeControl.style.display = '';
                 }, 100);
                 
-                console.log('Маршрут полностью очищен');
+                console.log('Маршрут толығымен тазартылды');
                 return true;
             } catch (error) {
-                console.error('Ошибка очистки маршрута:', error);
-                // Принудительно скрываем кнопку даже при ошибке
+                console.error('Маршрутты тазарту қатесі:', error);
                 routeControl.classList.remove('visible');
                 return false;
             }
@@ -836,16 +799,13 @@
             const videosSection = document.getElementById('videos-section');
             const videosList = document.getElementById('videos-list');
             
-            // Очищаем список видео
             videosList.innerHTML = '';
             
             if (!videos || videos.length === 0) {
-                // Скрываем секцию если нет видео
                 videosSection.classList.add('hidden');
                 return;
             }
             
-            // Показываем секцию и добавляем видео
             videosSection.classList.remove('hidden');
             
             videos.forEach((videoSrc, index) => {
@@ -857,21 +817,19 @@
                 videoElement.preload = 'metadata';
                 videoElement.style.borderRadius = '8px';
                 
-                // Создаем source элемент
                 const sourceElement = document.createElement('source');
                 sourceElement.src = videoSrc;
                 sourceElement.type = 'video/mp4';
                 
                 videoElement.appendChild(sourceElement);
                 
-                // Обработка ошибок загрузки видео
                 videoElement.onerror = function() {
                     videoContainer.innerHTML = `
                         <div style="display: flex; align-items: center; justify-content: center; height: 100%; color: #9ca3af; flex-direction: column; font-size: 14px;">
                             <svg style="width: 24px; height: 24px; margin-bottom: 8px;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"></path>
                             </svg>
-                            Видео недоступно
+                            Бейне қолжетімсіз
                         </div>
                     `;
                 };
@@ -880,17 +838,18 @@
                 videosList.appendChild(videoContainer);
             });
             
-            console.log(`Добавлено видео: ${videos.length}`);
+            console.log(`Бейне қосылды: ${videos.length}`);
         }
         
         function getTypeLabel(type) {
             const types = {
                 'mausoleum': 'Мавзолей',
-                'mosque': 'Мечеть',
-                'monument': 'Памятник',
-                'museum': 'Музей'
+                'mosque': 'Мешіт',
+                'monument': 'Ескерткіш',
+                'museum': 'Мұражай',
+                'archaeological': 'Археологиялық ескерткіш'
             };
-            return types[type] || 'Историческое место';
+            return types[type] || 'Тарихи орын';
         }
         
         // Events
@@ -906,8 +865,7 @@
             if (item) {
                 const place = places.find(p => p.id == item.dataset.id);
                 if (place) {
-                    console.log('Клик по результату поиска:', place.name);
-                    // Автоматически строим маршрут при клике из поиска
+                    console.log('Іздеу нәтижесі бойынша клик:', place.name);
                     showPlace(place, true);
                 }
             }
@@ -921,7 +879,7 @@
                 const lat = parseFloat(e.target.dataset.lat);
                 
                 if (isNaN(lng) || isNaN(lat)) {
-                    console.error('Некорректные координаты для маршрута');
+                    console.error('Маршрут үшін дұрыс емес координаттар');
                     return;
                 }
                 
@@ -929,33 +887,32 @@
                 directions.setDestination([lng, lat]);
                 routeControl.classList.add('visible');
             } catch (error) {
-                console.error('Ошибка при построении маршрута:', error);
+                console.error('Маршрут құру қатесі:', error);
             }
         });
         
         document.getElementById('cancel-route').addEventListener('click', () => {
             const routeCleared = clearRoute();
             
-            // Показываем уведомление
             if (activePlace) {
-                showNotification(`Маршрут до "${activePlace.name}" отменен`);
+                showNotification(`"${activePlace.name}" дейінгі маршрут болдырылмады`);
             } else {
-                showNotification('Маршрут отменен');
+                showNotification('Маршрут болдырылмады');
             }
             
-            console.log('Маршрут отменен кнопкой');
+            console.log('Маршрут батырма арқылы болдырылмады');
         });
         
         document.getElementById('view-button').addEventListener('click', (e) => {
             try {
                 const placeId = e.target.dataset.id;
                 if (!placeId) {
-                    console.error('ID места не найден');
+                    console.error('Орын ID табылмады');
                     return;
                 }
                 window.location.href = `view.html?place_id=${placeId}`;
             } catch (error) {
-                console.error('Ошибка при переходе к 360° просмотру:', error);
+                console.error('360° көруге өту қатесі:', error);
             }
         });
         
