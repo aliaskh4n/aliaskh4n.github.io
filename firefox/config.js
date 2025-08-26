@@ -61,7 +61,7 @@ const CONFIG = {
 			id: '2',
 			name: 'Mail',
 			icon: 'mail',
-			link: 'https://mail.protonmail.com/',
+			link: 'https://mail.yandex.kz/',
 		},
 		{
 			id: '3',
@@ -94,7 +94,7 @@ const CONFIG = {
 			id: '1',
 			name: 'Music',
 			icon: 'headphones',
-			link: 'https://open.spotify.com',
+			link: 'https://music.yandex.kz/',
 		},
 		{
 			id: '2',
