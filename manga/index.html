@@ -98,11 +98,20 @@
     .card-stats img { width:16px; height:16px; }
 
     .bottom-menu {
-      position:fixed; bottom:10px; left:50%; transform:translateX(-50%);
-      width:420px; height:calc(70px + env(safe-area-inset-bottom));
-      background: rgba(40,45,55,0.4); backdrop-filter: blur(12px);
-      display:flex; justify-content:space-around; align-items:center;
-      box-shadow: 0 -4px 15px rgba(0,0,0,0.5); z-index:100; padding:0 10px;
+      position: fixed;
+      bottom: 0; /* теперь прижимается к низу экрана */
+      left: 50%;
+      transform: translateX(-50%);
+      width: 420px;
+      height: calc(70px + env(safe-area-inset-bottom)); 
+      background: rgba(40,45,55,0.4); 
+      backdrop-filter: blur(12px);
+      display: flex; 
+      justify-content: space-around; 
+      align-items: center;
+      box-shadow: 0 -4px 15px rgba(0,0,0,0.5); 
+      z-index: 100; 
+      padding: 15px 10px 0 10px; /* добавляем 15px сверху для кнопок */
       border-radius: 15px 15px 0 0;
     }
     .bottom-menu button {
