@@ -1,0 +1,158 @@
+.frame {
+  align-items: start;
+  background-color: #17212b;
+  display: grid;
+  justify-items: center;
+  width: 100vw;
+}
+
+.frame .div {
+  background-color: #17212b;
+  height: 800px;
+  overflow: hidden;
+  position: relative;
+  width: 400px;
+}
+
+.frame .overlap {
+  background-color: #2a3542;
+  border-radius: 10px;
+  height: 40px;
+  left: 10px;
+  position: absolute;
+  top: 10px;
+  width: 380px;
+}
+
+.frame .search {
+  height: 24px;
+  left: 178px;
+  position: relative;
+  top: 8px;
+  width: 24px;
+}
+
+.frame .vector {
+  height: 18px;
+  left: 3px;
+  position: absolute;
+  top: 3px;
+  width: 18px;
+}
+
+.frame .overlap-group {
+  background-color: #232e3c;
+  border-radius: 10px;
+  height: 250px;
+  left: 10px;
+  position: absolute;
+  top: 65px;
+  width: 185px;
+}
+
+.frame .rectangle {
+  height: 220px;
+  left: 0;
+  object-fit: cover;
+  position: absolute;
+  top: 0;
+  width: 185px;
+}
+
+.frame .text-wrapper {
+  color: #ffffff;
+  font-family: "Roboto-Black", Helvetica;
+  font-size: 12px;
+  font-weight: 900;
+  left: 44px;
+  letter-spacing: 0;
+  line-height: normal;
+  position: absolute;
+  top: 226px;
+  width: 98px;
+}
+
+.frame .overlap-2 {
+  background-color: #232e3c;
+  border-radius: 10px;
+  height: 250px;
+  left: 205px;
+  position: absolute;
+  top: 65px;
+  width: 185px;
+}
+
+.frame .text-wrapper-2 {
+  color: #ffffff;
+  font-family: "Roboto-Black", Helvetica;
+  font-size: 12px;
+  font-weight: 900;
+  left: 18px;
+  letter-spacing: 0;
+  line-height: normal;
+  position: absolute;
+  top: 226px;
+  width: 150px;
+}
+
+.frame .overlap-3 {
+  background-color: #232e3c;
+  border-radius: 10px;
+  height: 250px;
+  left: 10px;
+  position: absolute;
+  top: 330px;
+  width: 185px;
+}
+
+.frame .text-wrapper-3 {
+  color: #ffffff;
+  font-family: "Roboto-Black", Helvetica;
+  font-size: 12px;
+  font-weight: 900;
+  left: 30px;
+  letter-spacing: 0;
+  line-height: normal;
+  position: absolute;
+  top: 226px;
+  width: 126px;
+}
+
+.frame .overlap-4 {
+  background-color: #232e3c;
+  border-radius: 10px;
+  height: 250px;
+  left: 205px;
+  position: absolute;
+  top: 330px;
+  width: 185px;
+}
+
+.frame .rectangle-wrapper {
+  background-color: #232e3c;
+  border-radius: 10px;
+  height: 250px;
+  left: 10px;
+  position: absolute;
+  top: 590px;
+  width: 185px;
+}
+
+.frame .img {
+  height: 210px;
+  left: 0;
+  object-fit: cover;
+  position: absolute;
+  top: 0;
+  width: 185px;
+}
+
+.frame .img-wrapper {
+  background-color: #232e3c;
+  border-radius: 10px;
+  height: 250px;
+  left: 205px;
+  position: absolute;
+  top: 590px;
+  width: 185px;
+}
