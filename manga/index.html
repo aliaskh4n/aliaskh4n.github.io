@@ -115,22 +115,6 @@
     .bottom-menu button img { width:24px; height:24px; margin-bottom:2px; }
     .bottom-menu button:hover { transform:scale(1.1); background: rgba(255,255,255,0.15); }
 
-    .error-message {
-      text-align: center;
-      color: #ff6b6b;
-      background: rgba(255, 107, 107, 0.1);
-      border: 1px solid rgba(255, 107, 107, 0.3);
-      border-radius: 10px;
-      padding: 20px;
-      margin: 20px 0;
-    }
-
-    .loading {
-      text-align: center;
-      color: #fff;
-      padding: 20px;
-    }
-
     @media(max-width:420px){
       .app-container { width:100%; padding:0 10px; }
       .cards-container { grid-template-columns: repeat(auto-fill, minmax(140px,1fr)); }
@@ -144,9 +128,7 @@
       <img src="https://em-content.zobj.net/source/apple/419/magnifying-glass-tilted-left_1f50d.png" alt="Search">
       <input type="text" id="searchInput" placeholder="Поиск...">
     </div>
-    <div class="cards-container" id="cardsContainer">
-      <div class="loading">Загрузка...</div>
-    </div>
+    <div class="cards-container" id="cardsContainer"></div>
   </div>
 
   <div class="bottom-menu">
@@ -157,86 +139,34 @@
   </div>
 
   <script>
-    let allManga = [];
-
     async function loadManga() {
-      const container = document.getElementById('cardsContainer');
-      
       try {
         const res = await fetch("https://nekros.tatokz2006.workers.dev/database/database.json");
-        
-        if (!res.ok) {
-          throw new Error(`Ошибка загрузки: ${res.status} - ${res.statusText}`);
-        }
-        
+        if (!res.ok) throw new Error("Ошибка загрузки: " + res.status);
         const mangas = await res.json();
-        
-        if (!Array.isArray(mangas)) {
-          throw new Error("Неверный формат данных");
-        }
 
-        allManga = mangas;
-        renderManga(mangas);
-        
+        const container = document.getElementById('cardsContainer');
+        container.innerHTML = ""; // очистим старое
+        const fragment = document.createDocumentFragment();
+
+        mangas.forEach(manga => {
+          const cardDiv = document.createElement('div');
+          cardDiv.className = 'card';
+          cardDiv.innerHTML = `
+            <img src="${manga.img}" alt="${manga.name}" loading="lazy" onerror="this.src='img/placeholder.webp'">
+            <div class="card-title">${manga.name}</div>
+            <div class="card-stats">
+              <img src="https://em-content.zobj.net/source/apple/419/heart-on-fire_2764-fe0f-200d-1f525.png" alt="Like">
+              <span>${manga.likes}</span>
+            </div>
+          `;
+          fragment.appendChild(cardDiv);
+        });
+
+        container.appendChild(fragment);
       } catch (err) {
-        console.error('Ошибка загрузки:', err);
-        container.innerHTML = `
-          <div class="error-message">
-            <h3>Ошибка загрузки данных</h3>
-            <p>${err.message}</p>
-            <p>Проверьте:</p>
-            <ul style="text-align: left;">
-              <li>Репозиторий <code>aliaskh4n/database</code> существует</li>
-              <li>Файл <code>database.json</code> находится в корне</li>
-              <li>Репозиторий публичный</li>
-              <li>Cloudflare Worker настроен правильно</li>
-            </ul>
-            <button onclick="loadManga()" style="margin-top: 10px; padding: 8px 16px; background: #007bff; color: white; border: none; border-radius: 5px; cursor: pointer;">
-              Попробовать снова
-            </button>
-          </div>
-        `;
+        console.error(err);
       }
-    }
-
-    function renderManga(mangas) {
-      const container = document.getElementById('cardsContainer');
-      container.innerHTML = "";
-      
-      if (mangas.length === 0) {
-        container.innerHTML = '<div style="text-align: center; color: #fff; padding: 20px;">Ничего не найдено</div>';
-        return;
-      }
-      
-      const fragment = document.createDocumentFragment();
-
-      mangas.forEach(manga => {
-        const cardDiv = document.createElement('div');
-        cardDiv.className = 'card';
-        cardDiv.innerHTML = `
-          <img src="${manga.img}" alt="${manga.name}" loading="lazy" onerror="this.src='https://via.placeholder.com/185x200/2c3e50/ffffff?text=Нет+изображения'">
-          <div class="card-title">${manga.name}</div>
-          <div class="card-stats">
-            <img src="https://em-content.zobj.net/source/apple/419/heart-on-fire_2764-fe0f-200d-1f525.png" alt="Like">
-            <span>${manga.likes || '0'}</span>
-          </div>
-        `;
-        fragment.appendChild(cardDiv);
-      });
-
-      container.appendChild(fragment);
-    }
-
-    function filterManga(searchTerm) {
-      if (!searchTerm.trim()) {
-        renderManga(allManga);
-        return;
-      }
-      
-      const filtered = allManga.filter(manga => 
-        manga.name.toLowerCase().includes(searchTerm.toLowerCase())
-      );
-      renderManga(filtered);
     }
 
     // Инициализация
@@ -245,29 +175,14 @@
     // Поиск
     const searchBar = document.getElementById('searchBar');
     const searchInput = document.getElementById('searchInput');
-    
     searchBar.addEventListener('click', ()=>{ 
       if(!searchBar.classList.contains('active')) {
         searchBar.classList.add('active'); 
         searchInput.focus(); 
       }
     });
-    
     searchInput.addEventListener('focusout', ()=>{
       if(!searchInput.value) searchBar.classList.remove('active');
-    });
-
-    searchInput.addEventListener('input', (e) => {
-      filterManga(e.target.value);
-    });
-
-    // Очистка поиска при нажатии Escape
-    searchInput.addEventListener('keydown', (e) => {
-      if (e.key === 'Escape') {
-        searchInput.value = '';
-        searchBar.classList.remove('active');
-        filterManga('');
-      }
     });
   </script>
 </body>
