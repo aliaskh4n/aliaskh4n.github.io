@@ -1,29 +1,126 @@
 <!DOCTYPE html>
 <html lang="ru">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Manga App</title>
-<style>
-  body { margin:0; font-family:"Roboto-Black",sans-serif; background:#17212b; display:flex; justify-content:center; align-items:flex-start; min-height:100vh; padding:20px 0 90px; }
-  .app-container { width:420px; display:flex; flex-direction:column; gap:15px; }
-  .search-bar { width:100%; height:45px; background:rgba(255,255,255,0.05); backdrop-filter:blur(12px); border-radius:15px; display:flex; align-items:center; justify-content:center; overflow:hidden; border:1px solid rgba(255,255,255,0.15); cursor:pointer; transition:0.2s; position:relative; }
-  .search-bar:hover { transform:scale(1.02); background:rgba(255,255,255,0.08); }
-  .search-bar input { position:absolute; left:10px; right:10px; height:28px; border:none; border-radius:10px; padding:0 10px; background:rgba(0,0,0,0.3); color:#fff; font-size:14px; opacity:0; pointer-events:none; transition:0.3s; }
-  .search-bar.active input { opacity:1; pointer-events:auto; }
-  .cards-container { display:grid; grid-template-columns:repeat(auto-fill,minmax(185px,1fr)); gap:15px; }
-  .card { display:flex; flex-direction:column; background:rgba(255,255,255,0.05); backdrop-filter:blur(15px); border-radius:16px; overflow:hidden; cursor:pointer; transition:0.3s; border:1px solid rgba(255,255,255,0.15); box-shadow:0 8px 25px rgba(0,0,0,0.5); }
-  .card:hover { transform:translateY(-5px); box-shadow:0 12px 30px rgba(0,0,0,0.6); background:rgba(255,255,255,0.08); }
-  .card img { width:100%; height:200px; object-fit:cover; border-radius:16px 16px 0 0; }
-  .card-title { position:relative; padding:10px 8px; text-align:center; font-weight:900; font-size:14px; color:#fff; min-height:45px; display:flex; align-items:center; justify-content:center; text-shadow:0 1px 3px rgba(0,0,0,0.6); }
-  .card-title::before { content:""; position:absolute; top:0; left:0; right:0; bottom:0; background: rgba(0,0,0,0.3); z-index:-1; }
-  .card-stats { display:flex; justify-content:center; align-items:center; gap:6px; padding:6px 0; font-size:13px; color:#ffcc00; background:rgba(0,0,0,0.2); border-top:1px solid rgba(255,255,255,0.1); }
-  .card-stats img { width:16px; height:16px; }
-  .bottom-menu { position:fixed; bottom:0; left:50%; transform:translateX(-50%); width:420px; height:calc(70px + env(safe-area-inset-bottom)); background: rgba(40,45,55,0.4); backdrop-filter:blur(12px); display:flex; justify-content:space-around; align-items:center; box-shadow:0 -4px 15px rgba(0,0,0,0.5); z-index:100; padding:0 10px; border-radius:15px 15px 0 0; }
-  .bottom-menu button { background: rgba(255,255,255,0.1); backdrop-filter: blur(8px); border:none; border-radius:15px; cursor:pointer; display:flex; flex-direction:column; align-items:center; justify-content:center; color:#fff; font-size:10px; width:60px; height:50px; transition:0.2s; }
-  .bottom-menu button img { width:24px; height:24px; margin-bottom:2px; }
-  .bottom-menu button:hover { transform:scale(1.1); background: rgba(255,255,255,0.15); }
-</style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Manga App</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: "Roboto-Black", Helvetica, sans-serif;
+      background-color: #17212b;
+      display: flex;
+      justify-content: center;
+      align-items: flex-start;
+      min-height: 100vh;
+      padding: 20px 0 90px;
+    }
+
+    .app-container {
+      width: 420px;
+      display: flex;
+      flex-direction: column;
+      gap: 15px;
+    }
+
+    .search-bar {
+      width: 100%;
+      height: 45px;
+      background: rgba(255, 255, 255, 0.05);
+      backdrop-filter: blur(12px);
+      border-radius: 15px;
+      position: relative;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+      border: 1px solid rgba(255,255,255,0.15);
+      transition: transform 0.2s, background 0.2s;
+      will-change: transform;
+    }
+    .search-bar:hover { transform: scale(1.02); background: rgba(255,255,255,0.08); }
+    .search-bar img { width: 18px; height: 18px; transition: all 0.2s; }
+    .search-bar input {
+      position: absolute; left:10px; right:10px; height:28px;
+      border:none; border-radius:10px; padding:0 10px;
+      background-color: rgba(0,0,0,0.3); color:#fff;
+      font-size:14px; opacity:0; pointer-events:none; transition: all 0.3s;
+    }
+    .search-bar.active img { opacity:0; pointer-events:none; }
+    .search-bar.active input { opacity:1; pointer-events:auto; }
+
+    .cards-container {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(185px, 1fr));
+      gap: 15px;
+    }
+
+    .card {
+      display: flex; flex-direction: column;
+      background: rgba(255,255,255,0.05);
+      backdrop-filter: blur(15px);
+      border-radius: 16px;
+      overflow: hidden;
+      cursor: pointer;
+      transition: transform 0.3s, box-shadow 0.3s, background 0.3s;
+      border:1px solid rgba(255,255,255,0.15);
+      box-shadow:0 8px 25px rgba(0,0,0,0.5);
+      will-change: transform;
+    }
+    .card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 12px 30px rgba(0,0,0,0.6);
+      background: rgba(255,255,255,0.08);
+    }
+    .card img {
+      width:100%; height:200px;
+      object-fit:cover; border-radius:16px 16px 0 0;
+    }
+    .card-title {
+      position: relative;
+      padding:10px 8px; text-align:center;
+      font-weight:900; font-size:14px; color:#fff;
+      min-height:45px; display:flex; align-items:center; justify-content:center;
+      text-shadow:0 1px 3px rgba(0,0,0,0.6);
+    }
+    .card-title::before {
+      content:"";
+      position:absolute; top:0; left:0; right:0; bottom:0;
+      background: rgba(0,0,0,0.3); border-radius:0;
+      z-index:-1;
+    }
+    .card-stats {
+      display:flex; justify-content:center; align-items:center;
+      gap:6px; padding:6px 0; font-size:13px; color:#ffcc00;
+      background: rgba(0,0,0,0.2); border-top:1px solid rgba(255,255,255,0.1);
+    }
+    .card-stats img { width:16px; height:16px; }
+
+    .bottom-menu {
+      position:fixed; bottom:0; left:50%; transform:translateX(-50%);
+      width:420px; height:calc(70px + env(safe-area-inset-bottom));
+      background: rgba(40,45,55,0.4); backdrop-filter: blur(12px);
+      display:flex; justify-content:space-around; align-items:center;
+      box-shadow: 0 -4px 15px rgba(0,0,0,0.5); z-index:100; padding:0 10px;
+      border-radius: 15px 15px 0 0;
+    }
+    .bottom-menu button {
+      background: rgba(255,255,255,0.1); backdrop-filter: blur(8px);
+      border:none; border-radius:15px; cursor:pointer;
+      display:flex; flex-direction:column; align-items:center; justify-content:center;
+      color:#fff; font-size:10px; width:60px; height:50px;
+      transition: transform 0.2s, background 0.2s;
+    }
+    .bottom-menu button img { width:24px; height:24px; margin-bottom:2px; }
+    .bottom-menu button:hover { transform:scale(1.1); background: rgba(255,255,255,0.15); }
+
+    @media(max-width:420px){
+      .app-container { width:100%; padding:0 10px; }
+      .cards-container { grid-template-columns: repeat(auto-fill, minmax(140px,1fr)); }
+      .bottom-menu { width: calc(100% - 20px); }
+    }
+  </style>
 </head>
 <body>
   <div class="app-container">
@@ -33,6 +130,7 @@
     </div>
     <div class="cards-container" id="cardsContainer"></div>
   </div>
+
   <div class="bottom-menu">
     <button><img src="https://em-content.zobj.net/source/apple/419/three-oclock_1f552.png"></button>
     <button><img src="https://em-content.zobj.net/source/apple/419/bookmark_1f516.png"></button>
@@ -42,40 +140,50 @@
 
   <script>
     async function loadManga() {
-      const container = document.getElementById('cardsContainer');
-      container.innerHTML = "";
       try {
-        const res = await fetch("https://nekros.tatokz2006.workers.dev/database.json");
+        const res = await fetch("https://nekros.tatokz2006.workers.dev/database/database.json");
         if (!res.ok) throw new Error("Ошибка загрузки: " + res.status);
         const mangas = await res.json();
 
+        const container = document.getElementById('cardsContainer');
+        container.innerHTML = ""; // очистим старое
         const fragment = document.createDocumentFragment();
-        mangas.forEach(m => {
-          const card = document.createElement('div');
-          card.className = 'card';
-          card.innerHTML = `
-            <img src="${m.img}" alt="${m.name}" loading="lazy" onerror="this.src='img/placeholder.webp'">
-            <div class="card-title">${m.name}</div>
+
+        mangas.forEach(manga => {
+          const cardDiv = document.createElement('div');
+          cardDiv.className = 'card';
+          cardDiv.innerHTML = `
+            <img src="${manga.img}" alt="${manga.name}" loading="lazy" onerror="this.src='img/placeholder.webp'">
+            <div class="card-title">${manga.name}</div>
             <div class="card-stats">
               <img src="https://em-content.zobj.net/source/apple/419/heart-on-fire_2764-fe0f-200d-1f525.png" alt="Like">
-              <span>${m.likes}</span>
+              <span>${manga.likes}</span>
             </div>
           `;
-          fragment.appendChild(card);
+          fragment.appendChild(cardDiv);
         });
+
         container.appendChild(fragment);
-      } catch(e) {
-        console.error(e);
-        container.innerHTML = `<p style="color:white;text-align:center;">Ошибка загрузки данных</p>`;
+      } catch (err) {
+        console.error(err);
       }
     }
 
+    // Инициализация
     loadManga();
 
+    // Поиск
     const searchBar = document.getElementById('searchBar');
     const searchInput = document.getElementById('searchInput');
-    searchBar.addEventListener('click', ()=>{ searchBar.classList.add('active'); searchInput.focus(); });
-    searchInput.addEventListener('focusout', ()=>{ if(!searchInput.value) searchBar.classList.remove('active'); });
+    searchBar.addEventListener('click', ()=>{ 
+      if(!searchBar.classList.contains('active')) {
+        searchBar.classList.add('active'); 
+        searchInput.focus(); 
+      }
+    });
+    searchInput.addEventListener('focusout', ()=>{
+      if(!searchInput.value) searchBar.classList.remove('active');
+    });
   </script>
 </body>
 </html>
