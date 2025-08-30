@@ -58,6 +58,7 @@
       margin: 0 auto 15px;
       display: block;
       box-shadow: 0 8px 20px rgba(0,0,0,0.6);
+      background-color: rgba(255,255,255,0.1);
     }
 
     .manga-title {
@@ -252,6 +253,18 @@
       background: rgba(255,255,255,0.15); 
     }
 
+    /* Стили для placeholder изображения */
+    .placeholder-img {
+      background: linear-gradient(135deg, rgba(255,255,255,0.1), rgba(255,255,255,0.05));
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: rgba(255,255,255,0.5);
+      font-size: 14px;
+      text-align: center;
+      border: 2px dashed rgba(255,255,255,0.2);
+    }
+
     @media(max-width:420px){
       .app-container { 
         width: 100%; 
@@ -345,6 +358,21 @@
       return urlParams.get('id') || urlParams.get('manga') || '1'; // По умолчанию ID = 1
     }
 
+    // Функция для создания placeholder изображения
+    function createPlaceholderImage(element, title = 'Обложка недоступна') {
+      element.style.display = 'none';
+      
+      // Создаем div-placeholder
+      const placeholder = document.createElement('div');
+      placeholder.className = 'manga-cover placeholder-img';
+      placeholder.textContent = title;
+      placeholder.style.width = element.style.width || '200px';
+      placeholder.style.height = element.style.height || '280px';
+      
+      // Заменяем img на placeholder
+      element.parentNode.insertBefore(placeholder, element);
+    }
+
     // Функция для получения данных манги с API
     async function fetchMangaData(mangaId) {
       try {
@@ -412,8 +440,18 @@
     // Функция для отображения информации о манге
     function displayMangaInfo(mangaData) {
       document.getElementById('mangaTitle').textContent = mangaData.name || mangaData.title || 'Неизвестное название';
-      document.getElementById('mangaCover').src = mangaData.img || 'img/placeholder.webp';
-      document.getElementById('mangaCover').alt = mangaData.name || mangaData.title;
+      
+      const coverImg = document.getElementById('mangaCover');
+      const imgSrc = mangaData.img || '';
+      
+      if (imgSrc) {
+        coverImg.src = imgSrc;
+        coverImg.alt = mangaData.name || mangaData.title;
+      } else {
+        // Если нет изображения, создаем placeholder
+        createPlaceholderImage(coverImg, 'Обложка\nнедоступна');
+      }
+      
       document.getElementById('mangaLikes').textContent = mangaData.likes || '0';
       document.getElementById('mangaViews').textContent = mangaData.views || '0';
       document.getElementById('mangaDescription').textContent = mangaData.description || 'Описание недоступно';
@@ -463,11 +501,23 @@
       });
     }
 
-    // Обработка ошибок загрузки изображений
+    // Улучшенная обработка ошибок загрузки изображений
     document.addEventListener('DOMContentLoaded', () => {
       const coverImg = document.getElementById('mangaCover');
+      
+      let errorHandled = false;
+      
       coverImg.addEventListener('error', function() {
-        this.src = 'img/placeholder.webp';
+        if (!errorHandled) {
+          errorHandled = true;
+          console.log('Ошибка загрузки изображения обложки');
+          createPlaceholderImage(this, 'Обложка\nнедоступна');
+        }
+      });
+
+      // Добавляем таймаут для медленных изображений
+      coverImg.addEventListener('load', function() {
+        errorHandled = false; // Сброс флага при успешной загрузке
       });
     });
 
