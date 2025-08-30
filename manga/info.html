@@ -1,0 +1,478 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Детали манги - Manga App</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: "Roboto-Black", Helvetica, sans-serif;
+      background-color: #17212b;
+      display: flex;
+      justify-content: center;
+      align-items: flex-start;
+      min-height: 100vh;
+      padding: 20px 0 90px;
+    }
+
+    .app-container {
+      width: 420px;
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+
+    .loading {
+      text-align: center;
+      color: #fff;
+      font-size: 16px;
+      padding: 50px 0;
+    }
+
+    .error {
+      background: rgba(255, 59, 48, 0.1);
+      border: 1px solid rgba(255, 59, 48, 0.3);
+      border-radius: 12px;
+      padding: 20px;
+      color: #ff3b30;
+      text-align: center;
+      margin: 20px 0;
+    }
+
+    .manga-header {
+      background: rgba(255, 255, 255, 0.05);
+      backdrop-filter: blur(15px);
+      border-radius: 20px;
+      padding: 20px;
+      border: 1px solid rgba(255,255,255,0.15);
+      box-shadow: 0 8px 25px rgba(0,0,0,0.5);
+      text-align: center;
+    }
+
+    .manga-cover {
+      width: 200px;
+      height: 280px;
+      object-fit: cover;
+      border-radius: 16px;
+      margin: 0 auto 15px;
+      display: block;
+      box-shadow: 0 8px 20px rgba(0,0,0,0.6);
+    }
+
+    .manga-title {
+      font-size: 20px;
+      font-weight: 900;
+      color: #fff;
+      margin-bottom: 15px;
+      text-shadow: 0 2px 4px rgba(0,0,0,0.6);
+      line-height: 1.2;
+    }
+
+    .manga-info {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      margin-bottom: 15px;
+    }
+
+    .manga-meta {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 8px 0;
+      border-bottom: 1px solid rgba(255,255,255,0.1);
+    }
+
+    .manga-meta:last-child {
+      border-bottom: none;
+    }
+
+    .meta-label {
+      color: #999;
+      font-size: 14px;
+    }
+
+    .meta-value {
+      color: #fff;
+      font-size: 14px;
+      font-weight: 600;
+    }
+
+    .manga-stats {
+      display: flex;
+      justify-content: center;
+      gap: 30px;
+      margin-bottom: 15px;
+    }
+
+    .stat-item {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      color: #ffcc00;
+      font-size: 14px;
+      font-weight: 700;
+    }
+
+    .stat-item img {
+      width: 20px;
+      height: 20px;
+    }
+
+    .manga-description {
+      color: #ccc;
+      font-size: 14px;
+      line-height: 1.5;
+      text-align: left;
+      margin-top: 15px;
+      padding-top: 15px;
+      border-top: 1px solid rgba(255,255,255,0.1);
+    }
+
+    .chapters-section {
+      background: rgba(255, 255, 255, 0.05);
+      backdrop-filter: blur(15px);
+      border-radius: 20px;
+      padding: 20px;
+      border: 1px solid rgba(255,255,255,0.15);
+      box-shadow: 0 8px 25px rgba(0,0,0,0.5);
+    }
+
+    .chapters-title {
+      font-size: 18px;
+      font-weight: 900;
+      color: #fff;
+      margin-bottom: 15px;
+      text-align: center;
+      text-shadow: 0 1px 3px rgba(0,0,0,0.6);
+    }
+
+    .chapter-item {
+      background: rgba(0, 0, 0, 0.3);
+      border-radius: 12px;
+      padding: 15px;
+      margin-bottom: 10px;
+      cursor: pointer;
+      transition: all 0.2s;
+      border: 1px solid rgba(255,255,255,0.1);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .chapter-item:hover {
+      background: rgba(255, 255, 255, 0.08);
+      transform: translateY(-2px);
+      box-shadow: 0 4px 15px rgba(0,0,0,0.4);
+    }
+
+    .chapter-item:last-child {
+      margin-bottom: 0;
+    }
+
+    .chapter-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 8px;
+    }
+
+    .chapter-number {
+      background: rgba(255, 255, 255, 0.1);
+      color: #fff;
+      width: 30px;
+      height: 30px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 14px;
+      font-weight: 900;
+      flex-shrink: 0;
+    }
+
+    .chapter-likes {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      color: #ffcc00;
+      font-size: 12px;
+      font-weight: 700;
+    }
+
+    .chapter-likes img {
+      width: 16px;
+      height: 16px;
+    }
+
+    .chapter-title {
+      color: #fff;
+      font-size: 16px;
+      font-weight: 700;
+      flex-grow: 1;
+      margin-left: 15px;
+      text-shadow: 0 1px 2px rgba(0,0,0,0.6);
+    }
+
+    .bottom-menu {
+      position: fixed;
+      bottom: 0;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 420px;
+      height: calc(70px + env(safe-area-inset-bottom)); 
+      background: rgba(40,45,55,0.4); 
+      backdrop-filter: blur(12px);
+      display: flex; 
+      justify-content: space-around; 
+      align-items: center;
+      box-shadow: 0 -4px 15px rgba(0,0,0,0.5); 
+      z-index: 100; 
+      padding: 15px 10px 0 10px;
+      border-radius: 15px 15px 0 0;
+    }
+
+    .bottom-menu button {
+      background: none;
+      border: none;
+      cursor: pointer;
+      padding: 8px;
+      border-radius: 50%;
+      transition: all 0.2s;
+    }
+
+    .bottom-menu button img { 
+      width: 24px; 
+      height: 24px; 
+      margin-bottom: 2px; 
+    }
+
+    .bottom-menu button:hover { 
+      transform: scale(1.1); 
+      background: rgba(255,255,255,0.15); 
+    }
+
+    @media(max-width:420px){
+      .app-container { 
+        width: 100%; 
+        padding: 0 10px; 
+      }
+      .bottom-menu { 
+        width: calc(100% - 20px); 
+      }
+      .manga-cover {
+        width: 160px;
+        height: 220px;
+      }
+      .manga-stats {
+        gap: 20px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="app-container">
+    <!-- Загрузка -->
+    <div id="loadingDiv" class="loading">Загрузка...</div>
+
+    <!-- Сообщение об ошибке -->
+    <div id="errorDiv" class="error" style="display: none;"></div>
+
+    <!-- Информация о манге -->
+    <div id="mangaHeader" class="manga-header" style="display: none;">
+      <img src="" alt="Обложка манги" class="manga-cover" id="mangaCover">
+      <div class="manga-title" id="mangaTitle"></div>
+      
+      <!-- Дополнительная информация о манге -->
+      <div class="manga-info">
+        <div class="manga-meta">
+          <span class="meta-label">Автор:</span>
+          <span class="meta-value" id="mangaAuthor"></span>
+        </div>
+        <div class="manga-meta">
+          <span class="meta-label">Статус:</span>
+          <span class="meta-value" id="mangaStatus"></span>
+        </div>
+        <div class="manga-meta">
+          <span class="meta-label">Рейтинг:</span>
+          <span class="meta-value" id="mangaRating"></span>
+        </div>
+      </div>
+      
+      <div class="manga-stats">
+        <div class="stat-item">
+          <img src="https://em-content.zobj.net/source/apple/419/heart-on-fire_2764-fe0f-200d-1f525.png" alt="Лайки">
+          <span id="mangaLikes"></span>
+        </div>
+        <div class="stat-item">
+          <img src="https://em-content.zobj.net/source/apple/419/eyes_1f440.png" alt="Просмотры">
+          <span id="mangaViews"></span>
+        </div>
+      </div>
+
+      <div class="manga-description" id="mangaDescription"></div>
+    </div>
+
+    <!-- Список глав -->
+    <div id="chaptersSection" class="chapters-section" style="display: none;">
+      <div class="chapters-title">Главы</div>
+      <div id="chaptersList"></div>
+    </div>
+  </div>
+
+  <!-- Нижнее меню -->
+  <div class="bottom-menu">
+    <button><img src="https://em-content.zobj.net/source/apple/419/three-oclock_1f552.png"></button>
+    <button><img src="https://em-content.zobj.net/source/apple/419/bookmark_1f516.png"></button>
+    <button><img src="https://em-content.zobj.net/source/apple/419/bell_1f514.png"></button>
+    <button><img src="https://em-content.zobj.net/source/apple/419/money-with-wings_1f4b8.png"></button>
+  </div>
+
+  <script>
+    // Конфигурация API
+    const API_CONFIG = {
+      baseUrl: 'https://your-worker.your-subdomain.workers.dev', // Замените на ваш URL
+      endpoints: {
+        getAllManga: '/api/manga',
+        getMangaById: '/api/manga/{id}',
+        getChapterData: '/api/manga/{mangaId}/chapter/{chapterId}'
+      }
+    };
+
+    // Получение ID манги из URL параметров
+    function getMangaIdFromUrl() {
+      const urlParams = new URLSearchParams(window.location.search);
+      return urlParams.get('id') || urlParams.get('manga') || '1'; // По умолчанию ID = 1
+    }
+
+    // Функция для получения данных манги с API
+    async function fetchMangaData(mangaId) {
+      try {
+        const response = await fetch(`${API_CONFIG.baseUrl}${API_CONFIG.endpoints.getMangaById.replace('{id}', mangaId)}`);
+        
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        
+        const data = await response.json();
+        return data;
+      } catch (error) {
+        console.error('Ошибка при получении данных манги:', error);
+        
+        // Если API недоступен, попробуем загрузить весь список и найти нужную мангу
+        try {
+          const allMangaResponse = await fetch(`${API_CONFIG.baseUrl}${API_CONFIG.endpoints.getAllManga}`);
+          if (allMangaResponse.ok) {
+            const allManga = await allMangaResponse.json();
+            const manga = allManga.find(m => m.id == mangaId);
+            if (manga) return manga;
+          }
+        } catch (fallbackError) {
+          console.error('Fallback также не сработал:', fallbackError);
+        }
+        
+        throw error;
+      }
+    }
+
+    // Функция для отображения ошибки
+    function showError(message) {
+      document.getElementById('loadingDiv').style.display = 'none';
+      document.getElementById('mangaHeader').style.display = 'none';
+      document.getElementById('chaptersSection').style.display = 'none';
+      
+      const errorDiv = document.getElementById('errorDiv');
+      errorDiv.textContent = message;
+      errorDiv.style.display = 'block';
+    }
+
+    // Функция для загрузки данных манги
+    async function loadMangaDetails() {
+      const mangaId = getMangaIdFromUrl();
+      
+      try {
+        const mangaData = await fetchMangaData(mangaId);
+        
+        // Скрываем загрузку
+        document.getElementById('loadingDiv').style.display = 'none';
+        
+        // Отображаем данные манги
+        displayMangaInfo(mangaData);
+        displayChapters(mangaData.chapters || []);
+        
+        // Показываем секции
+        document.getElementById('mangaHeader').style.display = 'block';
+        document.getElementById('chaptersSection').style.display = 'block';
+        
+      } catch (error) {
+        showError(`Ошибка загрузки данных: ${error.message}. Проверьте подключение к API.`);
+      }
+    }
+
+    // Функция для отображения информации о манге
+    function displayMangaInfo(mangaData) {
+      document.getElementById('mangaTitle').textContent = mangaData.name || mangaData.title || 'Неизвестное название';
+      document.getElementById('mangaCover').src = mangaData.img || 'img/placeholder.webp';
+      document.getElementById('mangaCover').alt = mangaData.name || mangaData.title;
+      document.getElementById('mangaLikes').textContent = mangaData.likes || '0';
+      document.getElementById('mangaViews').textContent = mangaData.views || '0';
+      document.getElementById('mangaDescription').textContent = mangaData.description || 'Описание недоступно';
+      document.getElementById('mangaAuthor').textContent = mangaData.author || 'Неизвестен';
+      document.getElementById('mangaStatus').textContent = mangaData.status || 'Неизвестен';
+      document.getElementById('mangaRating').textContent = mangaData.rating ? `${mangaData.rating}/10` : 'Не оценено';
+      
+      // Обновляем заголовок страницы
+      document.title = `${mangaData.name || mangaData.title} - Manga App`;
+    }
+
+    // Функция для отображения глав
+    function displayChapters(chapters) {
+      const chaptersList = document.getElementById('chaptersList');
+      chaptersList.innerHTML = '';
+
+      if (!chapters || chapters.length === 0) {
+        chaptersList.innerHTML = '<div style="color: #999; text-align: center; padding: 20px;">Главы не найдены</div>';
+        return;
+      }
+
+      // Сортируем главы по убыванию ID (новые сверху)
+      const sortedChapters = [...chapters].sort((a, b) => (b.id || 0) - (a.id || 0));
+
+      sortedChapters.forEach(chapter => {
+        const chapterDiv = document.createElement('div');
+        chapterDiv.className = 'chapter-item';
+        chapterDiv.innerHTML = `
+          <div class="chapter-header">
+            <div class="chapter-number">${chapter.id || '?'}</div>
+            <div class="chapter-title">${chapter.title || `Глава ${chapter.id}`}</div>
+            <div class="chapter-likes">
+              <img src="https://em-content.zobj.net/source/apple/419/heart-on-fire_2764-fe0f-200d-1f525.png" alt="Лайки">
+              <span>${chapter.likes || '0'}</span>
+            </div>
+          </div>
+        `;
+        
+        chapterDiv.addEventListener('click', () => {
+          const mangaId = getMangaIdFromUrl();
+          console.log(`Открытие главы ${chapter.id} манги ${mangaId}`);
+          // Переход на страницу чтения главы
+          window.location.href = `chapter.html?manga=${mangaId}&chapter=${chapter.id}`;
+        });
+
+        chaptersList.appendChild(chapterDiv);
+      });
+    }
+
+    // Обработка ошибок загрузки изображений
+    document.addEventListener('DOMContentLoaded', () => {
+      const coverImg = document.getElementById('mangaCover');
+      coverImg.addEventListener('error', function() {
+        this.src = 'img/placeholder.webp';
+      });
+    });
+
+    // Запуск загрузки данных при загрузке страницы
+    loadMangaDetails();
+  </script>
+</body>
+</html>
