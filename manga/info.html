@@ -383,7 +383,7 @@
     // Получение ID манги из URL параметров
     function getMangaIdFromUrl() {
       const urlParams = new URLSearchParams(window.location.search);
-      return urlParams.get('id') || urlParams.get('manga') || '1';
+      return urlParams.get('id') || urlParams.get('manga');
     }
 
     // Функция для создания placeholder изображения
@@ -450,6 +450,13 @@
     // Функция для загрузки данных манги
     async function loadMangaDetails() {
       const mangaId = getMangaIdFromUrl();
+      
+      // Проверяем, есть ли ID в URL
+      if (!mangaId) {
+        showError('ID манги не указан в URL. Возвращайтесь к списку и выберите мангу.');
+        return;
+      }
+      
       console.log(`Загружаем детали манги ID: ${mangaId}`);
       
       try {
