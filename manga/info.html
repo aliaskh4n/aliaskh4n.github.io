@@ -367,7 +367,7 @@
 
   <!-- Нижнее меню -->
   <div class="bottom-menu">
-    <button><img src="https://em-content.zobj.net/source/apple/419/three-oclock_1f552.png"></button>
+    <button onclick="history.back()"><img src="https://em-content.zobj.net/source/apple/419/leftwards-arrow-with-hook_21a9-fe0f.png"></button>
     <button><img src="https://em-content.zobj.net/source/apple/419/bookmark_1f516.png"></button>
     <button><img src="https://em-content.zobj.net/source/apple/419/bell_1f514.png"></button>
     <button><img src="https://em-content.zobj.net/source/apple/419/money-with-wings_1f4b8.png"></button>
@@ -543,17 +543,81 @@
       document.getElementById('mangaRating').textContent = rating;
     }
 
-    // Функция для отображения глав
-    function displayChapters(chapters) {
-      const chaptersList = document.getElementById('chaptersList');
-      chaptersList.innerHTML = '';
+    // Функция для получения информации о главах
+    async function fetchChapterInfo(mangaId, chapterFilenames) {
+      const chapterInfos = [];
+      
+      for (const filename of chapterFilenames) {
+        try {
+          // Извлекаем номер главы из имени файла (например: chapter1.json -> 1)
+          const chapterNumber = filename.match(/chapter(\d+)\.json/)?.[1] || 
+                              filename.match(/(\d+)\.json/)?.[1] ||
+                              chapterInfos.length + 1;
+          
+          console.log(`Загружаем информацию о главе: ${filename}`);
+          
+          const response = await fetch(`${API_CONFIG.baseUrl}/?id=${mangaId}&cr=${chapterNumber}`, {
+            headers: {
+              'Accept': 'application/json',
+              'Origin': window.location.origin
+            }
+          });
+          
+          if (response.ok) {
+            const chapterData = await response.json();
+            const chapterInfo = chapterData.chapterInfo || chapterData.chapterContent;
+            
+            chapterInfos.push({
+              id: chapterNumber,
+              title: chapterInfo?.title || `Глава ${chapterNumber}`,
+              likes: chapterInfo?.likes || 0,
+              views: chapterInfo?.views || 0,
+              filename: filename
+            });
+          } else {
+            // Если не удалось загрузить, создаем базовую информацию
+            chapterInfos.push({
+              id: chapterNumber,
+              title: `Глава ${chapterNumber}`,
+              likes: 0,
+              views: 0,
+              filename: filename
+            });
+          }
+        } catch (error) {
+          console.error(`Ошибка загрузки главы ${filename}:`, error);
+          const chapterNumber = chapterInfos.length + 1;
+          chapterInfos.push({
+            id: chapterNumber,
+            title: `Глава ${chapterNumber}`,
+            likes: 0,
+            views: 0,
+            filename: filename
+          });
+        }
+      }
+      
+      return chapterInfos;
+    }
 
-      if (!chapters || chapters.length === 0) {
+    // Функция для отображения глав
+    async function displayChapters(chapterFilenames) {
+      const chaptersList = document.getElementById('chaptersList');
+      chaptersList.innerHTML = '<div style="color: #999; text-align: center; padding: 20px;">Загрузка информации о главах...</div>';
+
+      if (!chapterFilenames || chapterFilenames.length === 0) {
         chaptersList.innerHTML = '<div style="color: #999; text-align: center; padding: 20px;">Главы не найдены</div>';
         return;
       }
 
-      console.log(`Отображаем ${chapters.length} глав`);
+      console.log(`Обрабатываем ${chapterFilenames.length} глав`);
+
+      // Получаем информацию о главах
+      const mangaId = getMangaIdFromUrl();
+      const chapters = await fetchChapterInfo(mangaId, chapterFilenames);
+      
+      // Очищаем список
+      chaptersList.innerHTML = '';
 
       // Сортируем главы по убыванию ID (новые сверху)
       const sortedChapters = [...chapters].sort((a, b) => {
@@ -567,19 +631,17 @@
         chapterDiv.className = 'chapter-item';
         chapterDiv.innerHTML = `
           <div class="chapter-header">
-            <div class="chapter-number">${chapter.id || '?'}</div>
-            <div class="chapter-title">${chapter.title || chapter.name || `Глава ${chapter.id}`}</div>
+            <div class="chapter-number">${chapter.id}</div>
+            <div class="chapter-title">${chapter.title}</div>
             <div class="chapter-likes">
               <img src="https://em-content.zobj.net/source/apple/419/heart-on-fire_2764-fe0f-200d-1f525.png" alt="Лайки">
-              <span>${chapter.likes || '0'}</span>
+              <span>${chapter.likes}</span>
             </div>
           </div>
         `;
         
         chapterDiv.addEventListener('click', () => {
-          const mangaId = getMangaIdFromUrl();
           console.log(`Открытие главы ${chapter.id} манги ${mangaId}`);
-          // Переход на страницу чтения главы (если у вас есть такая страница)
           window.location.href = `chapter.html?manga=${mangaId}&chapter=${chapter.id}`;
         });
 
