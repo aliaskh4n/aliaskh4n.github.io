@@ -1,0 +1,663 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Чтение главы - Manga App</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: "Roboto-Black", Helvetica, sans-serif;
+      background-color: #0d1117;
+      color: #fff;
+      padding: 0;
+      user-select: none;
+    }
+
+    /* Шапка с информацией */
+    .chapter-header {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 60px;
+      background: rgba(13, 17, 23, 0.95);
+      backdrop-filter: blur(12px);
+      border-bottom: 1px solid rgba(255,255,255,0.1);
+      z-index: 100;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 15px;
+      transition: transform 0.3s ease;
+    }
+
+    .chapter-header.hidden {
+      transform: translateY(-100%);
+    }
+
+    .header-left {
+      display: flex;
+      align-items: center;
+      gap: 15px;
+    }
+
+    .back-button {
+      background: rgba(255, 255, 255, 0.1);
+      border: none;
+      border-radius: 8px;
+      padding: 8px 12px;
+      color: #fff;
+      font-size: 14px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      transition: all 0.2s;
+    }
+
+    .back-button:hover {
+      background: rgba(255, 255, 255, 0.2);
+    }
+
+    .chapter-info {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+    }
+
+    .manga-name {
+      font-size: 16px;
+      font-weight: 700;
+      color: #fff;
+    }
+
+    .chapter-title {
+      font-size: 12px;
+      color: #999;
+    }
+
+    .header-right {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .chapter-counter {
+      background: rgba(255, 255, 255, 0.1);
+      padding: 4px 8px;
+      border-radius: 6px;
+      font-size: 12px;
+      color: #fff;
+    }
+
+    /* Контейнер для контента */
+    .chapter-container {
+      margin-top: 60px;
+      min-height: calc(100vh - 60px);
+      background: #0d1117;
+    }
+
+    /* Индикаторы состояния */
+    .loading {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      height: 50vh;
+      gap: 20px;
+    }
+
+    .loading-spinner {
+      width: 40px;
+      height: 40px;
+      border: 3px solid rgba(255,255,255,0.1);
+      border-top: 3px solid #fff;
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+    }
+
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+
+    .error {
+      background: rgba(255, 59, 48, 0.1);
+      border: 1px solid rgba(255, 59, 48, 0.3);
+      border-radius: 12px;
+      padding: 20px;
+      color: #ff3b30;
+      text-align: center;
+      margin: 20px;
+    }
+
+    /* Контент главы */
+    .chapter-content {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 20px 0;
+      gap: 5px;
+    }
+
+    .chapter-page {
+      max-width: 100%;
+      width: auto;
+      height: auto;
+      object-fit: contain;
+      background: rgba(255,255,255,0.05);
+      border-radius: 8px;
+    }
+
+    .chapter-page.loading {
+      background: rgba(255,255,255,0.1);
+      min-height: 400px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: rgba(255,255,255,0.5);
+    }
+
+    /* Навигация между главами */
+    .chapter-navigation {
+      position: fixed;
+      bottom: 20px;
+      left: 50%;
+      transform: translateX(-50%);
+      display: flex;
+      gap: 10px;
+      background: rgba(13, 17, 23, 0.95);
+      backdrop-filter: blur(12px);
+      padding: 12px 16px;
+      border-radius: 25px;
+      border: 1px solid rgba(255,255,255,0.1);
+      transition: opacity 0.3s ease;
+    }
+
+    .chapter-navigation.hidden {
+      opacity: 0;
+      pointer-events: none;
+    }
+
+    .nav-button {
+      background: rgba(255, 255, 255, 0.1);
+      border: none;
+      border-radius: 20px;
+      padding: 10px 16px;
+      color: #fff;
+      font-size: 14px;
+      cursor: pointer;
+      transition: all 0.2s;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .nav-button:hover {
+      background: rgba(255, 255, 255, 0.2);
+      transform: translateY(-1px);
+    }
+
+    .nav-button:disabled {
+      background: rgba(255, 255, 255, 0.05);
+      color: rgba(255,255,255,0.3);
+      cursor: not-allowed;
+      transform: none;
+    }
+
+    /* Текстовый контент главы */
+    .text-content {
+      max-width: 800px;
+      margin: 0 auto;
+      padding: 20px;
+      line-height: 1.6;
+      font-size: 16px;
+      background: rgba(255,255,255,0.02);
+      border-radius: 12px;
+      margin-bottom: 20px;
+    }
+
+    /* Адаптивность */
+    @media(max-width: 768px) {
+      .manga-name {
+        font-size: 14px;
+      }
+      
+      .chapter-title {
+        font-size: 11px;
+      }
+      
+      .header-left {
+        gap: 10px;
+      }
+      
+      .chapter-navigation {
+        bottom: 15px;
+        left: 15px;
+        right: 15px;
+        transform: none;
+        justify-content: center;
+      }
+      
+      .nav-button {
+        flex: 1;
+        justify-content: center;
+        max-width: 120px;
+      }
+    }
+
+    /* Полноэкранный режим для изображений */
+    .fullscreen-overlay {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0,0,0,0.95);
+      z-index: 1000;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .fullscreen-overlay.active {
+      display: flex;
+    }
+
+    .fullscreen-overlay img {
+      max-width: 95%;
+      max-height: 95%;
+      object-fit: contain;
+    }
+
+    .fullscreen-close {
+      position: absolute;
+      top: 20px;
+      right: 20px;
+      background: rgba(255,255,255,0.1);
+      border: none;
+      border-radius: 50%;
+      width: 40px;
+      height: 40px;
+      color: #fff;
+      cursor: pointer;
+      font-size: 18px;
+    }
+  </style>
+</head>
+<body>
+  <!-- Шапка -->
+  <div class="chapter-header" id="chapterHeader">
+    <div class="header-left">
+      <button class="back-button" onclick="goBack()">
+        ← Назад
+      </button>
+      <div class="chapter-info">
+        <div class="manga-name" id="mangaName">Загрузка...</div>
+        <div class="chapter-title" id="chapterTitle">Загрузка главы...</div>
+      </div>
+    </div>
+    <div class="header-right">
+      <div class="chapter-counter" id="chapterCounter">-/-</div>
+    </div>
+  </div>
+
+  <!-- Контейнер контента -->
+  <div class="chapter-container">
+    <!-- Загрузка -->
+    <div id="loadingDiv" class="loading">
+      <div class="loading-spinner"></div>
+      <div>Загрузка главы...</div>
+    </div>
+
+    <!-- Ошибка -->
+    <div id="errorDiv" class="error" style="display: none;"></div>
+
+    <!-- Контент главы -->
+    <div id="chapterContent" class="chapter-content" style="display: none;"></div>
+  </div>
+
+  <!-- Навигация -->
+  <div class="chapter-navigation" id="chapterNavigation">
+    <button class="nav-button" id="prevButton" onclick="navigateChapter('prev')">
+      ← Предыдущая
+    </button>
+    <button class="nav-button" id="nextButton" onclick="navigateChapter('next')">
+      Следующая →
+    </button>
+  </div>
+
+  <!-- Полноэкранный просмотр -->
+  <div class="fullscreen-overlay" id="fullscreenOverlay" onclick="closeFullscreen()">
+    <button class="fullscreen-close" onclick="closeFullscreen()">×</button>
+    <img id="fullscreenImg" src="" alt="">
+  </div>
+
+  <script>
+    // Конфигурация API
+    const API_CONFIG = {
+      baseUrl: 'https://nekros.tatokz2006.workers.dev',
+      timeout: 15000
+    };
+
+    let currentMangaData = null;
+    let currentChapterData = null;
+    let isHeaderVisible = true;
+    let lastScrollY = 0;
+
+    // Получение параметров из URL
+    function getUrlParams() {
+      const urlParams = new URLSearchParams(window.location.search);
+      return {
+        mangaId: urlParams.get('manga'),
+        chapterId: urlParams.get('chapter')
+      };
+    }
+
+    // Функция для возврата назад
+    function goBack() {
+      const params = getUrlParams();
+      if (params.mangaId) {
+        window.location.href = `info.html?id=${params.mangaId}`;
+      } else {
+        window.location.href = 'index.html';
+      }
+    }
+
+    // Получение данных главы с API
+    async function fetchChapterData(mangaId, chapterId) {
+      try {
+        console.log(`Запрос данных главы: manga=${mangaId}, chapter=${chapterId}`);
+        
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), API_CONFIG.timeout);
+        
+        // Согласно вашему worker: ?id={mangaId}&cr={chapterId}
+        const url = `${API_CONFIG.baseUrl}/?id=${mangaId}&cr=${chapterId}`;
+        console.log(`Запрос к: ${url}`);
+        
+        const response = await fetch(url, {
+          signal: controller.signal,
+          headers: {
+            'Accept': 'application/json',
+            'Origin': window.location.origin
+          }
+        });
+        
+        clearTimeout(timeoutId);
+        
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status} - ${response.statusText}`);
+        }
+        
+        const data = await response.json();
+        console.log('Данные главы получены:', data);
+        return data;
+        
+      } catch (error) {
+        console.error('Ошибка получения данных главы:', error);
+        throw error;
+      }
+    }
+
+    // Получение информации о манге (для навигации между главами)
+    async function fetchMangaInfo(mangaId) {
+      try {
+        const url = `${API_CONFIG.baseUrl}/?id=${mangaId}`;
+        const response = await fetch(url);
+        
+        if (!response.ok) throw new Error('Ошибка загрузки информации о манге');
+        
+        return await response.json();
+      } catch (error) {
+        console.error('Ошибка получения информации о манге:', error);
+        return null;
+      }
+    }
+
+    // Показ ошибки
+    function showError(message) {
+      document.getElementById('loadingDiv').style.display = 'none';
+      document.getElementById('chapterContent').style.display = 'none';
+      
+      const errorDiv = document.getElementById('errorDiv');
+      errorDiv.textContent = message;
+      errorDiv.style.display = 'block';
+    }
+
+    // Отображение контента главы
+    function displayChapterContent(chapterData) {
+      const contentContainer = document.getElementById('chapterContent');
+      contentContainer.innerHTML = '';
+      
+      // Обновляем заголовки
+      document.getElementById('mangaName').textContent = chapterData.mangaName || 'Неизвестная манга';
+      
+      const chapterInfo = chapterData.chapterInfo || {};
+      const chapterTitle = chapterInfo.title || chapterInfo.name || `Глава ${chapterInfo.id}`;
+      document.getElementById('chapterTitle').textContent = chapterTitle;
+      
+      // Обновляем заголовок страницы
+      document.title = `${chapterTitle} - ${chapterData.mangaName} - Manga App`;
+
+      // Обрабатываем содержимое главы
+      const content = chapterData.chapterContent;
+      
+      if (!content) {
+        contentContainer.innerHTML = '<div class="text-content">Содержимое главы не найдено</div>';
+        return;
+      }
+
+      // Если контент - это массив изображений
+      if (Array.isArray(content)) {
+        content.forEach((item, index) => {
+          if (typeof item === 'string' && (item.startsWith('http') || item.startsWith('/'))) {
+            createImageElement(item, index, contentContainer);
+          }
+        });
+      } 
+      // Если контент - это объект с изображениями
+      else if (typeof content === 'object' && content.pages) {
+        content.pages.forEach((page, index) => {
+          createImageElement(page, index, contentContainer);
+        });
+      }
+      // Если контент - это объект с изображениями в другом формате
+      else if (typeof content === 'object' && content.images) {
+        content.images.forEach((image, index) => {
+          createImageElement(image, index, contentContainer);
+        });
+      }
+      // Если это текстовое содержимое
+      else if (typeof content === 'string') {
+        const textDiv = document.createElement('div');
+        textDiv.className = 'text-content';
+        textDiv.innerHTML = content.replace(/\n/g, '<br>');
+        contentContainer.appendChild(textDiv);
+      }
+      // Если это объект - показываем как JSON (временно)
+      else {
+        const textDiv = document.createElement('div');
+        textDiv.className = 'text-content';
+        textDiv.innerHTML = `<pre>${JSON.stringify(content, null, 2)}</pre>`;
+        contentContainer.appendChild(textDiv);
+      }
+
+      // Показываем контент
+      document.getElementById('loadingDiv').style.display = 'none';
+      document.getElementById('chapterContent').style.display = 'flex';
+    }
+
+    // Создание элемента изображения
+    function createImageElement(imageSrc, index, container) {
+      const img = document.createElement('img');
+      img.className = 'chapter-page loading';
+      img.alt = `Страница ${index + 1}`;
+      img.textContent = `Загрузка страницы ${index + 1}...`;
+      
+      img.onload = () => {
+        img.classList.remove('loading');
+        img.textContent = '';
+      };
+      
+      img.onerror = () => {
+        img.classList.remove('loading');
+        img.textContent = `Ошибка загрузки страницы ${index + 1}`;
+        img.style.minHeight = '200px';
+        img.style.background = 'rgba(255, 59, 48, 0.1)';
+        img.style.color = '#ff3b30';
+      };
+
+      // Полноэкранный просмотр при клике
+      img.onclick = () => openFullscreen(imageSrc);
+      
+      img.src = imageSrc;
+      container.appendChild(img);
+    }
+
+    // Полноэкранный просмотр
+    function openFullscreen(imageSrc) {
+      const overlay = document.getElementById('fullscreenOverlay');
+      const img = document.getElementById('fullscreenImg');
+      img.src = imageSrc;
+      overlay.classList.add('active');
+    }
+
+    function closeFullscreen() {
+      document.getElementById('fullscreenOverlay').classList.remove('active');
+    }
+
+    // Навигация между главами
+    function navigateChapter(direction) {
+      const params = getUrlParams();
+      if (!currentMangaData || !params.mangaId) return;
+      
+      const chapters = currentMangaData.chapters || [];
+      const currentIndex = chapters.findIndex(ch => ch.id == params.chapterId);
+      
+      if (currentIndex === -1) return;
+      
+      let newIndex;
+      if (direction === 'next') {
+        newIndex = currentIndex + 1;
+      } else {
+        newIndex = currentIndex - 1;
+      }
+      
+      if (newIndex >= 0 && newIndex < chapters.length) {
+        const newChapterId = chapters[newIndex].id;
+        window.location.href = `chapter.html?manga=${params.mangaId}&chapter=${newChapterId}`;
+      }
+    }
+
+    // Обновление навигации
+    function updateNavigation() {
+      const params = getUrlParams();
+      if (!currentMangaData || !params.chapterId) return;
+      
+      const chapters = currentMangaData.chapters || [];
+      const currentIndex = chapters.findIndex(ch => ch.id == params.chapterId);
+      
+      if (currentIndex !== -1) {
+        // Обновляем счетчик
+        document.getElementById('chapterCounter').textContent = `${currentIndex + 1}/${chapters.length}`;
+        
+        // Обновляем кнопки
+        const prevButton = document.getElementById('prevButton');
+        const nextButton = document.getElementById('nextButton');
+        
+        prevButton.disabled = currentIndex === 0;
+        nextButton.disabled = currentIndex === chapters.length - 1;
+      }
+    }
+
+    // Скрытие/показ интерфейса при прокрутке
+    function handleScroll() {
+      const currentScrollY = window.scrollY;
+      const header = document.getElementById('chapterHeader');
+      const navigation = document.getElementById('chapterNavigation');
+      
+      if (currentScrollY > lastScrollY && currentScrollY > 100) {
+        // Прокрутка вниз - скрываем
+        header.classList.add('hidden');
+        navigation.classList.add('hidden');
+        isHeaderVisible = false;
+      } else {
+        // Прокрутка вверх - показываем
+        header.classList.remove('hidden');
+        navigation.classList.remove('hidden');
+        isHeaderVisible = true;
+      }
+      
+      lastScrollY = currentScrollY;
+    }
+
+    // Основная функция загрузки
+    async function loadChapter() {
+      const params = getUrlParams();
+      
+      // Проверяем параметры
+      if (!params.mangaId || !params.chapterId) {
+        showError('Параметры главы не указаны в URL. Вернитесь к списку манги.');
+        return;
+      }
+      
+      try {
+        console.log(`Загружаем главу ${params.chapterId} манги ${params.mangaId}`);
+        
+        // Загружаем данные главы
+        const chapterData = await fetchChapterData(params.mangaId, params.chapterId);
+        currentChapterData = chapterData;
+        
+        // Загружаем информацию о манге для навигации
+        currentMangaData = await fetchMangaInfo(params.mangaId);
+        
+        // Отображаем контент
+        displayChapterContent(chapterData);
+        
+        // Обновляем навигацию
+        updateNavigation();
+        
+      } catch (error) {
+        let errorMessage = 'Ошибка загрузки главы: ';
+        
+        if (error.name === 'AbortError') {
+          errorMessage += 'Превышено время ожидания';
+        } else if (error.message.includes('HTTP error')) {
+          errorMessage += 'Глава не найдена или недоступна';
+        } else if (error.message.includes('fetch')) {
+          errorMessage += 'Проблемы с подключением к серверу';
+        } else {
+          errorMessage += error.message;
+        }
+        
+        showError(errorMessage + '. Попробуйте обновить страницу.');
+      }
+    }
+
+    // Инициализация
+    document.addEventListener('DOMContentLoaded', () => {
+      loadChapter();
+      
+      // Добавляем обработчик прокрутки с дебаунсингом
+      let scrollTimeout;
+      window.addEventListener('scroll', () => {
+        clearTimeout(scrollTimeout);
+        scrollTimeout = setTimeout(handleScroll, 10);
+      });
+      
+      // Обработка клавиш для навигации
+      document.addEventListener('keydown', (e) => {
+        if (e.key === 'ArrowLeft' || e.key === 'a' || e.key === 'A') {
+          navigateChapter('prev');
+        } else if (e.key === 'ArrowRight' || e.key === 'd' || e.key === 'D') {
+          navigateChapter('next');
+        } else if (e.key === 'Escape') {
+          closeFullscreen();
+        }
+      });
+    });
+  </script>
+</body>
+</html>
