@@ -76,6 +76,7 @@
     .card img {
       width:100%; height:200px;
       object-fit:cover; border-radius:16px 16px 0 0;
+      background: rgba(255,255,255,0.1);
     }
     .card-title {
       position: relative;
@@ -99,7 +100,7 @@
 
     .bottom-menu {
       position: fixed;
-      bottom: 0; /* прилипает к низу */
+      bottom: 0;
       left: 50%;
       transform: translateX(-50%);
       width: 420px;
@@ -108,10 +109,10 @@
       backdrop-filter: blur(12px);
       display: flex;
       justify-content: space-around;
-      align-items: flex-end; /* кнопки прижаты к низу контейнера */
+      align-items: flex-end;
       box-shadow: 0 -4px 15px rgba(0,0,0,0.5);
       z-index: 100;
-      padding: 0 10px 25px 0px; /* снизу отступ 15px */
+      padding: 0 10px 25px 0px;
       border-radius: 15px 15px 0 0;
     }
     .bottom-menu button {
@@ -123,6 +124,38 @@
     }
     .bottom-menu button img { width:24px; height:24px; margin-bottom:2px; }
     .bottom-menu button:hover { transform:scale(1.1); background: rgba(255,255,255,0.15); }
+
+    /* Плейсхолдер для изображений */
+    .placeholder-img {
+      width: 100%;
+      height: 200px;
+      background: linear-gradient(135deg, rgba(255,255,255,0.1), rgba(255,255,255,0.05));
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: rgba(255,255,255,0.5);
+      font-size: 12px;
+      text-align: center;
+      border: 2px dashed rgba(255,255,255,0.2);
+    }
+
+    /* Индикатор загрузки */
+    .loading {
+      text-align: center;
+      color: #fff;
+      font-size: 16px;
+      padding: 50px 0;
+    }
+
+    .error {
+      background: rgba(255, 59, 48, 0.1);
+      border: 1px solid rgba(255, 59, 48, 0.3);
+      border-radius: 12px;
+      padding: 20px;
+      color: #ff3b30;
+      text-align: center;
+      margin: 20px 0;
+    }
 
     @media(max-width:420px){
       .app-container { width:100%; padding:0 10px; }
@@ -137,6 +170,10 @@
       <img src="https://em-content.zobj.net/source/apple/419/magnifying-glass-tilted-left_1f50d.png" alt="Search">
       <input type="text" id="searchInput" placeholder="Поиск...">
     </div>
+    
+    <div id="loadingDiv" class="loading">Загрузка...</div>
+    <div id="errorDiv" class="error" style="display: none;"></div>
+    
     <div class="cards-container" id="cardsContainer"></div>
   </div>
 
@@ -148,50 +185,213 @@
   </div>
 
   <script>
+    // Конфигурация API
+    const API_CONFIG = {
+      baseUrl: 'https://nekros.tatokz2006.workers.dev',
+      timeout: 10000 // 10 секунд таймаут
+    };
+
+    let allManga = []; // Для поиска
+
+    // Функция для создания плейсхолдера изображения
+    function createImagePlaceholder(title = 'Обложка недоступна') {
+      const placeholder = document.createElement('div');
+      placeholder.className = 'placeholder-img';
+      placeholder.textContent = title;
+      return placeholder;
+    }
+
+    // Функция для показа ошибки
+    function showError(message) {
+      document.getElementById('loadingDiv').style.display = 'none';
+      const errorDiv = document.getElementById('errorDiv');
+      errorDiv.textContent = message;
+      errorDiv.style.display = 'block';
+      document.getElementById('cardsContainer').style.display = 'none';
+    }
+
+    // Функция для скрытия индикаторов загрузки/ошибок
+    function hideLoading() {
+      document.getElementById('loadingDiv').style.display = 'none';
+      document.getElementById('errorDiv').style.display = 'none';
+      document.getElementById('cardsContainer').style.display = 'grid';
+    }
+
+    // Функция загрузки манги
     async function loadManga() {
       try {
-        const res = await fetch("https://nekros.tatokz2006.workers.dev/database/database.json");
-        if (!res.ok) throw new Error("Ошибка загрузки: " + res.status);
-        const mangas = await res.json();
+        console.log('Начинаем загрузку манги...');
+        
+        // Создаем контроллер для таймаута
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), API_CONFIG.timeout);
 
-        const container = document.getElementById('cardsContainer');
-        container.innerHTML = ""; // очистим старое
-        const fragment = document.createDocumentFragment();
-
-        mangas.forEach(manga => {
-          const cardDiv = document.createElement('div');
-          cardDiv.className = 'card';
-          cardDiv.innerHTML = `
-            <img src="${manga.img}" alt="${manga.name}" loading="lazy" onerror="this.src='img/placeholder.webp'">
-            <div class="card-title">${manga.name}</div>
-            <div class="card-stats">
-              <img src="https://em-content.zobj.net/source/apple/419/heart-on-fire_2764-fe0f-200d-1f525.png" alt="Like">
-              <span>${manga.likes}</span>
-            </div>
-          `;
-          fragment.appendChild(cardDiv);
+        const response = await fetch(API_CONFIG.baseUrl, {
+          signal: controller.signal,
+          headers: {
+            'Accept': 'application/json',
+            'Origin': window.location.origin
+          }
         });
 
-        container.appendChild(fragment);
-      } catch (err) {
-        console.error(err);
+        clearTimeout(timeoutId);
+
+        if (!response.ok) {
+          throw new Error(`Ошибка HTTP: ${response.status} ${response.statusText}`);
+        }
+
+        const contentType = response.headers.get('content-type');
+        if (!contentType || !contentType.includes('application/json')) {
+          throw new Error('Сервер вернул не JSON данные');
+        }
+
+        allManga = await response.json();
+        console.log(`Загружено ${allManga.length} манги`);
+
+        displayManga(allManga);
+        hideLoading();
+
+      } catch (error) {
+        console.error('Ошибка загрузки манги:', error);
+        let errorMessage = 'Ошибка загрузки данных. ';
+        
+        if (error.name === 'AbortError') {
+          errorMessage += 'Превышено время ожидания.';
+        } else if (error.message.includes('fetch')) {
+          errorMessage += 'Проблемы с подключением к серверу.';
+        } else {
+          errorMessage += error.message;
+        }
+        
+        showError(errorMessage + ' Попробуйте обновить страницу.');
       }
     }
 
-    // Инициализация
-    loadManga();
-
-    // Поиск
-    const searchBar = document.getElementById('searchBar');
-    const searchInput = document.getElementById('searchInput');
-    searchBar.addEventListener('click', ()=>{ 
-      if(!searchBar.classList.contains('active')) {
-        searchBar.classList.add('active'); 
-        searchInput.focus(); 
+    // Функция для отображения манги
+    function displayManga(mangaArray) {
+      const container = document.getElementById('cardsContainer');
+      container.innerHTML = "";
+      
+      if (!mangaArray || mangaArray.length === 0) {
+        container.innerHTML = '<div style="color: #999; text-align: center; padding: 50px; grid-column: 1/-1;">Манга не найдена</div>';
+        return;
       }
-    });
-    searchInput.addEventListener('focusout', ()=>{
-      if(!searchInput.value) searchBar.classList.remove('active');
+
+      const fragment = document.createDocumentFragment();
+
+      mangaArray.forEach(manga => {
+        const cardDiv = document.createElement('div');
+        cardDiv.className = 'card';
+        cardDiv.setAttribute('data-manga-id', manga.id);
+        
+        // Создаем HTML структуру карточки
+        const cardHTML = `
+          <div class="card-image-container"></div>
+          <div class="card-title">${manga.name || 'Без названия'}</div>
+          <div class="card-stats">
+            <img src="https://em-content.zobj.net/source/apple/419/heart-on-fire_2764-fe0f-200d-1f525.png" alt="Like">
+            <span>${manga.likes || '0'}</span>
+          </div>
+        `;
+        
+        cardDiv.innerHTML = cardHTML;
+        
+        // Обрабатываем изображение
+        const imageContainer = cardDiv.querySelector('.card-image-container');
+        
+        if (manga.img && manga.img.trim()) {
+          const img = document.createElement('img');
+          img.src = manga.img.trim();
+          img.alt = manga.name || 'Обложка манги';
+          img.loading = 'lazy';
+          
+          img.onload = () => {
+            imageContainer.appendChild(img);
+          };
+          
+          img.onerror = () => {
+            console.log(`Ошибка загрузки изображения для ${manga.name}`);
+            const placeholder = createImagePlaceholder('Обложка\nнедоступна');
+            imageContainer.appendChild(placeholder);
+          };
+          
+          // Таймаут для медленных изображений
+          setTimeout(() => {
+            if (!imageContainer.hasChildNodes()) {
+              const placeholder = createImagePlaceholder('Загрузка...');
+              imageContainer.appendChild(placeholder);
+            }
+          }, 3000);
+        } else {
+          // Если нет URL изображения, сразу показываем плейсхолдер
+          const placeholder = createImagePlaceholder('Нет\nобложки');
+          imageContainer.appendChild(placeholder);
+        }
+
+        // ВАЖНО: Добавляем обработчик клика на карточку
+        cardDiv.addEventListener('click', (e) => {
+          e.preventDefault();
+          const mangaId = manga.id;
+          console.log(`Переход к манге ID: ${mangaId}`);
+          // Переходим на страницу с детальной информацией
+          window.location.href = `info.html?id=${mangaId}`;
+        });
+
+        fragment.appendChild(cardDiv);
+      });
+
+      container.appendChild(fragment);
+    }
+
+    // Функция поиска
+    function searchManga(query) {
+      if (!query.trim()) {
+        displayManga(allManga);
+        return;
+      }
+
+      const filtered = allManga.filter(manga => 
+        (manga.name && manga.name.toLowerCase().includes(query.toLowerCase())) ||
+        (manga.author && manga.author.toLowerCase().includes(query.toLowerCase()))
+      );
+
+      displayManga(filtered);
+    }
+
+    // Инициализация поиска
+    function initializeSearch() {
+      const searchBar = document.getElementById('searchBar');
+      const searchInput = document.getElementById('searchInput');
+
+      searchBar.addEventListener('click', () => { 
+        if (!searchBar.classList.contains('active')) {
+          searchBar.classList.add('active'); 
+          searchInput.focus(); 
+        }
+      });
+
+      searchInput.addEventListener('input', (e) => {
+        searchManga(e.target.value);
+      });
+
+      searchInput.addEventListener('blur', () => {
+        if (!searchInput.value.trim()) {
+          searchBar.classList.remove('active');
+        }
+      });
+
+      // Обработка Enter
+      searchInput.addEventListener('keypress', (e) => {
+        if (e.key === 'Enter') {
+          searchManga(e.target.value);
+        }
+      });
+    }
+
+    // Инициализация приложения
+    document.addEventListener('DOMContentLoaded', () => {
+      initializeSearch();
+      loadManga();
     });
   </script>
 </body>
