@@ -374,7 +374,7 @@
   </div>
 
   <script>
-    // Конфигурация API - ИСПРАВЛЕНО под ваш worker!
+    // Конфигурация API
     const API_CONFIG = {
       baseUrl: 'https://nekros.tatokz2006.workers.dev',
       timeout: 10000
@@ -394,16 +394,14 @@
       return placeholder;
     }
 
-    // Функция для получения данных манги с API - ИСПРАВЛЕНО!
+    // Функция для получения данных манги с API
     async function fetchMangaData(mangaId) {
       try {
         console.log(`Запрашиваем данные для манги ID: ${mangaId}`);
         
-        // Контроллер для таймаута
         const controller = new AbortController();
         const timeoutId = setTimeout(() => controller.abort(), API_CONFIG.timeout);
         
-        // ПРАВИЛЬНЫЙ endpoint согласно вашему worker: /?id={mangaId}
         const url = `${API_CONFIG.baseUrl}/?id=${mangaId}`;
         console.log(`Запрос к: ${url}`);
         
@@ -451,7 +449,6 @@
     async function loadMangaDetails() {
       const mangaId = getMangaIdFromUrl();
       
-      // Проверяем, есть ли ID в URL
       if (!mangaId) {
         showError('ID манги не указан в URL. Возвращайтесь к списку и выберите мангу.');
         return;
@@ -462,19 +459,15 @@
       try {
         const mangaData = await fetchMangaData(mangaId);
         
-        // Проверяем, что данные получены
         if (!mangaData) {
           throw new Error('Данные манги не найдены');
         }
         
-        // Скрываем загрузку
         document.getElementById('loadingDiv').style.display = 'none';
         
-        // Отображаем данные манги
         displayMangaInfo(mangaData);
         displayChapters(mangaData.chapters || []);
         
-        // Показываем секции
         document.getElementById('mangaHeader').style.display = 'block';
         document.getElementById('chaptersSection').style.display = 'block';
         
@@ -499,7 +492,6 @@
     function displayMangaInfo(mangaData) {
       console.log('Отображаем информацию о манге:', mangaData);
       
-      // Заголовок
       const title = mangaData.name || mangaData.title || 'Без названия';
       document.getElementById('mangaTitle').textContent = title;
       document.title = `${title} - Manga App`;
@@ -543,106 +535,57 @@
       document.getElementById('mangaRating').textContent = rating;
     }
 
-    // Функция для получения информации о главах
-    async function fetchChapterInfo(mangaId, chapterFilenames) {
-      const chapterInfos = [];
-      
-      for (const filename of chapterFilenames) {
-        try {
-          // Извлекаем номер главы из имени файла (например: chapter1.json -> 1)
-          const chapterNumber = filename.match(/chapter(\d+)\.json/)?.[1] || 
-                              filename.match(/(\d+)\.json/)?.[1] ||
-                              chapterInfos.length + 1;
-          
-          console.log(`Загружаем информацию о главе: ${filename}`);
-          
-          const response = await fetch(`${API_CONFIG.baseUrl}/?id=${mangaId}&cr=${chapterNumber}`, {
-            headers: {
-              'Accept': 'application/json',
-              'Origin': window.location.origin
-            }
-          });
-          
-          if (response.ok) {
-            const chapterData = await response.json();
-            const chapterInfo = chapterData.chapterInfo || chapterData.chapterContent;
-            
-            chapterInfos.push({
-              id: chapterNumber,
-              title: chapterInfo?.title || `Глава ${chapterNumber}`,
-              likes: chapterInfo?.likes || 0,
-              views: chapterInfo?.views || 0,
-              filename: filename
-            });
-          } else {
-            // Если не удалось загрузить, создаем базовую информацию
-            chapterInfos.push({
-              id: chapterNumber,
-              title: `Глава ${chapterNumber}`,
-              likes: 0,
-              views: 0,
-              filename: filename
-            });
-          }
-        } catch (error) {
-          console.error(`Ошибка загрузки главы ${filename}:`, error);
-          const chapterNumber = chapterInfos.length + 1;
-          chapterInfos.push({
-            id: chapterNumber,
-            title: `Глава ${chapterNumber}`,
-            likes: 0,
-            views: 0,
-            filename: filename
-          });
-        }
-      }
-      
-      return chapterInfos;
-    }
-
-    // Функция для отображения глав
-    async function displayChapters(chapterFilenames) {
+    // ИСПРАВЛЕННАЯ функция для отображения глав
+    function displayChapters(chapters) {
       const chaptersList = document.getElementById('chaptersList');
-      chaptersList.innerHTML = '<div style="color: #999; text-align: center; padding: 20px;">Загрузка информации о главах...</div>';
-
-      if (!chapterFilenames || chapterFilenames.length === 0) {
+      
+      console.log('Структура данных глав:', chapters);
+      
+      if (!chapters || !Array.isArray(chapters) || chapters.length === 0) {
         chaptersList.innerHTML = '<div style="color: #999; text-align: center; padding: 20px;">Главы не найдены</div>';
         return;
       }
 
-      console.log(`Обрабатываем ${chapterFilenames.length} глав`);
-
-      // Получаем информацию о главах
-      const mangaId = getMangaIdFromUrl();
-      const chapters = await fetchChapterInfo(mangaId, chapterFilenames);
-      
-      // Очищаем список
+      console.log(`Обрабатываем ${chapters.length} глав`);
       chaptersList.innerHTML = '';
 
-      // Сортируем главы по убыванию ID (новые сверху)
+      // Сортируем главы по убыванию ID (новые сверху) 
       const sortedChapters = [...chapters].sort((a, b) => {
-        const aId = parseInt(a.id) || 0;
-        const bId = parseInt(b.id) || 0;
+        const aId = parseInt(a.id || a.chapter || 0);
+        const bId = parseInt(b.id || b.chapter || 0);
         return bId - aId;
       });
 
       sortedChapters.forEach(chapter => {
+        // Проверяем что chapter это объект
+        if (typeof chapter !== 'object' || chapter === null) {
+          console.error('Неправильный формат главы:', chapter);
+          return;
+        }
+
         const chapterDiv = document.createElement('div');
         chapterDiv.className = 'chapter-item';
+        
+        // Извлекаем данные из объекта главы
+        const chapterId = chapter.id || chapter.chapter || '?';
+        const chapterTitle = chapter.title || chapter.name || `Глава ${chapterId}`;
+        const chapterLikes = chapter.likes || '0';
+        
         chapterDiv.innerHTML = `
           <div class="chapter-header">
-            <div class="chapter-number">${chapter.id}</div>
-            <div class="chapter-title">${chapter.title}</div>
+            <div class="chapter-number">${chapterId}</div>
+            <div class="chapter-title">${chapterTitle}</div>
             <div class="chapter-likes">
               <img src="https://em-content.zobj.net/source/apple/419/heart-on-fire_2764-fe0f-200d-1f525.png" alt="Лайки">
-              <span>${chapter.likes}</span>
+              <span>${chapterLikes}</span>
             </div>
           </div>
         `;
         
         chapterDiv.addEventListener('click', () => {
-          console.log(`Открытие главы ${chapter.id} манги ${mangaId}`);
-          window.location.href = `chapter.html?manga=${mangaId}&chapter=${chapter.id}`;
+          const mangaId = getMangaIdFromUrl();
+          console.log(`Открытие главы ${chapterId} манги ${mangaId}`);
+          window.location.href = `chapter.html?manga=${mangaId}&chapter=${chapterId}`;
         });
 
         chaptersList.appendChild(chapterDiv);
