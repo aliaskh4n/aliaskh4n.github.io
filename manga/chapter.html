@@ -577,9 +577,8 @@
       // Обновляем заголовки
       document.getElementById('mangaName').textContent = chapterData.mangaName || 'Неизвестная манга';
       
-      // Получаем информацию о главе
-      const chapterContent = chapterData.chapterContent || {};
-      const chapterInfo = chapterData.chapterInfo || chapterContent;
+      // Получаем информацию о главе - ИСПРАВЛЕНО для вашего формата данных
+      const chapterInfo = chapterData.chapterInfo || chapterData.chapterContent || chapterData.chapter || {};
       
       const chapterTitle = chapterInfo.title || `Глава ${chapterInfo.id || chapterInfo.chapter || 'без номера'}`;
       document.getElementById('chapterTitle').textContent = chapterTitle;
@@ -619,7 +618,29 @@
       }
 
       // Обрабатываем страницы главы
-      const pages = chapterInfo.pages || chapterContent.pages;
+      const pages = chapterInfo.pages || chapterData.pages || [];
+      
+      // Если есть сообщение об ошибке от worker'а
+      if (chapterData.message && chapterData.message.includes('не найдено')) {
+        const warningDiv = document.createElement('div');
+        warningDiv.style.cssText = `
+          background: rgba(255, 165, 0, 0.1);
+          border: 1px solid rgba(255, 165, 0, 0.3);
+          border-radius: 12px;
+          padding: 20px;
+          margin-bottom: 20px;
+          text-align: center;
+          color: #ffa500;
+        `;
+        warningDiv.innerHTML = `
+          <div style="font-size: 18px; margin-bottom: 10px;">⚠️</div>
+          <div>${chapterData.message}</div>
+          <div style="font-size: 12px; margin-top: 10px; opacity: 0.7;">
+            Файл главы не найден в репозитории. Проверьте путь: chapters/${chapterData.mangaId}/chapter_${chapterInfo.id || chapterInfo.chapter}.json
+          </div>
+        `;
+        contentContainer.appendChild(warningDiv);
+      }
       
       if (!pages || !Array.isArray(pages) || pages.length === 0) {
         const noPages = document.createElement('div');
@@ -632,17 +653,38 @@
           border: 1px solid rgba(255,255,255,0.1);
           color: #999;
         `;
-        noPages.innerHTML = `
+        
+        let noPagesHtml = `
           <div style="font-size: 24px; margin-bottom: 10px;">📄</div>
           <div>Страницы главы не найдены</div>
-          <div style="font-size: 12px; margin-top: 10px; opacity: 0.7;">
-            Проверьте структуру данных в JSON файле
+        `;
+        
+        // Показываем больше информации для отладки
+        if (chapterInfo.id || chapterInfo.chapter) {
+          noPagesHtml += `
+            <div style="font-size: 12px; margin-top: 15px; opacity: 0.7;">
+              <div>Информация о главе:</div>
+              <div>ID: ${chapterInfo.id || chapterInfo.chapter}</div>
+              <div>Название: ${chapterInfo.title || 'Не указано'}</div>
+              ${chapterInfo.filename ? `<div>Файл: ${chapterInfo.filename}</div>` : ''}
+            </div>
+          `;
+        }
+        
+        noPagesHtml += `
+          <div style="font-size: 12px; margin-top: 10px; opacity: 0.5;">
+            Проверьте файл главы в репозитории
           </div>
         `;
+        
+        noPages.innerHTML = noPagesHtml;
         contentContainer.appendChild(noPages);
         
         // Показываем содержимое для отладки
-        console.error('Структура данных главы:', chapterData);
+        console.error('Структура данных главы для отладки:');
+        console.error('chapterData:', chapterData);
+        console.error('chapterInfo:', chapterInfo);
+        console.error('pages:', pages);
         return;
       }
 
