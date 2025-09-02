@@ -434,54 +434,91 @@
       // Обновляем заголовки
       document.getElementById('mangaName').textContent = chapterData.mangaName || 'Неизвестная манга';
       
-      const chapterInfo = chapterData.chapterInfo || {};
-      const chapterTitle = chapterInfo.title || chapterInfo.name || `Глава ${chapterInfo.id}`;
+      // Получаем информацию о главе из chapterContent (это данные из JSON файла)
+      const chapterInfo = chapterData.chapterContent || {};
+      const chapterTitle = chapterInfo.title || `Глава ${chapterInfo.id || chapterInfo.chapter}`;
       document.getElementById('chapterTitle').textContent = chapterTitle;
       
       // Обновляем заголовок страницы
       document.title = `${chapterTitle} - ${chapterData.mangaName} - Manga App`;
 
-      // Обрабатываем содержимое главы
-      const content = chapterData.chapterContent;
+      // Отображаем информацию о переводчиках (если есть)
+      if (chapterInfo.translators) {
+        const translatorsDiv = document.createElement('div');
+        translatorsDiv.className = 'translators-info';
+        translatorsDiv.style.cssText = `
+          background: rgba(255, 255, 255, 0.05);
+          padding: 15px;
+          margin-bottom: 20px;
+          border-radius: 12px;
+          text-align: center;
+          border: 1px solid rgba(255,255,255,0.1);
+        `;
+        
+        let translatorsHtml = `<div style="color: #ffcc00; font-weight: bold; margin-bottom: 8px;">Перевод:</div>`;
+        translatorsHtml += `<div style="color: #fff; font-size: 14px;">${chapterInfo.translators.name}</div>`;
+        
+        if (chapterInfo.translators.tme || chapterInfo.translators.vk) {
+          translatorsHtml += `<div style="margin-top: 8px; display: flex; justify-content: center; gap: 15px;">`;
+          
+          if (chapterInfo.translators.tme) {
+            translatorsHtml += `<a href="https://${chapterInfo.translators.tme}" target="_blank" style="color: #00aced; text-decoration: none; font-size: 12px;">📱 Telegram</a>`;
+          }
+          
+          if (chapterInfo.translators.vk) {
+            translatorsHtml += `<a href="https://${chapterInfo.translators.vk}" target="_blank" style="color: #4680c2; text-decoration: none; font-size: 12px;">🔷 VKontakte</a>`;
+          }
+          
+          translatorsHtml += `</div>`;
+        }
+        
+        translatorsDiv.innerHTML = translatorsHtml;
+        contentContainer.appendChild(translatorsDiv);
+      }
+
+      // Обрабатываем страницы главы
+      const pages = chapterInfo.pages;
       
-      if (!content) {
-        contentContainer.innerHTML = '<div class="text-content">Содержимое главы не найдено</div>';
+      if (!pages || !Array.isArray(pages) || pages.length === 0) {
+        contentContainer.innerHTML += '<div class="text-content">Страницы главы не найдены</div>';
         return;
       }
 
-      // Если контент - это массив изображений
-      if (Array.isArray(content)) {
-        content.forEach((item, index) => {
-          if (typeof item === 'string' && (item.startsWith('http') || item.startsWith('/'))) {
-            createImageElement(item, index, contentContainer);
-          }
-        });
-      } 
-      // Если контент - это объект с изображениями
-      else if (typeof content === 'object' && content.pages) {
-        content.pages.forEach((page, index) => {
-          createImageElement(page, index, contentContainer);
-        });
-      }
-      // Если контент - это объект с изображениями в другом формате
-      else if (typeof content === 'object' && content.images) {
-        content.images.forEach((image, index) => {
-          createImageElement(image, index, contentContainer);
-        });
-      }
-      // Если это текстовое содержимое
-      else if (typeof content === 'string') {
-        const textDiv = document.createElement('div');
-        textDiv.className = 'text-content';
-        textDiv.innerHTML = content.replace(/\n/g, '<br>');
-        contentContainer.appendChild(textDiv);
-      }
-      // Если это объект - показываем как JSON (временно)
-      else {
-        const textDiv = document.createElement('div');
-        textDiv.className = 'text-content';
-        textDiv.innerHTML = `<pre>${JSON.stringify(content, null, 2)}</pre>`;
-        contentContainer.appendChild(textDiv);
+      console.log(`Загружаем ${pages.length} страниц`);
+
+      // Создаем элементы для каждой страницы
+      pages.forEach((pageUrl, index) => {
+        createImageElement(pageUrl, index + 1, contentContainer);
+      });
+
+      // Добавляем информацию в конце главы
+      if (chapterInfo.views || chapterInfo.likes || chapterInfo.release_date) {
+        const footerDiv = document.createElement('div');
+        footerDiv.className = 'chapter-footer';
+        footerDiv.style.cssText = `
+          background: rgba(255, 255, 255, 0.05);
+          padding: 20px;
+          margin-top: 30px;
+          border-radius: 12px;
+          text-align: center;
+          border: 1px solid rgba(255,255,255,0.1);
+          color: #999;
+          font-size: 14px;
+        `;
+        
+        let footerHtml = '';
+        if (chapterInfo.release_date) {
+          footerHtml += `<div>📅 Дата выпуска: ${chapterInfo.release_date}</div>`;
+        }
+        if (chapterInfo.views) {
+          footerHtml += `<div>👀 Просмотры: ${chapterInfo.views}</div>`;
+        }
+        if (chapterInfo.likes) {
+          footerHtml += `<div>❤️ Лайки: ${chapterInfo.likes}</div>`;
+        }
+        
+        footerDiv.innerHTML = footerHtml;
+        contentContainer.appendChild(footerDiv);
       }
 
       // Показываем контент
@@ -490,30 +527,90 @@
     }
 
     // Создание элемента изображения
-    function createImageElement(imageSrc, index, container) {
+    function createImageElement(imageSrc, pageNumber, container) {
+      const pageContainer = document.createElement('div');
+      pageContainer.style.cssText = `
+        position: relative;
+        margin-bottom: 10px;
+        width: 100%;
+        max-width: 800px;
+      `;
+      
+      // Номер страницы
+      const pageLabel = document.createElement('div');
+      pageLabel.style.cssText = `
+        position: absolute;
+        top: 10px;
+        right: 10px;
+        background: rgba(0,0,0,0.7);
+        color: white;
+        padding: 4px 8px;
+        border-radius: 6px;
+        font-size: 12px;
+        z-index: 10;
+        pointer-events: none;
+      `;
+      pageLabel.textContent = `${pageNumber}`;
+      
       const img = document.createElement('img');
       img.className = 'chapter-page loading';
-      img.alt = `Страница ${index + 1}`;
-      img.textContent = `Загрузка страницы ${index + 1}...`;
+      img.alt = `Страница ${pageNumber}`;
+      img.style.cssText = `
+        width: 100%;
+        height: auto;
+        border-radius: 8px;
+        cursor: pointer;
+        transition: transform 0.2s;
+      `;
+      
+      // Плейсхолдер во время загрузки
+      img.style.minHeight = '400px';
+      img.style.background = 'rgba(255,255,255,0.1)';
+      img.style.display = 'flex';
+      img.style.alignItems = 'center';
+      img.style.justifyContent = 'center';
       
       img.onload = () => {
         img.classList.remove('loading');
-        img.textContent = '';
+        img.style.minHeight = 'auto';
+        img.style.background = 'none';
+        pageContainer.appendChild(pageLabel);
       };
       
       img.onerror = () => {
         img.classList.remove('loading');
-        img.textContent = `Ошибка загрузки страницы ${index + 1}`;
         img.style.minHeight = '200px';
         img.style.background = 'rgba(255, 59, 48, 0.1)';
+        img.style.border = '2px dashed rgba(255, 59, 48, 0.3)';
         img.style.color = '#ff3b30';
+        img.style.display = 'flex';
+        img.style.alignItems = 'center';
+        img.style.justifyContent = 'center';
+        img.textContent = `Ошибка загрузки страницы ${pageNumber}`;
+        img.style.cursor = 'default';
       };
 
-      // Полноэкранный просмотр при клике
-      img.onclick = () => openFullscreen(imageSrc);
+      // Полноэкранный просмотр при клике (только если изображение загрузилось)
+      img.onclick = () => {
+        if (!img.classList.contains('loading') && !img.textContent) {
+          openFullscreen(imageSrc);
+        }
+      };
+
+      // Эффект при наведении
+      img.onmouseenter = () => {
+        if (!img.classList.contains('loading') && !img.textContent) {
+          img.style.transform = 'scale(1.02)';
+        }
+      };
+      
+      img.onmouseleave = () => {
+        img.style.transform = 'scale(1)';
+      };
       
       img.src = imageSrc;
-      container.appendChild(img);
+      pageContainer.appendChild(img);
+      container.appendChild(pageContainer);
     }
 
     // Полноэкранный просмотр
