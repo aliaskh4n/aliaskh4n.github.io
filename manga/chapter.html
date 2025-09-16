@@ -14,88 +14,30 @@
       user-select: none;
     }
 
-    /* Шапка с информацией */
-    .chapter-header {
-      position: fixed;
-      top: 0;
-      left: 0;
-      right: 0;
-      height: 60px;
-      background: rgba(13, 17, 23, 0.95);
-      backdrop-filter: blur(12px);
-      border-bottom: 1px solid rgba(255,255,255,0.1);
-      z-index: 100;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      padding: 0 15px;
-      transition: transform 0.3s ease;
-    }
-
-    .chapter-header.hidden {
-      transform: translateY(-100%);
-    }
-
-    .header-left {
-      display: flex;
-      align-items: center;
-      gap: 15px;
-    }
-
-    .back-button {
-      background: rgba(255, 255, 255, 0.1);
-      border: none;
-      border-radius: 8px;
-      padding: 8px 12px;
-      color: #fff;
-      font-size: 14px;
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      gap: 5px;
-      transition: all 0.2s;
-    }
-
-    .back-button:hover {
-      background: rgba(255, 255, 255, 0.2);
-    }
-
-    .chapter-info {
-      display: flex;
-      flex-direction: column;
-      gap: 2px;
-    }
-
-    .manga-name {
-      font-size: 16px;
-      font-weight: 700;
-      color: #fff;
-    }
-
-    .chapter-title {
-      font-size: 12px;
-      color: #999;
-    }
-
-    .header-right {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-    }
-
-    .chapter-counter {
-      background: rgba(255, 255, 255, 0.1);
-      padding: 4px 8px;
-      border-radius: 6px;
-      font-size: 12px;
-      color: #fff;
-    }
-
     /* Контейнер для контента */
     .chapter-container {
-      margin-top: 60px;
-      min-height: calc(100vh - 60px);
-      background: #0d1117;
+      margin: 0;
+      padding: 0;
+    }
+
+    /* Контент главы */
+    .chapter-content {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 0;
+    }
+
+    .chapter-page {
+      width: 100%;
+      max-width: 100%;
+      height: auto;
+      object-fit: contain;
+      background: #000;
+      border-radius: 0;
+      margin: 0;
+      padding: 0;
+      display: block;
     }
 
     /* Индикаторы состояния */
@@ -131,218 +73,10 @@
       text-align: center;
       margin: 20px;
     }
-
-    /* Контент главы */
-    .chapter-content {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      padding: 20px 0;
-      gap: 5px;
-    }
-
-    .chapter-page {
-      max-width: 100%;
-      width: auto;
-      height: auto;
-      object-fit: contain;
-      background: rgba(255,255,255,0.05);
-      border-radius: 8px;
-    }
-
-    .chapter-page.loading {
-      background: rgba(255,255,255,0.1);
-      min-height: 400px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      color: rgba(255,255,255,0.5);
-    }
-
-    .page-container {
-      position: relative;
-      margin-bottom: 10px;
-      width: 100%;
-      max-width: 800px;
-    }
-
-    .page-label {
-      position: absolute;
-      top: 10px;
-      right: 10px;
-      background: rgba(0,0,0,0.7);
-      color: white;
-      padding: 4px 8px;
-      border-radius: 6px;
-      font-size: 12px;
-      z-index: 10;
-      pointer-events: none;
-    }
-
-    /* Информация о переводчиках */
-    .translators-info {
-      background: rgba(255, 255, 255, 0.05);
-      padding: 15px;
-      margin-bottom: 20px;
-      border-radius: 12px;
-      text-align: center;
-      border: 1px solid rgba(255,255,255,0.1);
-      max-width: 800px;
-      width: 100%;
-    }
-
-    .translator-name {
-      color: #ffcc00;
-      font-weight: bold;
-      margin-bottom: 8px;
-    }
-
-    .translator-contacts {
-      margin-top: 8px;
-      display: flex;
-      justify-content: center;
-      gap: 15px;
-    }
-
-    .translator-link {
-      color: #00aced;
-      text-decoration: none;
-      font-size: 12px;
-    }
-
-    /* Навигация между главами */
-    .chapter-navigation {
-      position: fixed;
-      bottom: 20px;
-      left: 50%;
-      transform: translateX(-50%);
-      display: flex;
-      gap: 10px;
-      background: rgba(13, 17, 23, 0.95);
-      backdrop-filter: blur(12px);
-      padding: 12px 16px;
-      border-radius: 25px;
-      border: 1px solid rgba(255,255,255,0.1);
-      transition: opacity 0.3s ease;
-    }
-
-    .chapter-navigation.hidden {
-      opacity: 0;
-      pointer-events: none;
-    }
-
-    .nav-button {
-      background: rgba(255, 255, 255, 0.1);
-      border: none;
-      border-radius: 20px;
-      padding: 10px 16px;
-      color: #fff;
-      font-size: 14px;
-      cursor: pointer;
-      transition: all 0.2s;
-      display: flex;
-      align-items: center;
-      gap: 6px;
-    }
-
-    .nav-button:hover {
-      background: rgba(255, 255, 255, 0.2);
-      transform: translateY(-1px);
-    }
-
-    .nav-button:disabled {
-      background: rgba(255, 255, 255, 0.05);
-      color: rgba(255,255,255,0.3);
-      cursor: not-allowed;
-      transform: none;
-    }
-
-    /* Полноэкранный режим для изображений */
-    .fullscreen-overlay {
-      display: none;
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      background: rgba(0,0,0,0.95);
-      z-index: 1000;
-      justify-content: center;
-      align-items: center;
-    }
-
-    .fullscreen-overlay.active {
-      display: flex;
-    }
-
-    .fullscreen-overlay img {
-      max-width: 95%;
-      max-height: 95%;
-      object-fit: contain;
-    }
-
-    .fullscreen-close {
-      position: absolute;
-      top: 20px;
-      right: 20px;
-      background: rgba(255,255,255,0.1);
-      border: none;
-      border-radius: 50%;
-      width: 40px;
-      height: 40px;
-      color: #fff;
-      cursor: pointer;
-      font-size: 18px;
-    }
-
-    /* Адаптивность */
-    @media(max-width: 768px) {
-      .manga-name {
-        font-size: 14px;
-      }
-      
-      .chapter-title {
-        font-size: 11px;
-      }
-      
-      .header-left {
-        gap: 10px;
-      }
-      
-      .chapter-navigation {
-        bottom: 15px;
-        left: 15px;
-        right: 15px;
-        transform: none;
-        justify-content: center;
-      }
-      
-      .nav-button {
-        flex: 1;
-        justify-content: center;
-        max-width: 120px;
-      }
-    }
   </style>
 </head>
 <body>
-  <!-- Шапка -->
-  <div class="chapter-header" id="chapterHeader">
-    <div class="header-left">
-      <button class="back-button" onclick="goBack()">
-        ← Назад
-      </button>
-      <div class="chapter-info">
-        <div class="manga-name" id="mangaName">Загрузка...</div>
-        <div class="chapter-title" id="chapterTitle">Загрузка главы...</div>
-      </div>
-    </div>
-    <div class="header-right">
-      <div class="chapter-counter" id="chapterCounter">-/-</div>
-    </div>
-  </div>
-
-  <!-- Контейнер контента -->
+  <!-- Контейнер -->
   <div class="chapter-container">
     <!-- Загрузка -->
     <div id="loadingDiv" class="loading">
@@ -357,33 +91,11 @@
     <div id="chapterContent" class="chapter-content" style="display: none;"></div>
   </div>
 
-  <!-- Навигация -->
-  <div class="chapter-navigation" id="chapterNavigation">
-    <button class="nav-button" id="prevButton" onclick="navigateChapter('prev')">
-      ← Предыдущая
-    </button>
-    <button class="nav-button" id="nextButton" onclick="navigateChapter('next')">
-      Следующая →
-    </button>
-  </div>
-
-  <!-- Полноэкранный просмотр -->
-  <div class="fullscreen-overlay" id="fullscreenOverlay" onclick="closeFullscreen()">
-    <button class="fullscreen-close" onclick="closeFullscreen()">×</button>
-    <img id="fullscreenImg" src="" alt="">
-  </div>
-
   <script>
-    // Конфигурация API
     const API_CONFIG = {
       baseUrl: 'https://nekros.tatokz2006.workers.dev',
       timeout: 15000
     };
-
-    let currentMangaData = null;
-    let currentChapterData = null;
-    let isHeaderVisible = true;
-    let lastScrollY = 0;
 
     // Получение параметров из URL
     function getUrlParams() {
@@ -392,66 +104,6 @@
         mangaId: urlParams.get('manga'),
         chapterId: urlParams.get('chapter')
       };
-    }
-
-    // Функция для возврата назад
-    function goBack() {
-      const params = getUrlParams();
-      if (params.mangaId) {
-        window.location.href = `info.html?id=${params.mangaId}`;
-      } else {
-        window.location.href = 'index.html';
-      }
-    }
-
-    // Получение данных главы с API
-    async function fetchChapterData(mangaId, chapterId) {
-      try {
-        console.log(`Запрос данных главы: manga=${mangaId}, chapter=${chapterId}`);
-        
-        const controller = new AbortController();
-        const timeoutId = setTimeout(() => controller.abort(), API_CONFIG.timeout);
-        
-        const url = `${API_CONFIG.baseUrl}/?id=${mangaId}&cr=${chapterId}`;
-        console.log(`Запрос к: ${url}`);
-        
-        const response = await fetch(url, {
-          signal: controller.signal,
-          headers: {
-            'Accept': 'application/json',
-            'Origin': window.location.origin
-          }
-        });
-        
-        clearTimeout(timeoutId);
-        
-        if (!response.ok) {
-          throw new Error(`HTTP error! status: ${response.status} - ${response.statusText}`);
-        }
-        
-        const data = await response.json();
-        console.log('Данные главы получены:', data);
-        return data;
-        
-      } catch (error) {
-        console.error('Ошибка получения данных главы:', error);
-        throw error;
-      }
-    }
-
-    // Получение информации о манге (для навигации между главами)
-    async function fetchMangaInfo(mangaId) {
-      try {
-        const url = `${API_CONFIG.baseUrl}/?id=${mangaId}`;
-        const response = await fetch(url);
-        
-        if (!response.ok) throw new Error('Ошибка загрузки информации о манге');
-        
-        return await response.json();
-      } catch (error) {
-        console.error('Ошибка получения информации о манге:', error);
-        return null;
-      }
     }
 
     // Показ ошибки
@@ -464,107 +116,13 @@
       errorDiv.style.display = 'block';
     }
 
-    // Создание элемента изображения с улучшенной обработкой ошибок
-    function createImageElement(imageSrc, pageNumber, container) {
-      const pageContainer = document.createElement('div');
-      pageContainer.className = 'page-container';
-      
-      const pageLabel = document.createElement('div');
-      pageLabel.className = 'page-label';
-      pageLabel.textContent = `${pageNumber}`;
-      
+    // Создание элемента изображения
+    function createImageElement(imageSrc, container) {
       const img = document.createElement('img');
-      img.className = 'chapter-page loading';
-      img.alt = `Страница ${pageNumber}`;
-      img.style.cssText = `
-        width: 100%;
-        height: auto;
-        border-radius: 8px;
-        cursor: pointer;
-        transition: transform 0.2s;
-        min-height: 400px;
-        background: rgba(255,255,255,0.1);
-        display: flex;
-        align-items: center;
-        justify-content: center;
-      `;
-      
-      // Таймаут для загрузки изображения
-      const loadTimeout = setTimeout(() => {
-        if (img.classList.contains('loading')) {
-          img.onerror();
-        }
-      }, 10000); // 10 секунд на загрузку
-      
-      img.onload = () => {
-        clearTimeout(loadTimeout);
-        img.classList.remove('loading');
-        img.style.minHeight = 'auto';
-        img.style.background = 'none';
-        pageContainer.appendChild(pageLabel);
-        console.log(`Страница ${pageNumber} загружена успешно`);
-      };
-      
-      img.onerror = () => {
-        clearTimeout(loadTimeout);
-        console.error(`Ошибка загрузки страницы ${pageNumber}: ${imageSrc}`);
-        img.classList.remove('loading');
-        
-        // Создаем placeholder для ошибки
-        const errorDiv = document.createElement('div');
-        errorDiv.style.cssText = `
-          min-height: 200px;
-          background: rgba(255, 59, 48, 0.1);
-          border: 2px dashed rgba(255, 59, 48, 0.3);
-          color: #ff3b30;
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          text-align: center;
-          border-radius: 8px;
-          flex-direction: column;
-          gap: 10px;
-        `;
-        
-        errorDiv.innerHTML = `
-          <div>❌</div>
-          <div>Ошибка загрузки<br>страницы ${pageNumber}</div>
-          <div style="font-size: 12px; opacity: 0.7;">Проверьте URL изображения</div>
-        `;
-        
-        img.style.display = 'none';
-        pageContainer.appendChild(errorDiv);
-      };
-
-      // Полноэкранный просмотр при клике
-      img.onclick = () => {
-        if (!img.classList.contains('loading') && img.style.display !== 'none') {
-          openFullscreen(imageSrc);
-        }
-      };
-
-      // Эффект при наведении
-      img.onmouseenter = () => {
-        if (!img.classList.contains('loading') && img.style.display !== 'none') {
-          img.style.transform = 'scale(1.02)';
-        }
-      };
-      
-      img.onmouseleave = () => {
-        img.style.transform = 'scale(1)';
-      };
-      
-      // Проверяем URL перед загрузкой
-      if (!imageSrc || imageSrc.trim() === '') {
-        console.error(`Пустой URL для страницы ${pageNumber}`);
-        img.onerror();
-      } else {
-        console.log(`Начинаем загрузку страницы ${pageNumber}: ${imageSrc}`);
-        img.src = imageSrc.trim();
-      }
-      
-      pageContainer.appendChild(img);
-      container.appendChild(pageContainer);
+      img.className = 'chapter-page';
+      img.alt = 'Страница';
+      img.src = imageSrc;
+      container.appendChild(img);
     }
 
     // Отображение контента главы
@@ -573,278 +131,61 @@
       
       const contentContainer = document.getElementById('chapterContent');
       contentContainer.innerHTML = '';
-      
-      // Обновляем заголовки
-      document.getElementById('mangaName').textContent = chapterData.mangaName || 'Неизвестная манга';
-      
-      // Получаем информацию о главе - ИСПРАВЛЕНО для вашего формата данных
-      const chapterInfo = chapterData.chapterInfo || chapterData.chapterContent || chapterData.chapter || {};
-      
-      const chapterTitle = chapterInfo.title || `Глава ${chapterInfo.id || chapterInfo.chapter || 'без номера'}`;
-      document.getElementById('chapterTitle').textContent = chapterTitle;
-      
-      // Обновляем заголовок страницы
-      document.title = `${chapterTitle} - ${chapterData.mangaName} - Manga App`;
 
-      // Отображаем информацию о переводчиках
-      if (chapterInfo.translators) {
-        const translatorsDiv = document.createElement('div');
-        translatorsDiv.className = 'translators-info';
-        
-        let translatorsHtml = `<div class="translator-name">Перевод: ${chapterInfo.translators.name || 'Неизвестно'}</div>`;
-        
-        if (chapterInfo.translators.tme || chapterInfo.translators.vk) {
-          translatorsHtml += `<div class="translator-contacts">`;
-          
-          if (chapterInfo.translators.tme) {
-            const telegramLink = chapterInfo.translators.tme.startsWith('http') 
-              ? chapterInfo.translators.tme 
-              : `https://${chapterInfo.translators.tme}`;
-            translatorsHtml += `<a href="${telegramLink}" target="_blank" class="translator-link">📱 Telegram</a>`;
-          }
-          
-          if (chapterInfo.translators.vk) {
-            const vkLink = chapterInfo.translators.vk.startsWith('http') 
-              ? chapterInfo.translators.vk 
-              : `https://${chapterInfo.translators.vk}`;
-            translatorsHtml += `<a href="${vkLink}" target="_blank" class="translator-link" style="color: #4680c2;">🔷 VK</a>`;
-          }
-          
-          translatorsHtml += `</div>`;
-        }
-        
-        translatorsDiv.innerHTML = translatorsHtml;
-        contentContainer.appendChild(translatorsDiv);
-      }
+      const pages = (chapterData.chapterContent && chapterData.chapterContent.pages) || [];
 
-      // Обрабатываем страницы главы
-      const pages = chapterInfo.pages 
-            || chapterData.pages 
-            || (chapterData.chapterContent && chapterData.chapterContent.pages) 
-            || [];
-      
-      // Если есть сообщение об ошибке от worker'а
-      if (chapterData.message && chapterData.message.includes('не найдено')) {
-        const warningDiv = document.createElement('div');
-        warningDiv.style.cssText = `
-          background: rgba(255, 165, 0, 0.1);
-          border: 1px solid rgba(255, 165, 0, 0.3);
-          border-radius: 12px;
-          padding: 20px;
-          margin-bottom: 20px;
-          text-align: center;
-          color: #ffa500;
-        `;
-        warningDiv.innerHTML = `
-          <div style="font-size: 18px; margin-bottom: 10px;">⚠️</div>
-          <div>${chapterData.message}</div>
-          <div style="font-size: 12px; margin-top: 10px; opacity: 0.7;">
-            Файл главы не найден в репозитории. Проверьте путь: chapters/${chapterData.mangaId}/chapter_${chapterInfo.id || chapterInfo.chapter}.json
-          </div>
-        `;
-        contentContainer.appendChild(warningDiv);
-      }
-      
-      if (!pages || !Array.isArray(pages) || pages.length === 0) {
-        const noPages = document.createElement('div');
-        noPages.style.cssText = `
-          background: rgba(255, 255, 255, 0.05);
-          padding: 40px 20px;
-          margin: 20px;
-          border-radius: 12px;
-          text-align: center;
-          border: 1px solid rgba(255,255,255,0.1);
-          color: #999;
-        `;
-        
-        let noPagesHtml = `
-          <div style="font-size: 24px; margin-bottom: 10px;">📄</div>
-          <div>Страницы главы не найдены</div>
-        `;
-        
-        // Показываем больше информации для отладки
-        if (chapterInfo.id || chapterInfo.chapter) {
-          noPagesHtml += `
-            <div style="font-size: 12px; margin-top: 15px; opacity: 0.7;">
-              <div>Информация о главе:</div>
-              <div>ID: ${chapterInfo.id || chapterInfo.chapter}</div>
-              <div>Название: ${chapterInfo.title || 'Не указано'}</div>
-              ${chapterInfo.filename ? `<div>Файл: ${chapterInfo.filename}</div>` : ''}
-            </div>
-          `;
-        }
-        
-        noPagesHtml += `
-          <div style="font-size: 12px; margin-top: 10px; opacity: 0.5;">
-            Проверьте файл главы в репозитории
-          </div>
-        `;
-        
-        noPages.innerHTML = noPagesHtml;
-        contentContainer.appendChild(noPages);
-        
-        // Показываем содержимое для отладки
-        console.error('Структура данных главы для отладки:');
-        console.error('chapterData:', chapterData);
-        console.error('chapterInfo:', chapterInfo);
-        console.error('pages:', pages);
+      if (!pages.length) {
+        showError('Страницы главы не найдены');
         return;
       }
 
-      console.log(`Загружаем ${pages.length} страниц:`, pages);
-
-      // Создаем элементы для каждой страницы
-      pages.forEach((pageUrl, index) => {
+      pages.forEach((pageUrl) => {
         if (pageUrl && pageUrl.trim()) {
-          createImageElement(pageUrl.trim(), index + 1, contentContainer);
-        } else {
-          console.error(`Пустой URL для страницы ${index + 1}`);
-          createImageElement('', index + 1, contentContainer);
+          createImageElement(pageUrl.trim(), contentContainer);
         }
       });
 
-      // Показываем контент
       document.getElementById('loadingDiv').style.display = 'none';
       document.getElementById('chapterContent').style.display = 'flex';
     }
 
-    // Полноэкранный просмотр
-    function openFullscreen(imageSrc) {
-      const overlay = document.getElementById('fullscreenOverlay');
-      const img = document.getElementById('fullscreenImg');
-      img.src = imageSrc;
-      overlay.classList.add('active');
-    }
+    // Получение данных главы с API
+    async function fetchChapterData(mangaId, chapterId) {
+      try {
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), API_CONFIG.timeout);
 
-    function closeFullscreen() {
-      document.getElementById('fullscreenOverlay').classList.remove('active');
-    }
+        const url = `${API_CONFIG.baseUrl}/?id=${mangaId}&cr=${chapterId}`;
+        const response = await fetch(url, { signal: controller.signal });
 
-    // Навигация между главами
-    function navigateChapter(direction) {
-      const params = getUrlParams();
-      if (!currentMangaData || !params.mangaId) return;
-      
-      const chapters = currentMangaData.chapters || [];
-      const currentIndex = chapters.findIndex(ch => ch.id == params.chapterId);
-      
-      if (currentIndex === -1) return;
-      
-      let newIndex;
-      if (direction === 'next') {
-        newIndex = currentIndex + 1;
-      } else {
-        newIndex = currentIndex - 1;
-      }
-      
-      if (newIndex >= 0 && newIndex < chapters.length) {
-        const newChapterId = chapters[newIndex].id;
-        window.location.href = `chapter.html?manga=${params.mangaId}&chapter=${newChapterId}`;
-      }
-    }
+        clearTimeout(timeoutId);
 
-    // Обновление навигации
-    function updateNavigation() {
-      const params = getUrlParams();
-      if (!currentMangaData || !params.chapterId) return;
-      
-      const chapters = currentMangaData.chapters || [];
-      const currentIndex = chapters.findIndex(ch => ch.id == params.chapterId);
-      
-      if (currentIndex !== -1) {
-        document.getElementById('chapterCounter').textContent = `${currentIndex + 1}/${chapters.length}`;
-        
-        const prevButton = document.getElementById('prevButton');
-        const nextButton = document.getElementById('nextButton');
-        
-        prevButton.disabled = currentIndex === 0;
-        nextButton.disabled = currentIndex === chapters.length - 1;
-      }
-    }
+        if (!response.ok) throw new Error(`Ошибка HTTP: ${response.status}`);
 
-    // Скрытие/показ интерфейса при прокрутке
-    function handleScroll() {
-      const currentScrollY = window.scrollY;
-      const header = document.getElementById('chapterHeader');
-      const navigation = document.getElementById('chapterNavigation');
-      
-      if (currentScrollY > lastScrollY && currentScrollY > 100) {
-        header.classList.add('hidden');
-        navigation.classList.add('hidden');
-        isHeaderVisible = false;
-      } else {
-        header.classList.remove('hidden');
-        navigation.classList.remove('hidden');
-        isHeaderVisible = true;
+        return await response.json();
+      } catch (error) {
+        console.error('Ошибка получения данных главы:', error);
+        throw error;
       }
-      
-      lastScrollY = currentScrollY;
     }
 
     // Основная функция загрузки
     async function loadChapter() {
       const params = getUrlParams();
-      
       if (!params.mangaId || !params.chapterId) {
-        showError('Параметры главы не указаны в URL. Проверьте ссылку.');
+        showError('Параметры главы не указаны в URL.');
         return;
       }
-      
+
       try {
-        console.log(`Загружаем главу ${params.chapterId} манги ${params.mangaId}`);
-        
-        // Загружаем данные главы
         const chapterData = await fetchChapterData(params.mangaId, params.chapterId);
-        currentChapterData = chapterData;
-        
-        // Загружаем информацию о манге для навигации
-        currentMangaData = await fetchMangaInfo(params.mangaId);
-        
-        // Отображаем контент
         displayChapterContent(chapterData);
-        
-        // Обновляем навигацию
-        updateNavigation();
-        
       } catch (error) {
-        let errorMessage = 'Ошибка загрузки главы: ';
-        
-        if (error.name === 'AbortError') {
-          errorMessage += 'Превышено время ожидания';
-        } else if (error.message.includes('HTTP error')) {
-          errorMessage += 'Глава не найдена или недоступна';
-        } else if (error.message.includes('fetch')) {
-          errorMessage += 'Проблемы с подключением к серверу';
-        } else {
-          errorMessage += error.message;
-        }
-        
-        showError(errorMessage + '. Попробуйте обновить страницу.');
+        showError('Ошибка загрузки главы: ' + error.message);
       }
     }
 
-    // Инициализация
-    document.addEventListener('DOMContentLoaded', () => {
-      loadChapter();
-      
-      // Добавляем обработчик прокрутки с дебаунсингом
-      let scrollTimeout;
-      window.addEventListener('scroll', () => {
-        clearTimeout(scrollTimeout);
-        scrollTimeout = setTimeout(handleScroll, 10);
-      });
-      
-      // Обработка клавиш для навигации
-      document.addEventListener('keydown', (e) => {
-        if (e.key === 'ArrowLeft' || e.key === 'a' || e.key === 'A') {
-          navigateChapter('prev');
-        } else if (e.key === 'ArrowRight' || e.key === 'd' || e.key === 'D') {
-          navigateChapter('next');
-        } else if (e.key === 'Escape') {
-          closeFullscreen();
-        }
-      });
-    });
+    document.addEventListener('DOMContentLoaded', loadChapter);
   </script>
 </body>
 </html>
