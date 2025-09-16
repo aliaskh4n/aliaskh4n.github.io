@@ -176,42 +176,6 @@
         showError('Ошибка загрузки главы: ' + error.message);
       }
     }
-
-    // Свайпы для смены главы
-    let touchStartX = 0;
-    let touchEndX = 0;
-    let touchStartTime = 0;
-    let startZone = ""; // "left" или "right"
-    
-    document.addEventListener("touchstart", (e) => {
-      touchStartX = e.changedTouches[0].screenX;
-      touchStartTime = Date.now();
-    
-      const screenWidth = window.innerWidth;
-      if (touchStartX < screenWidth * 0.15) {
-        startZone = "left"; // левая сторона
-      } else if (touchStartX > screenWidth * 0.85) {
-        startZone = "right"; // правая сторона
-      } else {
-        startZone = "";
-      }
-    });
-    
-    document.addEventListener("touchend", (e) => {
-      touchEndX = e.changedTouches[0].screenX;
-      const deltaX = touchEndX - touchStartX;
-      const duration = Date.now() - touchStartTime;
-    
-      // свайп засчитывается только если движение было длиннее 80px и длилось больше 150мс
-      if (Math.abs(deltaX) > 80 && duration > 150) {
-        if (deltaX > 0 && startZone === "left") {
-          goToChapter("prev"); // свайп вправо с левого края → назад
-        } else if (deltaX < 0 && startZone === "right") {
-          goToChapter("next"); // свайп влево с правого края → вперёд
-        }
-      }
-    });
-
   </script>
 </body>
 </html>
