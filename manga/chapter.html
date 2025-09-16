@@ -96,7 +96,12 @@
       Telegram.WebApp.ready();
       Telegram.WebApp.BackButton.show();
       Telegram.WebApp.BackButton.onClick(() => {
-        Telegram.WebApp.close(); // закрываем mini app
+        // Переход назад внутри приложения
+        if (document.referrer) {
+          window.location.href = document.referrer;
+        } else {
+          window.history.back(); 
+        }
       });
     }
 
