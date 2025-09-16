@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Чтение главы - Manga App</title>
+  <title>Чтение главы</title>
   <style>
     body {
       margin: 0;
@@ -14,13 +14,11 @@
       user-select: none;
     }
 
-    /* Контейнер для контента */
     .chapter-container {
       margin: 0;
       padding: 0;
     }
 
-    /* Контент главы */
     .chapter-content {
       display: flex;
       flex-direction: column;
@@ -34,13 +32,11 @@
       height: auto;
       object-fit: contain;
       background: #000;
-      border-radius: 0;
+      display: block;
       margin: 0;
       padding: 0;
-      display: block;
     }
 
-    /* Индикаторы состояния */
     .loading {
       display: flex;
       flex-direction: column;
@@ -76,20 +72,18 @@
   </style>
 </head>
 <body>
-  <!-- Контейнер -->
   <div class="chapter-container">
-    <!-- Загрузка -->
     <div id="loadingDiv" class="loading">
       <div class="loading-spinner"></div>
       <div>Загрузка главы...</div>
     </div>
 
-    <!-- Ошибка -->
     <div id="errorDiv" class="error" style="display: none;"></div>
-
-    <!-- Контент главы -->
     <div id="chapterContent" class="chapter-content" style="display: none;"></div>
   </div>
+
+  <!-- Telegram Mini App API -->
+  <script src="https://telegram.org/js/telegram-web-app.js"></script>
 
   <script>
     const API_CONFIG = {
@@ -97,7 +91,15 @@
       timeout: 15000
     };
 
-    // Получение параметров из URL
+    // Telegram Back Button
+    if (window.Telegram && Telegram.WebApp) {
+      Telegram.WebApp.ready();
+      Telegram.WebApp.BackButton.show();
+      Telegram.WebApp.BackButton.onClick(() => {
+        Telegram.WebApp.close(); // закрываем mini app
+      });
+    }
+
     function getUrlParams() {
       const urlParams = new URLSearchParams(window.location.search);
       return {
@@ -106,17 +108,14 @@
       };
     }
 
-    // Показ ошибки
     function showError(message) {
       document.getElementById('loadingDiv').style.display = 'none';
       document.getElementById('chapterContent').style.display = 'none';
-      
       const errorDiv = document.getElementById('errorDiv');
       errorDiv.textContent = message;
       errorDiv.style.display = 'block';
     }
 
-    // Создание элемента изображения
     function createImageElement(imageSrc, container) {
       const img = document.createElement('img');
       img.className = 'chapter-page';
@@ -125,15 +124,11 @@
       container.appendChild(img);
     }
 
-    // Отображение контента главы
     function displayChapterContent(chapterData) {
-      console.log('Отображаем контент главы:', chapterData);
-      
       const contentContainer = document.getElementById('chapterContent');
       contentContainer.innerHTML = '';
 
       const pages = (chapterData.chapterContent && chapterData.chapterContent.pages) || [];
-
       if (!pages.length) {
         showError('Страницы главы не найдены');
         return;
@@ -149,27 +144,22 @@
       document.getElementById('chapterContent').style.display = 'flex';
     }
 
-    // Получение данных главы с API
     async function fetchChapterData(mangaId, chapterId) {
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), API_CONFIG.timeout);
+      const url = `${API_CONFIG.baseUrl}/?id=${mangaId}&cr=${chapterId}`;
+
       try {
-        const controller = new AbortController();
-        const timeoutId = setTimeout(() => controller.abort(), API_CONFIG.timeout);
-
-        const url = `${API_CONFIG.baseUrl}/?id=${mangaId}&cr=${chapterId}`;
         const response = await fetch(url, { signal: controller.signal });
-
         clearTimeout(timeoutId);
-
         if (!response.ok) throw new Error(`Ошибка HTTP: ${response.status}`);
-
         return await response.json();
       } catch (error) {
-        console.error('Ошибка получения данных главы:', error);
+        clearTimeout(timeoutId);
         throw error;
       }
     }
 
-    // Основная функция загрузки
     async function loadChapter() {
       const params = getUrlParams();
       if (!params.mangaId || !params.chapterId) {
@@ -183,6 +173,44 @@
       } catch (error) {
         showError('Ошибка загрузки главы: ' + error.message);
       }
+    }
+
+    // Свайпы для смены главы
+    let touchStartX = 0;
+    let touchEndX = 0;
+
+    document.addEventListener("touchstart", (e) => {
+      touchStartX = e.changedTouches[0].screenX;
+    });
+
+    document.addEventListener("touchend", (e) => {
+      touchEndX = e.changedTouches[0].screenX;
+      handleSwipe();
+    });
+
+    function handleSwipe() {
+      const deltaX = touchEndX - touchStartX;
+      if (deltaX > 50) {
+        goToChapter("next");
+      }
+      if (deltaX < -50) {
+        goToChapter("prev");
+      }
+    }
+
+    function goToChapter(direction) {
+      const params = new URLSearchParams(window.location.search);
+      const mangaId = params.get("manga");
+      let chapterId = parseInt(params.get("chapter"));
+      if (!mangaId || !chapterId) return;
+
+      if (direction === "next") {
+        chapterId++;
+      } else if (direction === "prev" && chapterId > 1) {
+        chapterId--;
+      }
+
+      window.location.href = `chapter.html?manga=${mangaId}&chapter=${chapterId}`;
     }
 
     document.addEventListener('DOMContentLoaded', loadChapter);
