@@ -183,42 +183,38 @@
     // Свайпы для смены главы
     let touchStartX = 0;
     let touchEndX = 0;
-
+    let touchStartTime = 0;
+    let startZone = ""; // "left" или "right"
+    
     document.addEventListener("touchstart", (e) => {
       touchStartX = e.changedTouches[0].screenX;
+      touchStartTime = Date.now();
+    
+      const screenWidth = window.innerWidth;
+      if (touchStartX < screenWidth * 0.15) {
+        startZone = "left"; // левая сторона
+      } else if (touchStartX > screenWidth * 0.85) {
+        startZone = "right"; // правая сторона
+      } else {
+        startZone = "";
+      }
     });
-
+    
     document.addEventListener("touchend", (e) => {
       touchEndX = e.changedTouches[0].screenX;
-      handleSwipe();
+      const deltaX = touchEndX - touchStartX;
+      const duration = Date.now() - touchStartTime;
+    
+      // свайп засчитывается только если движение было длиннее 80px и длилось больше 150мс
+      if (Math.abs(deltaX) > 80 && duration > 150) {
+        if (deltaX > 0 && startZone === "left") {
+          goToChapter("prev"); // свайп вправо с левого края → назад
+        } else if (deltaX < 0 && startZone === "right") {
+          goToChapter("next"); // свайп влево с правого края → вперёд
+        }
+      }
     });
 
-    function handleSwipe() {
-      const deltaX = touchEndX - touchStartX;
-      if (deltaX > 50) {
-        goToChapter("next");
-      }
-      if (deltaX < -50) {
-        goToChapter("prev");
-      }
-    }
-
-    function goToChapter(direction) {
-      const params = new URLSearchParams(window.location.search);
-      const mangaId = params.get("manga");
-      let chapterId = parseInt(params.get("chapter"));
-      if (!mangaId || !chapterId) return;
-
-      if (direction === "next") {
-        chapterId++;
-      } else if (direction === "prev" && chapterId > 1) {
-        chapterId--;
-      }
-
-      window.location.href = `chapter.html?manga=${mangaId}&chapter=${chapterId}`;
-    }
-
-    document.addEventListener('DOMContentLoaded', loadChapter);
   </script>
 </body>
 </html>
