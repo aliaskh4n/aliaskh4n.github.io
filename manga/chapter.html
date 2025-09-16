@@ -92,18 +92,15 @@
     };
 
     // Telegram Back Button
-    if (window.Telegram && Telegram.WebApp) {
-      Telegram.WebApp.ready();
-      Telegram.WebApp.BackButton.show();
-      Telegram.WebApp.BackButton.onClick(() => {
-        // Переход назад внутри приложения
-        if (document.referrer) {
-          window.location.href = document.referrer;
-        } else {
-          window.history.back(); 
-        }
-      });
-    }
+    Telegram.WebApp.ready();
+    Telegram.WebApp.BackButton.show();
+    Telegram.WebApp.BackButton.onClick(() => {
+      if (document.referrer) {
+        window.location.href = document.referrer;
+      } else {
+        window.history.back();
+      }
+    });
 
     function getUrlParams() {
       const urlParams = new URLSearchParams(window.location.search);
