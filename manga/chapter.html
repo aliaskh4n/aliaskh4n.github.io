@@ -618,7 +618,10 @@
       }
 
       // Обрабатываем страницы главы
-      const pages = chapterInfo.pages || chapterData.pages || [];
+      const pages = chapterInfo.pages 
+            || chapterData.pages 
+            || (chapterData.chapterContent && chapterData.chapterContent.pages) 
+            || [];
       
       // Если есть сообщение об ошибке от worker'а
       if (chapterData.message && chapterData.message.includes('не найдено')) {
