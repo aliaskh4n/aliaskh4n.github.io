@@ -1,55 +1,87 @@
-import React from "react";
-import rectangle8 from "./rectangle-8.png";
-import rectangle9 from "./rectangle-9.png";
-import rectangle10 from "./rectangle-10.png";
-import rectangle11 from "./rectangle-11.png";
-import rectangle12 from "./rectangle-12.png";
-import rectangle13 from "./rectangle-13.png";
-import "./style.css";
-import vector from "./vector.svg";
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>Sound to Image Demo</title>
+</head>
+<body>
+  <h2>Генерация дорожки</h2>
+  <input type="file" id="fileInput" accept="audio/*">
+  <canvas id="waveCanvas" width="800" height="200"></canvas>
+  <button id="saveBtn">Сохранить PNG</button>
 
-export const Frame = () => {
-  return (
-    <div className="frame">
-      <div className="div">
-        <div className="overlap">
-          <div className="search">
-            <img className="vector" alt="Vector" src={vector} />
-          </div>
-        </div>
+  <h2>Сканирование дорожки</h2>
+  <video id="video" width="400" height="200" autoplay></video>
+  <button id="scanBtn">Сканировать</button>
+  <button id="playBtn">Играть звук</button>
 
-        <div className="overlap-group">
-          <img className="rectangle" alt="Rectangle" src={rectangle8} />
+  <script>
+    const canvas = document.getElementById("waveCanvas");
+    const ctx = canvas.getContext("2d");
+    const fileInput = document.getElementById("fileInput");
+    const saveBtn = document.getElementById("saveBtn");
 
-          <div className="text-wrapper">Убийство Игрока</div>
-        </div>
+    let audioData = [];
 
-        <div className="overlap-2">
-          <div className="text-wrapper-2">Призванный в параллел...</div>
+    // === Генерация картинки из аудио ===
+    fileInput.addEventListener("change", async (e) => {
+      const file = e.target.files[0];
+      const arrayBuffer = await file.arrayBuffer();
+      const audioCtx = new AudioContext();
+      const audioBuffer = await audioCtx.decodeAudioData(arrayBuffer);
+      const data = audioBuffer.getChannelData(0);
 
-          <img className="rectangle" alt="Rectangle" src={rectangle9} />
-        </div>
+      audioData = data; // сохраним для декодера
 
-        <div className="overlap-3">
-          <img className="rectangle" alt="Rectangle" src={rectangle10} />
+      ctx.clearRect(0,0,canvas.width,canvas.height);
+      ctx.beginPath();
+      ctx.moveTo(0, canvas.height/2);
 
-          <div className="text-wrapper-3">Смертельная красота</div>
-        </div>
+      for (let i = 0; i < canvas.width; i++) {
+        const sampleIndex = Math.floor(i * data.length / canvas.width);
+        const v = data[sampleIndex] * (canvas.height/2);
+        ctx.lineTo(i, (canvas.height/2) - v);
+      }
+      ctx.strokeStyle = "red";
+      ctx.stroke();
+    });
 
-        <div className="overlap-4">
-          <div className="text-wrapper">Руна Возмездия</div>
+    saveBtn.addEventListener("click", () => {
+      const link = document.createElement("a");
+      link.download = "waveform.png";
+      link.href = canvas.toDataURL();
+      link.click();
+    });
 
-          <img className="rectangle" alt="Rectangle" src={rectangle11} />
-        </div>
+    // === Сканирование дорожки (камера) ===
+    const video = document.getElementById("video");
+    navigator.mediaDevices.getUserMedia({ video: true })
+      .then(stream => video.srcObject = stream);
 
-        <div className="rectangle-wrapper">
-          <img className="img" alt="Rectangle" src={rectangle12} />
-        </div>
+    document.getElementById("scanBtn").addEventListener("click", () => {
+      const scanCanvas = document.createElement("canvas");
+      scanCanvas.width = video.videoWidth;
+      scanCanvas.height = video.videoHeight;
+      const scanCtx = scanCanvas.getContext("2d");
+      scanCtx.drawImage(video, 0, 0);
+      const imgData = scanCtx.getImageData(0,0,scanCanvas.width,scanCanvas.height);
 
-        <div className="img-wrapper">
-          <img className="img" alt="Rectangle" src={rectangle13} />
-        </div>
-      </div>
-    </div>
-  );
-};
+      // ⚡ Тут нужно распознать волну → массив амплитуд (упрощено!)
+      // Сейчас для примера просто вернем сохранённый массив
+      console.log("Сканирование картинок пока прототипное");
+    });
+
+    // === Воспроизведение ===
+    document.getElementById("playBtn").addEventListener("click", () => {
+      const audioCtx = new AudioContext();
+      const buffer = audioCtx.createBuffer(1, audioData.length, audioCtx.sampleRate);
+      buffer.getChannelData(0).set(audioData);
+
+      const source = audioCtx.createBufferSource();
+      source.buffer = buffer;
+      source.connect(audioCtx.destination);
+      source.start();
+    });
+  </script>
+</body>
+</html>
