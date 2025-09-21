@@ -1,87 +1,304 @@
-<!DOCTYPE html>
-<html>
+<!doctype html>
+<html lang="ru">
 <head>
-  <meta charset="UTF-8">
-  <title>Sound to Image Demo</title>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Sound <→> Printed Wave — прототип</title>
+<style>
+  body { font-family: Arial, sans-serif; padding:18px; max-width:1000px; margin:auto; color:#111; }
+  h1 { margin-top:0 }
+  canvas { border:1px solid #ddd; display:block; margin:10px 0; max-width:100%; }
+  .row { display:flex; gap:10px; flex-wrap:wrap; align-items:center; }
+  button, input[type=file], select { padding:8px 10px; }
+  label { display:block; margin-top:8px; }
+  small { color:#666 }
+  #video { border:1px solid #ddd; background:#000; }
+</style>
 </head>
 <body>
-  <h2>Генерация дорожки</h2>
-  <input type="file" id="fileInput" accept="audio/*">
-  <canvas id="waveCanvas" width="800" height="200"></canvas>
-  <button id="saveBtn">Сохранить PNG</button>
+  <h1>Sound ↔ Printed Wave — веб-прототип</h1>
 
-  <h2>Сканирование дорожки</h2>
-  <video id="video" width="400" height="200" autoplay></video>
-  <button id="scanBtn">Сканировать</button>
-  <button id="playBtn">Играть звук</button>
+  <section>
+    <h3>1) Загрузить аудио (или записать)</h3>
+    <div class="row">
+      <input id="audioInput" type="file" accept="audio/*,.wav,.mp3" />
+      <button id="recordBtn">Record (microphone)</button>
+      <label>Samples per column (печать / декодирование): 
+        <input id="samplesPerCol" type="number" value="256" min="16" max="4096" style="width:90px" />
+      </label>
+      <button id="drawBtn">Нарисовать дорожку</button>
+      <button id="savePngBtn">Сохранить PNG</button>
+    </div>
+    <small>Если при выборе файла телефон предлагает камеру — выбери «Файлы / Browse» или загрузи с компьютера.</small>
+    <canvas id="waveCanvas" width="1200" height="300"></canvas>
+  </section>
+
+  <section>
+    <h3>2) Сканировать / Воспроизвести (загрузка изображения или камера)</h3>
+    <div class="row">
+      <input id="imageInput" type="file" accept="image/*" />
+      <button id="startCamBtn">Запустить камеру</button>
+      <button id="switchCamBtn">Переключить камеру</button>
+      <button id="captureBtn">Сделать фото</button>
+      <button id="decodeBtn">Декодировать и Воспроизвести</button>
+      <button id="stopCamBtn">Остановить камеру</button>
+    </div>
+    <div style="display:flex;gap:10px;margin-top:8px;align-items:flex-start">
+      <video id="video" autoplay playsinline muted width="480" height="270"></video>
+      <canvas id="photoCanvas" width="1200" height="300" style="display:none"></canvas>
+    </div>
+    <small>Если камера по умолчанию открыла фронтальную — нажми <b>Переключить камеру</b>.</small>
+  </section>
 
   <script>
-    const canvas = document.getElementById("waveCanvas");
-    const ctx = canvas.getContext("2d");
-    const fileInput = document.getElementById("fileInput");
-    const saveBtn = document.getElementById("saveBtn");
+  (async ()=>{
 
-    let audioData = [];
+    // --- utility ---
+    const $ = id => document.getElementById(id);
 
-    // === Генерация картинки из аудио ===
-    fileInput.addEventListener("change", async (e) => {
-      const file = e.target.files[0];
-      const arrayBuffer = await file.arrayBuffer();
-      const audioCtx = new AudioContext();
-      const audioBuffer = await audioCtx.decodeAudioData(arrayBuffer);
-      const data = audioBuffer.getChannelData(0);
+    const waveCanvas = $('waveCanvas');
+    const wctx = waveCanvas.getContext('2d');
 
-      audioData = data; // сохраним для декодера
+    const photoCanvas = $('photoCanvas');
+    const pctx = photoCanvas.getContext('2d');
 
-      ctx.clearRect(0,0,canvas.width,canvas.height);
-      ctx.beginPath();
-      ctx.moveTo(0, canvas.height/2);
+    let audioCtx = null;
+    let lastAudioBuffer = null; // original decoded (for save/play)
+    let lastAmplitudes = null;  // amplitudes array (used to play after decode)
+    let lastSampleRate = 44100;
 
-      for (let i = 0; i < canvas.width; i++) {
-        const sampleIndex = Math.floor(i * data.length / canvas.width);
-        const v = data[sampleIndex] * (canvas.height/2);
-        ctx.lineTo(i, (canvas.height/2) - v);
+    // draw blank
+    wctx.fillStyle = "#fff"; wctx.fillRect(0,0,waveCanvas.width,waveCanvas.height);
+
+    // --- audio loading & drawing ---
+    $('audioInput').addEventListener('change', async (e) => {
+      const f = e.target.files && e.target.files[0];
+      if (!f) return;
+      if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+      const abuf = await f.arrayBuffer();
+      try {
+        lastAudioBuffer = await audioCtx.decodeAudioData(abuf.slice(0)); // clone
+      } catch (err) {
+        // Safari sometimes rejects; try older callback style (rare)
+        lastAudioBuffer = await new Promise((res,rej)=>{
+          audioCtx.decodeAudioData(abuf.slice(0), res, rej);
+        });
       }
-      ctx.strokeStyle = "red";
-      ctx.stroke();
+      lastSampleRate = lastAudioBuffer.sampleRate || 44100;
+      alert('Аудио загружено: ' + (lastAudioBuffer.duration.toFixed(2)) + ' с, sr=' + lastSampleRate);
     });
 
-    saveBtn.addEventListener("click", () => {
-      const link = document.createElement("a");
-      link.download = "waveform.png";
-      link.href = canvas.toDataURL();
+    // simple record via MediaRecorder
+    $('recordBtn').addEventListener('click', async ()=>{
+      if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) { alert("Нет доступа к микрофону"); return; }
+      const stream = await navigator.mediaDevices.getUserMedia({ audio:true });
+      const mr = new MediaRecorder(stream);
+      const parts = [];
+      mr.ondataavailable = ev => parts.push(ev.data);
+      mr.onstop = async () => {
+        const blob = new Blob(parts, { type: 'audio/webm' });
+        const abuf = await blob.arrayBuffer();
+        if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        lastAudioBuffer = await audioCtx.decodeAudioData(abuf.slice(0));
+        lastSampleRate = lastAudioBuffer.sampleRate || 44100;
+        alert('Запись готова: ' + lastAudioBuffer.duration.toFixed(2) + ' с');
+      };
+      mr.start();
+      alert('Началась запись. Нажмите OK — запись остановится (демо режим).');
+      mr.stop();
+    });
+
+    // draw button
+    $('drawBtn').addEventListener('click', ()=> {
+      if (!lastAudioBuffer) { alert('Сначала загрузите или запишите аудио.'); return; }
+      drawWaveFromAudioBuffer(lastAudioBuffer, parseInt($('samplesPerCol').value || 256));
+    });
+
+    $('savePngBtn').addEventListener('click', ()=>{
+      const link = document.createElement('a');
+      link.download = 'wave_print.png';
+      link.href = waveCanvas.toDataURL('image/png');
       link.click();
     });
 
-    // === Сканирование дорожки (камера) ===
-    const video = document.getElementById("video");
-    navigator.mediaDevices.getUserMedia({ video: true })
-      .then(stream => video.srcObject = stream);
+    function drawWaveFromAudioBuffer(audioBuffer, samplesPerColumn) {
+      const ch = audioBuffer.numberOfChannels > 0 ? audioBuffer.getChannelData(0) : new Float32Array(0);
+      const width = waveCanvas.width;
+      const height = waveCanvas.height;
+      const centerY = height/2;
+      // compute block size to map audio samples -> columns
+      const totalSamples = ch.length;
+      const block = Math.max(1, Math.floor(totalSamples / width));
+      // compute amplitude per column (rms)
+      const amps = new Float32Array(width);
+      for (let x=0; x<width; x++) {
+        const s = x*block;
+        let sum = 0, cnt=0;
+        for (let i=s; i < Math.min(totalSamples, s+block); i++) { const v = ch[i]; sum += Math.abs(v); cnt++; }
+        const avg = cnt ? sum/cnt : 0;
+        amps[x] = Math.max(-1, Math.min(1, avg)); // amplitude envelope (positive)
+      }
+      // but we want signed waveform: compute peak sign by sampling center sample
+      // approximate sign by mean signed value in block
+      for (let x=0; x<width; x++) {
+        const s = x*block;
+        let sum = 0, cnt=0;
+        for (let i=s; i < Math.min(totalSamples, s+block); i++) { sum += ch[i]; cnt++; }
+        const mean = cnt ? (sum/cnt) : 0;
+        amps[x] = mean; // direct sign + amplitude
+      }
+      lastAmplitudes = amps;
+      lastSampleRate = audioBuffer.sampleRate || 44100;
 
-    document.getElementById("scanBtn").addEventListener("click", () => {
-      const scanCanvas = document.createElement("canvas");
-      scanCanvas.width = video.videoWidth;
-      scanCanvas.height = video.videoHeight;
-      const scanCtx = scanCanvas.getContext("2d");
-      scanCtx.drawImage(video, 0, 0);
-      const imgData = scanCtx.getImageData(0,0,scanCanvas.width,scanCanvas.height);
+      // draw background
+      wctx.fillStyle="#fff"; wctx.fillRect(0,0,width,height);
 
-      // ⚡ Тут нужно распознать волну → массив амплитуд (упрощено!)
-      // Сейчас для примера просто вернем сохранённый массив
-      console.log("Сканирование картинок пока прототипное");
+      // draw center line
+      wctx.strokeStyle="#eee"; wctx.lineWidth=1;
+      wctx.beginPath(); wctx.moveTo(0,centerY); wctx.lineTo(width,centerY); wctx.stroke();
+
+      // draw waveform as red thin line
+      wctx.beginPath();
+      wctx.lineWidth = 2;
+      wctx.strokeStyle = 'red';
+      for (let x=0; x<width; x++) {
+        const v = amps[x]; // -1..1
+        const y = centerY - v * (centerY - 4);
+        if (x===0) wctx.moveTo(x,y); else wctx.lineTo(x,y);
+      }
+      wctx.stroke();
+
+      // small footer text with samplesPerColumn information (so it's visible on print)
+      wctx.fillStyle = '#000';
+      wctx.font = '16px monospace';
+      wctx.fillText('samplesPerCol='+samplesPerColumn + '   sr=' + lastSampleRate, 8, height - 8);
+      alert('Готово: дорожка отрисована. Сохрани PNG → распечатай или открой на телефоне.');
+    }
+
+    // --- camera & scanning ---
+    let stream = null;
+    let usingEnv = true; // prefer back camera
+    async function startCamera() {
+      stopCamera();
+      const constraints = { video: { facingMode: { ideal: usingEnv ? "environment" : "user" }, width: { ideal: 1280 }, height: { ideal: 720 } }, audio:false };
+      try {
+        stream = await navigator.mediaDevices.getUserMedia(constraints);
+      } catch (err) {
+        // fallback: try without facingMode
+        stream = await navigator.mediaDevices.getUserMedia({ video:true, audio:false });
+      }
+      $('video').srcObject = stream;
+      $('video').play();
+    }
+    function stopCamera() {
+      if (stream) {
+        stream.getTracks().forEach(t=>t.stop());
+        stream = null;
+        $('video').srcObject = null;
+      }
+    }
+    $('startCamBtn').addEventListener('click', ()=> startCamera());
+    $('stopCamBtn').addEventListener('click', ()=> stopCamera());
+    $('switchCamBtn').addEventListener('click', async ()=>{
+      usingEnv = !usingEnv;
+      await startCamera();
     });
 
-    // === Воспроизведение ===
-    document.getElementById("playBtn").addEventListener("click", () => {
-      const audioCtx = new AudioContext();
-      const buffer = audioCtx.createBuffer(1, audioData.length, audioCtx.sampleRate);
-      buffer.getChannelData(0).set(audioData);
-
-      const source = audioCtx.createBufferSource();
-      source.buffer = buffer;
-      source.connect(audioCtx.destination);
-      source.start();
+    $('captureBtn').addEventListener('click', ()=>{
+      if (!stream) { alert('Сначала запустите камеру.'); return; }
+      // draw current video frame to photoCanvas sized to waveCanvas
+      photoCanvas.width = waveCanvas.width;
+      photoCanvas.height = waveCanvas.height;
+      pctx.drawImage($('video'), 0, 0, photoCanvas.width, photoCanvas.height);
+      // show preview on waveCanvas (for convenience)
+      wctx.clearRect(0,0,waveCanvas.width,waveCanvas.height);
+      wctx.drawImage(photoCanvas, 0, 0);
+      alert('Фото сделано и помещено в область. Нажмите "Декодировать и Воспроизвести".');
     });
+
+    // allow loading an image file (e.g. PNG сохраненный ранее)
+    $('imageInput').addEventListener('change', async (e) => {
+      const f = e.target.files && e.target.files[0];
+      if (!f) return;
+      const img = new Image();
+      img.onload = () => {
+        // draw to photo canvas sized to wave canvas
+        photoCanvas.width = waveCanvas.width;
+        photoCanvas.height = waveCanvas.height;
+        pctx.fillStyle = '#fff'; pctx.fillRect(0,0,photoCanvas.width,photoCanvas.height);
+        pctx.drawImage(img, 0, 0, photoCanvas.width, photoCanvas.height);
+        // preview
+        wctx.clearRect(0,0,waveCanvas.width,waveCanvas.height);
+        wctx.drawImage(photoCanvas, 0, 0);
+        alert('Изображение загружено. Теперь нажмите "Декодировать и Воспроизвести".');
+      }
+      img.onerror = ()=> alert('Не удалось загрузить изображение.');
+      img.src = URL.createObjectURL(f);
+    });
+
+    // main decode routine: image in photoCanvas -> amplitudes -> audio buffer -> play
+    $('decodeBtn').addEventListener('click', async ()=>{
+      // ensure photoCanvas has something (either from capture or from upload)
+      if (photoCanvas.width === 0 || photoCanvas.height === 0) { alert('Нет изображения для декодирования. Сделайте фото или загрузите PNG.'); return; }
+      const imgData = pctx.getImageData(0,0,photoCanvas.width,photoCanvas.height);
+      const amps = detectWaveFromImage(imgData, photoCanvas.width, photoCanvas.height);
+      lastAmplitudes = amps;
+      // build audio samples from amplitudes
+      const samplesPerColumn = parseInt($('samplesPerCol').value || 256);
+      const sr = lastSampleRate || 44100;
+      const totalSamples = amps.length * samplesPerColumn;
+      const out = new Float32Array(totalSamples);
+      // fill by linear interpolation between columns for smoothing
+      for (let i=0;i<amps.length;i++){
+        const a1 = amps[i];
+        const a2 = amps[Math.min(i+1, amps.length-1)];
+        for (let j=0;j<samplesPerColumn;j++){
+          const t = j / samplesPerColumn;
+          const v = a1 * (1-t) + a2 * t;
+          out[i*samplesPerColumn + j] = v;
+        }
+      }
+      // create AudioContext and play
+      if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+      const buf = audioCtx.createBuffer(1, out.length, sr);
+      buf.getChannelData(0).set(out);
+      const src = audioCtx.createBufferSource();
+      src.buffer = buf;
+      src.connect(audioCtx.destination);
+      src.start();
+      alert('Воспроизведение: ' + (out.length/sr).toFixed(2) + 's, sr=' + sr);
+    });
+
+    // detect waveform: per-column search for strongest "line" pixel (works for red stroke or black)
+    function detectWaveFromImage(imageData, width, height) {
+      const data = imageData.data;
+      const centerY = height/2;
+      const amps = new Float32Array(width);
+      // For each column find best pixel (heuristic: prefer red channel or dark line)
+      for (let x=0; x<width; x++){
+        let bestY = centerY;
+        let bestScore = -Infinity;
+        for (let y=0; y<height; y++){
+          const idx = (y*width + x) * 4;
+          const r = data[idx], g = data[idx+1], b = data[idx+2];
+          // compute redness and darkness
+          const redness = r - (g + b) / 2;
+          const brightness = 0.299*r + 0.587*g + 0.114*b;
+          // score: prefer strong red; also prefer dark lines (low brightness)
+          const score = redness * 1.8 + (255 - brightness) * 0.6;
+          if (score > bestScore) { bestScore = score; bestY = y; }
+        }
+        // convert y to signed amplitude: center -> 0, top -> +1, bottom -> -1
+        const amp = (centerY - bestY) / centerY;
+        amps[x] = Math.max(-1, Math.min(1, amp));
+      }
+      return amps;
+    }
+
+    // stop camera on page unload
+    window.addEventListener('beforeunload', ()=> stopCamera());
+
+  })();
   </script>
 </body>
 </html>
