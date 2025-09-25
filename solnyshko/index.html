@@ -5,151 +5,172 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Антикалық философия</title>
   <style>
-    * {margin:0; padding:0; box-sizing:border-box;}
     body {
+      margin: 0;
       font-family: "Segoe UI", sans-serif;
-      background: linear-gradient(135deg, #f5f7fa, #c3cfe2);
-      color: #222;
+      background: #e5ddd5;
+    }
+    .chat {
+      max-width: 700px;
+      margin: 0 auto;
+      padding: 20px;
+    }
+    .message {
+      display: flex;
+      margin-bottom: 20px;
+      align-items: flex-start;
+    }
+    .avatar {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
       overflow: hidden;
+      margin-right: 10px;
+      flex-shrink: 0;
     }
-    .slide {
-      display: none;
-      height: 100vh;
+    .avatar img {
       width: 100%;
-      padding: 50px;
-      text-align: center;
-      justify-content: center;
-      align-items: center;
-      flex-direction: column;
+      height: 100%;
+      object-fit: cover;
     }
-    .slide.active {display: flex; animation: fadeIn 1s;}
-    h1, h2 {margin-bottom: 20px;}
-    ul {list-style: none; padding: 0;}
-    li {margin: 5px 0;}
-    .controls {
-      position: fixed;
-      bottom: 20px;
-      width: 100%;
-      text-align: center;
-    }
-    button {
-      margin: 0 10px;
-      padding: 10px 20px;
-      border: none;
-      border-radius: 6px;
-      background: #333;
-      color: #fff;
-      cursor: pointer;
+    .bubble {
+      background: #fff;
+      padding: 12px 15px;
+      border-radius: 15px;
+      max-width: 80%;
       font-size: 16px;
+      line-height: 1.5;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
     }
-    button:hover {background: #555;}
-    @keyframes fadeIn {from {opacity:0;} to {opacity:1;}}
+    .bot .bubble {
+      background: #fff;
+    }
+    .user {
+      flex-direction: row-reverse;
+    }
+    .user .bubble {
+      background: #dcf8c6;
+    }
+    .sticker {
+      width: 120px;
+      height: 120px;
+      margin-top: 10px;
+    }
+    img.inline-photo {
+      width: 100%;
+      max-width: 250px;
+      border-radius: 10px;
+      margin-top: 10px;
+    }
   </style>
 </head>
 <body>
+  <div class="chat">
 
-  <div class="slide active">
-    <h1>Антикалық философия туралы толық мазмұн</h1>
-    <p>Антикалық философия – бұл Ежелгі Грекия мен Римде пайда болған философия. 
-    Уақыты шамамен б.з.б. VI ғасырдан – б.з. V ғасырына дейін созылады. 
-    Ол – бүкіл Еуропа мәдениеті мен ғылымының бастауы.</p>
-    <p>Бұрын адамдар табиғатты мифтер мен аңыздар арқылы түсіндірген. 
-    Ал грек ойшылдары табиғатты, адамды, қоғамды ақылмен, дәлелмен түсіндіруге тырысты. 
-    Сол себепті философия ғылым ретінде қалыптасты.</p>
+    <!-- Титул -->
+    <div class="message bot">
+      <div class="avatar"><img src="https://upload.wikimedia.org/wikipedia/commons/8/8d/Socrates_Louvre.jpg"></div>
+      <div class="bubble">
+        <b>Антикалық философия туралы толық мазмұн</b><br><br>
+        Антикалық философия – бұл Ежелгі Грекия мен Римде пайда болған философия. 
+        Уақыты шамамен б.з.б. VI ғасырдан – б.з. V ғасырына дейін созылады. 
+        Ол – бүкіл Еуропа мәдениеті мен ғылымының бастауы.
+      </div>
+    </div>
+
+    <!-- Алғашқы грек философиясы -->
+    <div class="message bot">
+      <div class="avatar"><img src="https://upload.wikimedia.org/wikipedia/commons/2/2a/Thales_Massimo.jpg"></div>
+      <div class="bubble">
+        <b>1. Алғашқы грек философиясы (табиғатты зерттеу)</b><br><br>
+        Фалес – дүниенің бастауы су деді.<br>
+        Анаксимандр – бастауы «апейрон».<br>
+        Анаксимен – ауа бәрінің негізі деді.<br>
+        Гераклит – әлемнің негізі от, «бәрі ағады» деді.<br>
+        Демокрит – барлық заттың негізі атомдар.
+        <br>
+        <img class="inline-photo" src="https://upload.wikimedia.org/wikipedia/commons/9/97/Democritus2.jpg">
+      </div>
+    </div>
+
+    <!-- Сократ -->
+    <div class="message bot">
+      <div class="avatar"><img src="https://upload.wikimedia.org/wikipedia/commons/8/8d/Socrates_Louvre.jpg"></div>
+      <div class="bubble">
+        <b>2. Адамға бет бұру (софистер мен Сократ)</b><br><br>
+        Софистер – «ақиқат әркімге байланысты».<br>
+        Сократ – «Өзіңді таны». Жан, ар-ождан басты орында.<br>
+      </div>
+    </div>
+
+    <!-- Платон -->
+    <div class="message bot">
+      <div class="avatar"><img src="https://upload.wikimedia.org/wikipedia/commons/d/d7/Plato_Silanion_Musei_Capitolini_MC1377.jpg"></div>
+      <div class="bubble">
+        <b>3. Платон</b><br><br>
+        Нағыз шындық – идеялар әлемінде.<br>
+        Біздің көріп жүргеніміз – көлеңке.<br>
+        Әділетті қоғам: философтар басқаруы керек.<br>
+        <div id="platoSticker" class="sticker"></div>
+      </div>
+    </div>
+
+    <!-- Аристотель -->
+    <div class="message bot">
+      <div class="avatar"><img src="https://upload.wikimedia.org/wikipedia/commons/1/12/Aristotle_Altemps_Inv8575.jpg"></div>
+      <div class="bubble">
+        <b>4. Аристотель</b><br><br>
+        Логиканың негізін салды.<br>
+        Төрт себеп: материя, форма, қозғаушы күш, мақсат.<br>
+        «Алтын орта» – артық та емес, кем де емес.
+      </div>
+    </div>
+
+    <!-- Эллинизм -->
+    <div class="message bot">
+      <div class="avatar"><img src="https://upload.wikimedia.org/wikipedia/commons/1/10/Epikur.jpg"></div>
+      <div class="bubble">
+        <b>5. Эллинизм дәуірі</b><br><br>
+        Стоицизм – сабырлы өмір.<br>
+        Эпикуризм – бақыт жан тыныштығында.<br>
+        Скептицизм – күмәндану керек.<br>
+      </div>
+    </div>
+
+    <!-- Маңызы -->
+    <div class="message bot">
+      <div class="avatar"><img src="https://upload.wikimedia.org/wikipedia/commons/4/47/Zeno_of_Citium_pushkin.jpg"></div>
+      <div class="bubble">
+        <b>6. Антикалық философияның маңызы</b><br><br>
+        – Ғылымның бастауы.<br>
+        – Логика, этика, саясаттың негізі.<br>
+        – Адам, қоғам, табиғат туралы сұрақтар.<br>
+      </div>
+    </div>
+
+    <!-- Қорытынды -->
+    <div class="message bot">
+      <div class="avatar"><img src="https://upload.wikimedia.org/wikipedia/commons/2/2a/School_of_Athens_Raphael.jpg"></div>
+      <div class="bubble">
+        <b>Қорытынды</b><br><br>
+        Антикалық философия – мифтен ғылымға, табиғаттан адамға өткен ойлау дәуірі. 
+        Ол қазіргі ғылым мен философияның ең алғашқы негізі.
+      </div>
+    </div>
+
   </div>
 
-  <div class="slide">
-    <h2>1. Алғашқы грек философиясы</h2>
-    <p>Алғашқы философтарды натурфилософтар дейді, себебі олар табиғат құбылыстарын зерттеді:</p>
-    <ul>
-      <li>Фалес – дүниенің бастауы су деді.</li>
-      <li>Анаксимандр – бастауы «апейрон» (шексіздік, белгісіз зат).</li>
-      <li>Анаксимен – ауа бәрінің негізі деді.</li>
-      <li>Гераклит – әлемнің негізі от, «барлығы өзгереді, бәрі ағады» деді.</li>
-      <li>Демокрит – барлық заттың негізі атомдар деді.</li>
-    </ul>
-  </div>
-
-  <div class="slide">
-    <h2>2. Адамға бет бұру</h2>
-    <ul>
-      <li>Софистер – «ақиқат әркімге байланысты» деді. Сөз сөйлеу, дауласу өнерін дамытты.</li>
-      <li>Сократ – «Өзіңді таны» деп, адамның жанын, ар-ожданын басты орынға қойды. Сұрақ-жауап әдісімен ойландырды.</li>
-    </ul>
-  </div>
-
-  <div class="slide">
-    <h2>3. Платон</h2>
-    <ul>
-      <li>Сократтың шәкірті.</li>
-      <li>Нағыз шындық – идеялар әлемінде деді.</li>
-      <li>Біз көріп жүрген заттар – сол идеялардың көлеңкесі.</li>
-      <li>Әділетті қоғам туралы ілім жасады. «Философтар басқаруы керек» деді.</li>
-    </ul>
-  </div>
-
-  <div class="slide">
-    <h2>4. Аристотель</h2>
-    <ul>
-      <li>Платонның шәкірті, бірақ оның көзқарасымен келіспеді.</li>
-      <li>Логиканың негізін салды.</li>
-      <li>Төрт себеп:
-        <ol>
-          <li>Материя</li>
-          <li>Форма</li>
-          <li>Қозғаушы күш</li>
-          <li>Мақсат</li>
-        </ol>
-      </li>
-      <li>«Алтын орта» принципін ұсынды.</li>
-    </ul>
-  </div>
-
-  <div class="slide">
-    <h2>5. Эллинизм дәуірі</h2>
-    <ul>
-      <li>Стоицизм (Зенон) – табиғатқа сай, сабырлы өмір.</li>
-      <li>Эпикуризм (Эпикур) – бақыт – жан тыныштығында.</li>
-      <li>Скептицизм (Пиррон) – күмәндану керек.</li>
-    </ul>
-  </div>
-
-  <div class="slide">
-    <h2>6. Антикалық философияның маңызы</h2>
-    <ul>
-      <li>Ғылымға негіз салды (астрономия, математика, физика).</li>
-      <li>Логика, этика, саясат, педагогика бастау алды.</li>
-      <li>Батыс философиясының іргетасын қалады.</li>
-      <li>Адам, қоғам, табиғат туралы сұрақтарды алғаш қойды.</li>
-    </ul>
-  </div>
-
-  <div class="slide">
-    <h2>Қорытынды</h2>
-    <p>Антикалық философия – мифтен ғылымға, табиғаттан адамға қарай өткен ойлау дәуірі. 
-    Ол – қазіргі ғылым мен философияның ең алғашқы негізі.</p>
-  </div>
-
-  <div class="controls">
-    <button onclick="prevSlide()">← Алдыңғы</button>
-    <button onclick="nextSlide()">Келесі →</button>
-  </div>
-
+  <!-- Lottie -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/lottie-web/5.12.2/lottie.min.js"></script>
   <script>
-    let current = 0;
-    const slides = document.querySelectorAll(".slide");
-    function showSlide(i) {
-      slides[current].classList.remove("active");
-      current = (i + slides.length) % slides.length;
-      slides[current].classList.add("active");
-    }
-    function nextSlide() { showSlide(current + 1); }
-    function prevSlide() { showSlide(current - 1); }
-    document.addEventListener("keydown", e => {
-      if (e.key === "ArrowRight") nextSlide();
-      if (e.key === "ArrowLeft") prevSlide();
+    // Место для Lottie анимации (пример для Платона)
+    lottie.loadAnimation({
+      container: document.getElementById('platoSticker'),
+      renderer: 'svg',
+      loop: true,
+      autoplay: true,
+      path: 'https://assets1.lottiefiles.com/packages/lf20_tq9mgtcf.json'
     });
   </script>
-
 </body>
 </html>
