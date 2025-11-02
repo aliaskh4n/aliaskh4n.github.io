@@ -1,158 +1,398 @@
 <!DOCTYPE html>
 <html lang="ru">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Manga Catalog</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <style>
-        /* Настройка шрифта Inter и темного фона */
-        body { font-family: 'Inter', sans-serif; background-color: #0F172A; }
-        /* Красивый скроллбар */
-        ::-webkit-scrollbar { width: 8px; }
-        ::-webkit-scrollbar-track { background: #0F172A; }
-        ::-webkit-scrollbar-thumb { background: #334155; border-radius: 4px; }
-        ::-webkit-scrollbar-thumb:hover { background: #475569; }
-        /* Эффект при наведении на карточку */
-        .manga-card:hover { transform: translateY(-4px); box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.2), 0 4px 6px -2px rgba(0, 0, 0, 0.05); }
-    </style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Manga App</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: "Roboto-Black", Helvetica, sans-serif;
+      background-color: #17212b;
+      display: flex;
+      justify-content: center;
+      align-items: flex-start;
+      min-height: 100vh;
+      padding: 20px 0 90px;
+    }
+
+    .app-container {
+      width: 420px;
+      display: flex;
+      flex-direction: column;
+      gap: 15px;
+    }
+
+    .search-bar {
+      width: 100%;
+      height: 45px;
+      background: rgba(255, 255, 255, 0.05);
+      backdrop-filter: blur(12px);
+      border-radius: 15px;
+      position: relative;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+      border: 1px solid rgba(255,255,255,0.15);
+      transition: transform 0.2s, background 0.2s;
+      will-change: transform;
+    }
+    .search-bar:hover { transform: scale(1.02); background: rgba(255,255,255,0.08); }
+    .search-bar img { width: 18px; height: 18px; transition: all 0.2s; }
+    .search-bar input {
+      position: absolute; left:10px; right:10px; height:28px;
+      border:none; border-radius:10px; padding:0 10px;
+      background-color: rgba(0,0,0,0.3); color:#fff;
+      font-size:14px; opacity:0; pointer-events:none; transition: all 0.3s;
+    }
+    .search-bar.active img { opacity:0; pointer-events:none; }
+    .search-bar.active input { opacity:1; pointer-events:auto; }
+
+    .cards-container {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(185px, 1fr));
+      gap: 15px;
+    }
+
+    .card {
+      display: flex; flex-direction: column;
+      background: rgba(255,255,255,0.05);
+      backdrop-filter: blur(15px);
+      border-radius: 16px;
+      overflow: hidden;
+      cursor: pointer;
+      transition: transform 0.3s, box-shadow 0.3s, background 0.3s;
+      border:1px solid rgba(255,255,255,0.15);
+      box-shadow:0 8px 25px rgba(0,0,0,0.5);
+      will-change: transform;
+    }
+    .card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 12px 30px rgba(0,0,0,0.6);
+      background: rgba(255,255,255,0.08);
+    }
+    .card img {
+      width:100%; height:200px;
+      object-fit:cover; border-radius:16px 16px 0 0;
+      background: rgba(255,255,255,0.1);
+    }
+    .card-title {
+      position: relative;
+      padding:10px 8px; text-align:center;
+      font-weight:900; font-size:14px; color:#fff;
+      min-height:45px; display:flex; align-items:center; justify-content:center;
+      text-shadow:0 1px 3px rgba(0,0,0,0.6);
+    }
+    .card-title::before {
+      content:"";
+      position:absolute; top:0; left:0; right:0; bottom:0;
+      background: rgba(0,0,0,0.3); border-radius:0;
+      z-index:-1;
+    }
+    .card-stats {
+      display:flex; justify-content:center; align-items:center;
+      gap:6px; padding:6px 0; font-size:13px; color:#ffcc00;
+      background: rgba(0,0,0,0.2); border-top:1px solid rgba(255,255,255,0.1);
+    }
+    .card-stats img { width:16px; height:16px; }
+
+    .bottom-menu {
+      position: fixed;
+      bottom: 0;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 420px;
+      height: calc(70px + env(safe-area-inset-bottom));
+      background: rgba(40,45,55,0.4);
+      backdrop-filter: blur(12px);
+      display: flex;
+      justify-content: space-around;
+      align-items: flex-end;
+      box-shadow: 0 -4px 15px rgba(0,0,0,0.5);
+      z-index: 100;
+      padding: 0 10px 25px 0px;
+      border-radius: 15px 15px 0 0;
+    }
+    .bottom-menu button {
+      background: rgba(255,255,255,0.1); backdrop-filter: blur(8px);
+      border:none; border-radius:15px; cursor:pointer;
+      display:flex; flex-direction:column; align-items:center; justify-content:center;
+      color:#fff; font-size:10px; width:60px; height:50px;
+      transition: transform 0.2s, background 0.2s;
+    }
+    .bottom-menu button img { width:24px; height:24px; margin-bottom:2px; }
+    .bottom-menu button:hover { transform:scale(1.1); background: rgba(255,255,255,0.15); }
+
+    /* Плейсхолдер для изображений */
+    .placeholder-img {
+      width: 100%;
+      height: 200px;
+      background: linear-gradient(135deg, rgba(255,255,255,0.1), rgba(255,255,255,0.05));
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: rgba(255,255,255,0.5);
+      font-size: 12px;
+      text-align: center;
+      border: 2px dashed rgba(255,255,255,0.2);
+    }
+
+    /* Индикатор загрузки */
+    .loading {
+      text-align: center;
+      color: #fff;
+      font-size: 16px;
+      padding: 50px 0;
+    }
+
+    .error {
+      background: rgba(255, 59, 48, 0.1);
+      border: 1px solid rgba(255, 59, 48, 0.3);
+      border-radius: 12px;
+      padding: 20px;
+      color: #ff3b30;
+      text-align: center;
+      margin: 20px 0;
+    }
+
+    @media(max-width:420px){
+      .app-container { width:100%; padding:0 10px; }
+      .cards-container { grid-template-columns: repeat(auto-fill, minmax(140px,1fr)); }
+      .bottom-menu { width: calc(100% - 20px); }
+    }
+  </style>
 </head>
-<body class="text-white">
-
-    <div class="max-w-4xl mx-auto p-4 md:p-8">
-        <header class="mb-8">
-            <h1 class="text-4xl font-extrabold text-white mb-4">Каталог Манги</h1>
-            <div class="relative">
-                <input id="searchInput" type="text" placeholder="Поиск манги по названию или автору..."
-                       class="w-full bg-slate-800 text-white placeholder-slate-400 border border-slate-700 rounded-xl py-3 px-5 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition duration-300 shadow-lg">
-                <svg xmlns="http://www.w3.org/2000/svg" class="absolute right-4 top-3 h-6 w-6 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-                </svg>
-            </div>
-        </header>
-
-        <div id="loading" class="text-center py-10">
-            <div class="animate-spin rounded-full h-10 w-10 border-b-2 border-indigo-500 mx-auto mb-4"></div>
-            <p class="text-slate-400">Загрузка каталога...</p>
-        </div>
-        
-        <div id="error" class="hidden bg-red-900/30 border border-red-600 p-4 rounded-xl text-red-300 font-medium mb-8">
-            <p id="errorMessage"></p>
-        </div>
-
-        <div id="mangaContainer" class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-6">
-            <!-- Здесь будут карточки манги -->
-        </div>
-
-        <div id="noResults" class="hidden text-center py-10 text-slate-400">
-            <p>Ничего не найдено. Попробуйте другой запрос.</p>
-        </div>
+<body>
+  <div class="app-container">
+    <div class="search-bar" id="searchBar">
+      <img src="https://em-content.zobj.net/source/apple/419/magnifying-glass-tilted-left_1f50d.png" alt="Search">
+      <input type="text" id="searchInput" placeholder="Поиск...">
     </div>
+    
+    <div id="loadingDiv" class="loading">Загрузка...</div>
+    <div id="errorDiv" class="error" style="display: none;"></div>
+    
+    <div class="cards-container" id="cardsContainer"></div>
+  </div>
 
-    <script>
-        // Замените YOUR_WORKER_DOMAIN на домен вашего Cloudflare Worker
-        const API_BASE = "https://nekros.tatokz2006.workers.dev"; 
+  <div class="bottom-menu">
+    <button><img src="https://em-content.zobj.net/source/apple/419/three-oclock_1f552.png"></button>
+    <button><img src="https://em-content.zobj.net/source/apple/419/bookmark_1f516.png"></button>
+    <button><img src="https://em-content.zobj.net/source/apple/419/bell_1f514.png"></button>
+    <button><img src="https://em-content.zobj.net/source/apple/419/money-with-wings_1f4b8.png"></button>
+  </div>
+
+  <script>
+    // Конфигурация API
+    const API_CONFIG = {
+      baseUrl: 'https://nekros.tatokz2006.workers.dev',
+      timeout: 10000 // 10 секунд таймаут
+    };
+
+    let allManga = []; // Для поиска
+
+    // Функция для создания плейсхолдера изображения
+    function createImagePlaceholder(title = 'Обложка недоступна') {
+      const placeholder = document.createElement('div');
+      placeholder.className = 'placeholder-img';
+      placeholder.textContent = title;
+      return placeholder;
+    }
+
+    // Функция для показа ошибки
+    function showError(message) {
+      document.getElementById('loadingDiv').style.display = 'none';
+      const errorDiv = document.getElementById('errorDiv');
+      errorDiv.textContent = message;
+      errorDiv.style.display = 'block';
+      document.getElementById('cardsContainer').style.display = 'none';
+    }
+
+    // Функция для скрытия индикаторов загрузки/ошибок
+    function hideLoading() {
+      document.getElementById('loadingDiv').style.display = 'none';
+      document.getElementById('errorDiv').style.display = 'none';
+      document.getElementById('cardsContainer').style.display = 'grid';
+    }
+
+    // Функция загрузки манги
+    async function loadManga() {
+      try {
+        console.log('Начинаем загрузку манги...');
         
-        let allManga = [];
-        
-        /**
-         * Загружает полный список манги из Worker API.
-         */
-        async function fetchMangaList() {
-            const loading = document.getElementById('loading');
-            const errorDiv = document.getElementById('error');
-            const errorMessage = document.getElementById('errorMessage');
-            loading.classList.remove('hidden');
-            errorDiv.classList.add('hidden');
+        // Создаем контроллер для таймаута
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), API_CONFIG.timeout);
 
-            try {
-                const response = await fetch(`${API_BASE}/api/list`);
-                if (!response.ok) {
-                    throw new Error(`HTTP error! status: ${response.status}`);
-                }
-                allManga = await response.json();
-                displayManga(allManga);
-            } catch (error) {
-                console.error("Fetch error:", error);
-                errorMessage.textContent = `Не удалось загрузить каталог: ${error.message}. Проверьте домен Worker'а.`;
-                errorDiv.classList.remove('hidden');
-            } finally {
-                loading.classList.add('hidden');
-            }
-        }
-
-        /**
-         * Отображает карточки манги.
-         */
-        function displayManga(mangaList) {
-            const container = document.getElementById('mangaContainer');
-            const noResults = document.getElementById('noResults');
-            container.innerHTML = '';
-            
-            if (mangaList.length === 0) {
-                noResults.classList.remove('hidden');
-                return;
-            } else {
-                noResults.classList.add('hidden');
-            }
-            
-            const fragment = document.createDocumentFragment();
-
-            mangaList.forEach(manga => {
-                const card = document.createElement('a');
-                card.href = `info.html?id=${manga.id}`;
-                card.className = 'manga-card bg-slate-800 rounded-xl overflow-hidden shadow-lg transition duration-300 ease-in-out hover:scale-[1.03] hover:shadow-indigo-500/50 block';
-                
-                card.innerHTML = `
-                    <div class="h-48 sm:h-64 lg:h-80 overflow-hidden">
-                        <img src="${manga.cover_url}" alt="${manga.title_ru}" 
-                             onerror="this.onerror=null; this.src='https://placehold.co/400x570/475569/ffffff?text=Нет+обложки';" 
-                             class="w-full h-full object-cover transform hover:scale-105 transition duration-500">
-                    </div>
-                    <div class="p-3">
-                        <h2 class="text-base font-semibold truncate text-indigo-400">${manga.title_ru}</h2>
-                        <p class="text-xs text-slate-400 truncate mt-1">
-                            ${manga.author}
-                        </p>
-                        <span class="inline-block bg-slate-700 text-slate-300 text-xs font-medium px-2 py-0.5 rounded-full mt-2">
-                            ${manga.latest_chapter ? `Глава ${manga.latest_chapter}` : 'TBD'}
-                        </span>
-                    </div>
-                `;
-                fragment.appendChild(card);
-            });
-
-            container.appendChild(fragment);
-        }
-
-        /**
-         * Ищет мангу в загруженном списке.
-         */
-        function searchManga(query) {
-            if (!query.trim()) {
-                displayManga(allManga);
-                return;
-            }
-
-            const lowerQuery = query.toLowerCase();
-            const filtered = allManga.filter(manga => 
-                (manga.title_ru && manga.title_ru.toLowerCase().includes(lowerQuery)) ||
-                (manga.title_en && manga.title_en.toLowerCase().includes(lowerQuery)) ||
-                (manga.author && manga.author.toLowerCase().includes(lowerQuery))
-            );
-
-            displayManga(filtered);
-        }
-
-        // Инициализация
-        document.addEventListener('DOMContentLoaded', () => {
-            const searchInput = document.getElementById('searchInput');
-            searchInput.addEventListener('input', (e) => {
-                searchManga(e.target.value);
-            });
-            
-            fetchMangaList();
+        const response = await fetch(API_CONFIG.baseUrl, {
+          signal: controller.signal,
+          headers: {
+            'Accept': 'application/json',
+            'Origin': window.location.origin
+          }
         });
-    </script>
+
+        clearTimeout(timeoutId);
+
+        if (!response.ok) {
+          throw new Error(`Ошибка HTTP: ${response.status} ${response.statusText}`);
+        }
+
+        const contentType = response.headers.get('content-type');
+        if (!contentType || !contentType.includes('application/json')) {
+          throw new Error('Сервер вернул не JSON данные');
+        }
+
+        allManga = await response.json();
+        console.log(`Загружено ${allManga.length} манги`);
+
+        displayManga(allManga);
+        hideLoading();
+
+      } catch (error) {
+        console.error('Ошибка загрузки манги:', error);
+        let errorMessage = 'Ошибка загрузки данных. ';
+        
+        if (error.name === 'AbortError') {
+          errorMessage += 'Превышено время ожидания.';
+        } else if (error.message.includes('fetch')) {
+          errorMessage += 'Проблемы с подключением к серверу.';
+        } else {
+          errorMessage += error.message;
+        }
+        
+        showError(errorMessage + ' Попробуйте обновить страницу.');
+      }
+    }
+
+    // Функция для отображения манги
+    function displayManga(mangaArray) {
+      const container = document.getElementById('cardsContainer');
+      container.innerHTML = "";
+      
+      if (!mangaArray || mangaArray.length === 0) {
+        container.innerHTML = '<div style="color: #999; text-align: center; padding: 50px; grid-column: 1/-1;">Манга не найдена</div>';
+        return;
+      }
+
+      const fragment = document.createDocumentFragment();
+
+      mangaArray.forEach(manga => {
+        const cardDiv = document.createElement('div');
+        cardDiv.className = 'card';
+        cardDiv.setAttribute('data-manga-id', manga.id);
+        
+        // Создаем HTML структуру карточки
+        const cardHTML = `
+          <div class="card-image-container"></div>
+          <div class="card-title">${manga.name || 'Без названия'}</div>
+          <div class="card-stats">
+            <img src="https://em-content.zobj.net/source/apple/419/heart-on-fire_2764-fe0f-200d-1f525.png" alt="Like">
+            <span>${manga.likes || '0'}</span>
+          </div>
+        `;
+        
+        cardDiv.innerHTML = cardHTML;
+        
+        // Обрабатываем изображение
+        const imageContainer = cardDiv.querySelector('.card-image-container');
+        
+        if (manga.img && manga.img.trim()) {
+          const img = document.createElement('img');
+          img.src = manga.img.trim();
+          img.alt = manga.name || 'Обложка манги';
+          img.loading = 'lazy';
+          
+          img.onload = () => {
+            imageContainer.appendChild(img);
+          };
+          
+          img.onerror = () => {
+            console.log(`Ошибка загрузки изображения для ${manga.name}`);
+            const placeholder = createImagePlaceholder('Обложка\nнедоступна');
+            imageContainer.appendChild(placeholder);
+          };
+          
+          // Таймаут для медленных изображений
+          setTimeout(() => {
+            if (!imageContainer.hasChildNodes()) {
+              const placeholder = createImagePlaceholder('Загрузка...');
+              imageContainer.appendChild(placeholder);
+            }
+          }, 3000);
+        } else {
+          // Если нет URL изображения, сразу показываем плейсхолдер
+          const placeholder = createImagePlaceholder('Нет\nобложки');
+          imageContainer.appendChild(placeholder);
+        }
+
+        // ВАЖНО: Добавляем обработчик клика на карточку
+        cardDiv.addEventListener('click', (e) => {
+          e.preventDefault();
+          const mangaId = manga.id;
+          console.log(`Переход к манге ID: ${mangaId}`);
+          // Переходим на страницу с детальной информацией
+          window.location.href = `info.html?id=${mangaId}`;
+        });
+
+        fragment.appendChild(cardDiv);
+      });
+
+      container.appendChild(fragment);
+    }
+
+    // Функция поиска
+    function searchManga(query) {
+      if (!query.trim()) {
+        displayManga(allManga);
+        return;
+      }
+
+      const filtered = allManga.filter(manga => 
+        (manga.name && manga.name.toLowerCase().includes(query.toLowerCase())) ||
+        (manga.author && manga.author.toLowerCase().includes(query.toLowerCase()))
+      );
+
+      displayManga(filtered);
+    }
+
+    // Инициализация поиска
+    function initializeSearch() {
+      const searchBar = document.getElementById('searchBar');
+      const searchInput = document.getElementById('searchInput');
+
+      searchBar.addEventListener('click', () => { 
+        if (!searchBar.classList.contains('active')) {
+          searchBar.classList.add('active'); 
+          searchInput.focus(); 
+        }
+      });
+
+      searchInput.addEventListener('input', (e) => {
+        searchManga(e.target.value);
+      });
+
+      searchInput.addEventListener('blur', () => {
+        if (!searchInput.value.trim()) {
+          searchBar.classList.remove('active');
+        }
+      });
+
+      // Обработка Enter
+      searchInput.addEventListener('keypress', (e) => {
+        if (e.key === 'Enter') {
+          searchManga(e.target.value);
+        }
+      });
+    }
+
+    // Инициализация приложения
+    document.addEventListener('DOMContentLoaded', () => {
+      initializeSearch();
+      loadManga();
+    });
+  </script>
 </body>
 </html>
