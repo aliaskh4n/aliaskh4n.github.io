@@ -3,250 +3,156 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title id="pageTitle">Чтение Главы</title>
+    <title>Manga Catalog</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
-        body { font-family: 'Inter', sans-serif; background-color: #000000; margin: 0; padding: 0; user-select: none; }
-        .chapter-page {
-            width: 100%;
-            max-width: 100%;
-            height: auto;
-            object-fit: contain;
-            display: block;
-            margin: 0 auto;
-            /* Чтобы избежать скачков CLS */
-            min-height: 50vh; 
-        }
-        .chapter-container {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-        }
+        /* Настройка шрифта Inter и темного фона */
+        body { font-family: 'Inter', sans-serif; background-color: #0F172A; }
+        /* Красивый скроллбар */
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: #0F172A; }
+        ::-webkit-scrollbar-thumb { background: #334155; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #475569; }
+        /* Эффект при наведении на карточку */
+        .manga-card:hover { transform: translateY(-4px); box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.2), 0 4px 6px -2px rgba(0, 0, 0, 0.05); }
     </style>
 </head>
 <body class="text-white">
 
-    <!-- Хедер навигации -->
-    <header class="sticky top-0 z-10 bg-gray-900/90 backdrop-blur-md shadow-lg p-3 border-b border-gray-700">
-        <div class="max-w-4xl mx-auto flex justify-between items-center">
-            <a id="backButton" href="index.html" class="flex items-center text-indigo-400 hover:text-indigo-300 transition duration-200">
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7" /></svg>
-                <span class="hidden sm:inline">К деталям</span>
-            </a>
-            <h1 id="chapterTitle" class="text-lg font-semibold truncate max-w-[50%] text-center">Загрузка...</h1>
-            <div class="flex space-x-2">
-                <button id="prevChapter" class="p-2 bg-slate-700 hover:bg-slate-600 rounded-lg transition duration-200" title="Предыдущая глава" disabled>
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M11 19l-7-7 7-7m8 14l-7-7 7-7" /></svg>
-                </button>
-                <button id="nextChapter" class="p-2 bg-slate-700 hover:bg-slate-600 rounded-lg transition duration-200" title="Следующая глава" disabled>
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M13 5l7 7-7 7M5 5l7 7-7 7" /></svg>
-                </button>
+    <div class="max-w-4xl mx-auto p-4 md:p-8">
+        <header class="mb-8">
+            <h1 class="text-4xl font-extrabold text-white mb-4">Каталог Манги</h1>
+            <div class="relative">
+                <input id="searchInput" type="text" placeholder="Поиск манги по названию или автору..."
+                       class="w-full bg-slate-800 text-white placeholder-slate-400 border border-slate-700 rounded-xl py-3 px-5 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition duration-300 shadow-lg">
+                <svg xmlns="http://www.w3.org/2000/svg" class="absolute right-4 top-3 h-6 w-6 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                </svg>
             </div>
+        </header>
+
+        <div id="loading" class="text-center py-10">
+            <div class="animate-spin rounded-full h-10 w-10 border-b-2 border-indigo-500 mx-auto mb-4"></div>
+            <p class="text-slate-400">Загрузка каталога...</p>
         </div>
-    </header>
+        
+        <div id="error" class="hidden bg-red-900/30 border border-red-600 p-4 rounded-xl text-red-300 font-medium mb-8">
+            <p id="errorMessage"></p>
+        </div>
 
-    <div id="loading" class="text-center py-20">
-        <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-indigo-500 mx-auto mb-4"></div>
-        <p class="text-slate-400">Загрузка главы...</p>
-    </div>
+        <div id="mangaContainer" class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-6">
+            <!-- Здесь будут карточки манги -->
+        </div>
 
-    <div id="error" class="hidden bg-red-900/30 border border-red-600 p-4 rounded-xl text-red-300 font-medium max-w-xl mx-auto my-10">
-        <p id="errorMessage"></p>
-    </div>
-
-    <div id="chapterContainer" class="chapter-container hidden">
-        <div id="chapterContent" class="chapter-content">
-            <!-- Здесь будут изображения страниц -->
+        <div id="noResults" class="hidden text-center py-10 text-slate-400">
+            <p>Ничего не найдено. Попробуйте другой запрос.</p>
         </div>
     </div>
 
     <script>
         // Замените YOUR_WORKER_DOMAIN на домен вашего Cloudflare Worker
         const API_BASE = "https://YOUR_WORKER_DOMAIN"; 
-        let currentMangaId = null;
-        let currentChapterId = null;
+        
+        let allManga = [];
         
         /**
-         * Получает ID манги и главы из URL.
+         * Загружает полный список манги из Worker API.
          */
-        function getChapterParams() {
-            const params = new URLSearchParams(window.location.search);
-            return {
-                mangaId: params.get('manga'),
-                chapterId: parseInt(params.get('chapter'))
-            };
-        }
-
-        /**
-         * Загружает данные главы.
-         */
-        async function fetchChapterData(mangaId, chapterId) {
+        async function fetchMangaList() {
             const loading = document.getElementById('loading');
             const errorDiv = document.getElementById('error');
             const errorMessage = document.getElementById('errorMessage');
             loading.classList.remove('hidden');
             errorDiv.classList.add('hidden');
-            document.getElementById('chapterContainer').classList.add('hidden');
 
             try {
-                const response = await fetch(`${API_BASE}/api/chapter?manga=${mangaId}&chapter=${chapterId}`);
-                const data = await response.json();
-
+                const response = await fetch(`${API_BASE}/api/list`);
                 if (!response.ok) {
-                    throw new Error(data.error || `HTTP error! status: ${response.status}`);
+                    throw new Error(`HTTP error! status: ${response.status}`);
                 }
-                
-                return data;
-
+                allManga = await response.json();
+                displayManga(allManga);
             } catch (error) {
                 console.error("Fetch error:", error);
-                errorMessage.textContent = `Ошибка загрузки главы: ${error.message}`;
+                errorMessage.textContent = `Не удалось загрузить каталог: ${error.message}. Проверьте домен Worker'а.`;
                 errorDiv.classList.remove('hidden');
-                return null;
             } finally {
                 loading.classList.add('hidden');
             }
         }
 
         /**
-         * Отображает полученные страницы главы.
+         * Отображает карточки манги.
          */
-        function displayChapterContent(data) {
-            const contentDiv = document.getElementById('chapterContent');
-            const titleElement = document.getElementById('chapterTitle');
-            contentDiv.innerHTML = '';
+        function displayManga(mangaList) {
+            const container = document.getElementById('mangaContainer');
+            const noResults = document.getElementById('noResults');
+            container.innerHTML = '';
             
-            titleElement.textContent = `Глава ${data.chapterId}: ${data.chapterTitle || 'Без названия'}`;
-            document.getElementById('pageTitle').textContent = `Чтение ${data.chapterTitle || 'Главы'} | Manga App`;
-            document.getElementById('chapterContainer').classList.remove('hidden');
-            
-            // Обновляем кнопку "К деталям"
-            document.getElementById('backButton').href = `info.html?id=${data.mangaId}`;
-
-
-            if (!data.pages || data.pages.length === 0) {
-                 const p = document.createElement('p');
-                 p.className = 'text-slate-400 p-10';
-                 p.textContent = 'Страницы для этой главы отсутствуют.';
-                 contentDiv.appendChild(p);
-                 return;
+            if (mangaList.length === 0) {
+                noResults.classList.remove('hidden');
+                return;
+            } else {
+                noResults.classList.add('hidden');
             }
+            
+            const fragment = document.createDocumentFragment();
 
-            // Создание и предзагрузка изображений
-            data.pages.forEach((pageUrl, index) => {
-                const img = document.createElement('img');
-                img.src = pageUrl;
-                img.alt = `Страница ${index + 1}`;
-                img.className = 'chapter-page';
-                contentDiv.appendChild(img);
+            mangaList.forEach(manga => {
+                const card = document.createElement('a');
+                card.href = `info.html?id=${manga.id}`;
+                card.className = 'manga-card bg-slate-800 rounded-xl overflow-hidden shadow-lg transition duration-300 ease-in-out hover:scale-[1.03] hover:shadow-indigo-500/50 block';
                 
-                // Предзагрузка следующего изображения
-                if (index < data.pages.length - 1) {
-                    const nextImg = new Image();
-                    nextImg.src = data.pages[index + 1];
-                }
+                card.innerHTML = `
+                    <div class="h-48 sm:h-64 lg:h-80 overflow-hidden">
+                        <img src="${manga.cover_url}" alt="${manga.title_ru}" 
+                             onerror="this.onerror=null; this.src='https://placehold.co/400x570/475569/ffffff?text=Нет+обложки';" 
+                             class="w-full h-full object-cover transform hover:scale-105 transition duration-500">
+                    </div>
+                    <div class="p-3">
+                        <h2 class="text-base font-semibold truncate text-indigo-400">${manga.title_ru}</h2>
+                        <p class="text-xs text-slate-400 truncate mt-1">
+                            ${manga.author}
+                        </p>
+                        <span class="inline-block bg-slate-700 text-slate-300 text-xs font-medium px-2 py-0.5 rounded-full mt-2">
+                            ${manga.latest_chapter ? `Глава ${manga.latest_chapter}` : 'TBD'}
+                        </span>
+                    </div>
+                `;
+                fragment.appendChild(card);
             });
+
+            container.appendChild(fragment);
         }
-        
+
         /**
-         * Переход к следующей/предыдущей главе.
-         * В текущей архитектуре без полного списка глав в браузере,
-         * мы просто увеличиваем/уменьшаем номер. В реальном проекте
-         * Worker API должен давать "next_chapter_id" и "prev_chapter_id".
+         * Ищет мангу в загруженном списке.
          */
-        function goToChapter(direction) {
-            if (!currentMangaId || !currentChapterId) return;
-
-            // Здесь мы предполагаем, что главы идут последовательно (ID +/- 1)
-            const newChapterId = direction === "next" ? currentChapterId + 1 : currentChapterId - 1;
-
-            if (newChapterId <= 0 && direction === "prev") {
-                alertBox('info', 'Это самая первая глава.');
+        function searchManga(query) {
+            if (!query.trim()) {
+                displayManga(allManga);
                 return;
             }
-            
-            // Переход на новую страницу
-            window.location.href = `chapter.html?manga=${currentMangaId}&chapter=${newChapterId}`;
-        }
-        
-        /**
-         * Отображение кастомного сообщения вместо alert().
-         */
-        function alertBox(type, message) {
-            const errorDiv = document.getElementById('error');
-            const errorMessage = document.getElementById('errorMessage');
-            
-            errorDiv.classList.remove('hidden', 'bg-red-900/30', 'border-red-600');
-            errorDiv.classList.add(type === 'error' ? 'bg-red-900/30' : 'bg-blue-900/30', type === 'error' ? 'border-red-600' : 'border-blue-600');
-            errorMessage.textContent = message;
 
-            setTimeout(() => {
-                errorDiv.classList.add('hidden');
-            }, 3000);
+            const lowerQuery = query.toLowerCase();
+            const filtered = allManga.filter(manga => 
+                (manga.title_ru && manga.title_ru.toLowerCase().includes(lowerQuery)) ||
+                (manga.title_en && manga.title_en.toLowerCase().includes(lowerQuery)) ||
+                (manga.author && manga.author.toLowerCase().includes(lowerQuery))
+            );
+
+            displayManga(filtered);
         }
 
-        // ----------------------------------------------------------------------
-        // Логика Свайпов и Навигации
-        // ----------------------------------------------------------------------
-        let touchStartX = 0;
-        let touchEndX = 0;
-        const SWIPE_THRESHOLD = 80;
-
-        // Обработчик нажатия (start)
-        document.addEventListener("touchstart", (e) => {
-            touchStartX = e.changedTouches[0].screenX;
-        });
-
-        // Обработчик отпускания (end)
-        document.addEventListener("touchend", (e) => {
-            touchEndX = e.changedTouches[0].screenX;
-            handleSwipe();
-        });
-        
-        document.getElementById('prevChapter').addEventListener('click', () => goToChapter("prev"));
-        document.getElementById('nextChapter').addEventListener('click', () => goToChapter("next"));
-
-
-        function handleSwipe() {
-            const deltaX = touchEndX - touchStartX;
-            
-            if (Math.abs(deltaX) < SWIPE_THRESHOLD) return; // Слишком короткий свайп
-
-            if (deltaX > SWIPE_THRESHOLD) {
-                // Свайп вправо (Предыдущая глава)
-                goToChapter("prev");
-            }
-            if (deltaX < -SWIPE_THRESHOLD) {
-                // Свайп влево (Следующая глава)
-                goToChapter("next");
-            }
-        }
-        
         // Инициализация
-        document.addEventListener('DOMContentLoaded', async () => {
-            const params = getChapterParams();
+        document.addEventListener('DOMContentLoaded', () => {
+            const searchInput = document.getElementById('searchInput');
+            searchInput.addEventListener('input', (e) => {
+                searchManga(e.target.value);
+            });
             
-            if (!params.mangaId || !params.chapterId) {
-                alertBox('error', 'Параметры манги или главы не указаны в URL.');
-                return;
-            }
-            
-            currentMangaId = params.mangaId;
-            currentChapterId = params.chapterId;
-            
-            if (currentChapterId > 1) { // Условная проверка, если 1 - самая первая
-                 document.getElementById('prevChapter').disabled = false;
-            }
-
-            const chapterData = await fetchChapterData(params.mangaId, params.chapterId);
-            if (chapterData) {
-                displayChapterContent(chapterData);
-                // В реальном приложении здесь нужно проверить, есть ли следующая глава
-                // Для демо-целей просто включим кнопку следующей главы
-                document.getElementById('nextChapter').disabled = false;
-            }
+            fetchMangaList();
         });
-
     </script>
 </body>
 </html>
