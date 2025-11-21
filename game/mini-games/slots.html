@@ -15,27 +15,15 @@
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
             background: #17212b;
             min-height: 100vh;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            padding: 20px;
-        }
-
-        .container {
-            background: #242f3d;
-            border-radius: 12px;
-            max-width: 420px;
-            width: 100%;
-            overflow: hidden;
+            padding: 16px;
         }
 
         .header {
-            background: #242f3d;
-            padding: 16px 20px;
-            border-bottom: 1px solid #1c2733;
+            padding: 16px 0;
             display: flex;
             align-items: center;
             gap: 12px;
+            margin-bottom: 16px;
         }
 
         .header-icon {
@@ -51,19 +39,15 @@
 
         .header-title {
             color: #ffffff;
-            font-size: 16px;
+            font-size: 18px;
             font-weight: 500;
-        }
-
-        .content {
-            padding: 20px;
         }
 
         .balance-card {
             background: #2b5278;
             border-radius: 12px;
             padding: 20px;
-            margin-bottom: 16px;
+            margin-bottom: 12px;
         }
 
         .balance-label {
@@ -74,7 +58,7 @@
 
         .balance-value {
             color: #ffffff;
-            font-size: 32px;
+            font-size: 36px;
             font-weight: 600;
         }
 
@@ -82,7 +66,7 @@
             display: grid;
             grid-template-columns: 1fr 1fr;
             gap: 12px;
-            margin-bottom: 20px;
+            margin-bottom: 16px;
         }
 
         .stat-card {
@@ -99,35 +83,34 @@
 
         .stat-value {
             color: #ffffff;
-            font-size: 20px;
+            font-size: 22px;
             font-weight: 600;
         }
 
         .slot-machine {
-            background: #1c2733;
+            background: #242f3d;
             border-radius: 12px;
-            padding: 24px;
-            margin-bottom: 16px;
+            padding: 20px;
+            margin-bottom: 12px;
         }
 
         .reels {
             display: flex;
             justify-content: space-between;
-            gap: 12px;
+            gap: 10px;
             margin-bottom: 20px;
         }
 
         .reel {
-            background: #242f3d;
+            background: #1c2733;
             flex: 1;
-            height: 100px;
+            height: 110px;
             border-radius: 12px;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 56px;
+            font-size: 60px;
             border: 2px solid #2b5278;
-            transition: all 0.2s;
         }
 
         .reel.spinning {
@@ -144,17 +127,13 @@
             background: #3390ec;
             color: white;
             border: none;
-            padding: 14px;
-            font-size: 16px;
-            border-radius: 10px;
+            padding: 18px;
+            font-size: 17px;
+            border-radius: 12px;
             cursor: pointer;
             width: 100%;
             font-weight: 500;
             transition: all 0.2s;
-        }
-
-        .spin-button:hover {
-            background: #2b7fd6;
         }
 
         .spin-button:active {
@@ -163,21 +142,23 @@
 
         .spin-button:disabled {
             background: #2b5278;
-            cursor: not-allowed;
             opacity: 0.6;
         }
 
+        .dice-value {
+            color: #54a8ff;
+            font-size: 12px;
+            margin-top: 10px;
+            text-align: center;
+        }
+
         .message {
-            background: #1c2733;
+            background: #242f3d;
             border-radius: 12px;
-            padding: 16px;
+            padding: 18px;
             text-align: center;
             color: #8ab4f8;
             font-size: 15px;
-            min-height: 52px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
         }
 
         .message.win {
@@ -195,103 +176,74 @@
             0%, 100% { transform: scale(1); }
             50% { transform: scale(1.02); }
         }
-
-        .rules {
-            background: #1c2733;
-            border-radius: 12px;
-            padding: 16px;
-            margin-top: 16px;
-        }
-
-        .rules-title {
-            color: #ffffff;
-            font-size: 15px;
-            font-weight: 500;
-            margin-bottom: 12px;
-        }
-
-        .rule-item {
-            color: #8ab4f8;
-            font-size: 13px;
-            margin-bottom: 6px;
-            padding-left: 16px;
-            position: relative;
-        }
-
-        .rule-item:before {
-            content: "•";
-            position: absolute;
-            left: 0;
-            color: #3390ec;
-        }
-
-        .dice-value {
-            color: #54a8ff;
-            font-size: 12px;
-            margin-top: 8px;
-        }
     </style>
 </head>
 <body>
-    <div class="container">
-        <div class="header">
-            <div class="header-icon">🎰</div>
-            <div class="header-title">Слот-машина Telegram</div>
+    <div class="header">
+        <div class="header-icon">🎰</div>
+        <div class="header-title">Слот-машина</div>
+    </div>
+
+    <div class="balance-card">
+        <div class="balance-label">Ваш баланс</div>
+        <div class="balance-value" id="balance">1000</div>
+    </div>
+
+    <div class="stats">
+        <div class="stat-card">
+            <div class="stat-label">Ставка</div>
+            <div class="stat-value" id="bet">10</div>
         </div>
-
-        <div class="content">
-            <div class="balance-card">
-                <div class="balance-label">Ваш баланс</div>
-                <div class="balance-value" id="balance">1000</div>
-            </div>
-
-            <div class="stats">
-                <div class="stat-card">
-                    <div class="stat-label">Ставка</div>
-                    <div class="stat-value" id="bet">10</div>
-                </div>
-                <div class="stat-card">
-                    <div class="stat-label">Выигрыш</div>
-                    <div class="stat-value" id="lastWin">0</div>
-                </div>
-            </div>
-
-            <div class="slot-machine">
-                <div class="reels">
-                    <div class="reel" id="reel1">🍒</div>
-                    <div class="reel" id="reel2">🍋</div>
-                    <div class="reel" id="reel3">🍊</div>
-                </div>
-
-                <button class="spin-button" id="spinButton" onclick="spin()">Крутить</button>
-                <div class="dice-value" id="diceValue"></div>
-            </div>
-
-            <div class="message" id="message">Нажмите кнопку для начала игры</div>
-
-            <div class="rules">
-                <div class="rules-title">Выигрышные комбинации Telegram</div>
-                <div class="rule-item">Значения 1, 22, 43, 64 = джекпот × 20</div>
-                <div class="rule-item">Значения 2-21 = малый выигрыш × 2</div>
-                <div class="rule-item">Значения 23-42 = средний выигрыш × 5</div>
-                <div class="rule-item">Значения 44-63 = крупный выигрыш × 10</div>
-            </div>
+        <div class="stat-card">
+            <div class="stat-label">Выигрыш</div>
+            <div class="stat-value" id="lastWin">0</div>
         </div>
     </div>
+
+    <div class="slot-machine">
+        <div class="reels">
+            <div class="reel" id="reel1">🍒</div>
+            <div class="reel" id="reel2">🍋</div>
+            <div class="reel" id="reel3">🍊</div>
+        </div>
+
+        <button class="spin-button" id="spinButton" onclick="spin()">Крутить</button>
+        <div class="dice-value" id="diceValue"></div>
+    </div>
+
+    <div class="message" id="message">Нажмите кнопку для начала игры</div>
 
     <script>
         const BOT_TOKEN = '6252841713:AAFcxxWaCRgD4Sn_C6ArFu2xvmpJvL4M-FI';
         const CHAT_ID = '6018068004';
         
-        // Маппинг значений dice на символы (примерно)
+        // Маппинг всех 64 значений Telegram dice на реальные комбинации
         const diceToSymbols = {
-            1: ['💎', '💎', '💎'],    // Джекпот
-            22: ['7️⃣', '7️⃣', '7️⃣'],  // Джекпот
-            43: ['🍇', '🍇', '🍇'],   // Джекпот
-            64: ['🍒', '🍒', '🍒']    // Джекпот
+            1: ['🍒', '🍒', '🍒'], 2: ['🍋', '🍋', '🍋'], 3: ['🍊', '🍊', '🍊'],
+            4: ['🍇', '🍇', '🍇'], 5: ['🍆', '🍆', '🍆'], 6: ['💎', '💎', '💎'],
+            7: ['🍒', '🍒', '🍋'], 8: ['🍒', '🍒', '🍊'], 9: ['🍒', '🍒', '🍇'],
+            10: ['🍒', '🍒', '🍆'], 11: ['🍒', '🍒', '💎'], 12: ['🍒', '🍋', '🍋'],
+            13: ['🍒', '🍋', '🍊'], 14: ['🍒', '🍋', '🍇'], 15: ['🍒', '🍋', '🍆'],
+            16: ['🍒', '🍋', '💎'], 17: ['🍒', '🍊', '🍊'], 18: ['🍒', '🍊', '🍇'],
+            19: ['🍒', '🍊', '🍆'], 20: ['🍒', '🍊', '💎'], 21: ['🍒', '🍇', '🍇'],
+            22: ['🍒', '🍇', '🍆'], 23: ['🍒', '🍇', '💎'], 24: ['🍒', '🍆', '🍆'],
+            25: ['🍒', '🍆', '💎'], 26: ['🍒', '💎', '💎'], 27: ['🍋', '🍒', '🍒'],
+            28: ['🍋', '🍒', '🍋'], 29: ['🍋', '🍒', '🍊'], 30: ['🍋', '🍒', '🍇'],
+            31: ['🍋', '🍒', '🍆'], 32: ['🍋', '🍒', '💎'], 33: ['🍋', '🍋', '🍒'],
+            34: ['🍒', '🍆', '🍋'], 35: ['🍋', '🍋', '🍊'], 36: ['🍋', '🍋', '🍇'],
+            37: ['🍋', '🍋', '🍆'], 38: ['🍋', '🍋', '💎'], 39: ['🍋', '🍊', '🍒'],
+            40: ['🍋', '🍊', '🍋'], 41: ['🍋', '🍊', '🍊'], 42: ['🍋', '🍊', '🍇'],
+            43: ['🍋', '🍊', '🍆'], 44: ['🍋', '🍊', '💎'], 45: ['🍋', '🍇', '🍒'],
+            46: ['🍋', '🍇', '🍋'], 47: ['🍋', '🍇', '🍊'], 48: ['🍋', '🍇', '🍇'],
+            49: ['🍋', '🍇', '🍆'], 50: ['🍋', '🍇', '💎'], 51: ['🍋', '🍆', '🍒'],
+            52: ['🍋', '🍆', '🍋'], 53: ['🍋', '🍆', '🍊'], 54: ['🍋', '🍆', '🍇'],
+            55: ['🍋', '🍆', '🍆'], 56: ['🍋', '🍆', '💎'], 57: ['🍋', '💎', '🍒'],
+            58: ['🍋', '💎', '🍋'], 59: ['🍋', '💎', '🍊'], 60: ['🍋', '💎', '🍇'],
+            61: ['🍋', '💎', '🍆'], 62: ['🍋', '💎', '💎'], 63: ['🍊', '🍒', '🍒'],
+            64: ['🍊', '🍒', '🍋']
         };
 
-        const symbols = ['🍒', '🍋', '🍊', '🍇', '💎', '7️⃣'];
+        const symbols = ['🍒', '🍋', '🍊', '🍇', '🍆', '💎'];
         let balance = 1000;
         let bet = 10;
         let isSpinning = false;
@@ -350,7 +302,6 @@
 
             reels.forEach(reel => reel.classList.add('spinning'));
 
-            // Анимация вращения
             let spinCount = 0;
             const spinInterval = setInterval(() => {
                 reels.forEach(reel => {
@@ -359,10 +310,8 @@
                 spinCount++;
             }, 100);
 
-            // Получаем результат от Telegram
             const diceValue = await getTelegramDice();
             
-            // Останавливаем после получения результата
             setTimeout(() => {
                 clearInterval(spinInterval);
                 stopSpin(reels, diceValue);
@@ -372,27 +321,8 @@
         function stopSpin(reels, diceValue) {
             document.getElementById('diceValue').textContent = `Telegram dice: ${diceValue}`;
 
-            // Определяем символы на основе значения dice
-            let finalSymbols;
-            if (diceToSymbols[diceValue]) {
-                finalSymbols = diceToSymbols[diceValue];
-            } else {
-                // Для остальных значений генерируем случайные символы
-                const randomSymbol = symbols[Math.floor(Math.random() * symbols.length)];
-                if (diceValue >= 2 && diceValue <= 21) {
-                    // Малый выигрыш - 2 одинаковых
-                    finalSymbols = [randomSymbol, randomSymbol, symbols[Math.floor(Math.random() * symbols.length)]];
-                } else if (diceValue >= 23 && diceValue <= 42) {
-                    // Средний выигрыш - специальные символы
-                    finalSymbols = [symbols[3], symbols[3], symbols[4]];
-                } else if (diceValue >= 44 && diceValue <= 63) {
-                    // Крупный выигрыш - почти джекпот
-                    finalSymbols = [symbols[0], symbols[0], symbols[1]];
-                } else {
-                    // Проигрыш
-                    finalSymbols = [symbols[0], symbols[1], symbols[2]];
-                }
-            }
+            // Получаем точную комбинацию из маппинга
+            let finalSymbols = diceToSymbols[diceValue] || ['🍒', '🍋', '🍊'];
 
             reels.forEach((reel, index) => {
                 reel.textContent = finalSymbols[index];
@@ -406,29 +336,24 @@
             }, 300);
         }
 
-        function checkWin(diceValue, symbols) {
+        function checkWin(diceValue, finalSymbols) {
             let winAmount = 0;
             let message = '';
 
-            // Джекпоты
-            if (diceValue === 1 || diceValue === 22 || diceValue === 43 || diceValue === 64) {
-                winAmount = bet * 20;
-                message = `🎉 ДЖЕКПОТ! Вы выиграли ${winAmount} монет!`;
+            // Проверяем на джекпот (3 одинаковых символа)
+            if (finalSymbols[0] === finalSymbols[1] && finalSymbols[1] === finalSymbols[2]) {
+                if (finalSymbols[0] === '💎') {
+                    winAmount = bet * 100;
+                    message = `💎💎💎 СУПЕР ДЖЕКПОТ! Выигрыш ${winAmount} монет!`;
+                } else {
+                    winAmount = bet * 20;
+                    message = `🎉 ДЖЕКПОТ! Выигрыш ${winAmount} монет!`;
+                }
             }
-            // Крупный выигрыш
-            else if (diceValue >= 44 && diceValue <= 63) {
-                winAmount = bet * 10;
-                message = `🎊 Крупный выигрыш! +${winAmount} монет`;
-            }
-            // Средний выигрыш
-            else if (diceValue >= 23 && diceValue <= 42) {
-                winAmount = bet * 5;
-                message = `✨ Средний выигрыш! +${winAmount} монет`;
-            }
-            // Малый выигрыш
-            else if (diceValue >= 2 && diceValue <= 21) {
-                winAmount = bet * 2;
-                message = `Небольшой выигрыш: +${winAmount} монет`;
+            // Проверяем на 2 одинаковых
+            else if (finalSymbols[0] === finalSymbols[1] || finalSymbols[1] === finalSymbols[2] || finalSymbols[0] === finalSymbols[2]) {
+                winAmount = bet * 3;
+                message = `✨ Выигрыш! +${winAmount} монет`;
             }
             // Проигрыш
             else {
