@@ -8,11 +8,11 @@
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="mini-games/shared/tg-style.css">
   <style>
-    :root { --card-radius: 22px; --transition: all 0.32s cubic-bezier(0.4,0,0.2,1); }
-    .header h1 { font-size: 36px; background: linear-gradient(135deg,#2481cc,#40a0ff); -webkit-background-clip:text; -webkit-text-fill-color:transparent; }
+    :root { --card-radius:22px; --transition:all .32s cubic-bezier(.4,0,.2,1); }
+    .header h1 { font-size:36px; background:linear-gradient(135deg,#2481cc,#40a0ff); -webkit-background-clip:text; -webkit-text-fill-color:transparent; }
     .games-grid { gap:20px; grid-template-columns:repeat(auto-fit,minmax(156px,1fr)); }
     .thumb { height:140px; font-size:64px; }
-    .soon-badge { background:rgba(0,0,0,0.65); backdrop-filter:blur(4px); }
+    .soon-badge { background:rgba(0,0,0,.65); backdrop-filter:blur(4px); }
   </style>
 </head>
 <body>
@@ -21,69 +21,63 @@
       <h1>GameHub</h1>
       <div class="balance">Баланс: <span id="balance">—</span> 💰</div>
     </div>
-
     <div id="games-container" class="games-grid">
       <div class="loading">Загружаем игры...</div>
     </div>
-
     <div class="footer">
       <p>© 2025 GameHub • 1×1 игры на реальные ставки</p>
     </div>
   </div>
 
-  <script src="mini-games/shared/firebase.js"></script>
+  <!-- Автозагрузка Firebase + хаб -->
   <script>
-    // ИСПРАВЛЕННЫЙ ВАРИАНТ — используем относительный путь вместо абсолютного
+    // Загружаем Firebase динамически (чтобы не было firebase is not defined)
+    const fb = document.createElement('script');
+    fb.src = 'mini-games/shared/firebase.js';
+    document.head.appendChild(fb);
+  </script>
+
+  <script>
     const GAMES_JSON = "./mini-games/games.json?t=" + Date.now();
-  
-    async function init() {
-      try {
-        await initFirebaseAndBalance();
-  
-        const res = await fetch(GAMES_JSON, {
-          cache: "no-cache"  // на всякий случай
-        });
-  
-        if (!res.ok) {
-          throw new Error(`HTTP ${res.status}`);
-        }
-  
-        const games = await res.json();
-        const container = document.getElementById('games-container');
-        container.innerHTML = '';
-  
-        games.forEach(g => {
-          if (!g.id || !g.title) return;
-  
-          const grad = g.gradient ? `--g1:${g.gradient[0]};--g2:${g.gradient[1]};` : '';
-          const link = g.ready ? `./mini-games/${g.id}.html` : '#';
-  
-          const card = document.createElement('div');
-          card.className = `game-card${!g.ready ? ' disabled' : ''}`;
-          card.innerHTML = `
-            <a href="${link}" class="game-link">
-              <div class="thumb" style="${grad}">
-                <div class="emoji">${g.emoji || '🎮'}</div>
-              </div>
-              <div class="info">
-                <div class="title">${g.title}</div>
-                <div class="desc">${g.desc || ''}</div>
-              </div>
-              ${!g.ready ? '<div class="soon-badge">SOON</div>' : ''}
-            </a>
-          `;
-          container.appendChild(card);
-        });
-  
-      } catch (err) {
-        console.error("Ошибка загрузки игр:", err);
-        document.getElementById('games-container').innerHTML = 
-          '<div class="error">Ошибка загрузки игр 😔<br><small>Проверьте интернет или обновите страницу</small></div>';
-      }
+
+    async function initHub() {
+      // Ждём, пока Firebase полностью загрузится и инициализируется
+      while (!window.updateBalance) await new Promise(r => setTimeout(r, 100));
+
+      const res = await fetch(GAMES_JSON);
+      if (!res.ok) throw new Error("Не удалось загрузить games.json");
+
+      const games = await res.json();
+      const container = document.getElementById('games-container');
+      container.innerHTML = '';
+
+      games.forEach(g => {
+        if (!g.id || !g.title) return;
+        const grad = g.gradient ? `--g1:${g.gradient[0]};--g2:${g.gradient[1]};` : '';
+        const link = g.ready ? `./mini-games/${g.id}.html` : '#';
+
+        const card = document.createElement('div');
+        card.className = `game-card${!g.ready ? ' disabled' : ''}`;
+        card.innerHTML = `
+          <a href="${link}" class="game-link">
+            <div class="thumb" style="${grad}">
+              <div class="emoji">${g.emoji || '🎮'}</div>
+            </div>
+            <div class="info">
+              <div class="title">${g.title}</div>
+              <div class="desc">${g.desc || ''}</div>
+            </div>
+            ${!g.ready ? '<div class="soon-badge">SOON</div>' : ''}
+          </a>
+        `;
+        container.appendChild(card);
+      });
     }
-  
-    init();
+
+    // Запуск после полной загрузки Firebase
+    setTimeout(() => initHub().catch(() => {
+      document.getElementById('games-container').innerHTML = '<div class="error">Ошибка загрузки игр 😔</div>';
+    }), 500);
   </script>
 </body>
-
 </html>
