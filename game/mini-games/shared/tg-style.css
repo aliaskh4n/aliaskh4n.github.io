@@ -5,6 +5,7 @@ body{font-family:'Inter',-apple-system,BlinkMacSystemFont,sans-serif;background:
 .balance{font-size:20px;font-weight:600;color:var(--tg-theme-link-color,#2481cc)}
 .game-card{border-radius:22px;overflow:hidden;box-shadow:0 4px 15px rgba(0,0,0,.08);transition:all .32s cubic-bezier(.4,0,.2,1);background:var(--tg-theme-secondary-bg-color,#f8f9fa)}
 .game-card:hover{transform:translateY(-6px);box-shadow:0 16px 32px rgba(0,0,0,.15)}
+.game-card.disabled{opacity:0.6;pointer-events:none}
 .game-link{display:block;text-decoration:none;color:inherit}
 .thumb{height:140px;display:flex;align-items:center;justify-content:center;position:relative;overflow:hidden}
 .thumb::before{content:'';position:absolute;inset:0;background:linear-gradient(135deg,var(--g1,#2481cc),var(--g2,#6bb6ff))}
