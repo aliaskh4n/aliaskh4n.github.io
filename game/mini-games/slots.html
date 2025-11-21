@@ -9,172 +9,109 @@
   <script src="shared/firebase.js"></script>
   <script src="slots.js" defer></script>
   <style>
-    .slots-container {
-      background: linear-gradient(135deg, #0f0c29, #302b63, #24243e);
-      border-radius: 24px;
-      padding: 24px;
-      text-align: center;
-      box-shadow: 0 20px 40px rgba(0,0,0,0.4);
-      position: relative;
-      overflow: hidden;
-      margin: 20px 0;
-    }
-    .slots-container::before {
-      content: '';
-      position: absolute;
-      top: -50%; left: -50%;
-      width: 200%; height: 200%;
-      background: radial-gradient(circle, rgba(138,43,226,0.15) 0%, transparent 70%);
-      animation: glow 8s infinite alternate;
-    }
-    @keyframes glow { 0% { transform: translate(25%,25%); } 100% { transform: translate(-25%,-25%); } }
+    .screen{display:none;min-height:100vh}.screen.active{display:block}
+    .btn{height:52px;border-radius:12px;padding:0 20px;font-size:17px;font-weight:600;border:none;cursor:pointer;background:var(--tg-theme-button-color,#2481cc);color:var(--tg-theme-button-text-color,#fff);width:100%;margin-bottom:16px}
+    .btn:disabled{opacity:0.6;cursor:not-allowed}
+    .btn.outline{background:transparent;border:1.5px solid var(--tg-theme-button-color,#2481cc);color:var(--tg-theme-button-color,#2481cc)}
 
-    .machine {
-      background: #111;
-      border-radius: 20px;
-      padding: 20px;
-      box-shadow: inset 0 0 40px rgba(0,0,0,0.8), 0 0 30px rgba(138,43,226,0.4);
-      border: 3px solid #333;
+    .slot-machine{
+      background:var(--tg-theme-secondary-bg-color,#f7f7f8);
+      border-radius:20px;
+      padding:24px;
+      text-align:center;
+      margin:20px 0;
+      box-shadow:0 4px 20px rgba(0,0,0,0.08);
     }
-
-    .reels-wrapper {
-      display: flex;
-      justify-content: center;
-      gap: 16px;
-      margin: 30px 0;
-      padding: 20px 0;
-      background: linear-gradient(to bottom, transparent, #0008, transparent);
+    .reels{
+      display:flex;
+      justify-content:center;
+      gap:16px;
+      margin:32px 0;
+      padding:20px;
+      background:rgba(0,0,0,0.05);
+      border-radius:16px;
     }
-
-    .reel {
-      width: 100px;
-      height: 120px;
-      background: linear-gradient(to bottom, #1a1a2e, #16213e);
-      border-radius: 16px;
-      overflow: hidden;
-      position: relative;
-      box-shadow: 0 8px 25px rgba(0,0,0,0.6);
-      border: 2px solid #444;
+    .reel{
+      width:96px;
+      height:96px;
+      background:var(--tg-theme-bg-color,#fff);
+      border-radius:16px;
+      font-size:72px;
+      line-height:96px;
+      box-shadow:inset 0 4px 10px rgba(0,0,0,0.1);
+      overflow:hidden;
+      position:relative;
     }
-
-    .reel::before {
-      content: '';
-      position: absolute;
-      top: 0; left: 0; right: 0; height: 2px;
-      background: linear-gradient(90deg, transparent, #fff4, transparent);
-      z-index: 10;
+    .reel::after{
+      content:'';
+      position:absolute;
+      top:0;left:0;right:0;bottom:0;
+      background:linear-gradient(180deg, transparent 0%, rgba(0,0,0,0.1) 50%, transparent 100%);
+      pointer-events:none;
     }
-
-    .reel-strip {
-      font-size: 80px;
-      line-height: 120px;
-      transition: transform 0s;
+    .spinning{
+      animation:slotSpin 0.8s linear infinite;
     }
-
-    .spinning .reel-strip {
-      animation: spin 2.5s cubic-bezier(0.25, 0.1, 0.25, 1) forwards;
+    @keyframes slotSpin{
+      from{transform:rotateX(0deg)}
+      to{transform:rotateX(360deg)}
     }
-
-    @keyframes spin {
-      0% { transform: translateY(0); }
-      100% { transform: translateY(-1200px); }
+    .result-text{
+      font-size:28px;
+      font-weight:700;
+      margin:20px 0;
+      min-height:40px;
     }
-
-    .symbol {
-      display: block;
-      height: 120px;
-      text-shadow: 0 0 20px currentColor;
+    .bet-controls{
+      display:flex;
+      justify-content:center;
+      align-items:center;
+      gap:12px;
+      margin:20px 0;
     }
-
-    .win-line {
-      position: absolute;
-      top: 50%;
-      left: 50%;
-      transform: translate(-50%, -50%);
-      width: 340px;
-      height: 4px;
-      background: linear-gradient(90deg, transparent, #ffd700, transparent);
-      box-shadow: 0 0 30px #ffd700;
-      opacity: 0;
-      z-index: 5;
+    .bet-btn{
+      width:56px;
+      height:56px;
+      border-radius:50%;
+      font-size:24px;
+      font-weight:bold;
     }
-
-    .win-glow { animation: winPulse 1.5s infinite; }
-    @keyframes winPulse { 0%,100% { opacity: 0.7; } 50% { opacity: 1; } }
-
-    .controls {
-      margin: 30px 0 20px;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      gap: 20px;
-      flex-wrap: wrap;
-    }
-
-    .bet-display {
-      font-size: 24px;
-      font-weight: 700;
-      color: var(--tg-theme-link-color, #2481cc);
-    }
-
-    .spin-btn {
-      height: 64px;
-      padding: 0 48px;
-      font-size: 20px;
-      font-weight: 700;
-      border-radius: 32px;
-      background: linear-gradient(135deg, #ff6b6b, #ee5a52);
-      box-shadow: 0 8px 25px rgba(255,107,107,0.4);
-      text-transform: uppercase;
-      letter-spacing: 1px;
-    }
-
-    .result {
-      margin-top: 20px;
-      font-size: 28px;
-      font-weight: 700;
-      min-height: 50px;
-      text-shadow: 0 0 20px;
-    }
-
-    .jackpot {
-      font-size: 18px;
-      color: #ffd700;
-      margin-bottom: 10px;
-      text-shadow: 0 0 15px #ffd700;
+    .jackpot{
+      font-size:18px;
+      color:#ffd700;
+      font-weight:600;
+      margin-bottom:8px;
     }
   </style>
 </head>
 <body>
   <div class="container">
     <div class="header">
-      <h1>Слоты 777</h1>
+      <h1>Слоты 777 🎰</h1>
       <div class="balance">Баланс: <span id="balance">—</span> 💰</div>
     </div>
 
-    <div class="slots-container">
-      <div class="jackpot">★ ДЖЕКПОТ: 777× ★</div>
-      <div class="machine">
-        <div class="win-line" id="winLine"></div>
-        <div class="reels-wrapper" id="reelsWrapper">
-          <div class="reel"><div class="reel-strip" id="strip1"></div></div>
-          <div class="reel"><div class="reel-strip" id="strip2"></div></div>
-          <div class="reel"><div class="reel-strip" id="strip3"></div></div>
-        </div>
+    <div class="slot-machine">
+      <div class="jackpot">★ ДЖЕКПОТ: 777× ставка ★</div>
+
+      <div class="reels">
+        <div id="reel1" class="reel">7</div>
+        <div id="reel2" class="reel">7</div>
+        <div id="reel3" class="reel">7</div>
       </div>
 
-      <div class="controls">
-        <button id="betDown" class="btn outline">−</button>
-        <div class="bet-display">Ставка: <strong id="currentBet">50</strong> 💰</div>
-        <button id="betUp" class="btn outline">+</button>
+      <div class="bet-controls">
+        <button id="betDown" class="btn outline bet-btn">−</button>
+        <div style="font-size:20px">Ставка: <strong id="currentBet">50</strong> 💰</div>
+        <button id="betUp" class="btn outline bet-btn">+</button>
       </div>
 
-      <button id="spinBtn" class="btn primary spin-btn">Крутить</button>
+      <button id="spinBtn" class="btn">КРУТИТЬ!</button>
 
-      <div id="result" class="result"></div>
+      <div id="result" class="result-text"></div>
     </div>
 
-    <button onclick="history.back()" class="btn outline" style="width:100%">◄ Назад</button>
+    <button onclick="history.back()" class="btn outline">◄ Назад в хаб</button>
   </div>
 </body>
 </html>
