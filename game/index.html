@@ -3,99 +3,182 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-  <title>Кости: Кто выше? 🎲</title>
+  <title>GameHub 🎮</title>
   <script src="https://telegram.org/js/telegram-web-app.js"></script>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-  
-  <!-- Firebase -->
-  <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
-  
-  <link rel="stylesheet" href="style.css" />
+  <style>
+    :root { --card-radius: 20px; --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      background: var(--tg-theme-bg-color, #fff);
+      color: var(--tg-theme-text-color, #000);
+      min-height: 100vh;
+      -webkit-tap-highlight-color: transparent;
+    }
+    .container {
+      max-width: 480px;
+      margin: 0 auto;
+      padding: 20px;
+      padding-top: env(safe-area-inset-top, 30px);
+      padding-bottom: env(safe-area-inset-bottom, 20px);
+    }
+    .header { text-align: center; margin-bottom: 32px; }
+    .header h1 { font-size: 34px; font-weight: 700; margin-bottom: 8px; background: linear-gradient(135deg, #2481cc, #40a0ff); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+    .balance { font-size: 20px; font-weight: 600; color: var(--tg-theme-link-color, #2481cc); }
+
+    .games-grid {
+      display: grid;
+      gap: 18px;
+      grid-template-columns: repeat(auto-fit, minmax(145px, 1fr));
+    }
+    .game-card {
+      position: relative;
+      border-radius: var(--card-radius);
+      overflow: hidden;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+      transition: var(--transition);
+    }
+    .game-card:hover { transform: translateY(-6px); box-shadow: 0 16px 32px rgba(0,0,0,0.15); }
+    .game-card.disabled { opacity: 0.6; pointer-events: none; }
+
+    .game-link {
+      display: block;
+      text-decoration: none;
+      color: inherit;
+    }
+    .thumb {
+      height: 130px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 60px;
+      position: relative;
+      overflow: hidden;
+    }
+    .thumb::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(135deg, var(--g1, #2481cc), var(--g2, #6bb6ff));
+      opacity: 0.9;
+    }
+    .thumb::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(circle at 20% 20%, rgba(255,255,255,0.4), transparent 70%);
+    }
+    .emoji { position: relative; z-index: 1; }
+
+    .info {
+      padding: 16px;
+      text-align: center;
+      background: var(--tg-theme-secondary-bg-color, #f8f9fa);
+    }
+    .title { font-size: 17px; font-weight: 600; margin-bottom: 4px; }
+    .desc { font-size: 13px; opacity: 0.7; color: var(--tg-theme-hint-color, #888); }
+
+    .soon-badge {
+      position: absolute;
+      top: 10px; right: 10px;
+      background: rgba(0,0,0,0.6);
+      color: white;
+      font-size: 11px;
+      font-weight: 700;
+      padding: 5px 10px;
+      border-radius: 12px;
+      letter-spacing: 0.5px;
+      z-index: 2;
+    }
+
+    .loading, .error {
+      text-align: center;
+      padding: 40px 20px;
+      font-size: 16px;
+      color: var(--tg-theme-hint-color, #999);
+    }
+    .footer {
+      margin-top: 50px;
+      text-align: center;
+      font-size: 14px;
+      color: var(--tg-theme-hint-color, #999);
+    }
+  </style>
 </head>
 <body>
   <div class="container">
-
-    <!-- Главное меню -->
-    <div id="menu" class="screen active">
-      <div class="header">
-        <h1>Кости: Кто выше?</h1>
-        <div class="balance">Баланс <span id="balance">1000</span> 💰</div>
-      </div>
-
-      <div class="section">
-        <div class="input-group">
-          <input type="number" id="betAmount" placeholder="Ставка от 10" min="10" value="50" />
-          <button id="createGame" class="btn primary">Создать комнату</button>
-        </div>
-      </div>
-
-      <div class="section">
-        <div class="input-group">
-          <input type="text" id="roomCode" placeholder="Код комнаты" maxlength="6" style="text-transform: uppercase;" />
-          <button id="joinGame" class="btn primary">Войти</button>
-        </div>
-      </div>
-
-      <div class="section">
-        <div class="section-title">Открытые комнаты</div>
-        <div id="roomsList" class="rooms-list">
-          <div class="placeholder">Нет активных комнат</div>
-        </div>
-      </div>
+    <div class="header">
+      <h1>GameHub</h1>
+      <div class="balance">Баланс: <span id="balance">1 250</span> 💰</div>
     </div>
 
-    <!-- Ожидание соперника -->
-    <div id="waiting" class="screen">
-      <div class="center">
-        <div class="room-code">Комната <strong id="roomIdDisplay"></strong></div>
-        <div class="dice-large rolling">🎲</div>
-        <p>Ожидаем второго игрока...</p>
-        <button id="cancelRoom" class="btn outline">Отмена</button>
-      </div>
+    <div id="games-container" class="games-grid">
+      <div class="loading">Загружаем игры... 🎮</div>
     </div>
 
-    <!-- Игровой экран -->
-    <div id="game" class="screen">
-      <div class="game-header">
-        <div class="player">
-          <img id="myAvatar" src="" alt="Вы" class="avatar" />
-          <div class="name" id="mypName">Вы</div>
-        </div>
-        <div class="vs">VS</div>
-        <div class="player">
-          <img id="oppAvatar" src="" alt="Соперник" class="avatar" />
-          <div class="name" id="oppName">Соперник</div>
-        </div>
-      </div>
-
-      <div class="bet-display">Ставка <strong id="gameBet">50</strong> 💰</div>
-
-      <div class="dice-container">
-        <div class="dice-wrapper">
-          <div id="yourDice" class="dice-large">🎲</div>
-          <div id="yourResult" class="dice-value">-</div>
-        </div>
-        <div class="dice-wrapper">
-          <div id="opponentDice" class="dice-large">🎲</div>
-          <div id="opponentResult" class="dice-value">-</div>
-        </div>
-      </div>
-
-      <button id="rollBtn" class="btn primary large" disabled>Бросить кости!</button>
-      <button id="leaveGame" class="btn outline">Покинуть</button>
-    </div>
-
-    <!-- Результат -->
-    <div id="result" class="screen">
-      <div class="center">
-        <h1 id="resultText">Вы выиграли! 🎉</h1>
-        <div class="win-amount" id="winAmount">+150 💰</div>
-        <button id="playAgain" class="btn primary large">Играть снова</button>
-      </div>
+    <div class="footer">
+      <p>© 2025 GameHub • Добавляй новые игры в папку mini-games</p>
     </div>
   </div>
 
-  <script src="app.js"></script>
+  <script>
+    Telegram.WebApp.ready();
+    Telegram.WebApp.expand();
+
+    const GAMES_JSON_URL = "https://aliaskh4n.github.io/game/mini-games/games.json";
+
+    async function loadGames() {
+      const container = document.getElementById('games-container');
+      
+      try {
+        const res = await fetch(GAMES_JSON_URL + "?t=" + Date.now()); // антикэш
+        if (!res.ok) throw new Error("Не удалось загрузить список игр");
+        
+        const games = await res.json();
+
+        if (!games || games.length === 0) {
+          container.innerHTML = '<div class="loading">Нет доступных игр</div>';
+          return;
+        }
+
+        container.innerHTML = '';
+
+        games.forEach(game => {
+          const card = document.createElement('div');
+          card.className = 'game-card' + (game.ready === false ? ' disabled' : '');
+
+          const gradientStyle = game.gradient 
+            ? `--g1: ${game.gradient[0]}; --g2: ${game.gradient[1]};` 
+            : '';
+
+          card.innerHTML = `
+            <a href="${game.ready ? '/game/mini-games/' + game.id + '.html' : '#'}"
+               class="game-link" ${game.ready ? '' : 'onclick="return false"'} >
+              <div class="thumb" style="${gradientStyle}">
+                <div class="emoji">${game.emoji}</div>
+              </div>
+              <div class="info">
+                <div class="title">${game.title}</div>
+                <div class="desc">${game.desc}</div>
+              </div>
+              ${game.ready === false ? '<div class="soon-badge">SOON</div>' : ''}
+            </a>
+          `;
+
+          container.appendChild(card);
+        });
+
+      } catch (err) {
+        container.innerHTML = `<div class="error">Ошибка загрузки игр 😔<br><small>${err.message}</small></div>`;
+      }
+    }
+
+    // Автозагрузка
+    loadGames();
+    
+    // Перезагружать каждые 30 сек (на случай если ты добавил игру)
+    setInterval(loadGames, 30000);
+  </script>
 </body>
 </html>
