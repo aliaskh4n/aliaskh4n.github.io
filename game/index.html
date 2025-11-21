@@ -1,184 +1,73 @@
 <!DOCTYPE html>
 <html lang="ru">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>GameHub 🎮</title>
   <script src="https://telegram.org/js/telegram-web-app.js"></script>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="mini-games/shared/tg-style.css">
   <style>
-    :root { --card-radius: 20px; --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); }
-    * { margin: 0; padding: 0; box-sizing: border-box; }
-    body {
-      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-      background: var(--tg-theme-bg-color, #fff);
-      color: var(--tg-theme-text-color, #000);
-      min-height: 100vh;
-      -webkit-tap-highlight-color: transparent;
-    }
-    .container {
-      max-width: 480px;
-      margin: 0 auto;
-      padding: 20px;
-      padding-top: env(safe-area-inset-top, 30px);
-      padding-bottom: env(safe-area-inset-bottom, 20px);
-    }
-    .header { text-align: center; margin-bottom: 32px; }
-    .header h1 { font-size: 34px; font-weight: 700; margin-bottom: 8px; background: linear-gradient(135deg, #2481cc, #40a0ff); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
-    .balance { font-size: 20px; font-weight: 600; color: var(--tg-theme-link-color, #2481cc); }
-
-    .games-grid {
-      display: grid;
-      gap: 18px;
-      grid-template-columns: repeat(auto-fit, minmax(145px, 1fr));
-    }
-    .game-card {
-      position: relative;
-      border-radius: var(--card-radius);
-      overflow: hidden;
-      box-shadow: 0 4px 15px rgba(0,0,0,0.08);
-      transition: var(--transition);
-    }
-    .game-card:hover { transform: translateY(-6px); box-shadow: 0 16px 32px rgba(0,0,0,0.15); }
-    .game-card.disabled { opacity: 0.6; pointer-events: none; }
-
-    .game-link {
-      display: block;
-      text-decoration: none;
-      color: inherit;
-    }
-    .thumb {
-      height: 130px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 60px;
-      position: relative;
-      overflow: hidden;
-    }
-    .thumb::before {
-      content: '';
-      position: absolute;
-      inset: 0;
-      background: linear-gradient(135deg, var(--g1, #2481cc), var(--g2, #6bb6ff));
-      opacity: 0.9;
-    }
-    .thumb::after {
-      content: '';
-      position: absolute;
-      inset: 0;
-      background: radial-gradient(circle at 20% 20%, rgba(255,255,255,0.4), transparent 70%);
-    }
-    .emoji { position: relative; z-index: 1; }
-
-    .info {
-      padding: 16px;
-      text-align: center;
-      background: var(--tg-theme-secondary-bg-color, #f8f9fa);
-    }
-    .title { font-size: 17px; font-weight: 600; margin-bottom: 4px; }
-    .desc { font-size: 13px; opacity: 0.7; color: var(--tg-theme-hint-color, #888); }
-
-    .soon-badge {
-      position: absolute;
-      top: 10px; right: 10px;
-      background: rgba(0,0,0,0.6);
-      color: white;
-      font-size: 11px;
-      font-weight: 700;
-      padding: 5px 10px;
-      border-radius: 12px;
-      letter-spacing: 0.5px;
-      z-index: 2;
-    }
-
-    .loading, .error {
-      text-align: center;
-      padding: 40px 20px;
-      font-size: 16px;
-      color: var(--tg-theme-hint-color, #999);
-    }
-    .footer {
-      margin-top: 50px;
-      text-align: center;
-      font-size: 14px;
-      color: var(--tg-theme-hint-color, #999);
-    }
+    :root { --card-radius: 22px; --transition: all 0.32s cubic-bezier(0.4,0,0.2,1); }
+    .header h1 { font-size: 36px; background: linear-gradient(135deg,#2481cc,#40a0ff); -webkit-background-clip:text; -webkit-text-fill-color:transparent; }
+    .games-grid { gap:20px; grid-template-columns:repeat(auto-fit,minmax(156px,1fr)); }
+    .thumb { height:140px; font-size:64px; }
+    .soon-badge { background:rgba(0,0,0,0.65); backdrop-filter:blur(4px); }
   </style>
 </head>
 <body>
   <div class="container">
     <div class="header">
       <h1>GameHub</h1>
-      <div class="balance">Баланс: <span id="balance">1 250</span> 💰</div>
+      <div class="balance">Баланс: <span id="balance">—</span> 💰</div>
     </div>
 
     <div id="games-container" class="games-grid">
-      <div class="loading">Загружаем игры... 🎮</div>
+      <div class="loading">Загружаем игры...</div>
     </div>
 
     <div class="footer">
-      <p>© 2025 GameHub • Добавляй новые игры в папку mini-games</p>
+      <p>© 2025 GameHub • 1×1 игры на реальные ставки</p>
     </div>
   </div>
 
+  <script src="mini-games/shared/firebase.js"></script>
   <script>
-    Telegram.WebApp.ready();
-    Telegram.WebApp.expand();
+    const GAMES_JSON = "https://aliaskh4n.github.io/game/mini-games/games.json?t=" + Date.now();
 
-    const GAMES_JSON_URL = "https://aliaskh4n.github.io/game/mini-games/games.json";
-
-    async function loadGames() {
+    async function init() {
+      await initFirebaseAndBalance();
+      const res = await fetch(GAMES_JSON);
+      const games = await res.json();
       const container = document.getElementById('games-container');
-      
-      try {
-        const res = await fetch(GAMES_JSON_URL + "?t=" + Date.now()); // антикэш
-        if (!res.ok) throw new Error("Не удалось загрузить список игр");
-        
-        const games = await res.json();
+      container.innerHTML = '';
 
-        if (!games || games.length === 0) {
-          container.innerHTML = '<div class="loading">Нет доступных игр</div>';
-          return;
-        }
+      games.forEach(g => {
+        if (!g.id || !g.title) return;
+        const grad = g.gradient ? `--g1:${g.gradient[0]};--g2:${g.gradient[1]};` : '';
+        const link = g.ready ? `/game/mini-games/${g.id}.html` : '#';
 
-        container.innerHTML = '';
-
-        games.forEach(game => {
-          const card = document.createElement('div');
-          card.className = 'game-card' + (game.ready === false ? ' disabled' : '');
-
-          const gradientStyle = game.gradient 
-            ? `--g1: ${game.gradient[0]}; --g2: ${game.gradient[1]};` 
-            : '';
-
-          card.innerHTML = `
-            <a href="${game.ready ? '/game/mini-games/' + game.id + '.html' : '#'}"
-               class="game-link" ${game.ready ? '' : 'onclick="return false"'} >
-              <div class="thumb" style="${gradientStyle}">
-                <div class="emoji">${game.emoji}</div>
-              </div>
-              <div class="info">
-                <div class="title">${game.title}</div>
-                <div class="desc">${game.desc}</div>
-              </div>
-              ${game.ready === false ? '<div class="soon-badge">SOON</div>' : ''}
-            </a>
-          `;
-
-          container.appendChild(card);
-        });
-
-      } catch (err) {
-        container.innerHTML = `<div class="error">Ошибка загрузки игр 😔<br><small>${err.message}</small></div>`;
-      }
+        const card = document.createElement('div');
+        card.className = `game-card${!g.ready ? ' disabled' : ''}`;
+        card.innerHTML = `
+          <a href="${link}" class="game-link">
+            <div class="thumb" style="${grad}">
+              <div class="emoji">${g.emoji || '🎮'}</div>
+            </div>
+            <div class="info">
+              <div class="title">${g.title}</div>
+              <div class="desc">${g.desc || ''}</div>
+            </div>
+            ${!g.ready ? '<div class="soon-badge">SOON</div>' : ''}
+          </a>
+        `;
+        container.appendChild(card);
+      });
     }
 
-    // Автозагрузка
-    loadGames();
-    
-    // Перезагружать каждые 30 сек (на случай если ты добавил игру)
-    setInterval(loadGames, 30000);
+    init().catch(() => {
+      document.getElementById('games-container').innerHTML = '<div class="error">Ошибка загрузки игр</div>';
+    });
   </script>
 </body>
 </html>

@@ -1,1 +1,87 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Кости: Кто выше? 🎲</title>
+  <script src="https://telegram.org/js/telegram-web-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
+  <link rel="stylesheet" href="shared/tg-style.css">
+  <script src="shared/firebase.js"></script>
+  <script src="dice.js" defer></script>
+  <style>
+    .screen{display:none;min-height:100vh}.screen.active{display:block}
+    .btn{height:52px;border-radius:12px;padding:0 20px;font-size:17px;font-weight:600;border:none;cursor:pointer;background:var(--tg-theme-button-color,#2481cc);color:var(--tg-theme-button-text-color,#fff)}
+    .btn:disabled{opacity:0.6;cursor:not-allowed}
+    .rolling{animation:roll 1s cubic-bezier(.25,.46,.45,.94) infinite}
+    @keyframes roll{from{transform:rotate(0deg)}to{transform:rotate(360deg)}}
+    .dice-large{font-size:96px}
+    .room-item{display:flex;justify-content:space-between;align-items:center;padding:14px 16px;background:var(--tg-theme-bg-color,#fff);border-radius:12px;margin-bottom:8px}
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <h1>Кости: Кто выше?</h1>
+      <div class="balance">Баланс: <span id="balance">—</span> 💰</div>
+    </div>
 
+    <!-- Меню -->
+    <div id="menu" class="screen active">
+      <input type="number" id="betAmount" placeholder="Ставка от 10" min="10" value="50" style="width:100%;padding:16px;margin-bottom:12px;border-radius:12px;border:none;background:var(--tg-theme-secondary-bg-color)">
+      <button id="createGame" class="btn" style="width:100%;margin-bottom:20px">Создать комнату</button>
+      <input type="text" id="roomCode" placeholder="Код комнаты" maxlength="6" style="text-transform:uppercase;width:100%;padding:16px;margin-bottom:12px;border-radius:12px;border:none;background:var(--tg-theme-secondary-bg-color)">
+      <button id="joinGame" class="btn" style="width:100%;margin-bottom:20px">Войти по коду</button>
+      <div id="roomsList"></div>
+    </div>
+
+    <!-- Ожидание -->
+    <div id="waiting" class="screen">
+      <div style="text-align:center;padding-top:100px">
+        <h2>Комната <strong id="roomIdDisplay"></strong></h2>
+        <div class="dice-large rolling">🎲</div>
+        <p>Ожидаем второго игрока...</p>
+        <button id="cancelRoom" class="btn">Отмена</button>
+      </div>
+    </div>
+
+    <!-- Игра -->
+    <div id="game" class="screen">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:30px">
+        <div style="text-align:center">
+          <img id="myAvatar" src="" width="80" height="80" style="border-radius:50%;border:3px solid #2481cc">
+          <div id="mypName"></div>
+        </div>
+        <div style="font-size:28px;font-weight:bold">VS</div>
+        <div style="text-align:center">
+          <img id="oppAvatar" src="" width="80" height="80" style="border-radius:50%;border:3px solid #666">
+          <div id="oppName"></div>
+        </div>
+      </div>
+      <div style="text-align:center;font-size:18px;margin-bottom:30px">Ставка: <strong id="gameBet"></strong> 💰</div>
+      <div style="display:flex;justify-content:space-around;margin:40px 0">
+        <div style="text-align:center">
+          <div id="yourDice" class="dice-large">🎲</div>
+          <div id="yourResult" style="font-size:48px;margin-top:10px">-</div>
+        </div>
+        <div style="text-align:center">
+          <div id="opponentDice" class="dice-large">🎲</div>
+          <div id="opponentResult" style="font-size:48px;margin-top:10px">-</div>
+        </div>
+      </div>
+      <button id="rollBtn" class="btn" style="width:100%">Бросить кости!</button>
+      <button id="leaveGame" class="btn" style="margin-top:12px;background:#666">Покинуть</button>
+    </div>
+
+    <!-- Результат -->
+    <div id="result" class="screen">
+      <div style="text-align:center;padding-top:100px">
+        <h1 id="resultText"></h1>
+        <div style="font-size:48px;margin:30px 0" id="winAmount"></div>
+        <button id="playAgain" class="btn">Играть снова</button>
+      </div>
+    </div>
+  </div>
+</body>
+</html>
