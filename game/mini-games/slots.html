@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Слоты 777 🎰</title>
+  <script src="https://telegram.org/js/telegram-web-app.js"></script>
+  <link rel="stylesheet" href="shared/tg-style.css">
+  <script src="shared/firebase.js"></script>
+  <script src="slots.js" defer></script>
+  <style>
+    .slot-machine { background: linear-gradient(135deg,#000428,#004e92); border-radius:22px; padding:20px; text-align:center; color:#fff; box-shadow:0 10px 30px rgba(0,0,0,0.5); margin:20px 0; }
+    .reels { display:flex; justify-content:center; gap:15px; margin:30px 0; }
+    .reel { width:100px; height:100px; background:#111; border-radius:16px; font-size:80px; line-height:100px; overflow:hidden; box-shadow:inset 0 0 20px rgba(255,255,215,0.4); }
+    .spinning { animation: spin 0.1s linear infinite; }
+    @keyframes spin { from { transform:translateY(0); } to { transform:translateY(-100px); } }
+    .bet-controls { display:flex; justify-content:center; gap:10px; align-items:center; margin:20px 0; }
+    .bet-btn { width:50px; height:50px; border-radius:50%; background:var(--tg-theme-button-color,#2481cc); color:#fff; font-size:24px; font-weight:bold; }
+    .spin-btn { height:60px; padding:0 40px; font-size:20px; border-radius:30px; }
+    .jackpot { font-size:28px; font-weight:bold; color:#ffd700; margin:20px 0; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <h1>Слоты 777 🎰</h1>
+      <div class="balance">Баланс: <span id="balance">—</span> 💰</div>
+    </div>
+
+    <div class="slot-machine">
+      <div class="jackpot">Джекпот: 777 × ставка!</div>
+      
+      <div class="reels">
+        <div id="reel1" class="reel">7</div>
+        <div id="reel2" class="reel">7</div>
+        <div id="reel3" class="reel">7</div>
+      </div>
+
+      <div class="bet-controls">
+        <button class="bet-btn" id="betDown">-</button>
+        <span style="font-size:24px; min-width:80px">Ставка: <strong id="currentBet">50</strong> 💰</span>
+        <button class="bet-btn" id="betUp">+</button>
+      </div>
+
+      <button id="spinBtn" class="btn primary spin-btn">КРУТИТЬ!</button>
+
+      <div id="result" style="margin-top:30px; font-size:28px; min-height:50px"></div>
+    </div>
+
+    <button onclick="history.back()" class="btn outline" style="width:100%; margin-top:20px">Назад в хаб</button>
+  </div>
+</body>
+</html>
