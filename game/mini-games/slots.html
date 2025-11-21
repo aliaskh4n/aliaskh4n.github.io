@@ -1,117 +1,459 @@
 <!DOCTYPE html>
 <html lang="ru">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>Слоты 777 🎰</title>
-  <script src="https://telegram.org/js/telegram-web-app.js"></script>
-  <link rel="stylesheet" href="shared/tg-style.css">
-  <script src="shared/firebase.js"></script>
-  <script src="slots.js" defer></script>
-  <style>
-    .screen{display:none;min-height:100vh}.screen.active{display:block}
-    .btn{height:52px;border-radius:12px;padding:0 20px;font-size:17px;font-weight:600;border:none;cursor:pointer;background:var(--tg-theme-button-color,#2481cc);color:var(--tg-theme-button-text-color,#fff);width:100%;margin-bottom:16px}
-    .btn:disabled{opacity:0.6;cursor:not-allowed}
-    .btn.outline{background:transparent;border:1.5px solid var(--tg-theme-button-color,#2481cc);color:var(--tg-theme-button-color,#2481cc)}
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Слот-машина</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
 
-    .slot-machine{
-      background:var(--tg-theme-secondary-bg-color,#f7f7f8);
-      border-radius:20px;
-      padding:24px;
-      text-align:center;
-      margin:20px 0;
-      box-shadow:0 4px 20px rgba(0,0,0,0.08);
-    }
-    .reels{
-      display:flex;
-      justify-content:center;
-      gap:16px;
-      margin:32px 0;
-      padding:20px;
-      background:rgba(0,0,0,0.05);
-      border-radius:16px;
-    }
-    .reel{
-      width:96px;
-      height:96px;
-      background:var(--tg-theme-bg-color,#fff);
-      border-radius:16px;
-      font-size:72px;
-      line-height:96px;
-      box-shadow:inset 0 4px 10px rgba(0,0,0,0.1);
-      overflow:hidden;
-      position:relative;
-    }
-    .reel::after{
-      content:'';
-      position:absolute;
-      top:0;left:0;right:0;bottom:0;
-      background:linear-gradient(180deg, transparent 0%, rgba(0,0,0,0.1) 50%, transparent 100%);
-      pointer-events:none;
-    }
-    .spinning{
-      animation:slotSpin 0.8s linear infinite;
-    }
-    @keyframes slotSpin{
-      from{transform:rotateX(0deg)}
-      to{transform:rotateX(360deg)}
-    }
-    .result-text{
-      font-size:28px;
-      font-weight:700;
-      margin:20px 0;
-      min-height:40px;
-    }
-    .bet-controls{
-      display:flex;
-      justify-content:center;
-      align-items:center;
-      gap:12px;
-      margin:20px 0;
-    }
-    .bet-btn{
-      width:56px;
-      height:56px;
-      border-radius:50%;
-      font-size:24px;
-      font-weight:bold;
-    }
-    .jackpot{
-      font-size:18px;
-      color:#ffd700;
-      font-weight:600;
-      margin-bottom:8px;
-    }
-  </style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #17212b;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .container {
+            background: #242f3d;
+            border-radius: 12px;
+            max-width: 420px;
+            width: 100%;
+            overflow: hidden;
+        }
+
+        .header {
+            background: #242f3d;
+            padding: 16px 20px;
+            border-bottom: 1px solid #1c2733;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .header-icon {
+            width: 40px;
+            height: 40px;
+            background: linear-gradient(135deg, #54a8ff, #3390ec);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+        }
+
+        .header-title {
+            color: #ffffff;
+            font-size: 16px;
+            font-weight: 500;
+        }
+
+        .content {
+            padding: 20px;
+        }
+
+        .balance-card {
+            background: #2b5278;
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 16px;
+        }
+
+        .balance-label {
+            color: #8ab4f8;
+            font-size: 13px;
+            margin-bottom: 6px;
+        }
+
+        .balance-value {
+            color: #ffffff;
+            font-size: 32px;
+            font-weight: 600;
+        }
+
+        .stats {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+            margin-bottom: 20px;
+        }
+
+        .stat-card {
+            background: #2b5278;
+            border-radius: 12px;
+            padding: 16px;
+        }
+
+        .stat-label {
+            color: #8ab4f8;
+            font-size: 13px;
+            margin-bottom: 4px;
+        }
+
+        .stat-value {
+            color: #ffffff;
+            font-size: 20px;
+            font-weight: 600;
+        }
+
+        .slot-machine {
+            background: #1c2733;
+            border-radius: 12px;
+            padding: 24px;
+            margin-bottom: 16px;
+        }
+
+        .reels {
+            display: flex;
+            justify-content: space-between;
+            gap: 12px;
+            margin-bottom: 20px;
+        }
+
+        .reel {
+            background: #242f3d;
+            flex: 1;
+            height: 100px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 56px;
+            border: 2px solid #2b5278;
+            transition: all 0.2s;
+        }
+
+        .reel.spinning {
+            animation: spin 0.1s linear infinite;
+            border-color: #54a8ff;
+        }
+
+        @keyframes spin {
+            0% { transform: translateY(0); }
+            100% { transform: translateY(-15px); }
+        }
+
+        .spin-button {
+            background: #3390ec;
+            color: white;
+            border: none;
+            padding: 14px;
+            font-size: 16px;
+            border-radius: 10px;
+            cursor: pointer;
+            width: 100%;
+            font-weight: 500;
+            transition: all 0.2s;
+        }
+
+        .spin-button:hover {
+            background: #2b7fd6;
+        }
+
+        .spin-button:active {
+            transform: scale(0.98);
+        }
+
+        .spin-button:disabled {
+            background: #2b5278;
+            cursor: not-allowed;
+            opacity: 0.6;
+        }
+
+        .message {
+            background: #1c2733;
+            border-radius: 12px;
+            padding: 16px;
+            text-align: center;
+            color: #8ab4f8;
+            font-size: 15px;
+            min-height: 52px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .message.win {
+            background: #1f4d2c;
+            color: #6dd169;
+            animation: pulse 0.5s;
+        }
+
+        .message.lose {
+            background: #4d1f1f;
+            color: #ff6b6b;
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.02); }
+        }
+
+        .rules {
+            background: #1c2733;
+            border-radius: 12px;
+            padding: 16px;
+            margin-top: 16px;
+        }
+
+        .rules-title {
+            color: #ffffff;
+            font-size: 15px;
+            font-weight: 500;
+            margin-bottom: 12px;
+        }
+
+        .rule-item {
+            color: #8ab4f8;
+            font-size: 13px;
+            margin-bottom: 6px;
+            padding-left: 16px;
+            position: relative;
+        }
+
+        .rule-item:before {
+            content: "•";
+            position: absolute;
+            left: 0;
+            color: #3390ec;
+        }
+
+        .dice-value {
+            color: #54a8ff;
+            font-size: 12px;
+            margin-top: 8px;
+        }
+    </style>
 </head>
 <body>
-  <div class="container">
-    <div class="header">
-      <h1>Слоты 777 🎰</h1>
-      <div class="balance">Баланс: <span id="balance">—</span> 💰</div>
+    <div class="container">
+        <div class="header">
+            <div class="header-icon">🎰</div>
+            <div class="header-title">Слот-машина Telegram</div>
+        </div>
+
+        <div class="content">
+            <div class="balance-card">
+                <div class="balance-label">Ваш баланс</div>
+                <div class="balance-value" id="balance">1000</div>
+            </div>
+
+            <div class="stats">
+                <div class="stat-card">
+                    <div class="stat-label">Ставка</div>
+                    <div class="stat-value" id="bet">10</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">Выигрыш</div>
+                    <div class="stat-value" id="lastWin">0</div>
+                </div>
+            </div>
+
+            <div class="slot-machine">
+                <div class="reels">
+                    <div class="reel" id="reel1">🍒</div>
+                    <div class="reel" id="reel2">🍋</div>
+                    <div class="reel" id="reel3">🍊</div>
+                </div>
+
+                <button class="spin-button" id="spinButton" onclick="spin()">Крутить</button>
+                <div class="dice-value" id="diceValue"></div>
+            </div>
+
+            <div class="message" id="message">Нажмите кнопку для начала игры</div>
+
+            <div class="rules">
+                <div class="rules-title">Выигрышные комбинации Telegram</div>
+                <div class="rule-item">Значения 1, 22, 43, 64 = джекпот × 20</div>
+                <div class="rule-item">Значения 2-21 = малый выигрыш × 2</div>
+                <div class="rule-item">Значения 23-42 = средний выигрыш × 5</div>
+                <div class="rule-item">Значения 44-63 = крупный выигрыш × 10</div>
+            </div>
+        </div>
     </div>
 
-    <div class="slot-machine">
-      <div class="jackpot">★ ДЖЕКПОТ: 777× ставка ★</div>
+    <script>
+        const BOT_TOKEN = '6252841713:AAFcxxWaCRgD4Sn_C6ArFu2xvmpJvL4M-FI';
+        const CHAT_ID = '6018068004';
+        
+        // Маппинг значений dice на символы (примерно)
+        const diceToSymbols = {
+            1: ['💎', '💎', '💎'],    // Джекпот
+            22: ['7️⃣', '7️⃣', '7️⃣'],  // Джекпот
+            43: ['🍇', '🍇', '🍇'],   // Джекпот
+            64: ['🍒', '🍒', '🍒']    // Джекпот
+        };
 
-      <div class="reels">
-        <div id="reel1" class="reel">7</div>
-        <div id="reel2" class="reel">7</div>
-        <div id="reel3" class="reel">7</div>
-      </div>
+        const symbols = ['🍒', '🍋', '🍊', '🍇', '💎', '7️⃣'];
+        let balance = 1000;
+        let bet = 10;
+        let isSpinning = false;
 
-      <div class="bet-controls">
-        <button id="betDown" class="btn outline bet-btn">−</button>
-        <div style="font-size:20px">Ставка: <strong id="currentBet">50</strong> 💰</div>
-        <button id="betUp" class="btn outline bet-btn">+</button>
-      </div>
+        function updateDisplay() {
+            document.getElementById('balance').textContent = balance;
+            document.getElementById('bet').textContent = bet;
+        }
 
-      <button id="spinBtn" class="btn">КРУТИТЬ!</button>
+        async function getTelegramDice() {
+            try {
+                const response = await fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendDice`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        chat_id: CHAT_ID,
+                        emoji: '🎰'
+                    })
+                });
 
-      <div id="result" class="result-text"></div>
-    </div>
+                const data = await response.json();
+                if (data.ok && data.result && data.result.dice) {
+                    return data.result.dice.value;
+                }
+                throw new Error('Ошибка получения результата');
+            } catch (error) {
+                console.error('Ошибка Telegram API:', error);
+                return Math.floor(Math.random() * 64) + 1;
+            }
+        }
 
-    <button onclick="history.back()" class="btn outline">◄ Назад в хаб</button>
-  </div>
+        async function spin() {
+            if (isSpinning) return;
+            
+            if (balance < bet) {
+                showMessage('Недостаточно средств для ставки', 'lose');
+                return;
+            }
+
+            isSpinning = true;
+            balance -= bet;
+            updateDisplay();
+            document.getElementById('spinButton').disabled = true;
+            
+            const messageEl = document.getElementById('message');
+            messageEl.className = 'message';
+            messageEl.textContent = 'Получаем результат от Telegram...';
+
+            const reels = [
+                document.getElementById('reel1'),
+                document.getElementById('reel2'),
+                document.getElementById('reel3')
+            ];
+
+            reels.forEach(reel => reel.classList.add('spinning'));
+
+            // Анимация вращения
+            let spinCount = 0;
+            const spinInterval = setInterval(() => {
+                reels.forEach(reel => {
+                    reel.textContent = symbols[Math.floor(Math.random() * symbols.length)];
+                });
+                spinCount++;
+            }, 100);
+
+            // Получаем результат от Telegram
+            const diceValue = await getTelegramDice();
+            
+            // Останавливаем после получения результата
+            setTimeout(() => {
+                clearInterval(spinInterval);
+                stopSpin(reels, diceValue);
+            }, 2000);
+        }
+
+        function stopSpin(reels, diceValue) {
+            document.getElementById('diceValue').textContent = `Telegram dice: ${diceValue}`;
+
+            // Определяем символы на основе значения dice
+            let finalSymbols;
+            if (diceToSymbols[diceValue]) {
+                finalSymbols = diceToSymbols[diceValue];
+            } else {
+                // Для остальных значений генерируем случайные символы
+                const randomSymbol = symbols[Math.floor(Math.random() * symbols.length)];
+                if (diceValue >= 2 && diceValue <= 21) {
+                    // Малый выигрыш - 2 одинаковых
+                    finalSymbols = [randomSymbol, randomSymbol, symbols[Math.floor(Math.random() * symbols.length)]];
+                } else if (diceValue >= 23 && diceValue <= 42) {
+                    // Средний выигрыш - специальные символы
+                    finalSymbols = [symbols[3], symbols[3], symbols[4]];
+                } else if (diceValue >= 44 && diceValue <= 63) {
+                    // Крупный выигрыш - почти джекпот
+                    finalSymbols = [symbols[0], symbols[0], symbols[1]];
+                } else {
+                    // Проигрыш
+                    finalSymbols = [symbols[0], symbols[1], symbols[2]];
+                }
+            }
+
+            reels.forEach((reel, index) => {
+                reel.textContent = finalSymbols[index];
+                reel.classList.remove('spinning');
+            });
+
+            setTimeout(() => {
+                checkWin(diceValue, finalSymbols);
+                isSpinning = false;
+                document.getElementById('spinButton').disabled = false;
+            }, 300);
+        }
+
+        function checkWin(diceValue, symbols) {
+            let winAmount = 0;
+            let message = '';
+
+            // Джекпоты
+            if (diceValue === 1 || diceValue === 22 || diceValue === 43 || diceValue === 64) {
+                winAmount = bet * 20;
+                message = `🎉 ДЖЕКПОТ! Вы выиграли ${winAmount} монет!`;
+            }
+            // Крупный выигрыш
+            else if (diceValue >= 44 && diceValue <= 63) {
+                winAmount = bet * 10;
+                message = `🎊 Крупный выигрыш! +${winAmount} монет`;
+            }
+            // Средний выигрыш
+            else if (diceValue >= 23 && diceValue <= 42) {
+                winAmount = bet * 5;
+                message = `✨ Средний выигрыш! +${winAmount} монет`;
+            }
+            // Малый выигрыш
+            else if (diceValue >= 2 && diceValue <= 21) {
+                winAmount = bet * 2;
+                message = `Небольшой выигрыш: +${winAmount} монет`;
+            }
+            // Проигрыш
+            else {
+                message = 'Не повезло. Попробуйте еще раз!';
+            }
+
+            if (winAmount > 0) {
+                balance += winAmount;
+                document.getElementById('lastWin').textContent = winAmount;
+                showMessage(message, 'win');
+            } else {
+                document.getElementById('lastWin').textContent = 0;
+                showMessage(message, 'lose');
+            }
+
+            updateDisplay();
+        }
+
+        function showMessage(text, type) {
+            const messageEl = document.getElementById('message');
+            messageEl.textContent = text;
+            messageEl.className = 'message ' + type;
+        }
+
+        updateDisplay();
+    </script>
 </body>
 </html>
