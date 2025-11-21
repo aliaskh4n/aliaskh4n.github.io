@@ -1,81 +1,120 @@
-// mini-games/slots.js — полностью рабочий слот-автомат
+// mini-games/slots.js — Профессиональная версия 2025
 
 const symbols = ['🍒', '🍋', '🍊', '⭐', '💎', '🔔', '7'];
-const reels = [document.getElementById('reel1'), document.getElementById('reel2'), document.getElementById('reel3')];
+const strips = [document.getElementById('strip1'), document.getElementById('strip2'), document.getElementById('strip3')];
+const reelsWrapper = document.getElementById('reelsWrapper');
+const winLine = document.getElementById('winLine');
 const resultEl = document.getElementById('result');
 const spinBtn = document.getElementById('spinBtn');
 const betDisplay = document.getElementById('currentBet');
 
 let currentBet = 50;
-const minBet = 10;
-const maxBet = 500;
+const bets = [10, 25, 50, 100, 250, 500];
 
-document.getElementById('betUp').onclick = () => {
-  if (currentBet < maxBet && currentBet * 2 <= window.currentUserBalance) {
-    currentBet *= 2;
-    betDisplay.textContent = currentBet;
-  }
-};
+// Инициализация полос
+function initReels() {
+  strips.forEach(strip => {
+    strip.innerHTML = '';
+    for (let i = 0; i < 30; i++) {
+      const sym = symbols[Math.floor(Math.random() * symbols.length)];
+      strip.innerHTML += `<div class="symbol">${sym}</div>`;
+    }
+  });
+}
 
-document.getElementById('betDown').onclick = () => {
-  if (currentBet > minBet) {
-    currentBet = Math.max(minBet, currentBet / 2 | 0);
-    betDisplay.textContent = currentBet;
-  }
-};
-
+// Крутить!
 spinBtn.onclick = async () => {
-  if (currentBet > window.currentUserBalance) return alert('Недостаточно средств!');
+  if (currentBet > window.currentUserBalance) return alert('Недостаточно монет!');
 
   spinBtn.disabled = true;
-  spinBtn.textContent = 'КРУТИТСЯ...';
   resultEl.textContent = '';
+  winLine.style.opacity = '0';
+  reelsWrapper.classList.add('spinning');
 
-  reels.forEach(r => r.classList.add('spinning'));
+  // Звук (вибрация в Telegram)
+  Telegram.WebApp.HapticFeedback.impactOccurred('heavy');
 
-  // Имитация вращения
-  let spins = 0;
-  const interval = setInterval(() => {
-    reels.forEach(r => r.textContent = symbols[Math.floor(Math.random() * symbols.length)]);
-    spins++;
-    if (spins > 20) clearInterval(interval);
-  }, 80);
+  // Случайные финальные символы
+  const final = [
+    symbols[Math.floor(Math.random() * symbols.length)],
+    symbols[Math.floor(Math.random() * symbols.length)],
+    symbols[Math.floor(Math.random() * symbols.length)]
+  ];
 
-  // Финальные символы
-  await new Promise(r => setTimeout(r, 2000));
-  clearInterval(interval);
-  reels.forEach(r => r.classList.remove('spinning'));
+  // Анимация прокрутки
+  await new Promise(r => setTimeout(r, 800));
+  strips[0].style.transition = 'transform 2.8s cubic-bezier(0.25, 0.1, 0.25, 1)';
+  strips[1].style.transition = 'transform 3.2s cubic-bezier(0.25, 0.1, 0.25, 1)';
+  strips[2].style.transition = 'transform 3.6s cubic-bezier(0.25, 0.1, 0.25, 1)';
 
-  const result = [];
-  reels.forEach((r, i) => {
-    const sym = symbols[Math.floor(Math.random() * symbols.length)];
-    r.textContent = sym;
-    result.push(sym);
+  strips.forEach((strip, i) => {
+    strip.style.transform = `translateY(-${1200 + (i * 120)}px)`;
   });
 
-  // Проверка выигрыша
-  let win = 0;
+  // Финальная остановка
+  setTimeout(() => {
+    strips.forEach((strip, i) => {
+      strip.innerHTML = `<div class="symbol">${final[i]}</div>`;
+      strip.style.transform = 'translateY(0)';
+      strip.style.transition = 'none';
+    });
+
+    reelsWrapper.classList.remove('spinning');
+
+    // Проверка выигрыша
+    checkWin(final);
+  }, 3800);
+};
+
+function checkWin(result) {
+  let multiplier = 0;
   let message = '';
 
   if (result[0] === result[1] && result[1] === result[2]) {
     if (result[0] === '7') {
-      win = currentBet * 777;
-      message = `ДЖЕКПОТ! +${win} 💰`;
+      multiplier = 777;
+      message = `ДЖЕКПОТ! +${currentBet * multiplier} 💰`;
+      winLine.style.opacity = '1';
+      winLine.classList.add('win-glow');
+      Telegram.WebApp.HapticFeedback.notificationOccurred('success');
     } else {
-      win = currentBet * 10;
-      message = `Три в ряд! +${win} 💰`;
+      multiplier = 20;
+      message = `Три одинаковых! +${currentBet * multiplier} 💰`;
+      winLine.style.opacity = '1';
     }
-  } else if (result[0] === result[1] || result[1] === result[2] || result[0] === result[2]) {
-    win = currentBet * 2;
-    message = `Две одинаковые! +${win} 💰`;
+  } else if (new Set(result).size === 2) {
+    multiplier = 3;
+    message = `Две одинаковые! +${currentBet * multiplier} 💰`;
   } else {
-    win = -currentBet;
-    message = 'Повезёт в следующий раз 😢';
+    multiplier = -1;
+    message = 'Не повезло...';
+    Telegram.WebApp.HapticFeedback.notificationOccurred('error');
   }
 
+  const win = currentBet * multiplier;
   window.updateBalance(win);
-  resultEl.innerHTML = `<div style="color:${win > 0 ? '#ffd700' : '#ff4444'}">${message}</div>`;
+
+  resultEl.innerHTML = `<div style="color:${win > 0 ? '#ffd700' : '#ff6b6b'}">${message}</div>`;
 
   spinBtn.disabled = false;
-  spinBtn.textContent = 'КРУТИТЬ!';
+}
+
+// Управление ставкой
+document.getElementById('betDown').onclick = () => {
+  const idx = bets.indexOf(currentBet);
+  if (idx > 0) {
+    currentBet = bets[idx - 1];
+    betDisplay.textContent = currentBet;
+  }
 };
+
+document.getElementById('betUp').onclick = () => {
+  const idx = bets.indexOf(currentBet);
+  if (idx < bets.length - 1 && bets[idx + 1] <= window.currentUserBalance) {
+    currentBet = bets[idx + 1];
+    betDisplay.textContent = currentBet;
+  }
+};
+
+// Старт
+initReels();
