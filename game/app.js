@@ -1,5 +1,3 @@
-// app.js — полностью безопасно, без ключей, работает с твоими правилами
-
 const firebaseConfig = {
   databaseURL: "https://nekros-6c4c6-default-rtdb.firebaseio.com"
 };
@@ -15,24 +13,22 @@ let isCreator = false;
 Telegram.WebApp.ready();
 Telegram.WebApp.expand();
 
+// Инициализация имени игрока
 if (Telegram.WebApp.initDataUnsafe.user) {
-  userName = Telegram.WebApp.initDataUnsafe.user.first_name || "Игрок";
+  userName = (Telegram.WebApp.initDataUnsafe.user.first_name || "Игрок").substring(0, 50);
 }
 
+// Баланс
 let balance = parseInt(localStorage.getItem('diceBalance') || '1000');
 document.getElementById('balance').textContent = balance;
 
-// Генерация токена из Telegram initData (подделать невозможно)
+// Генерация уникального токена игрока (SHA-256)
 async function generateToken() {
-  const initData = Telegram.WebApp.initData;
-  if (!initData) return 'guest_' + Date.now();
-
+  const initData = Telegram.WebApp.initData || "guest_" + Date.now();
   const encoder = new TextEncoder();
   const data = encoder.encode(initData);
   const hash = await crypto.subtle.digest('SHA-256', data);
-  userToken = Array.from(new Uint8Array(hash))
-    .map(b => b.toString(16).padStart(2, '0'))
-    .join('');
+  userToken = Array.from(new Uint8Array(hash)).map(b => b.toString(16).padStart(2,'0')).join('');
   
   loadOpenRooms();
   setInterval(loadOpenRooms, 5000);
@@ -40,10 +36,10 @@ async function generateToken() {
 
 generateToken();
 
-// Создать комнату
+// Создание комнаты
 document.getElementById('createGame').onclick = () => {
   const bet = parseInt(document.getElementById('betAmount').value);
-  if (bet < 10 || bet > balance) return alert('Неверная ставка!');
+  if (bet < 10 || bet > 10000 || bet > balance) return alert('Неверная ставка!');
 
   const roomId = Math.random().toString(36).substr(2, 6).toUpperCase();
   currentRoom = roomId;
@@ -54,7 +50,7 @@ document.getElementById('createGame').onclick = () => {
     creatorToken: userToken,
     creatorName: userName,
     status: 'waiting',
-    createdAt: Date.now()
+    createdAt: firebase.database.ServerValue.TIMESTAMP
   }).then(() => {
     document.getElementById('roomIdDisplay').textContent = roomId;
     showScreen('waiting');
@@ -62,7 +58,7 @@ document.getElementById('createGame').onclick = () => {
   });
 };
 
-// Присоединиться
+// Присоединение к комнате
 document.getElementById('joinGame').onclick = () => {
   const code = document.getElementById('roomCode').value.trim().toUpperCase();
   if (!code) return alert('Введите код');
@@ -89,7 +85,7 @@ document.getElementById('joinGame').onclick = () => {
   });
 };
 
-// Бросок — только создатель
+// Бросок кубиков (только создатель)
 document.getElementById('rollBtn').onclick = () => {
   if (!isCreator) return;
   document.getElementById('rollBtn').disabled = true;
@@ -104,7 +100,7 @@ document.getElementById('rollBtn').onclick = () => {
   });
 };
 
-// Прослушка результата
+// Прослушка результатов
 function listenToRolls() {
   db.ref('rooms/' + currentRoom).on('value', snap => {
     const room = snap.val();
@@ -147,9 +143,7 @@ function listenToRolls() {
   });
 }
 
-// Остальные функции (showScreen, loadOpenRooms, quickJoin и т.д.) — оставь как у тебя были
-
-// Запуск
+// Прослушка комнаты для создателя
 function listenToRoom(roomId) {
   db.ref('rooms/' + roomId).on('value', snap => {
     const room = snap.val();
