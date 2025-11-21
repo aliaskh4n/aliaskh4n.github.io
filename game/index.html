@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>Кости: Кто выше? 🎲</title>
+  <script src="https://telegram.org/js/telegram-web-app.js"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Rubik:wght@400;500;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css" />
+  <!-- Firebase SDK (только databaseURL, без ключей!) -->
+  <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
+</head>
+<body>
+  <div class="container">
+    <!-- Главное меню -->
+    <div id="menu" class="screen active">
+      <h1 class="title">🎲 Кости: Кто выше?</h1>
+      <div class="balance">Баланс: <span id="balance">1000</span> 💰</div>
+      
+      <div class="card">
+        <h2>Создать игру</h2>
+        <input type="number" id="betAmount" placeholder="Ставка" min="10" value="50" />
+        <button class="btn primary" id="createGame">Создать комнату</button>
+      </div>
+
+      <div class="card">
+        <h2>Присоединиться</h2>
+        <input type="text" id="roomCode" placeholder="Код комнаты" maxlength="6" />
+        <button class="btn primary" id="joinGame">Войти</button>
+      </div>
+
+      <div class="card rooms-list">
+        <h2>Открытые комнаты</h2>
+        <div id="roomsList">Нет активных комнат</div>
+      </div>
+    </div>
+
+    <!-- Экран ожидания соперника -->
+    <div id="waiting" class="screen">
+      <div class="waiting-room">
+        <h2>Комната <span id="roomIdDisplay"></span></h2>
+        <p>Ожидаем второго игрока...</p>
+        <div class="dice-animation">
+          <div class="dice">🎲</div>
+          <div class="dice">🎲</div>
+        </div>
+        <button class="btn secondary" id="cancelRoom">Отмена</button>
+      </div>
+    </div>
+
+    <!-- Игровой экран -->
+    <div id="game" class="screen">
+      <div class="game-header">
+        <div class="player you">
+          <div class="avatar">Вы</div>
+          <div class="name" id="player1Name">Вы</div>
+          <div class="bet">Ставка: <span id="gameBet">50</span> 💰</div>
+        </div>
+        <div class="vs">VS</div>
+        <div class="player opponent">
+          <div class="avatar">?</div>
+          <div class="name" id="player2Name">Ожидаем...</div>
+        </div>
+      </div>
+
+      <div class="dice-area">
+        <div class="player-dice">
+          <div id="yourDice" class="dice-big">🎲</div>
+          <div id="yourResult" class="result">-</div>
+        </div>
+        <div class="player-dice">
+          <div id="opponentDice" class="dice-big">🎲</div>
+          <div id="opponentResult" class="result">-</div>
+        </div>
+      </div>
+
+      <button class="btn primary big" id="rollBtn" disabled>Бросить кости!</button>
+      <div id="gameStatus" class="status"></div>
+      <button class="btn secondary" id="leaveGame">Покинуть игру</button>
+    </div>
+
+    <!-- Результат -->
+    <div id="result" class="screen">
+      <h1 id="resultText">Вы выиграли! 🎉</h1>
+      <div class="big-win">+<span id="winAmount">150</span> 💰</div>
+      <button class="btn primary" id="playAgain">Играть снова</button>
+    </div>
+  </div>
+
+  <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
