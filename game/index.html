@@ -33,41 +33,57 @@
 
   <script src="mini-games/shared/firebase.js"></script>
   <script>
-    const GAMES_JSON = "https://aliaskh4n.github.io/game/mini-games/games.json?t=" + Date.now();
-
+    // ИСПРАВЛЕННЫЙ ВАРИАНТ — используем относительный путь вместо абсолютного
+    const GAMES_JSON = "./mini-games/games.json?t=" + Date.now();
+  
     async function init() {
-      await initFirebaseAndBalance();
-      const res = await fetch(GAMES_JSON);
-      const games = await res.json();
-      const container = document.getElementById('games-container');
-      container.innerHTML = '';
-
-      games.forEach(g => {
-        if (!g.id || !g.title) return;
-        const grad = g.gradient ? `--g1:${g.gradient[0]};--g2:${g.gradient[1]};` : '';
-        const link = g.ready ? `/game/mini-games/${g.id}.html` : '#';
-
-        const card = document.createElement('div');
-        card.className = `game-card${!g.ready ? ' disabled' : ''}`;
-        card.innerHTML = `
-          <a href="${link}" class="game-link">
-            <div class="thumb" style="${grad}">
-              <div class="emoji">${g.emoji || '🎮'}</div>
-            </div>
-            <div class="info">
-              <div class="title">${g.title}</div>
-              <div class="desc">${g.desc || ''}</div>
-            </div>
-            ${!g.ready ? '<div class="soon-badge">SOON</div>' : ''}
-          </a>
-        `;
-        container.appendChild(card);
-      });
+      try {
+        await initFirebaseAndBalance();
+  
+        const res = await fetch(GAMES_JSON, {
+          cache: "no-cache"  // на всякий случай
+        });
+  
+        if (!res.ok) {
+          throw new Error(`HTTP ${res.status}`);
+        }
+  
+        const games = await res.json();
+        const container = document.getElementById('games-container');
+        container.innerHTML = '';
+  
+        games.forEach(g => {
+          if (!g.id || !g.title) return;
+  
+          const grad = g.gradient ? `--g1:${g.gradient[0]};--g2:${g.gradient[1]};` : '';
+          const link = g.ready ? `./mini-games/${g.id}.html` : '#';
+  
+          const card = document.createElement('div');
+          card.className = `game-card${!g.ready ? ' disabled' : ''}`;
+          card.innerHTML = `
+            <a href="${link}" class="game-link">
+              <div class="thumb" style="${grad}">
+                <div class="emoji">${g.emoji || '🎮'}</div>
+              </div>
+              <div class="info">
+                <div class="title">${g.title}</div>
+                <div class="desc">${g.desc || ''}</div>
+              </div>
+              ${!g.ready ? '<div class="soon-badge">SOON</div>' : ''}
+            </a>
+          `;
+          container.appendChild(card);
+        });
+  
+      } catch (err) {
+        console.error("Ошибка загрузки игр:", err);
+        document.getElementById('games-container').innerHTML = 
+          '<div class="error">Ошибка загрузки игр 😔<br><small>Проверьте интернет или обновите страницу</small></div>';
+      }
     }
-
-    init().catch(() => {
-      document.getElementById('games-container').innerHTML = '<div class="error">Ошибка загрузки игр</div>';
-    });
+  
+    init();
   </script>
 </body>
+
 </html>
