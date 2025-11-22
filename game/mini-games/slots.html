@@ -299,14 +299,6 @@
             const nextBet = amount === game.currentBet ? game.bets[(currentIndex + 1) % game.bets.length] : amount;
             game.currentBet = nextBet;
 
-            // Обновляем активный элемент
-            document.querySelectorAll('.stat-card').forEach(card => {
-                card.classList.remove('active');
-                if (parseInt(card.dataset.bet) === nextBet) {
-                    card.classList.add('active');
-                }
-            });
-
             // Обновляем значение ставки
             document.querySelectorAll('.stat-card')[0].querySelector('.stat-value').textContent = nextBet;
         }
