@@ -83,6 +83,26 @@
             background: var(--tg-theme-secondary-bg-color, #f4f4f5);
             border-radius: 12px;
             padding: 12px;
+            cursor: pointer;
+            transition: all 0.2s;
+            user-select: none;
+        }
+
+        .stat-card:active {
+            transform: scale(0.98);
+            opacity: 0.85;
+        }
+
+        .stat-card.active {
+            background: var(--tg-theme-button-color, #3390ec);
+        }
+
+        .stat-card.active .stat-label {
+            color: rgba(255, 255, 255, 0.7);
+        }
+
+        .stat-card.active .stat-value {
+            color: #ffffff;
         }
 
         .stat-label {
@@ -95,26 +115,6 @@
             color: var(--tg-theme-text-color, #000000);
             font-size: 20px;
             font-weight: 700;
-        }
-
-        .bet-input {
-            background: var(--tg-theme-secondary-bg-color, #f4f4f5);
-            border-radius: 12px;
-            padding: 12px;
-            margin-bottom: 12px;
-            display: flex;
-            gap: 8px;
-            align-items: center;
-        }
-
-        .bet-input input {
-            flex: 1;
-            padding: 8px 12px;
-            border: none;
-            border-radius: 8px;
-            background: var(--tg-theme-bg-color, #ffffff);
-            color: var(--tg-theme-text-color, #000000);
-            font-size: 14px;
         }
 
         .slot-machine {
@@ -204,17 +204,6 @@
             color: #ff3b30;
         }
 
-        .back-btn {
-            display: inline-block;
-            padding: 6px 12px;
-            background: var(--tg-theme-secondary-bg-color, #f4f4f5);
-            border: none;
-            border-radius: 6px;
-            cursor: pointer;
-            font-size: 12px;
-            margin-bottom: 12px;
-        }
-
         @media (prefers-color-scheme: dark) {
             .reel { box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3); }
         }
@@ -222,8 +211,6 @@
 </head>
 <body>
     <div class="container">
-        <button class="back-btn" onclick="history.back()">← Назад</button>
-
         <div class="header">
             <div class="header-icon">🎰</div>
             <div class="header-title">Слоты 777</div>
@@ -235,19 +222,14 @@
         </div>
 
         <div class="stats">
-            <div class="stat-card">
+            <div class="stat-card active" data-bet="50" onclick="changeBet(50)">
                 <div class="stat-label">Ставка</div>
-                <div class="stat-value" id="currentBet">10</div>
+                <div class="stat-value">50</div>
             </div>
-            <div class="stat-card">
+            <div class="stat-card" data-bet="100" onclick="changeBet(100)">
                 <div class="stat-label">Выигрыш</div>
                 <div class="stat-value" id="lastWin">0</div>
             </div>
-        </div>
-
-        <div class="bet-input">
-            <label style="flex: 0; font-size: 12px; color: var(--tg-theme-hint-color, #999999);">Ставка:</label>
-            <input type="number" id="bet" placeholder="10" min="1" value="10">
         </div>
 
         <div class="slot-machine">
@@ -274,15 +256,15 @@
                 balance: parseInt(localStorage.getItem('user_balance') || '0')
             },
             spinning: false,
+            currentBet: 50,
+            bets: [50, 100, 150, 200, 250, 300],
             symbols: ['🍒', '🍋', '🔔', '7']
         };
 
         // ========== DOM ==========
         const ui = {
             balance: document.getElementById('balance'),
-            currentBet: document.getElementById('currentBet'),
             lastWin: document.getElementById('lastWin'),
-            bet: document.getElementById('bet'),
             spinBtn: document.getElementById('spinButton'),
             message: document.getElementById('message'),
             reels: [
@@ -296,6 +278,10 @@
         function init() {
             game.tg.ready();
             game.tg.expand();
+            game.tg.BackButton.show();
+            game.tg.BackButton.onClick(() => {
+                window.history.back();
+            });
 
             if (!game.user.id || !game.user.token) {
                 showMsg('Пожалуйста, вернитесь на главную', 'lose');
@@ -305,7 +291,24 @@
 
             ui.balance.textContent = game.user.balance.toLocaleString();
             ui.spinBtn.onclick = spin;
-            ui.bet.oninput = () => ui.currentBet.textContent = ui.bet.value;
+        }
+
+        // ========== СМЕНА СТАВКИ ==========
+        function changeBet(amount) {
+            const currentIndex = game.bets.indexOf(game.currentBet);
+            const nextBet = amount === game.currentBet ? game.bets[(currentIndex + 1) % game.bets.length] : amount;
+            game.currentBet = nextBet;
+
+            // Обновляем активный элемент
+            document.querySelectorAll('.stat-card').forEach(card => {
+                card.classList.remove('active');
+                if (parseInt(card.dataset.bet) === nextBet) {
+                    card.classList.add('active');
+                }
+            });
+
+            // Обновляем значение ставки
+            document.querySelectorAll('.stat-card')[0].querySelector('.stat-value').textContent = nextBet;
         }
 
         // ========== API ==========
@@ -329,9 +332,8 @@
         async function spin() {
             if (game.spinning) return;
 
-            const bet = parseInt(ui.bet.value);
-            if (bet < 1 || bet > game.user.balance) {
-                showMsg('Невалидная ставка', 'lose');
+            if (game.currentBet > game.user.balance) {
+                showMsg('Недостаточно средств', 'lose');
                 game.tg.HapticFeedback.notificationOccurred('error');
                 return;
             }
@@ -343,16 +345,14 @@
 
             ui.reels.forEach(r => r.classList.add('spinning'));
 
-            let spinCount = 0;
             const interval = setInterval(() => {
                 ui.reels.forEach(r => r.textContent = game.symbols[Math.floor(Math.random() * game.symbols.length)]);
-                spinCount++;
             }, 100);
 
             try {
                 const result = await apiCall('/game/slots/play', 'POST', {
                     userId: game.user.id,
-                    bet: bet
+                    bet: game.currentBet
                 });
 
                 setTimeout(() => {
@@ -370,10 +370,8 @@
         }
 
         function stopSpin(result) {
-            const symbols = result.symbols;
-            
             ui.reels.forEach((reel, i) => {
-                reel.textContent = symbols[i];
+                reel.textContent = result.symbols[i];
                 reel.classList.remove('spinning');
             });
 
@@ -392,23 +390,20 @@
             let msg = '';
             const type = result.winAmount > 0 ? 'win' : 'lose';
 
-            if (result.winType === 'jackpot_777') {
-                msg = `🎉 ДЖЕКПОТ 777! +${result.winAmount}`;
-                game.tg.HapticFeedback.notificationOccurred('success');
-            } else if (result.winType === 'jackpot_lemon') {
-                msg = `🍋 ЛИМОН! +${result.winAmount}`;
-                game.tg.HapticFeedback.notificationOccurred('success');
-            } else if (result.winType === 'jackpot_cherry') {
-                msg = `🍒 ВИШНЯ! +${result.winAmount}`;
-                game.tg.HapticFeedback.notificationOccurred('success');
-            } else if (result.winType === 'jackpot_bell') {
-                msg = `🔔 КОЛОКОЛ! +${result.winAmount}`;
-                game.tg.HapticFeedback.notificationOccurred('success');
-            } else if (result.winType === 'pair') {
-                msg = `✨ Пара! +${result.winAmount}`;
+            const messages = {
+                'jackpot_777': `🎉 ДЖЕКПОТ 777! +${result.winAmount}`,
+                'jackpot_lemon': `🍋 ЛИМОН! +${result.winAmount}`,
+                'jackpot_cherry': `🍒 ВИШНЯ! +${result.winAmount}`,
+                'jackpot_bell': `🔔 КОЛОКОЛ! +${result.winAmount}`,
+                'pair': `✨ Пара! +${result.winAmount}`,
+                'lose': `😔 Не повезло. Попробуйте ещё!`
+            };
+
+            msg = messages[result.winType] || msg;
+            
+            if (result.winAmount > 0) {
                 game.tg.HapticFeedback.notificationOccurred('success');
             } else {
-                msg = `😔 Не повезло. Попробуйте ещё!`;
                 game.tg.HapticFeedback.notificationOccurred('error');
             }
 
