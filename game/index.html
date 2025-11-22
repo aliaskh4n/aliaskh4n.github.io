@@ -1,93 +1,163 @@
 <!DOCTYPE html>
-<!-- saved from url=(0033)https://aliaskh4n.github.io/game/ -->
-<html lang="ru" style="--tg-viewport-height: 100vh; --tg-viewport-stable-height: 100vh;"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-  
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>GameHub 🎮</title>
-  <script src="./GameHub 🎮_files/telegram-web-app.js.Без названия"></script>
-  <link href="./GameHub 🎮_files/css2" rel="stylesheet">
+  <script src="https://telegram.org/js/telegram-web-app.js"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
   <style>
-    :root { --card-radius: 20px; --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); }
-    * { margin: 0; padding: 0; box-sizing: border-box; }
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
     body {
-      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-      background: var(--tg-theme-bg-color, #fff);
-      color: var(--tg-theme-text-color, #000);
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+      background: var(--tg-theme-bg-color, #ffffff);
+      color: var(--tg-theme-text-color, #000000);
       min-height: 100vh;
+      padding: 0;
+      margin: 0;
+      overflow-x: hidden;
       -webkit-tap-highlight-color: transparent;
     }
+
     .container {
-      max-width: 480px;
-      margin: 0 auto;
-      padding: 20px;
-      padding-top: env(safe-area-inset-top, 30px);
-      padding-bottom: env(safe-area-inset-bottom, 20px);
+      max-width: 100%;
+      padding: 12px;
     }
-    .header { text-align: center; margin-bottom: 32px; }
-    .header h1 { font-size: 34px; font-weight: 700; margin-bottom: 8px; background: linear-gradient(135deg, #2481cc, #40a0ff); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
-    .balance { font-size: 20px; font-weight: 600; color: var(--tg-theme-link-color, #2481cc); }
+
+    .header {
+      padding: 8px 0 16px 0;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .header-icon {
+      width: 40px;
+      height: 40px;
+      background: var(--tg-theme-button-color, #3390ec);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 24px;
+    }
+
+    .header-title {
+      color: var(--tg-theme-text-color, #000000);
+      font-size: 20px;
+      font-weight: 600;
+    }
+
+    .balance-card {
+      background: var(--tg-theme-secondary-bg-color, #f4f4f5);
+      border-radius: 12px;
+      padding: 16px;
+      margin-bottom: 16px;
+    }
+
+    .balance-label {
+      color: var(--tg-theme-hint-color, #999999);
+      font-size: 14px;
+      margin-bottom: 4px;
+      font-weight: 400;
+    }
+
+    .balance-value {
+      color: var(--tg-theme-text-color, #000000);
+      font-size: 32px;
+      font-weight: 700;
+      letter-spacing: -0.5px;
+    }
 
     .games-grid {
       display: grid;
-      gap: 18px;
-      grid-template-columns: repeat(auto-fit, minmax(145px, 1fr));
+      gap: 12px;
+      grid-template-columns: repeat(2, 1fr);
     }
+
     .game-card {
-      position: relative;
-      border-radius: var(--card-radius);
+      background: var(--tg-theme-secondary-bg-color, #f4f4f5);
+      border-radius: 12px;
       overflow: hidden;
-      box-shadow: 0 4px 15px rgba(0,0,0,0.08);
-      transition: var(--transition);
+      transition: all 0.2s;
+      position: relative;
     }
-    .game-card:hover { transform: translateY(-6px); box-shadow: 0 16px 32px rgba(0,0,0,0.15); }
-    .game-card.disabled { opacity: 0.6; pointer-events: none; }
+
+    .game-card:active {
+      transform: scale(0.98);
+      opacity: 0.9;
+    }
+
+    .game-card.disabled {
+      opacity: 0.6;
+      pointer-events: none;
+    }
 
     .game-link {
       display: block;
       text-decoration: none;
       color: inherit;
     }
-    .thumb {
-      height: 130px;
+
+    .game-thumb {
+      height: 120px;
       display: flex;
       align-items: center;
       justify-content: center;
-      font-size: 60px;
+      font-size: 52px;
       position: relative;
       overflow: hidden;
+      background: var(--tg-theme-bg-color, #ffffff);
+      border-bottom: 1px solid var(--tg-theme-secondary-bg-color, #f4f4f5);
     }
-    .thumb::before {
-      content: '';
-      position: absolute;
-      inset: 0;
-      background: linear-gradient(135deg, var(--g1, #2481cc), var(--g2, #6bb6ff));
-      opacity: 0.9;
-    }
-    .thumb::after {
-      content: '';
-      position: absolute;
-      inset: 0;
-      background: radial-gradient(circle at 20% 20%, rgba(255,255,255,0.4), transparent 70%);
-    }
-    .emoji { position: relative; z-index: 1; }
 
-    .info {
-      padding: 16px;
-      text-align: center;
-      background: var(--tg-theme-secondary-bg-color, #f8f9fa);
+    .game-thumb::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(135deg, var(--g1, #3390ec), var(--g2, #60b0ff));
+      opacity: 0.15;
     }
-    .title { font-size: 17px; font-weight: 600; margin-bottom: 4px; }
-    .desc { font-size: 13px; opacity: 0.7; color: var(--tg-theme-hint-color, #888); }
+
+    .game-emoji {
+      position: relative;
+      z-index: 1;
+    }
+
+    .game-info {
+      padding: 12px;
+      text-align: center;
+    }
+
+    .game-title {
+      font-size: 15px;
+      font-weight: 600;
+      margin-bottom: 4px;
+      color: var(--tg-theme-text-color, #000000);
+    }
+
+    .game-desc {
+      font-size: 13px;
+      color: var(--tg-theme-hint-color, #999999);
+      font-weight: 400;
+      line-height: 1.3;
+    }
 
     .soon-badge {
       position: absolute;
-      top: 10px; right: 10px;
-      background: rgba(0,0,0,0.6);
+      top: 8px;
+      right: 8px;
+      background: rgba(0, 0, 0, 0.7);
       color: white;
-      font-size: 11px;
+      font-size: 10px;
       font-weight: 700;
-      padding: 5px 10px;
-      border-radius: 12px;
+      padding: 4px 8px;
+      border-radius: 8px;
       letter-spacing: 0.5px;
       z-index: 2;
     }
@@ -95,65 +165,96 @@
     .loading, .error {
       text-align: center;
       padding: 40px 20px;
-      font-size: 16px;
-      color: var(--tg-theme-hint-color, #999);
+      font-size: 15px;
+      color: var(--tg-theme-hint-color, #999999);
+      font-weight: 400;
     }
+
     .footer {
-      margin-top: 50px;
+      margin-top: 24px;
+      padding-top: 24px;
       text-align: center;
-      font-size: 14px;
-      color: var(--tg-theme-hint-color, #999);
+      font-size: 13px;
+      color: var(--tg-theme-hint-color, #999999);
+      font-weight: 400;
+      border-top: 1px solid var(--tg-theme-secondary-bg-color, #f4f4f5);
+    }
+
+    /* Dark theme adjustments */
+    @media (prefers-color-scheme: dark) {
+      .game-thumb {
+        border-bottom-color: rgba(255, 255, 255, 0.1);
+      }
+      
+      .soon-badge {
+        background: rgba(255, 255, 255, 0.2);
+      }
     }
   </style>
 </head>
 <body>
   <div class="container">
+    <div class="header">
+      <div class="header-icon">🎮</div>
+      <div class="header-title">GameHub</div>
+    </div>
 
-    <div id="games-container" class="games-grid"><div class="game-card">
-            <a href="https://aliaskh4n.github.io/game/mini-games/dice.html" class="game-link">
-              <div class="thumb" style="--g1: #2481cc; --g2: #6bb6ff;">
-                <div class="emoji">🎲</div>
-              </div>
-              <div class="info">
-                <div class="title">Кости: Кто выше?</div>
-                <div class="desc">Бросай кубик и побеждай оппонента</div>
-              </div>
-              
-            </a>
-          </div><div class="game-card">
-            <a href="https://aliaskh4n.github.io/game/mini-games/slots.html" class="game-link">
-              <div class="thumb" style="--g1: #ff6b6b; --g2: #ff8e8e;">
-                <div class="emoji">🎰</div>
-              </div>
-              <div class="info">
-                <div class="title">Слоты 777</div>
-                <div class="desc">Классические барабаны с джекпотом</div>
-              </div>
-              
-            </a>
-          </div><div class="game-card disabled">
-            <a href="https://aliaskh4n.github.io/game/#" class="game-link" onclick="return false">
-              <div class="thumb" style="--g1: #51cf66; --g2: #8ee29a;">
-                <div class="emoji">♠️</div>
-              </div>
-              <div class="info">
-                <div class="title">Покер</div>
-                <div class="desc">Техасский холдем 1 на 1</div>
-              </div>
-              <div class="soon-badge">SOON</div>
-            </a>
-          </div><div class="game-card disabled">
-            <a href="https://aliaskh4n.github.io/game/#" class="game-link" onclick="return false">
-              <div class="thumb" style="--g1: #9775fa; --g2: #bda3ff;">
-                <div class="emoji">🎰</div>
-              </div>
-              <div class="info">
-                <div class="title">Рулетка</div>
-                <div class="desc">Красное или чёрное?</div>
-              </div>
-              <div class="soon-badge">SOON</div>
-            </a>
-          </div></div>
+    <div class="balance-card">
+      <div class="balance-label">Ваш баланс</div>
+      <div class="balance-value" id="balance">1250</div>
+    </div>
+
+    <div id="games-container" class="games-grid">
+      <div class="game-card">
+        <a href="/game/mini-games/dice.html" class="game-link">
+          <div class="game-thumb" style="--g1: #2481cc; --g2: #6bb6ff;">
+            <div class="game-emoji">🎲</div>
+          </div>
+          <div class="game-info">
+            <div class="game-title">Кости: Кто выше?</div>
+            <div class="game-desc">Бросай кубик и побеждай оппонента</div>
+          </div>
+        </a>
+      </div>
+
+      <div class="game-card">
+        <a href="/game/mini-games/slots.html" class="game-link">
+          <div class="game-thumb" style="--g1: #ff6b6b; --g2: #ff8e8e;">
+            <div class="game-emoji">🎰</div>
+          </div>
+          <div class="game-info">
+            <div class="game-title">Слоты 777</div>
+            <div class="game-desc">Классические барабаны с джекпотом</div>
+          </div>
+        </a>
+      </div>
+
+      <div class="game-card disabled">
+        <a href="#" class="game-link" onclick="return false">
+          <div class="game-thumb" style="--g1: #51cf66; --g2: #8ee29a;">
+            <div class="game-emoji">♠️</div>
+          </div>
+          <div class="game-info">
+            <div class="game-title">Покер</div>
+            <div class="game-desc">Техасский холдем 1 на 1</div>
+          </div>
+          <div class="soon-badge">SOON</div>
+        </a>
+      </div>
+
+      <div class="game-card disabled">
+        <a href="#" class="game-link" onclick="return false">
+          <div class="game-thumb" style="--g1: #9775fa; --g2: #bda3ff;">
+            <div class="game-emoji">🎰</div>
+          </div>
+          <div class="game-info">
+            <div class="game-title">Рулетка</div>
+            <div class="game-desc">Красное или чёрное?</div>
+          </div>
+          <div class="soon-badge">SOON</div>
+        </a>
+      </div>
+    </div>
 
     <div class="footer">
       <p>© 2025 GameHub • Добавляй новые игры в папку mini-games</p>
@@ -161,16 +262,18 @@
   </div>
 
   <script>
-    Telegram.WebApp.ready();
-    Telegram.WebApp.expand();
+    // Инициализация Telegram Web App
+    let tg = window.Telegram.WebApp;
+    tg.ready();
+    tg.expand();
 
-    const GAMES_JSON_URL = "https://aliaskh4n.github.io/game/mini-games/games.json";
+    const GAMES_JSON_URL = "/game/mini-games/games.json";
 
     async function loadGames() {
       const container = document.getElementById('games-container');
       
       try {
-        const res = await fetch(GAMES_JSON_URL + "?t=" + Date.now()); // антикэш
+        const res = await fetch(GAMES_JSON_URL + "?t=" + Date.now());
         if (!res.ok) throw new Error("Не удалось загрузить список игр");
         
         const games = await res.json();
@@ -192,13 +295,13 @@
 
           card.innerHTML = `
             <a href="${game.ready ? '/game/mini-games/' + game.id + '.html' : '#'}"
-               class="game-link" ${game.ready ? '' : 'onclick="return false"'} >
-              <div class="thumb" style="${gradientStyle}">
-                <div class="emoji">${game.emoji}</div>
+               class="game-link" ${game.ready ? '' : 'onclick="return false"'}>
+              <div class="game-thumb" style="${gradientStyle}">
+                <div class="game-emoji">${game.emoji}</div>
               </div>
-              <div class="info">
-                <div class="title">${game.title}</div>
-                <div class="desc">${game.desc}</div>
+              <div class="game-info">
+                <div class="game-title">${game.title}</div>
+                <div class="game-desc">${game.desc}</div>
               </div>
               ${game.ready === false ? '<div class="soon-badge">SOON</div>' : ''}
             </a>
@@ -215,9 +318,8 @@
     // Автозагрузка
     loadGames();
     
-    // Перезагружать каждые 30 сек (на случай если ты добавил игру)
+    // Перезагружать каждые 30 сек
     setInterval(loadGames, 30000);
   </script>
-
-
-</body></html>
+</body>
+</html>
