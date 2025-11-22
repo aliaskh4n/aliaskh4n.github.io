@@ -1,427 +1,325 @@
 <!DOCTYPE html>
 <html lang="ru">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Слот-машина 🎰</title>
-    <script src="https://telegram.org/js/telegram-web-app.js"></script>
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>GameHub 🎮</title>
+  <script src="https://telegram.org/js/telegram-web-app.js"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
 
-        body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-            background: var(--tg-theme-bg-color, #ffffff);
-            color: var(--tg-theme-text-color, #000000);
-            min-height: 100vh;
-        }
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+      background: var(--tg-theme-bg-color, #ffffff);
+      color: var(--tg-theme-text-color, #000000);
+      min-height: 100vh;
+      padding: 0;
+      margin: 0;
+      overflow-x: hidden;
+      -webkit-tap-highlight-color: transparent;
+    }
 
-        .container {
-            max-width: 100%;
-            padding: 12px;
-        }
+    .container {
+      max-width: 100%;
+      padding: 12px;
+    }
 
-        .header {
-            padding: 8px 0 16px 0;
-            display: flex;
-            align-items: center;
-            gap: 12px;
-        }
+    .header {
+      padding: 8px 0 16px 0;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
 
-        .header-icon {
-            width: 40px;
-            height: 40px;
-            background: var(--tg-theme-button-color, #3390ec);
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 24px;
-        }
+    .header-icon {
+      width: 40px;
+      height: 40px;
+      background: var(--tg-theme-button-color, #3390ec);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 24px;
+    }
 
-        .header-title {
-            color: var(--tg-theme-text-color, #000000);
-            font-size: 20px;
-            font-weight: 600;
-        }
+    .header-title {
+      color: var(--tg-theme-text-color, #000000);
+      font-size: 20px;
+      font-weight: 600;
+    }
 
-        .balance-card {
-            background: var(--tg-theme-secondary-bg-color, #f4f4f5);
-            border-radius: 12px;
-            padding: 16px;
-            margin-bottom: 8px;
-        }
+    .balance-card {
+      background: var(--tg-theme-secondary-bg-color, #f4f4f5);
+      border-radius: 12px;
+      padding: 16px;
+      margin-bottom: 16px;
+    }
 
-        .balance-label {
-            color: var(--tg-theme-hint-color, #999999);
-            font-size: 14px;
-            margin-bottom: 4px;
-        }
+    .balance-label {
+      color: var(--tg-theme-hint-color, #999999);
+      font-size: 14px;
+      margin-bottom: 4px;
+      font-weight: 400;
+    }
 
-        .balance-value {
-            color: var(--tg-theme-text-color, #000000);
-            font-size: 32px;
-            font-weight: 700;
-        }
+    .balance-value {
+      color: var(--tg-theme-text-color, #000000);
+      font-size: 32px;
+      font-weight: 700;
+      letter-spacing: -0.5px;
+    }
 
-        .stats {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 8px;
-            margin-bottom: 8px;
-        }
+    .games-grid {
+      display: grid;
+      gap: 12px;
+      grid-template-columns: repeat(2, 1fr);
+    }
 
-        .stat-card {
-            background: var(--tg-theme-secondary-bg-color, #f4f4f5);
-            border-radius: 12px;
-            padding: 16px;
-        }
+    .game-card {
+      background: var(--tg-theme-secondary-bg-color, #f4f4f5);
+      border-radius: 12px;
+      overflow: hidden;
+      transition: all 0.2s;
+      position: relative;
+    }
 
-        .stat-label {
-            color: var(--tg-theme-hint-color, #999999);
-            font-size: 14px;
-            margin-bottom: 4px;
-        }
+    .game-card:active {
+      transform: scale(0.98);
+      opacity: 0.9;
+    }
 
-        .stat-value {
-            color: var(--tg-theme-text-color, #000000);
-            font-size: 24px;
-            font-weight: 700;
-        }
+    .game-card.disabled {
+      opacity: 0.6;
+      pointer-events: none;
+    }
 
-        .slot-machine {
-            background: var(--tg-theme-secondary-bg-color, #f4f4f5);
-            border-radius: 12px;
-            padding: 16px;
-            margin-bottom: 8px;
-        }
+    .game-link {
+      display: block;
+      text-decoration: none;
+      color: inherit;
+    }
 
-        .reels {
-            display: flex;
-            justify-content: center;
-            gap: 8px;
-            margin-bottom: 16px;
-        }
+    .game-thumb {
+      height: 120px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 52px;
+      position: relative;
+      overflow: hidden;
+      background: var(--tg-theme-bg-color, #ffffff);
+      border-bottom: 1px solid var(--tg-theme-secondary-bg-color, #f4f4f5);
+    }
 
-        .reel {
-            background: var(--tg-theme-bg-color, #ffffff);
-            width: 90px;
-            height: 90px;
-            border-radius: 12px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 52px;
-            border: 1px solid var(--tg-theme-secondary-bg-color, #f4f4f5);
-            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-        }
+    .game-thumb::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(135deg, var(--g1, #3390ec), var(--g2, #60b0ff));
+      opacity: 0.15;
+    }
 
-        .reel.spinning {
-            animation: spin 0.1s linear infinite;
-        }
+    .game-emoji {
+      position: relative;
+      z-index: 1;
+    }
 
-        @keyframes spin {
-            0%, 100% { transform: translateY(0); }
-            50% { transform: translateY(-10px); }
-        }
+    .game-info {
+      padding: 12px;
+      text-align: center;
+    }
 
-        .bet-input {
-            width: 100%;
-            padding: 12px;
-            border-radius: 8px;
-            border: none;
-            background: var(--tg-theme-bg-color, #ffffff);
-            font-size: 16px;
-            margin-bottom: 12px;
-        }
+    .game-title {
+      font-size: 15px;
+      font-weight: 600;
+      margin-bottom: 4px;
+      color: var(--tg-theme-text-color, #000000);
+    }
 
-        .spin-button {
-            background: var(--tg-theme-button-color, #3390ec);
-            color: white;
-            border: none;
-            padding: 14px;
-            font-size: 16px;
-            border-radius: 10px;
-            cursor: pointer;
-            width: 100%;
-            font-weight: 600;
-            transition: all 0.2s;
-        }
+    .game-desc {
+      font-size: 13px;
+      color: var(--tg-theme-hint-color, #999999);
+      font-weight: 400;
+      line-height: 1.3;
+    }
 
-        .spin-button:active {
-            transform: scale(0.98);
-        }
+    .soon-badge {
+      position: absolute;
+      top: 8px;
+      right: 8px;
+      background: rgba(0, 0, 0, 0.7);
+      color: white;
+      font-size: 10px;
+      font-weight: 700;
+      padding: 4px 8px;
+      border-radius: 8px;
+      letter-spacing: 0.5px;
+      z-index: 2;
+    }
 
-        .spin-button:disabled {
-            opacity: 0.5;
-            cursor: not-allowed;
-        }
+    .loading, .error {
+      text-align: center;
+      padding: 40px 20px;
+      font-size: 15px;
+      color: var(--tg-theme-hint-color, #999999);
+      font-weight: 400;
+    }
 
-        .message {
-            background: var(--tg-theme-secondary-bg-color, #f4f4f5);
-            border-radius: 12px;
-            padding: 16px;
-            text-align: center;
-            color: var(--tg-theme-text-color, #000000);
-            font-size: 15px;
-            font-weight: 500;
-            margin-top: 8px;
-        }
+    .footer {
+      margin-top: 24px;
+      padding-top: 24px;
+      text-align: center;
+      font-size: 13px;
+      color: var(--tg-theme-hint-color, #999999);
+      font-weight: 400;
+      border-top: 1px solid var(--tg-theme-secondary-bg-color, #f4f4f5);
+    }
 
-        .message.win {
-            background: rgba(52, 199, 89, 0.15);
-            color: #34c759;
-        }
-
-        .message.jackpot {
-            background: linear-gradient(135deg, #FFD700, #FFA500);
-            color: #000;
-            font-size: 18px;
-            font-weight: 700;
-            animation: pulse 0.5s ease-in-out infinite;
-        }
-
-        @keyframes pulse {
-            0%, 100% { transform: scale(1); }
-            50% { transform: scale(1.05); }
-        }
-
-        .message.lose {
-            background: rgba(255, 59, 48, 0.15);
-            color: #ff3b30;
-        }
-
-        .loading {
-            text-align: center;
-            padding: 40px;
-            color: var(--tg-theme-hint-color, #999);
-        }
-    </style>
+    /* Dark theme adjustments */
+    @media (prefers-color-scheme: dark) {
+      .game-thumb {
+        border-bottom-color: rgba(255, 255, 255, 0.1);
+      }
+      
+      .soon-badge {
+        background: rgba(255, 255, 255, 0.2);
+      }
+    }
+  </style>
 </head>
 <body>
-    <div class="container">
-        <div class="header">
-            <div class="header-icon">🎰</div>
-            <div class="header-title">Слот-машина</div>
-        </div>
-
-        <div id="loading" class="loading">Загрузка...</div>
-
-        <div id="gameContent" style="display: none;">
-            <div class="balance-card">
-                <div class="balance-label">Ваш баланс</div>
-                <div class="balance-value" id="balance">0</div>
-            </div>
-
-            <div class="stats">
-                <div class="stat-card">
-                    <div class="stat-label">Игр сыграно</div>
-                    <div class="stat-value" id="gamesPlayed">0</div>
-                </div>
-                <div class="stat-card">
-                    <div class="stat-label">Последний выигрыш</div>
-                    <div class="stat-value" id="lastWin">0</div>
-                </div>
-            </div>
-
-            <div class="slot-machine">
-                <input type="number" id="betInput" class="bet-input" placeholder="Ставка (мин. 1)" value="10" min="1">
-                
-                <div class="reels">
-                    <div class="reel" id="reel1">🍒</div>
-                    <div class="reel" id="reel2">🍋</div>
-                    <div class="reel" id="reel3">🔔</div>
-                </div>
-
-                <button class="spin-button" id="spinButton">Крутить</button>
-            </div>
-
-            <div class="message" id="message">Сделайте ставку и нажмите "Крутить"</div>
-        </div>
+  <div class="container">
+    <div class="header">
+      <div class="header-icon">🎮</div>
+      <div class="header-title">GameHub</div>
     </div>
 
-    <script>
-        // ЗАМЕНИТЕ НА ВАШ URL WORKER
-        const API_BASE = 'https://api.n-aliaskhan.workers.dev/';
+    <div class="balance-card">
+      <div class="balance-label">Ваш баланс</div>
+      <div class="balance-value" id="balance">1250</div>
+    </div>
+
+    <div id="games-container" class="games-grid">
+      <div class="game-card">
+        <a href="/game/mini-games/dice.html" class="game-link">
+          <div class="game-thumb" style="--g1: #2481cc; --g2: #6bb6ff;">
+            <div class="game-emoji">🎲</div>
+          </div>
+          <div class="game-info">
+            <div class="game-title">Кости: Кто выше?</div>
+            <div class="game-desc">Бросай кубик и побеждай оппонента</div>
+          </div>
+        </a>
+      </div>
+
+      <div class="game-card">
+        <a href="/game/mini-games/slots.html" class="game-link">
+          <div class="game-thumb" style="--g1: #ff6b6b; --g2: #ff8e8e;">
+            <div class="game-emoji">🎰</div>
+          </div>
+          <div class="game-info">
+            <div class="game-title">Слоты 777</div>
+            <div class="game-desc">Классические барабаны с джекпотом</div>
+          </div>
+        </a>
+      </div>
+
+      <div class="game-card disabled">
+        <a href="#" class="game-link" onclick="return false">
+          <div class="game-thumb" style="--g1: #51cf66; --g2: #8ee29a;">
+            <div class="game-emoji">♠️</div>
+          </div>
+          <div class="game-info">
+            <div class="game-title">Покер</div>
+            <div class="game-desc">Техасский холдем 1 на 1</div>
+          </div>
+          <div class="soon-badge">SOON</div>
+        </a>
+      </div>
+
+      <div class="game-card disabled">
+        <a href="#" class="game-link" onclick="return false">
+          <div class="game-thumb" style="--g1: #9775fa; --g2: #bda3ff;">
+            <div class="game-emoji">🎰</div>
+          </div>
+          <div class="game-info">
+            <div class="game-title">Рулетка</div>
+            <div class="game-desc">Красное или чёрное?</div>
+          </div>
+          <div class="soon-badge">SOON</div>
+        </a>
+      </div>
+    </div>
+
+    <div class="footer">
+      <p>© 2025 GameHub • Добавляй новые игры в папку mini-games</p>
+    </div>
+  </div>
+
+  <script>
+    // Инициализация Telegram Web App
+    let tg = window.Telegram.WebApp;
+    tg.ready();
+    tg.expand();
+
+    const GAMES_JSON_URL = "/game/mini-games/games.json";
+
+    async function loadGames() {
+      const container = document.getElementById('games-container');
+      
+      try {
+        const res = await fetch(GAMES_JSON_URL + "?t=" + Date.now());
+        if (!res.ok) throw new Error("Не удалось загрузить список игр");
         
-        let tg = window.Telegram.WebApp;
-        let currentUserId = null;
-        let currentBalance = 0;
-        let isSpinning = false;
-        let userStats = { gamesPlayed: 0, lastWin: 0 };
+        const games = await res.json();
 
-        const symbols = ['🍒', '🍋', '🔔', '7'];
-
-        tg.ready();
-        tg.expand();
-        tg.enableClosingConfirmation();
-
-        // Инициализация
-        async function init() {
-            try {
-                const initData = tg.initData;
-                
-                if (!initData) {
-                    alert('Ошибка: не удалось получить данные Telegram');
-                    return;
-                }
-
-                const response = await fetch(`${API_BASE}/api/auth/init`, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ initData })
-                });
-
-                const data = await response.json();
-                
-                if (data.success) {
-                    currentUserId = data.user.id;
-                    currentBalance = data.user.balance;
-                    userStats.gamesPlayed = data.user.gamesPlayed || 0;
-                    
-                    updateUI();
-                    
-                    document.getElementById('loading').style.display = 'none';
-                    document.getElementById('gameContent').style.display = 'block';
-                } else {
-                    alert('Ошибка инициализации: ' + (data.error || 'Неизвестная ошибка'));
-                }
-            } catch (error) {
-                console.error('Init error:', error);
-                alert('Ошибка подключения к серверу');
-            }
+        if (!games || games.length === 0) {
+          container.innerHTML = '<div class="loading">Нет доступных игр</div>';
+          return;
         }
 
-        function updateUI() {
-            document.getElementById('balance').textContent = currentBalance;
-            document.getElementById('gamesPlayed').textContent = userStats.gamesPlayed;
-            document.getElementById('lastWin').textContent = userStats.lastWin;
-        }
+        container.innerHTML = '';
 
-        // ИГРА - весь рандом на сервере
-        document.getElementById('spinButton').addEventListener('click', async () => {
-            if (isSpinning) return;
-            
-            const bet = parseInt(document.getElementById('betInput').value);
-            
-            if (!bet || bet < 1) {
-                tg.showAlert('Минимальная ставка 1 монета!');
-                return;
-            }
+        games.forEach(game => {
+          const card = document.createElement('div');
+          card.className = 'game-card' + (game.ready === false ? ' disabled' : '');
 
-            if (bet > currentBalance) {
-                tg.showAlert('Недостаточно средств!');
-                tg.HapticFeedback.notificationOccurred('error');
-                return;
-            }
+          const gradientStyle = game.gradient 
+            ? `--g1: ${game.gradient[0]}; --g2: ${game.gradient[1]};` 
+            : '';
 
-            isSpinning = true;
-            document.getElementById('spinButton').disabled = true;
-            document.getElementById('spinButton').textContent = 'Крутим...';
-            
-            tg.HapticFeedback.impactOccurred('medium');
-            
-            showMessage('Ожидание результата от сервера...', '');
+          card.innerHTML = `
+            <a href="${game.ready ? '/game/mini-games/' + game.id + '.html' : '#'}"
+               class="game-link" ${game.ready ? '' : 'onclick="return false"'}>
+              <div class="game-thumb" style="${gradientStyle}">
+                <div class="game-emoji">${game.emoji}</div>
+              </div>
+              <div class="game-info">
+                <div class="game-title">${game.title}</div>
+                <div class="game-desc">${game.desc}</div>
+              </div>
+              ${game.ready === false ? '<div class="soon-badge">SOON</div>' : ''}
+            </a>
+          `;
 
-            // Анимация кручения
-            const reels = [
-                document.getElementById('reel1'),
-                document.getElementById('reel2'),
-                document.getElementById('reel3')
-            ];
-
-            reels.forEach(reel => reel.classList.add('spinning'));
-
-            // Анимация случайных символов
-            let spinInterval = setInterval(() => {
-                reels.forEach(reel => {
-                    reel.textContent = symbols[Math.floor(Math.random() * symbols.length)];
-                });
-            }, 100);
-
-            try {
-                // ЗАПРОС К СЕРВЕРУ - сервер генерирует результат
-                const response = await fetch(`${API_BASE}/api/game/slots/play`, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                        userId: currentUserId,
-                        bet: bet
-                    })
-                });
-
-                const data = await response.json();
-
-                // Останавливаем анимацию
-                clearInterval(spinInterval);
-
-                if (data.success) {
-                    // Показываем результат от сервера
-                    setTimeout(() => {
-                        reels.forEach((reel, index) => {
-                            reel.textContent = data.symbols[index];
-                            reel.classList.remove('spinning');
-                        });
-
-                        // Обновляем локальные данные
-                        currentBalance = data.newBalance;
-                        userStats.gamesPlayed++;
-                        userStats.lastWin = data.winAmount;
-                        
-                        updateUI();
-                        showGameResult(data);
-                    }, 500);
-                } else {
-                    reels.forEach(reel => reel.classList.remove('spinning'));
-                    tg.showAlert(data.error || 'Ошибка игры');
-                }
-            } catch (error) {
-                clearInterval(spinInterval);
-                reels.forEach(reel => reel.classList.remove('spinning'));
-                console.error('Spin error:', error);
-                tg.showAlert('Ошибка подключения к серверу');
-            } finally {
-                isSpinning = false;
-                document.getElementById('spinButton').disabled = false;
-                document.getElementById('spinButton').textContent = 'Крутить';
-            }
+          container.appendChild(card);
         });
 
-        function showGameResult(data) {
-            const { winAmount, winType, winMultiplier } = data;
+      } catch (err) {
+        container.innerHTML = `<div class="error">Ошибка загрузки игр 😔<br><small>${err.message}</small></div>`;
+      }
+    }
 
-            if (winType === 'jackpot_777') {
-                showMessage(`🎊 ДЖЕКПОТ 777! +${winAmount} 💰 (x${winMultiplier})`, 'jackpot');
-                tg.HapticFeedback.notificationOccurred('success');
-            } else if (winType === 'jackpot_lemon') {
-                showMessage(`🍋 МЕГА ДЖЕКПОТ! +${winAmount} 💰 (x${winMultiplier})`, 'jackpot');
-                tg.HapticFeedback.notificationOccurred('success');
-            } else if (winType === 'jackpot_cherry') {
-                showMessage(`🍒 СУПЕР ДЖЕКПОТ! +${winAmount} 💰 (x${winMultiplier})`, 'jackpot');
-                tg.HapticFeedback.notificationOccurred('success');
-            } else if (winType === 'jackpot_bell') {
-                showMessage(`🔔 ДЖЕКПОТ! +${winAmount} 💰 (x${winMultiplier})`, 'jackpot');
-                tg.HapticFeedback.notificationOccurred('success');
-            } else if (winType === 'pair') {
-                showMessage(`✨ Выигрыш! +${winAmount} 💰 (x${winMultiplier})`, 'win');
-                tg.HapticFeedback.notificationOccurred('success');
-            } else {
-                showMessage('Не повезло. Попробуйте еще раз!', 'lose');
-                tg.HapticFeedback.notificationOccurred('error');
-            }
-        }
-
-        function showMessage(text, type) {
-            const messageEl = document.getElementById('message');
-            messageEl.textContent = text;
-            messageEl.className = 'message ' + type;
-        }
-
-        // Запуск приложения
-        init();
-    </script>
+    // Автозагрузка
+    loadGames();
+    
+    // Перезагружать каждые 30 сек
+    setInterval(loadGames, 30000);
+  </script>
 </body>
 </html>
