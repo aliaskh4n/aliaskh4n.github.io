@@ -40,17 +40,6 @@
       gap: 12px;
     }
 
-    .header-icon {
-      width: 40px;
-      height: 40px;
-      background: var(--tg-theme-button-color, #3390ec);
-      border-radius: 50%;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 24px;
-    }
-
     .header-title {
       color: var(--tg-theme-text-color, #000000);
       font-size: 20px;
@@ -72,8 +61,8 @@
     }
 
     .user-avatar {
-      width: 32px;
-      height: 32px;
+      width: 40px;
+      height: 40px;
       border-radius: 50%;
       background: var(--tg-theme-button-color, #3390ec);
       color: white;
@@ -82,6 +71,22 @@
       justify-content: center;
       font-size: 16px;
       font-weight: 600;
+      overflow: hidden;
+      flex-shrink: 0;
+    }
+
+    .user-avatar img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .user-avatar-placeholder {
+      width: 100%;
+      height: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
     }
 
     .balance-card {
@@ -231,11 +236,12 @@
   <div class="container">
     <div class="header">
       <div class="header-left">
-        <div class="header-icon">🎮</div>
         <div class="header-title">GameHub</div>
       </div>
       <div class="user-menu" id="user-menu">
-        <div class="user-avatar" id="user-avatar">👤</div>
+        <div class="user-avatar" id="user-avatar">
+          <div class="user-avatar-placeholder">👤</div>
+        </div>
       </div>
     </div>
 
@@ -252,194 +258,118 @@
   </div>
 
   <script>
-    // ========== КОНФИГУРАЦИЯ ==========
-    const CONFIG = {
-      GAMES_URL: '/game/mini-games/games.json',
-      API_URL: 'https://api.n-aliaskhan.workers.dev/api', // базовый URL API
-      RELOAD_INTERVAL: 30000,
+    // ========== КОНФИГ И СОСТОЯНИЕ ==========
+    const app = {
+      config: {
+        api: '/api',
+        games: '/game/mini-games/games.json',
+        reload: 30000,
+      },
+      state: {
+        user: null,
+        token: null,
+        tg: window.Telegram.WebApp,
+      },
+      dom: {
+        container: document.getElementById('games-container'),
+        balance: document.getElementById('balance'),
+        userMenu: document.getElementById('user-menu'),
+        userAvatar: document.getElementById('user-avatar'),
+      }
     };
 
-    // ========== СОСТОЯНИЕ ПРИЛОЖЕНИЯ ==========
-    const STATE = {
-      user: null,
-      token: null,
-      tg: null,
-    };
-
-    // ========== DOM ЭЛЕМЕНТЫ ==========
-    const DOM = {
-      container: document.getElementById('games-container'),
-      balance: document.getElementById('balance'),
-      userMenu: document.getElementById('user-menu'),
-      userAvatar: document.getElementById('user-avatar'),
-    };
-
-    // ========== API ЗАПРОСЫ ==========
-    class API {
-      static async request(endpoint, method = 'GET', body = null) {
-        const options = {
-          method,
-          headers: { 'Content-Type': 'application/json' },
-        };
-
-        if (body) options.body = JSON.stringify(body);
-        if (STATE.token) options.headers['Authorization'] = `Bearer ${STATE.token}`;
-
-        try {
-          const response = await fetch(`${CONFIG.API_URL}${endpoint}`, options);
-          const data = await response.json();
-
-          if (!response.ok) {
-            throw new Error(data.error || 'API Error');
-          }
-
-          return data;
-        } catch (error) {
-          console.error(`API Error [${endpoint}]:`, error);
-          throw error;
-        }
-      }
-
-      // Аутентификация
-      static async init(initData) {
-        return this.request('/auth/init', 'POST', { initData });
-      }
-
-      // Получить таблицу лидеров
-      static async getLeaderboard() {
-        return this.request('/stats/leaderboard');
-      }
-
-      // Получить список комнат
-      static async getRooms() {
-        return this.request('/room/list');
-      }
-    }
-
-    // ========== ИНИЦИАЛИЗАЦИЯ TELEGRAM ==========
-    function initTelegram() {
-      STATE.tg = window.Telegram.WebApp;
-      STATE.tg.ready();
-      STATE.tg.expand();
-    }
-
-    // ========== АУТЕНТИФИКАЦИЯ ПОЛЬЗОВАТЕЛЯ ==========
-    async function authenticateUser() {
-      try {
-        DOM.container.innerHTML = '<div class="message"><div class="loading-spinner"></div><p>Загрузка...</p></div>';
-
-        const initData = STATE.tg.initData;
-        if (!initData) {
-          throw new Error('Telegram WebApp data not available');
-        }
-
-        const response = await API.init(initData);
-
-        if (!response.success) {
-          throw new Error('Authentication failed');
-        }
-
-        STATE.user = response.user;
-        STATE.token = response.token;
-
-        updateUserUI();
-        loadGames();
-        setInterval(loadGames, CONFIG.RELOAD_INTERVAL);
-      } catch (error) {
-        showError(`Ошибка входа: ${error.message}`);
-        console.error('Auth Error:', error);
-      }
-    }
-
-    // ========== ОБНОВЛЕНИЕ UI ПОЛЬЗОВАТЕЛЯ ==========
-    function updateUserUI() {
-      if (!STATE.user) return;
-
-      // Баланс
-      DOM.balance.textContent = STATE.user.balance.toLocaleString();
-
-      // Аватар (первая буква имени)
-      const initial = STATE.user.name?.charAt(0).toUpperCase() || '👤';
-      DOM.userAvatar.textContent = initial;
-
-      // Клик на профиль
-      DOM.userMenu.onclick = () => {
-        const msg = `👤 ${STATE.user.name}\n💰 Баланс: ${STATE.user.balance}\n🎮 Игр сыграно: ${STATE.user.gamesPlayed}\n🏆 Побед: ${STATE.user.gamesWon}`;
-        STATE.tg.showAlert(msg);
+    // ========== API ==========
+    async function api(endpoint, method = 'GET', body = null) {
+      const opts = {
+        method,
+        headers: { 'Content-Type': 'application/json' },
       };
+      if (body) opts.body = JSON.stringify(body);
+      if (app.state.token) opts.headers.Authorization = `Bearer ${app.state.token}`;
+
+      const res = await fetch(`${app.config.api}${endpoint}`, opts);
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || 'Error');
+      return data;
     }
 
-    // ========== СОЗДАНИЕ HTML КАРТОЧКИ ==========
-    function createGameCard(game) {
-      const isReady = game.ready !== false;
-      const gradientStyle = game.gradient
-        ? `--g1: ${game.gradient[0]}; --g2: ${game.gradient[1]};`
-        : '';
-      const href = isReady ? `/game/mini-games/${game.id}.html` : '#';
-      const onClick = isReady ? '' : 'onclick="return false"';
+    // ========== ГЛАВНЫЕ ФУНКЦИИ ==========
+    async function auth() {
+      try {
+        app.dom.container.innerHTML = '<div class="message"><div class="loading-spinner"></div></div>';
+        
+        const res = await api('/auth/init', 'POST', { initData: app.state.tg.initData });
+        app.state.user = res.user;
+        app.state.token = res.token;
 
+        localStorage.setItem('token', app.state.token);
+        localStorage.setItem('user_id', app.state.user.id);
+        localStorage.setItem('user_balance', app.state.user.balance);
+
+        updateUI();
+        loadGames();
+        setInterval(loadGames, app.config.reload);
+      } catch (e) {
+        app.dom.container.innerHTML = `<div class="message">❌ ${e.message}</div>`;
+      }
+    }
+
+    function updateUI() {
+      app.dom.balance.textContent = app.state.user.balance.toLocaleString();
+
+      const avatar = app.dom.userAvatar;
+      if (app.state.user.photo_url) {
+        const img = document.createElement('img');
+        img.src = app.state.user.photo_url;
+        img.onerror = () => setAvatarText();
+        avatar.innerHTML = '';
+        avatar.appendChild(img);
+      } else {
+        setAvatarText();
+      }
+
+      app.dom.userMenu.onclick = () => app.state.tg.showAlert(
+        `👤 ${app.state.user.name}\n💰 ${app.state.user.balance}\n🎮 ${app.state.user.gamesPlayed}\n🏆 ${app.state.user.gamesWon}`
+      );
+    }
+
+    function setAvatarText() {
+      app.dom.userAvatar.innerHTML = `<div class="user-avatar-placeholder">${app.state.user.name?.charAt(0).toUpperCase() || '👤'}</div>`;
+    }
+
+    function createCard(g) {
+      const ready = g.ready !== false;
+      const style = g.gradient ? `--g1: ${g.gradient[0]}; --g2: ${g.gradient[1]};` : '';
       return `
-        <div class="game-card ${!isReady ? 'disabled' : ''}">
-          <a href="${href}" class="game-link" ${onClick}>
-            <div class="game-thumb" style="${gradientStyle}">
-              <div class="game-emoji">${game.emoji}</div>
+        <div class="game-card ${!ready ? 'disabled' : ''}">
+          <a href="${ready ? `/game/mini-games/${g.id}.html` : '#'}" class="game-link" ${ready ? '' : 'onclick="return false"'}>
+            <div class="game-thumb" style="${style}">
+              <div class="game-emoji">${g.emoji}</div>
             </div>
             <div class="game-info">
-              <div class="game-title">${game.title}</div>
-              <div class="game-desc">${game.desc}</div>
+              <div class="game-title">${g.title}</div>
+              <div class="game-desc">${g.desc}</div>
             </div>
-            ${!isReady ? '<div class="soon-badge">SOON</div>' : ''}
+            ${!ready ? '<div class="soon-badge">SOON</div>' : ''}
           </a>
         </div>
       `;
     }
 
-    // ========== ОТРИСОВКА ИГРЫ ==========
-    function renderGames(games) {
-      if (!games?.length) {
-        DOM.container.innerHTML = '<div class="message">Нет доступных игр</div>';
-        return;
-      }
-
-      DOM.container.innerHTML = games.map(createGameCard).join('');
-    }
-
-    // ========== ЗАГРУЗКА ИГРЫ ==========
     async function loadGames() {
       try {
-        const url = `${CONFIG.GAMES_URL}?t=${Date.now()}`;
-        const response = await fetch(url);
-
-        if (!response.ok) {
-          throw new Error('Ошибка загрузки игр');
-        }
-
-        const games = await response.json();
-        renderGames(games);
-      } catch (error) {
-        showError(error.message);
-        console.error('Games Load Error:', error);
+        const res = await fetch(`${app.config.games}?t=${Date.now()}`);
+        const games = await res.json();
+        app.dom.container.innerHTML = games?.length ? games.map(createCard).join('') : '<div class="message">Нет игр</div>';
+      } catch (e) {
+        app.dom.container.innerHTML = `<div class="message">❌ ${e.message}</div>`;
       }
     }
 
-    // ========== ОБРАБОТКА ОШИБОК ==========
-    function showError(message) {
-      DOM.container.innerHTML = `<div class="message">❌ ${message}</div>`;
-    }
-
-    // ========== ИНИЦИАЛИЗАЦИЯ ПРИЛОЖЕНИЯ ==========
-    function init() {
-      initTelegram();
-      authenticateUser();
-    }
-
-    // Запуск при загрузке страницы
-    if (document.readyState === 'loading') {
-      document.addEventListener('DOMContentLoaded', init);
-    } else {
-      init();
-    }
+    // ========== СТАРТ ==========
+    app.state.tg.ready();
+    app.state.tg.expand();
+    auth();
   </script>
 </body>
 </html>
-
