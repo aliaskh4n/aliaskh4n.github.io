@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Слот-машина</title>
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <style>
         * {
             margin: 0;
@@ -12,24 +13,31 @@
         }
 
         body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-            background: #17212b;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background: var(--tg-theme-bg-color, #ffffff);
+            color: var(--tg-theme-text-color, #000000);
             min-height: 100vh;
-            padding: 16px;
+            padding: 0;
+            margin: 0;
+            overflow-x: hidden;
+        }
+
+        .container {
+            max-width: 100%;
+            padding: 12px;
         }
 
         .header {
-            padding: 16px 0;
+            padding: 8px 0 16px 0;
             display: flex;
             align-items: center;
             gap: 12px;
-            margin-bottom: 16px;
         }
 
         .header-icon {
             width: 40px;
             height: 40px;
-            background: linear-gradient(135deg, #54a8ff, #3390ec);
+            background: var(--tg-theme-button-color, #3390ec);
             border-radius: 50%;
             display: flex;
             align-items: center;
@@ -38,212 +46,279 @@
         }
 
         .header-title {
-            color: #ffffff;
-            font-size: 18px;
-            font-weight: 500;
+            color: var(--tg-theme-text-color, #000000);
+            font-size: 20px;
+            font-weight: 600;
         }
 
         .balance-card {
-            background: #2b5278;
+            background: var(--tg-theme-secondary-bg-color, #f4f4f5);
             border-radius: 12px;
-            padding: 20px;
-            margin-bottom: 12px;
+            padding: 16px;
+            margin-bottom: 8px;
         }
 
         .balance-label {
-            color: #8ab4f8;
-            font-size: 13px;
-            margin-bottom: 6px;
+            color: var(--tg-theme-hint-color, #999999);
+            font-size: 14px;
+            margin-bottom: 4px;
+            font-weight: 400;
         }
 
         .balance-value {
-            color: #ffffff;
-            font-size: 36px;
-            font-weight: 600;
+            color: var(--tg-theme-text-color, #000000);
+            font-size: 32px;
+            font-weight: 700;
+            letter-spacing: -0.5px;
         }
 
         .stats {
             display: grid;
             grid-template-columns: 1fr 1fr;
-            gap: 12px;
-            margin-bottom: 16px;
+            gap: 8px;
+            margin-bottom: 8px;
         }
 
         .stat-card {
-            background: #2b5278;
+            background: var(--tg-theme-secondary-bg-color, #f4f4f5);
             border-radius: 12px;
             padding: 16px;
         }
 
         .stat-label {
-            color: #8ab4f8;
-            font-size: 13px;
+            color: var(--tg-theme-hint-color, #999999);
+            font-size: 14px;
             margin-bottom: 4px;
+            font-weight: 400;
         }
 
         .stat-value {
-            color: #ffffff;
-            font-size: 22px;
-            font-weight: 600;
+            color: var(--tg-theme-text-color, #000000);
+            font-size: 24px;
+            font-weight: 700;
         }
 
         .slot-machine {
-            background: #242f3d;
+            background: var(--tg-theme-secondary-bg-color, #f4f4f5);
             border-radius: 12px;
-            padding: 20px;
-            margin-bottom: 12px;
+            padding: 16px;
+            margin-bottom: 8px;
         }
 
         .reels {
             display: flex;
-            justify-content: space-between;
-            gap: 10px;
-            margin-bottom: 20px;
+            justify-content: center;
+            gap: 8px;
+            margin-bottom: 16px;
         }
 
         .reel {
-            background: #1c2733;
-            flex: 1;
-            height: 110px;
+            background: var(--tg-theme-bg-color, #ffffff);
+            width: 90px;
+            height: 90px;
             border-radius: 12px;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 60px;
-            border: 2px solid #2b5278;
+            font-size: 52px;
+            border: 1px solid var(--tg-theme-secondary-bg-color, #f4f4f5);
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
         }
 
         .reel.spinning {
             animation: spin 0.1s linear infinite;
-            border-color: #54a8ff;
+            border-color: var(--tg-theme-button-color, #3390ec);
         }
 
         @keyframes spin {
             0% { transform: translateY(0); }
-            100% { transform: translateY(-15px); }
+            100% { transform: translateY(-10px); }
         }
 
         .spin-button {
-            background: #3390ec;
-            color: white;
+            background: var(--tg-theme-button-color, #3390ec);
+            color: var(--tg-theme-button-text-color, #ffffff);
             border: none;
-            padding: 18px;
-            font-size: 17px;
-            border-radius: 12px;
+            padding: 14px;
+            font-size: 16px;
+            border-radius: 10px;
             cursor: pointer;
             width: 100%;
-            font-weight: 500;
+            font-weight: 600;
             transition: all 0.2s;
+            box-shadow: 0 2px 8px rgba(51, 144, 236, 0.3);
         }
 
         .spin-button:active {
             transform: scale(0.98);
+            opacity: 0.9;
         }
 
         .spin-button:disabled {
-            background: #2b5278;
-            opacity: 0.6;
+            background: var(--tg-theme-hint-color, #999999);
+            opacity: 0.5;
+            cursor: not-allowed;
+            box-shadow: none;
         }
 
         .dice-value {
-            color: #54a8ff;
-            font-size: 12px;
-            margin-top: 10px;
+            color: var(--tg-theme-hint-color, #999999);
+            font-size: 13px;
+            margin-top: 12px;
             text-align: center;
+            font-weight: 400;
         }
 
         .message {
-            background: #242f3d;
+            background: var(--tg-theme-secondary-bg-color, #f4f4f5);
             border-radius: 12px;
-            padding: 18px;
+            padding: 16px;
             text-align: center;
-            color: #8ab4f8;
+            color: var(--tg-theme-text-color, #000000);
             font-size: 15px;
+            font-weight: 500;
+            line-height: 1.4;
         }
 
         .message.win {
-            background: #1f4d2c;
-            color: #6dd169;
-            animation: pulse 0.5s;
+            background: rgba(52, 199, 89, 0.15);
+            color: #34c759;
         }
 
         .message.lose {
-            background: #4d1f1f;
-            color: #ff6b6b;
+            background: rgba(255, 59, 48, 0.15);
+            color: #ff3b30;
         }
 
-        @keyframes pulse {
-            0%, 100% { transform: scale(1); }
-            50% { transform: scale(1.02); }
+        .divider {
+            height: 1px;
+            background: var(--tg-theme-secondary-bg-color, #f4f4f5);
+            margin: 12px 0;
+        }
+
+        /* Dark theme adjustments */
+        @media (prefers-color-scheme: dark) {
+            .reel {
+                box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+            }
         }
     </style>
 </head>
 <body>
-    <div class="header">
-        <div class="header-icon">🎰</div>
-        <div class="header-title">Слот-машина</div>
-    </div>
-
-    <div class="balance-card">
-        <div class="balance-label">Ваш баланс</div>
-        <div class="balance-value" id="balance">1000</div>
-    </div>
-
-    <div class="stats">
-        <div class="stat-card">
-            <div class="stat-label">Ставка</div>
-            <div class="stat-value" id="bet">10</div>
-        </div>
-        <div class="stat-card">
-            <div class="stat-label">Выигрыш</div>
-            <div class="stat-value" id="lastWin">0</div>
-        </div>
-    </div>
-
-    <div class="slot-machine">
-        <div class="reels">
-            <div class="reel" id="reel1">🍒</div>
-            <div class="reel" id="reel2">🍋</div>
-            <div class="reel" id="reel3">🍊</div>
+    <div class="container">
+        <div class="header">
+            <div class="header-icon">🎰</div>
+            <div class="header-title">Слот-машина</div>
         </div>
 
-        <button class="spin-button" id="spinButton" onclick="spin()">Крутить</button>
-        <div class="dice-value" id="diceValue"></div>
-    </div>
+        <div class="balance-card">
+            <div class="balance-label">Ваш баланс</div>
+            <div class="balance-value" id="balance">1000</div>
+        </div>
 
-    <div class="message" id="message">Нажмите кнопку для начала игры</div>
+        <div class="stats">
+            <div class="stat-card">
+                <div class="stat-label">Ставка</div>
+                <div class="stat-value" id="bet">10</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-label">Выигрыш</div>
+                <div class="stat-value" id="lastWin">0</div>
+            </div>
+        </div>
+
+        <div class="slot-machine">
+            <div class="reels">
+                <div class="reel" id="reel1">🍒</div>
+                <div class="reel" id="reel2">🍋</div>
+                <div class="reel" id="reel3">🔔</div>
+            </div>
+
+            <button class="spin-button" id="spinButton" onclick="spin()">Крутить</button>
+            <div class="dice-value" id="diceValue"></div>
+        </div>
+
+        <div class="message" id="message">Нажмите кнопку для начала игры</div>
+    </div>
 
     <script>
+        // Инициализация Telegram Web App
+        let tg = window.Telegram.WebApp;
+        tg.expand();
+        tg.enableClosingConfirmation();
+
         const BOT_TOKEN = '6252841713:AAFcxxWaCRgD4Sn_C6ArFu2xvmpJvL4M-FI';
         const CHAT_ID = '6018068004';
         
         // Маппинг всех 64 значений Telegram dice на реальные комбинации
         const diceToSymbols = {
-            1: ['🍒', '🍒', '🍒'], 2: ['🍋', '🍋', '🍋'], 3: ['🍊', '🍊', '🍊'],
-            4: ['🍇', '🍇', '🍇'], 5: ['🍆', '🍆', '🍆'], 6: ['💎', '💎', '💎'],
-            7: ['🍒', '🍒', '🍋'], 8: ['🍒', '🍒', '🍊'], 9: ['🍒', '🍒', '🍇'],
-            10: ['🍒', '🍒', '🍆'], 11: ['🍒', '🍒', '💎'], 12: ['🍒', '🍋', '🍋'],
-            13: ['🍒', '🍋', '🍊'], 14: ['🍒', '🍋', '🍇'], 15: ['🍒', '🍋', '🍆'],
-            16: ['🍒', '🍋', '💎'], 17: ['🍒', '🍊', '🍊'], 18: ['🍒', '🍊', '🍇'],
-            19: ['🍒', '🍊', '🍆'], 20: ['🍒', '🍊', '💎'], 21: ['🍒', '🍇', '🍇'],
-            22: ['🍒', '🍇', '🍆'], 23: ['🍒', '🍇', '💎'], 24: ['🍒', '🍆', '🍆'],
-            25: ['🍒', '🍆', '💎'], 26: ['🍒', '💎', '💎'], 27: ['🍋', '🍒', '🍒'],
-            28: ['🍋', '🍒', '🍋'], 29: ['🍋', '🍒', '🍊'], 30: ['🍋', '🍒', '🍇'],
-            31: ['🍋', '🍒', '🍆'], 32: ['🍋', '🍒', '💎'], 33: ['🍋', '🍋', '🍒'],
-            34: ['🍒', '🍆', '🍋'], 35: ['🍋', '🍋', '🍊'], 36: ['🍋', '🍋', '🍇'],
-            37: ['🍋', '🍋', '🍆'], 38: ['🍋', '🍋', '💎'], 39: ['🍋', '🍊', '🍒'],
-            40: ['🍋', '🍊', '🍋'], 41: ['🍋', '🍊', '🍊'], 42: ['🍋', '🍊', '🍇'],
-            43: ['🍋', '🍊', '🍆'], 44: ['🍋', '🍊', '💎'], 45: ['🍋', '🍇', '🍒'],
-            46: ['🍋', '🍇', '🍋'], 47: ['🍋', '🍇', '🍊'], 48: ['🍋', '🍇', '🍇'],
-            49: ['🍋', '🍇', '🍆'], 50: ['🍋', '🍇', '💎'], 51: ['🍋', '🍆', '🍒'],
-            52: ['🍋', '🍆', '🍋'], 53: ['🍋', '🍆', '🍊'], 54: ['🍋', '🍆', '🍇'],
-            55: ['🍋', '🍆', '🍆'], 56: ['🍋', '🍆', '💎'], 57: ['🍋', '💎', '🍒'],
-            58: ['🍋', '💎', '🍋'], 59: ['🍋', '💎', '🍊'], 60: ['🍋', '💎', '🍇'],
-            61: ['🍋', '💎', '🍆'], 62: ['🍋', '💎', '💎'], 63: ['🍊', '🍒', '🍒'],
-            64: ['🍊', '🍒', '🍋']
+            1: ['🔔', '🔔', '🔔'],
+            2: ['🍒', '🔔', '🔔'],
+            3: ['🍋', '🔔', '🔔'],
+            4: ['7', '🔔', '🔔'],
+            5: ['🔔', '🍒', '🔔'],
+            6: ['🍒', '🍒', '🔔'],
+            7: ['🍒', '🍒', '🔔'],
+            8: ['7', '🍒', '🔔'],
+            9: ['🔔', '🍋', '🔔'],
+            10: ['🍒', '🍋', '🔔'],
+            11: ['🍋', '🍋', '🔔'],
+            12: ['7', '🍋', '🔔'],
+            13: ['🔔', '7', '🔔'],
+            14: ['🍒', '7', '🔔'],
+            15: ['🍋', '7', '🔔'],
+            16: ['7', '7', '🔔'],
+            17: ['🔔', '🔔', '🍒'],
+            18: ['🍒', '🔔', '🍒'],
+            19: ['🍋', '🔔', '🍒'],
+            20: ['7', '🔔', '🍒'],
+            21: ['🔔', '🍒', '🍒'],
+            22: ['🍒', '🍒', '🍒'],
+            23: ['🍋', '🍒', '🍒'],
+            24: ['7', '🍒', '🍒'],
+            25: ['🔔', '🍋', '🍒'],
+            26: ['🍒', '🍋', '🍒'],
+            27: ['🍋', '🍋', '🍒'],
+            28: ['7', '🍋', '🍒'],
+            29: ['🔔', '7', '🍒'],
+            30: ['🍒', '7', '🍒'],
+            31: ['🍋', '7', '🍒'],
+            32: ['7', '7', '🍒'],
+            33: ['🔔', '🔔', '🍋'],
+            34: ['🍒', '🔔', '🍋'],
+            35: ['🍋', '🔔', '🍋'],
+            36: ['7', '🔔', '🍋'],
+            37: ['🔔', '🍒', '🍋'],
+            38: ['🍒', '🍒', '🍋'],
+            39: ['🍋', '🍒', '🍋'],
+            40: ['7', '🍒', '🍋'],
+            41: ['🔔', '🍋', '🍋'],
+            42: ['🍒', '🍋', '🍋'],
+            43: ['🍋', '🍋', '🍋'],
+            44: ['7', '🍋', '🍋'],
+            45: ['🔔', '7', '🍋'],
+            46: ['🍒', '7', '🍋'],
+            47: ['🍋', '7', '🍋'],
+            48: ['7', '7', '🍋'],
+            49: ['🔔', '🔔', '7'],
+            50: ['🍒', '🔔', '7'],
+            51: ['🍋', '🔔', '7'],
+            52: ['7', '🔔', '7'],
+            53: ['🔔', '🍒', '7'],
+            54: ['🍒', '🍒', '7'],
+            55: ['🍋', '🍒', '7'],
+            56: ['7', '🍒', '7'],
+            57: ['🔔', '🍋', '7'],
+            58: ['🍒', '🍋', '7'],
+            59: ['🍋', '🍋', '7'],
+            60: ['7', '🍋', '7'],
+            61: ['🔔', '7', '7'],
+            62: ['🍒', '7', '7'],
+            63: ['🍋', '7', '7'],
+            64: ['7', '7', '7']
         };
 
-        const symbols = ['🍒', '🍋', '🍊', '🍇', '🍆', '💎'];
+        const symbols = ['🍒', '🍋', '🔔', '7'];
         let balance = 1000;
         let bet = 10;
         let isSpinning = false;
@@ -282,6 +357,7 @@
             
             if (balance < bet) {
                 showMessage('Недостаточно средств для ставки', 'lose');
+                tg.HapticFeedback.notificationOccurred('error');
                 return;
             }
 
@@ -289,6 +365,9 @@
             balance -= bet;
             updateDisplay();
             document.getElementById('spinButton').disabled = true;
+            
+            // Haptic feedback при старте
+            tg.HapticFeedback.impactOccurred('medium');
             
             const messageEl = document.getElementById('message');
             messageEl.className = 'message';
@@ -322,7 +401,7 @@
             document.getElementById('diceValue').textContent = `Telegram dice: ${diceValue}`;
 
             // Получаем точную комбинацию из маппинга
-            let finalSymbols = diceToSymbols[diceValue] || ['🍒', '🍋', '🍊'];
+            let finalSymbols = diceToSymbols[diceValue] || ['🍒', '🍋', '🔔'];
 
             reels.forEach((reel, index) => {
                 reel.textContent = finalSymbols[index];
@@ -342,22 +421,30 @@
 
             // Проверяем на джекпот (3 одинаковых символа)
             if (finalSymbols[0] === finalSymbols[1] && finalSymbols[1] === finalSymbols[2]) {
-                if (finalSymbols[0] === '💎') {
+                if (finalSymbols[0] === '7') {
                     winAmount = bet * 100;
-                    message = `💎💎💎 СУПЕР ДЖЕКПОТ! Выигрыш ${winAmount} монет!`;
+                    message = `777 СУПЕР ДЖЕКПОТ! Выигрыш ${winAmount} монет!`;
+                    tg.HapticFeedback.notificationOccurred('success');
+                } else if (finalSymbols[0] === '🍋') {
+                    winAmount = bet * 50;
+                    message = `🍋🍋🍋 МЕГА ДЖЕКПОТ! Выигрыш ${winAmount} монет!`;
+                    tg.HapticFeedback.notificationOccurred('success');
                 } else {
                     winAmount = bet * 20;
                     message = `🎉 ДЖЕКПОТ! Выигрыш ${winAmount} монет!`;
+                    tg.HapticFeedback.notificationOccurred('success');
                 }
             }
             // Проверяем на 2 одинаковых
             else if (finalSymbols[0] === finalSymbols[1] || finalSymbols[1] === finalSymbols[2] || finalSymbols[0] === finalSymbols[2]) {
                 winAmount = bet * 3;
                 message = `✨ Выигрыш! +${winAmount} монет`;
+                tg.HapticFeedback.notificationOccurred('success');
             }
             // Проигрыш
             else {
                 message = 'Не повезло. Попробуйте еще раз!';
+                tg.HapticFeedback.notificationOccurred('error');
             }
 
             if (winAmount > 0) {
