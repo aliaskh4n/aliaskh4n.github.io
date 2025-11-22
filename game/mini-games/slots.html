@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Слот-машина</title>
+    <title>Слоты 777 🎰</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <style>
         * {
@@ -32,6 +32,7 @@
             display: flex;
             align-items: center;
             gap: 12px;
+            margin-bottom: 12px;
         }
 
         .header-icon {
@@ -62,7 +63,6 @@
             color: var(--tg-theme-hint-color, #999999);
             font-size: 14px;
             margin-bottom: 4px;
-            font-weight: 400;
         }
 
         .balance-value {
@@ -76,33 +76,52 @@
             display: grid;
             grid-template-columns: 1fr 1fr;
             gap: 8px;
-            margin-bottom: 8px;
+            margin-bottom: 12px;
         }
 
         .stat-card {
             background: var(--tg-theme-secondary-bg-color, #f4f4f5);
             border-radius: 12px;
-            padding: 16px;
+            padding: 12px;
         }
 
         .stat-label {
             color: var(--tg-theme-hint-color, #999999);
-            font-size: 14px;
+            font-size: 12px;
             margin-bottom: 4px;
-            font-weight: 400;
         }
 
         .stat-value {
             color: var(--tg-theme-text-color, #000000);
-            font-size: 24px;
+            font-size: 20px;
             font-weight: 700;
+        }
+
+        .bet-input {
+            background: var(--tg-theme-secondary-bg-color, #f4f4f5);
+            border-radius: 12px;
+            padding: 12px;
+            margin-bottom: 12px;
+            display: flex;
+            gap: 8px;
+            align-items: center;
+        }
+
+        .bet-input input {
+            flex: 1;
+            padding: 8px 12px;
+            border: none;
+            border-radius: 8px;
+            background: var(--tg-theme-bg-color, #ffffff);
+            color: var(--tg-theme-text-color, #000000);
+            font-size: 14px;
         }
 
         .slot-machine {
             background: var(--tg-theme-secondary-bg-color, #f4f4f5);
             border-radius: 12px;
             padding: 16px;
-            margin-bottom: 8px;
+            margin-bottom: 12px;
         }
 
         .reels {
@@ -120,9 +139,9 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 52px;
-            border: 1px solid var(--tg-theme-secondary-bg-color, #f4f4f5);
-            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+            font-size: 48px;
+            border: 2px solid var(--tg-theme-secondary-bg-color, #f4f4f5);
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
         }
 
         .reel.spinning {
@@ -161,23 +180,18 @@
             box-shadow: none;
         }
 
-        .dice-value {
-            color: var(--tg-theme-hint-color, #999999);
-            font-size: 13px;
-            margin-top: 12px;
-            text-align: center;
-            font-weight: 400;
-        }
-
         .message {
             background: var(--tg-theme-secondary-bg-color, #f4f4f5);
             border-radius: 12px;
-            padding: 16px;
+            padding: 12px;
             text-align: center;
             color: var(--tg-theme-text-color, #000000);
-            font-size: 15px;
+            font-size: 14px;
             font-weight: 500;
-            line-height: 1.4;
+            min-height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
 
         .message.win {
@@ -190,36 +204,40 @@
             color: #ff3b30;
         }
 
-        .divider {
-            height: 1px;
+        .back-btn {
+            display: inline-block;
+            padding: 6px 12px;
             background: var(--tg-theme-secondary-bg-color, #f4f4f5);
-            margin: 12px 0;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 12px;
+            margin-bottom: 12px;
         }
 
-        /* Dark theme adjustments */
         @media (prefers-color-scheme: dark) {
-            .reel {
-                box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
-            }
+            .reel { box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3); }
         }
     </style>
 </head>
 <body>
     <div class="container">
+        <button class="back-btn" onclick="history.back()">← Назад</button>
+
         <div class="header">
             <div class="header-icon">🎰</div>
-            <div class="header-title">Слот-машина</div>
+            <div class="header-title">Слоты 777</div>
         </div>
 
         <div class="balance-card">
             <div class="balance-label">Ваш баланс</div>
-            <div class="balance-value" id="balance">1000</div>
+            <div class="balance-value" id="balance">-</div>
         </div>
 
         <div class="stats">
             <div class="stat-card">
                 <div class="stat-label">Ставка</div>
-                <div class="stat-value" id="bet">10</div>
+                <div class="stat-value" id="currentBet">10</div>
             </div>
             <div class="stat-card">
                 <div class="stat-label">Выигрыш</div>
@@ -227,245 +245,183 @@
             </div>
         </div>
 
+        <div class="bet-input">
+            <label style="flex: 0; font-size: 12px; color: var(--tg-theme-hint-color, #999999);">Ставка:</label>
+            <input type="number" id="bet" placeholder="10" min="1" value="10">
+        </div>
+
         <div class="slot-machine">
             <div class="reels">
-                <div class="reel" id="reel1">🍒</div>
-                <div class="reel" id="reel2">🍋</div>
-                <div class="reel" id="reel3">🔔</div>
+                <div class="reel" id="reel1">🔔</div>
+                <div class="reel" id="reel2">🍒</div>
+                <div class="reel" id="reel3">🍋</div>
             </div>
 
-            <button class="spin-button" id="spinButton" onclick="spin()">Крутить</button>
-            <div class="dice-value" id="diceValue"></div>
+            <button class="spin-button" id="spinButton">Крутить</button>
         </div>
 
         <div class="message" id="message">Нажмите кнопку для начала игры</div>
     </div>
 
     <script>
-        // Инициализация Telegram Web App
-        let tg = window.Telegram.WebApp;
-        tg.expand();
-        tg.enableClosingConfirmation();
-
-        const BOT_TOKEN = '6252841713:AAFcxxWaCRgD4Sn_C6ArFu2xvmpJvL4M-FI';
-        const CHAT_ID = '-1003411091429';
-        
-        // Маппинг всех 64 значений Telegram dice на реальные комбинации
-        const diceToSymbols = {
-            1: ['🔔', '🔔', '🔔'],
-            2: ['🍒', '🔔', '🔔'],
-            3: ['🍋', '🔔', '🔔'],
-            4: ['7', '🔔', '🔔'],
-            5: ['🔔', '🍒', '🔔'],
-            6: ['🍒', '🍒', '🔔'],
-            7: ['🍒', '🍒', '🔔'],
-            8: ['7', '🍒', '🔔'],
-            9: ['🔔', '🍋', '🔔'],
-            10: ['🍒', '🍋', '🔔'],
-            11: ['🍋', '🍋', '🔔'],
-            12: ['7', '🍋', '🔔'],
-            13: ['🔔', '7', '🔔'],
-            14: ['🍒', '7', '🔔'],
-            15: ['🍋', '7', '🔔'],
-            16: ['7', '7', '🔔'],
-            17: ['🔔', '🔔', '🍒'],
-            18: ['🍒', '🔔', '🍒'],
-            19: ['🍋', '🔔', '🍒'],
-            20: ['7', '🔔', '🍒'],
-            21: ['🔔', '🍒', '🍒'],
-            22: ['🍒', '🍒', '🍒'],
-            23: ['🍋', '🍒', '🍒'],
-            24: ['7', '🍒', '🍒'],
-            25: ['🔔', '🍋', '🍒'],
-            26: ['🍒', '🍋', '🍒'],
-            27: ['🍋', '🍋', '🍒'],
-            28: ['7', '🍋', '🍒'],
-            29: ['🔔', '7', '🍒'],
-            30: ['🍒', '7', '🍒'],
-            31: ['🍋', '7', '🍒'],
-            32: ['7', '7', '🍒'],
-            33: ['🔔', '🔔', '🍋'],
-            34: ['🍒', '🔔', '🍋'],
-            35: ['🍋', '🔔', '🍋'],
-            36: ['7', '🔔', '🍋'],
-            37: ['🔔', '🍒', '🍋'],
-            38: ['🍒', '🍒', '🍋'],
-            39: ['🍋', '🍒', '🍋'],
-            40: ['7', '🍒', '🍋'],
-            41: ['🔔', '🍋', '🍋'],
-            42: ['🍒', '🍋', '🍋'],
-            43: ['🍋', '🍋', '🍋'],
-            44: ['7', '🍋', '🍋'],
-            45: ['🔔', '7', '🍋'],
-            46: ['🍒', '7', '🍋'],
-            47: ['🍋', '7', '🍋'],
-            48: ['7', '7', '🍋'],
-            49: ['🔔', '🔔', '7'],
-            50: ['🍒', '🔔', '7'],
-            51: ['🍋', '🔔', '7'],
-            52: ['7', '🔔', '7'],
-            53: ['🔔', '🍒', '7'],
-            54: ['🍒', '🍒', '7'],
-            55: ['🍋', '🍒', '7'],
-            56: ['7', '🍒', '7'],
-            57: ['🔔', '🍋', '7'],
-            58: ['🍒', '🍋', '7'],
-            59: ['🍋', '🍋', '7'],
-            60: ['7', '🍋', '7'],
-            61: ['🔔', '7', '7'],
-            62: ['🍒', '7', '7'],
-            63: ['🍋', '7', '7'],
-            64: ['7', '7', '7']
+        // ========== КОНФИГ ==========
+        const game = {
+            api: '/api',
+            tg: window.Telegram.WebApp,
+            user: {
+                id: localStorage.getItem('user_id'),
+                token: localStorage.getItem('token'),
+                balance: parseInt(localStorage.getItem('user_balance') || '0')
+            },
+            spinning: false,
+            symbols: ['🍒', '🍋', '🔔', '7']
         };
 
-        const symbols = ['🍒', '🍋', '🔔', '7'];
-        let balance = 1000;
-        let bet = 10;
-        let isSpinning = false;
-
-        function updateDisplay() {
-            document.getElementById('balance').textContent = balance;
-            document.getElementById('bet').textContent = bet;
-        }
-
-        async function getTelegramDice() {
-            try {
-                const response = await fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendDice`, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify({
-                        chat_id: CHAT_ID,
-                        emoji: '🎰'
-                    })
-                });
-
-                const data = await response.json();
-                if (data.ok && data.result && data.result.dice) {
-                    return data.result.dice.value;
-                }
-                throw new Error('Ошибка получения результата');
-            } catch (error) {
-                console.error('Ошибка Telegram API:', error);
-                return Math.floor(Math.random() * 64) + 1;
-            }
-        }
-
-        async function spin() {
-            if (isSpinning) return;
-            
-            if (balance < bet) {
-                showMessage('Недостаточно средств для ставки', 'lose');
-                tg.HapticFeedback.notificationOccurred('error');
-                return;
-            }
-
-            isSpinning = true;
-            balance -= bet;
-            updateDisplay();
-            document.getElementById('spinButton').disabled = true;
-            
-            // Haptic feedback при старте
-            tg.HapticFeedback.impactOccurred('medium');
-            
-            const messageEl = document.getElementById('message');
-            messageEl.className = 'message';
-            messageEl.textContent = 'Получаем результат от Telegram...';
-
-            const reels = [
+        // ========== DOM ==========
+        const ui = {
+            balance: document.getElementById('balance'),
+            currentBet: document.getElementById('currentBet'),
+            lastWin: document.getElementById('lastWin'),
+            bet: document.getElementById('bet'),
+            spinBtn: document.getElementById('spinButton'),
+            message: document.getElementById('message'),
+            reels: [
                 document.getElementById('reel1'),
                 document.getElementById('reel2'),
                 document.getElementById('reel3')
-            ];
+            ]
+        };
 
-            reels.forEach(reel => reel.classList.add('spinning'));
+        // ========== ИНИЦИАЛИЗАЦИЯ ==========
+        function init() {
+            game.tg.ready();
+            game.tg.expand();
+
+            if (!game.user.id || !game.user.token) {
+                showMsg('Пожалуйста, вернитесь на главную', 'lose');
+                ui.spinBtn.disabled = true;
+                return;
+            }
+
+            ui.balance.textContent = game.user.balance.toLocaleString();
+            ui.spinBtn.onclick = spin;
+            ui.bet.oninput = () => ui.currentBet.textContent = ui.bet.value;
+        }
+
+        // ========== API ==========
+        async function apiCall(endpoint, method, body) {
+            const opts = {
+                method,
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${game.user.token}`
+                }
+            };
+            if (body) opts.body = JSON.stringify(body);
+
+            const res = await fetch(`${game.api}${endpoint}`, opts);
+            const data = await res.json();
+            if (!res.ok) throw new Error(data.error || 'API Error');
+            return data;
+        }
+
+        // ========== ИГРА ==========
+        async function spin() {
+            if (game.spinning) return;
+
+            const bet = parseInt(ui.bet.value);
+            if (bet < 1 || bet > game.user.balance) {
+                showMsg('Невалидная ставка', 'lose');
+                game.tg.HapticFeedback.notificationOccurred('error');
+                return;
+            }
+
+            game.spinning = true;
+            ui.spinBtn.disabled = true;
+            game.tg.HapticFeedback.impactOccurred('medium');
+            showMsg('Крутим барабаны...');
+
+            ui.reels.forEach(r => r.classList.add('spinning'));
 
             let spinCount = 0;
-            const spinInterval = setInterval(() => {
-                reels.forEach(reel => {
-                    reel.textContent = symbols[Math.floor(Math.random() * symbols.length)];
-                });
+            const interval = setInterval(() => {
+                ui.reels.forEach(r => r.textContent = game.symbols[Math.floor(Math.random() * game.symbols.length)]);
                 spinCount++;
             }, 100);
 
-            const diceValue = await getTelegramDice();
-            
-            setTimeout(() => {
-                clearInterval(spinInterval);
-                stopSpin(reels, diceValue);
-            }, 2000);
+            try {
+                const result = await apiCall('/game/slots/play', 'POST', {
+                    userId: game.user.id,
+                    bet: bet
+                });
+
+                setTimeout(() => {
+                    clearInterval(interval);
+                    stopSpin(result);
+                }, 1500);
+            } catch (e) {
+                clearInterval(interval);
+                showMsg(`Ошибка: ${e.message}`, 'lose');
+                game.spinning = false;
+                ui.spinBtn.disabled = false;
+                ui.reels.forEach(r => r.classList.remove('spinning'));
+                game.tg.HapticFeedback.notificationOccurred('error');
+            }
         }
 
-        function stopSpin(reels, diceValue) {
-            document.getElementById('diceValue').textContent = `Telegram dice: ${diceValue}`;
-
-            // Получаем точную комбинацию из маппинга
-            let finalSymbols = diceToSymbols[diceValue] || ['🍒', '🍋', '🔔'];
-
-            reels.forEach((reel, index) => {
-                reel.textContent = finalSymbols[index];
+        function stopSpin(result) {
+            const symbols = result.symbols;
+            
+            ui.reels.forEach((reel, i) => {
+                reel.textContent = symbols[i];
                 reel.classList.remove('spinning');
             });
 
             setTimeout(() => {
-                checkWin(diceValue, finalSymbols);
-                isSpinning = false;
-                document.getElementById('spinButton').disabled = false;
+                showResult(result);
+                game.user.balance = result.newBalance;
+                ui.balance.textContent = game.user.balance.toLocaleString();
+                localStorage.setItem('user_balance', game.user.balance);
+                
+                game.spinning = false;
+                ui.spinBtn.disabled = false;
             }, 300);
         }
 
-        function checkWin(diceValue, finalSymbols) {
-            let winAmount = 0;
-            let message = '';
+        function showResult(result) {
+            let msg = '';
+            const type = result.winAmount > 0 ? 'win' : 'lose';
 
-            // Проверяем на джекпот (3 одинаковых символа)
-            if (finalSymbols[0] === finalSymbols[1] && finalSymbols[1] === finalSymbols[2]) {
-                if (finalSymbols[0] === '7') {
-                    winAmount = bet * 100;
-                    message = `777 СУПЕР ДЖЕКПОТ! Выигрыш ${winAmount} монет!`;
-                    tg.HapticFeedback.notificationOccurred('success');
-                } else if (finalSymbols[0] === '🍋') {
-                    winAmount = bet * 50;
-                    message = `🍋🍋🍋 МЕГА ДЖЕКПОТ! Выигрыш ${winAmount} монет!`;
-                    tg.HapticFeedback.notificationOccurred('success');
-                } else {
-                    winAmount = bet * 20;
-                    message = `🎉 ДЖЕКПОТ! Выигрыш ${winAmount} монет!`;
-                    tg.HapticFeedback.notificationOccurred('success');
-                }
-            }
-            // Проверяем на 2 одинаковых
-            else if (finalSymbols[0] === finalSymbols[1] || finalSymbols[1] === finalSymbols[2] || finalSymbols[0] === finalSymbols[2]) {
-                winAmount = bet * 3;
-                message = `✨ Выигрыш! +${winAmount} монет`;
-                tg.HapticFeedback.notificationOccurred('success');
-            }
-            // Проигрыш
-            else {
-                message = 'Не повезло. Попробуйте еще раз!';
-                tg.HapticFeedback.notificationOccurred('error');
-            }
-
-            if (winAmount > 0) {
-                balance += winAmount;
-                document.getElementById('lastWin').textContent = winAmount;
-                showMessage(message, 'win');
+            if (result.winType === 'jackpot_777') {
+                msg = `🎉 ДЖЕКПОТ 777! +${result.winAmount}`;
+                game.tg.HapticFeedback.notificationOccurred('success');
+            } else if (result.winType === 'jackpot_lemon') {
+                msg = `🍋 ЛИМОН! +${result.winAmount}`;
+                game.tg.HapticFeedback.notificationOccurred('success');
+            } else if (result.winType === 'jackpot_cherry') {
+                msg = `🍒 ВИШНЯ! +${result.winAmount}`;
+                game.tg.HapticFeedback.notificationOccurred('success');
+            } else if (result.winType === 'jackpot_bell') {
+                msg = `🔔 КОЛОКОЛ! +${result.winAmount}`;
+                game.tg.HapticFeedback.notificationOccurred('success');
+            } else if (result.winType === 'pair') {
+                msg = `✨ Пара! +${result.winAmount}`;
+                game.tg.HapticFeedback.notificationOccurred('success');
             } else {
-                document.getElementById('lastWin').textContent = 0;
-                showMessage(message, 'lose');
+                msg = `😔 Не повезло. Попробуйте ещё!`;
+                game.tg.HapticFeedback.notificationOccurred('error');
             }
 
-            updateDisplay();
+            ui.lastWin.textContent = result.winAmount;
+            showMsg(msg, type);
         }
 
-        function showMessage(text, type) {
-            const messageEl = document.getElementById('message');
-            messageEl.textContent = text;
-            messageEl.className = 'message ' + type;
+        function showMsg(text, type = '') {
+            ui.message.textContent = text;
+            ui.message.className = 'message ' + type;
         }
 
-        updateDisplay();
+        init();
     </script>
 </body>
 </html>
