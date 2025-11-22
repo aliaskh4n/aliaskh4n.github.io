@@ -18,8 +18,6 @@
       background: var(--tg-theme-bg-color, #ffffff);
       color: var(--tg-theme-text-color, #000000);
       min-height: 100vh;
-      padding: 0;
-      margin: 0;
       overflow-x: hidden;
       -webkit-tap-highlight-color: transparent;
     }
@@ -31,6 +29,12 @@
 
     .header {
       padding: 8px 0 16px 0;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .header-left {
       display: flex;
       align-items: center;
       gap: 12px;
@@ -53,6 +57,33 @@
       font-weight: 600;
     }
 
+    .user-menu {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      cursor: pointer;
+      padding: 6px 12px;
+      border-radius: 8px;
+      transition: background 0.2s;
+    }
+
+    .user-menu:active {
+      background: var(--tg-theme-secondary-bg-color, #f4f4f5);
+    }
+
+    .user-avatar {
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      background: var(--tg-theme-button-color, #3390ec);
+      color: white;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 16px;
+      font-weight: 600;
+    }
+
     .balance-card {
       background: var(--tg-theme-secondary-bg-color, #f4f4f5);
       border-radius: 12px;
@@ -64,7 +95,6 @@
       color: var(--tg-theme-hint-color, #999999);
       font-size: 14px;
       margin-bottom: 4px;
-      font-weight: 400;
     }
 
     .balance-value {
@@ -86,6 +116,7 @@
       overflow: hidden;
       transition: all 0.2s;
       position: relative;
+      cursor: pointer;
     }
 
     .game-card:active {
@@ -144,7 +175,6 @@
     .game-desc {
       font-size: 13px;
       color: var(--tg-theme-hint-color, #999999);
-      font-weight: 400;
       line-height: 1.3;
     }
 
@@ -158,16 +188,14 @@
       font-weight: 700;
       padding: 4px 8px;
       border-radius: 8px;
-      letter-spacing: 0.5px;
       z-index: 2;
     }
 
-    .loading, .error {
+    .message {
       text-align: center;
       padding: 40px 20px;
       font-size: 15px;
       color: var(--tg-theme-hint-color, #999999);
-      font-weight: 400;
     }
 
     .footer {
@@ -176,85 +204,47 @@
       text-align: center;
       font-size: 13px;
       color: var(--tg-theme-hint-color, #999999);
-      font-weight: 400;
       border-top: 1px solid var(--tg-theme-secondary-bg-color, #f4f4f5);
     }
 
-    /* Dark theme adjustments */
+    .loading-spinner {
+      display: inline-block;
+      width: 20px;
+      height: 20px;
+      border: 3px solid rgba(0,0,0,0.1);
+      border-top-color: var(--tg-theme-button-color, #3390ec);
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+    }
+
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+
     @media (prefers-color-scheme: dark) {
-      .game-thumb {
-        border-bottom-color: rgba(255, 255, 255, 0.1);
-      }
-      
-      .soon-badge {
-        background: rgba(255, 255, 255, 0.2);
-      }
+      .game-thumb { border-bottom-color: rgba(255, 255, 255, 0.1); }
+      .soon-badge { background: rgba(255, 255, 255, 0.2); }
     }
   </style>
 </head>
 <body>
   <div class="container">
     <div class="header">
-      <div class="header-icon">🎮</div>
-      <div class="header-title">GameHub</div>
+      <div class="header-left">
+        <div class="header-icon">🎮</div>
+        <div class="header-title">GameHub</div>
+      </div>
+      <div class="user-menu" id="user-menu">
+        <div class="user-avatar" id="user-avatar">👤</div>
+      </div>
     </div>
 
     <div class="balance-card">
       <div class="balance-label">Ваш баланс</div>
-      <div class="balance-value" id="balance">1250</div>
+      <div class="balance-value" id="balance">-</div>
     </div>
 
-    <div id="games-container" class="games-grid">
-      <div class="game-card">
-        <a href="/game/mini-games/dice.html" class="game-link">
-          <div class="game-thumb" style="--g1: #2481cc; --g2: #6bb6ff;">
-            <div class="game-emoji">🎲</div>
-          </div>
-          <div class="game-info">
-            <div class="game-title">Кости: Кто выше?</div>
-            <div class="game-desc">Бросай кубик и побеждай оппонента</div>
-          </div>
-        </a>
-      </div>
-
-      <div class="game-card">
-        <a href="/game/mini-games/slots.html" class="game-link">
-          <div class="game-thumb" style="--g1: #ff6b6b; --g2: #ff8e8e;">
-            <div class="game-emoji">🎰</div>
-          </div>
-          <div class="game-info">
-            <div class="game-title">Слоты 777</div>
-            <div class="game-desc">Классические барабаны с джекпотом</div>
-          </div>
-        </a>
-      </div>
-
-      <div class="game-card disabled">
-        <a href="#" class="game-link" onclick="return false">
-          <div class="game-thumb" style="--g1: #51cf66; --g2: #8ee29a;">
-            <div class="game-emoji">♠️</div>
-          </div>
-          <div class="game-info">
-            <div class="game-title">Покер</div>
-            <div class="game-desc">Техасский холдем 1 на 1</div>
-          </div>
-          <div class="soon-badge">SOON</div>
-        </a>
-      </div>
-
-      <div class="game-card disabled">
-        <a href="#" class="game-link" onclick="return false">
-          <div class="game-thumb" style="--g1: #9775fa; --g2: #bda3ff;">
-            <div class="game-emoji">🎰</div>
-          </div>
-          <div class="game-info">
-            <div class="game-title">Рулетка</div>
-            <div class="game-desc">Красное или чёрное?</div>
-          </div>
-          <div class="soon-badge">SOON</div>
-        </a>
-      </div>
-    </div>
+    <div id="games-container" class="games-grid"></div>
 
     <div class="footer">
       <p>© 2025 GameHub • Добавляй новые игры в папку mini-games</p>
@@ -262,64 +252,193 @@
   </div>
 
   <script>
-    // Инициализация Telegram Web App
-    let tg = window.Telegram.WebApp;
-    tg.ready();
-    tg.expand();
+    // ========== КОНФИГУРАЦИЯ ==========
+    const CONFIG = {
+      GAMES_URL: '/game/mini-games/games.json',
+      API_URL: '/api', // базовый URL API
+      RELOAD_INTERVAL: 30000,
+    };
 
-    const GAMES_JSON_URL = "/game/mini-games/games.json";
+    // ========== СОСТОЯНИЕ ПРИЛОЖЕНИЯ ==========
+    const STATE = {
+      user: null,
+      token: null,
+      tg: null,
+    };
 
-    async function loadGames() {
-      const container = document.getElementById('games-container');
-      
-      try {
-        const res = await fetch(GAMES_JSON_URL + "?t=" + Date.now());
-        if (!res.ok) throw new Error("Не удалось загрузить список игр");
-        
-        const games = await res.json();
+    // ========== DOM ЭЛЕМЕНТЫ ==========
+    const DOM = {
+      container: document.getElementById('games-container'),
+      balance: document.getElementById('balance'),
+      userMenu: document.getElementById('user-menu'),
+      userAvatar: document.getElementById('user-avatar'),
+    };
 
-        if (!games || games.length === 0) {
-          container.innerHTML = '<div class="loading">Нет доступных игр</div>';
-          return;
+    // ========== API ЗАПРОСЫ ==========
+    class API {
+      static async request(endpoint, method = 'GET', body = null) {
+        const options = {
+          method,
+          headers: { 'Content-Type': 'application/json' },
+        };
+
+        if (body) options.body = JSON.stringify(body);
+        if (STATE.token) options.headers['Authorization'] = `Bearer ${STATE.token}`;
+
+        try {
+          const response = await fetch(`${CONFIG.API_URL}${endpoint}`, options);
+          const data = await response.json();
+
+          if (!response.ok) {
+            throw new Error(data.error || 'API Error');
+          }
+
+          return data;
+        } catch (error) {
+          console.error(`API Error [${endpoint}]:`, error);
+          throw error;
         }
+      }
 
-        container.innerHTML = '';
+      // Аутентификация
+      static async init(initData) {
+        return this.request('/auth/init', 'POST', { initData });
+      }
 
-        games.forEach(game => {
-          const card = document.createElement('div');
-          card.className = 'game-card' + (game.ready === false ? ' disabled' : '');
+      // Получить таблицу лидеров
+      static async getLeaderboard() {
+        return this.request('/stats/leaderboard');
+      }
 
-          const gradientStyle = game.gradient 
-            ? `--g1: ${game.gradient[0]}; --g2: ${game.gradient[1]};` 
-            : '';
-
-          card.innerHTML = `
-            <a href="${game.ready ? '/game/mini-games/' + game.id + '.html' : '#'}"
-               class="game-link" ${game.ready ? '' : 'onclick="return false"'}>
-              <div class="game-thumb" style="${gradientStyle}">
-                <div class="game-emoji">${game.emoji}</div>
-              </div>
-              <div class="game-info">
-                <div class="game-title">${game.title}</div>
-                <div class="game-desc">${game.desc}</div>
-              </div>
-              ${game.ready === false ? '<div class="soon-badge">SOON</div>' : ''}
-            </a>
-          `;
-
-          container.appendChild(card);
-        });
-
-      } catch (err) {
-        container.innerHTML = `<div class="error">Ошибка загрузки игр 😔<br><small>${err.message}</small></div>`;
+      // Получить список комнат
+      static async getRooms() {
+        return this.request('/room/list');
       }
     }
 
-    // Автозагрузка
-    loadGames();
-    
-    // Перезагружать каждые 30 сек
-    setInterval(loadGames, 30000);
+    // ========== ИНИЦИАЛИЗАЦИЯ TELEGRAM ==========
+    function initTelegram() {
+      STATE.tg = window.Telegram.WebApp;
+      STATE.tg.ready();
+      STATE.tg.expand();
+    }
+
+    // ========== АУТЕНТИФИКАЦИЯ ПОЛЬЗОВАТЕЛЯ ==========
+    async function authenticateUser() {
+      try {
+        DOM.container.innerHTML = '<div class="message"><div class="loading-spinner"></div><p>Загрузка...</p></div>';
+
+        const initData = STATE.tg.initData;
+        if (!initData) {
+          throw new Error('Telegram WebApp data not available');
+        }
+
+        const response = await API.init(initData);
+
+        if (!response.success) {
+          throw new Error('Authentication failed');
+        }
+
+        STATE.user = response.user;
+        STATE.token = response.token;
+
+        updateUserUI();
+        loadGames();
+        setInterval(loadGames, CONFIG.RELOAD_INTERVAL);
+      } catch (error) {
+        showError(`Ошибка входа: ${error.message}`);
+        console.error('Auth Error:', error);
+      }
+    }
+
+    // ========== ОБНОВЛЕНИЕ UI ПОЛЬЗОВАТЕЛЯ ==========
+    function updateUserUI() {
+      if (!STATE.user) return;
+
+      // Баланс
+      DOM.balance.textContent = STATE.user.balance.toLocaleString();
+
+      // Аватар (первая буква имени)
+      const initial = STATE.user.name?.charAt(0).toUpperCase() || '👤';
+      DOM.userAvatar.textContent = initial;
+
+      // Клик на профиль
+      DOM.userMenu.onclick = () => {
+        const msg = `👤 ${STATE.user.name}\n💰 Баланс: ${STATE.user.balance}\n🎮 Игр сыграно: ${STATE.user.gamesPlayed}\n🏆 Побед: ${STATE.user.gamesWon}`;
+        STATE.tg.showAlert(msg);
+      };
+    }
+
+    // ========== СОЗДАНИЕ HTML КАРТОЧКИ ==========
+    function createGameCard(game) {
+      const isReady = game.ready !== false;
+      const gradientStyle = game.gradient
+        ? `--g1: ${game.gradient[0]}; --g2: ${game.gradient[1]};`
+        : '';
+      const href = isReady ? `/game/mini-games/${game.id}.html` : '#';
+      const onClick = isReady ? '' : 'onclick="return false"';
+
+      return `
+        <div class="game-card ${!isReady ? 'disabled' : ''}">
+          <a href="${href}" class="game-link" ${onClick}>
+            <div class="game-thumb" style="${gradientStyle}">
+              <div class="game-emoji">${game.emoji}</div>
+            </div>
+            <div class="game-info">
+              <div class="game-title">${game.title}</div>
+              <div class="game-desc">${game.desc}</div>
+            </div>
+            ${!isReady ? '<div class="soon-badge">SOON</div>' : ''}
+          </a>
+        </div>
+      `;
+    }
+
+    // ========== ОТРИСОВКА ИГРЫ ==========
+    function renderGames(games) {
+      if (!games?.length) {
+        DOM.container.innerHTML = '<div class="message">Нет доступных игр</div>';
+        return;
+      }
+
+      DOM.container.innerHTML = games.map(createGameCard).join('');
+    }
+
+    // ========== ЗАГРУЗКА ИГРЫ ==========
+    async function loadGames() {
+      try {
+        const url = `${CONFIG.GAMES_URL}?t=${Date.now()}`;
+        const response = await fetch(url);
+
+        if (!response.ok) {
+          throw new Error('Ошибка загрузки игр');
+        }
+
+        const games = await response.json();
+        renderGames(games);
+      } catch (error) {
+        showError(error.message);
+        console.error('Games Load Error:', error);
+      }
+    }
+
+    // ========== ОБРАБОТКА ОШИБОК ==========
+    function showError(message) {
+      DOM.container.innerHTML = `<div class="message">❌ ${message}</div>`;
+    }
+
+    // ========== ИНИЦИАЛИЗАЦИЯ ПРИЛОЖЕНИЯ ==========
+    function init() {
+      initTelegram();
+      authenticateUser();
+    }
+
+    // Запуск при загрузке страницы
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', init);
+    } else {
+      init();
+    }
   </script>
 </body>
 </html>
