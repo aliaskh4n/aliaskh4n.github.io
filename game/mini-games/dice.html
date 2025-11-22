@@ -7,81 +7,462 @@
   <script src="https://telegram.org/js/telegram-web-app.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
-  <link rel="stylesheet" href="shared/tg-style.css">
-  <script src="shared/firebase.js"></script>
-  <script src="dice.js" defer></script>
   <style>
-    .screen{display:none;min-height:100vh}.screen.active{display:block}
-    .btn{height:52px;border-radius:12px;padding:0 20px;font-size:17px;font-weight:600;border:none;cursor:pointer;background:var(--tg-theme-button-color,#2481cc);color:var(--tg-theme-button-text-color,#fff)}
-    .btn:disabled{opacity:0.6;cursor:not-allowed}
-    .rolling{animation:roll 1s cubic-bezier(.25,.46,.45,.94) infinite}
-    @keyframes roll{from{transform:rotate(0deg)}to{transform:rotate(360deg)}}
-    .dice-large{font-size:96px}
-    .room-item{display:flex;justify-content:space-between;align-items:center;padding:14px 16px;background:var(--tg-theme-bg-color,#fff);border-radius:12px;margin-bottom:8px}
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+      background: var(--tg-theme-bg-color, #ffffff);
+      color: var(--tg-theme-text-color, #000000);
+      min-height: 100vh;
+      padding: 0;
+      margin: 0;
+      overflow-x: hidden;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    .container {
+      max-width: 100%;
+      padding: 12px;
+    }
+
+    .header {
+      padding: 8px 0 16px 0;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .header-icon {
+      width: 40px;
+      height: 40px;
+      background: var(--tg-theme-button-color, #3390ec);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 24px;
+    }
+
+    .header-title {
+      color: var(--tg-theme-text-color, #000000);
+      font-size: 20px;
+      font-weight: 600;
+    }
+
+    .balance-card {
+      background: var(--tg-theme-secondary-bg-color, #f4f4f5);
+      border-radius: 12px;
+      padding: 16px;
+      margin-bottom: 8px;
+    }
+
+    .balance-label {
+      color: var(--tg-theme-hint-color, #999999);
+      font-size: 14px;
+      margin-bottom: 4px;
+      font-weight: 400;
+    }
+
+    .balance-value {
+      color: var(--tg-theme-text-color, #000000);
+      font-size: 32px;
+      font-weight: 700;
+      letter-spacing: -0.5px;
+    }
+
+    .screen {
+      display: none;
+    }
+
+    .screen.active {
+      display: block;
+    }
+
+    .card {
+      background: var(--tg-theme-secondary-bg-color, #f4f4f5);
+      border-radius: 12px;
+      padding: 16px;
+      margin-bottom: 8px;
+    }
+
+    .input-field {
+      width: 100%;
+      padding: 14px 16px;
+      border-radius: 10px;
+      border: none;
+      background: var(--tg-theme-bg-color, #ffffff);
+      color: var(--tg-theme-text-color, #000000);
+      font-size: 16px;
+      font-weight: 500;
+      margin-bottom: 8px;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    }
+
+    .input-field::placeholder {
+      color: var(--tg-theme-hint-color, #999999);
+    }
+
+    .btn {
+      background: var(--tg-theme-button-color, #3390ec);
+      color: var(--tg-theme-button-text-color, #ffffff);
+      border: none;
+      padding: 14px;
+      font-size: 16px;
+      border-radius: 10px;
+      cursor: pointer;
+      width: 100%;
+      font-weight: 600;
+      transition: all 0.2s;
+      box-shadow: 0 2px 8px rgba(51, 144, 236, 0.3);
+      margin-bottom: 8px;
+    }
+
+    .btn:active {
+      transform: scale(0.98);
+      opacity: 0.9;
+    }
+
+    .btn:disabled {
+      background: var(--tg-theme-hint-color, #999999);
+      opacity: 0.5;
+      cursor: not-allowed;
+      box-shadow: none;
+    }
+
+    .btn-secondary {
+      background: var(--tg-theme-secondary-bg-color, #f4f4f5);
+      color: var(--tg-theme-text-color, #000000);
+      box-shadow: none;
+    }
+
+    .room-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 14px 16px;
+      background: var(--tg-theme-bg-color, #ffffff);
+      border-radius: 12px;
+      margin-bottom: 8px;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    }
+
+    .room-info {
+      flex: 1;
+    }
+
+    .room-code {
+      font-size: 16px;
+      font-weight: 600;
+      margin-bottom: 4px;
+    }
+
+    .room-bet {
+      font-size: 14px;
+      color: var(--tg-theme-hint-color, #999999);
+    }
+
+    .dice-large {
+      font-size: 96px;
+      text-align: center;
+      margin: 20px 0;
+    }
+
+    .rolling {
+      animation: roll 1s cubic-bezier(.25,.46,.45,.94) infinite;
+    }
+
+    @keyframes roll {
+      from { transform: rotate(0deg); }
+      to { transform: rotate(360deg); }
+    }
+
+    .waiting-screen {
+      text-align: center;
+      padding: 40px 20px;
+    }
+
+    .waiting-title {
+      font-size: 20px;
+      font-weight: 600;
+      margin-bottom: 8px;
+    }
+
+    .waiting-code {
+      color: var(--tg-theme-button-color, #3390ec);
+      font-size: 32px;
+      font-weight: 700;
+      letter-spacing: 2px;
+      margin-bottom: 20px;
+    }
+
+    .waiting-text {
+      color: var(--tg-theme-hint-color, #999999);
+      font-size: 15px;
+      margin-bottom: 30px;
+    }
+
+    .vs-container {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 20px;
+      background: var(--tg-theme-secondary-bg-color, #f4f4f5);
+      border-radius: 12px;
+      margin-bottom: 16px;
+    }
+
+    .player {
+      text-align: center;
+      flex: 1;
+    }
+
+    .player-avatar {
+      width: 70px;
+      height: 70px;
+      border-radius: 50%;
+      border: 3px solid var(--tg-theme-button-color, #3390ec);
+      margin-bottom: 8px;
+    }
+
+    .player-name {
+      font-size: 14px;
+      font-weight: 600;
+    }
+
+    .vs-text {
+      font-size: 24px;
+      font-weight: 700;
+      color: var(--tg-theme-hint-color, #999999);
+      padding: 0 20px;
+    }
+
+    .bet-display {
+      text-align: center;
+      padding: 16px;
+      background: var(--tg-theme-secondary-bg-color, #f4f4f5);
+      border-radius: 12px;
+      margin-bottom: 16px;
+    }
+
+    .bet-label {
+      font-size: 14px;
+      color: var(--tg-theme-hint-color, #999999);
+      margin-bottom: 4px;
+    }
+
+    .bet-value {
+      font-size: 24px;
+      font-weight: 700;
+    }
+
+    .dice-container {
+      display: flex;
+      justify-content: space-around;
+      padding: 20px;
+      background: var(--tg-theme-secondary-bg-color, #f4f4f5);
+      border-radius: 12px;
+      margin-bottom: 16px;
+    }
+
+    .dice-player {
+      text-align: center;
+      flex: 1;
+    }
+
+    .dice-emoji {
+      font-size: 80px;
+      margin-bottom: 12px;
+    }
+
+    .dice-result {
+      font-size: 40px;
+      font-weight: 700;
+    }
+
+    .result-screen {
+      text-align: center;
+      padding: 60px 20px;
+    }
+
+    .result-title {
+      font-size: 32px;
+      font-weight: 700;
+      margin-bottom: 20px;
+    }
+
+    .result-title.win {
+      color: #34c759;
+    }
+
+    .result-title.lose {
+      color: #ff3b30;
+    }
+
+    .result-title.draw {
+      color: var(--tg-theme-hint-color, #999999);
+    }
+
+    .result-amount {
+      font-size: 48px;
+      font-weight: 700;
+      margin: 30px 0;
+    }
+
+    .section-title {
+      font-size: 17px;
+      font-weight: 600;
+      margin-bottom: 12px;
+      color: var(--tg-theme-text-color, #000000);
+    }
+
+    @media (prefers-color-scheme: dark) {
+      .room-item, .input-field {
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+      }
+    }
   </style>
 </head>
 <body>
   <div class="container">
     <div class="header">
-      <h1>Кости: Кто выше?</h1>
-      <div class="balance">Баланс: <span id="balance">—</span> 💰</div>
+      <div class="header-icon">🎲</div>
+      <div class="header-title">Кости: Кто выше?</div>
+    </div>
+
+    <div class="balance-card">
+      <div class="balance-label">Ваш баланс</div>
+      <div class="balance-value" id="balance">—</div>
     </div>
 
     <!-- Меню -->
     <div id="menu" class="screen active">
-      <input type="number" id="betAmount" placeholder="Ставка от 10" min="10" value="50" style="width:100%;padding:16px;margin-bottom:12px;border-radius:12px;border:none;background:var(--tg-theme-secondary-bg-color)">
-      <button id="createGame" class="btn" style="width:100%;margin-bottom:20px">Создать комнату</button>
-      <input type="text" id="roomCode" placeholder="Код комнаты" maxlength="6" style="text-transform:uppercase;width:100%;padding:16px;margin-bottom:12px;border-radius:12px;border:none;background:var(--tg-theme-secondary-bg-color)">
-      <button id="joinGame" class="btn" style="width:100%;margin-bottom:20px">Войти по коду</button>
+      <div class="card">
+        <input type="number" id="betAmount" class="input-field" placeholder="Ставка от 10" min="10" value="50">
+        <button id="createGame" class="btn">Создать комнату</button>
+      </div>
+
+      <div class="card">
+        <input type="text" id="roomCode" class="input-field" placeholder="Код комнаты" maxlength="6" style="text-transform:uppercase">
+        <button id="joinGame" class="btn">Войти по коду</button>
+      </div>
+
+      <div class="section-title">Доступные комнаты</div>
       <div id="roomsList"></div>
     </div>
 
     <!-- Ожидание -->
     <div id="waiting" class="screen">
-      <div style="text-align:center;padding-top:100px">
-        <h2>Комната <strong id="roomIdDisplay"></strong></h2>
+      <div class="waiting-screen">
+        <div class="waiting-title">Комната создана</div>
+        <div class="waiting-code" id="roomIdDisplay"></div>
         <div class="dice-large rolling">🎲</div>
-        <p>Ожидаем второго игрока...</p>
-        <button id="cancelRoom" class="btn">Отмена</button>
+        <div class="waiting-text">Ожидаем второго игрока...</div>
+        <button id="cancelRoom" class="btn btn-secondary">Отмена</button>
       </div>
     </div>
 
     <!-- Игра -->
     <div id="game" class="screen">
-      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:30px">
-        <div style="text-align:center">
-          <img id="myAvatar" src="" width="80" height="80" style="border-radius:50%;border:3px solid #2481cc">
-          <div id="mypName"></div>
+      <div class="vs-container">
+        <div class="player">
+          <img id="myAvatar" class="player-avatar" src="" alt="You">
+          <div class="player-name" id="myName">Вы</div>
         </div>
-        <div style="font-size:28px;font-weight:bold">VS</div>
-        <div style="text-align:center">
-          <img id="oppAvatar" src="" width="80" height="80" style="border-radius:50%;border:3px solid #666">
-          <div id="oppName"></div>
-        </div>
-      </div>
-      <div style="text-align:center;font-size:18px;margin-bottom:30px">Ставка: <strong id="gameBet"></strong> 💰</div>
-      <div style="display:flex;justify-content:space-around;margin:40px 0">
-        <div style="text-align:center">
-          <div id="yourDice" class="dice-large">🎲</div>
-          <div id="yourResult" style="font-size:48px;margin-top:10px">-</div>
-        </div>
-        <div style="text-align:center">
-          <div id="opponentDice" class="dice-large">🎲</div>
-          <div id="opponentResult" style="font-size:48px;margin-top:10px">-</div>
+        <div class="vs-text">VS</div>
+        <div class="player">
+          <img id="oppAvatar" class="player-avatar" src="" alt="Opponent">
+          <div class="player-name" id="oppName">Противник</div>
         </div>
       </div>
-      <button id="rollBtn" class="btn" style="width:100%">Бросить кости!</button>
-      <button id="leaveGame" class="btn" style="margin-top:12px;background:#666">Покинуть</button>
+
+      <div class="bet-display">
+        <div class="bet-label">Ставка</div>
+        <div class="bet-value"><span id="gameBet">—</span> 💰</div>
+      </div>
+
+      <div class="dice-container">
+        <div class="dice-player">
+          <div id="yourDice" class="dice-emoji">🎲</div>
+          <div id="yourResult" class="dice-result">-</div>
+        </div>
+        <div class="dice-player">
+          <div id="opponentDice" class="dice-emoji">🎲</div>
+          <div id="opponentResult" class="dice-result">-</div>
+        </div>
+      </div>
+
+      <button id="rollBtn" class="btn">Бросить кости!</button>
+      <button id="leaveGame" class="btn btn-secondary">Покинуть</button>
     </div>
 
     <!-- Результат -->
     <div id="result" class="screen">
-      <div style="text-align:center;padding-top:100px">
-        <h1 id="resultText"></h1>
-        <div style="font-size:48px;margin:30px 0" id="winAmount"></div>
+      <div class="result-screen">
+        <h1 id="resultText" class="result-title"></h1>
+        <div class="result-amount" id="winAmount"></div>
         <button id="playAgain" class="btn">Играть снова</button>
       </div>
     </div>
   </div>
+
+  <script>
+    // Инициализация Telegram Web App
+    let tg = window.Telegram.WebApp;
+    tg.ready();
+    tg.expand();
+    tg.enableClosingConfirmation();
+
+    // Placeholder Firebase и игровая логика
+    // Здесь должна быть ваша логика из dice.js и firebase.js
+    
+    // Пример функций для демонстрации
+    document.getElementById('balance').textContent = '1000';
+    
+    document.getElementById('createGame').addEventListener('click', function() {
+      document.getElementById('menu').classList.remove('active');
+      document.getElementById('waiting').classList.add('active');
+      document.getElementById('roomIdDisplay').textContent = 'ABC123';
+    });
+    
+    document.getElementById('cancelRoom').addEventListener('click', function() {
+      document.getElementById('waiting').classList.remove('active');
+      document.getElementById('menu').classList.add('active');
+    });
+    
+    document.getElementById('leaveGame').addEventListener('click', function() {
+      document.getElementById('game').classList.remove('active');
+      document.getElementById('menu').classList.add('active');
+    });
+    
+    document.getElementById('playAgain').addEventListener('click', function() {
+      document.getElementById('result').classList.remove('active');
+      document.getElementById('menu').classList.add('active');
+    });
+
+    // Пример списка комнат
+    const roomsList = document.getElementById('roomsList');
+    const exampleRooms = [
+      { code: 'XYZ789', bet: 50, player: 'Игрок123' },
+      { code: 'DEF456', bet: 100, player: 'Гость999' }
+    ];
+    
+    exampleRooms.forEach(room => {
+      const item = document.createElement('div');
+      item.className = 'room-item';
+      item.innerHTML = `
+        <div class="room-info">
+          <div class="room-code">${room.code}</div>
+          <div class="room-bet">Ставка: ${room.bet} 💰 • ${room.player}</div>
+        </div>
+        <button class="btn" style="width: auto; padding: 10px 20px; font-size: 14px;">Войти</button>
+      `;
+      roomsList.appendChild(item);
+    });
+  </script>
 </body>
 </html>
