@@ -415,7 +415,7 @@
         winsScroll: document.getElementById('wins-scroll'),
       }
     };
-
+    
     // ========== API WITH RETRY ==========
     async function api(endpoint, method = 'GET', body = null, retries = 3) {
       let lastError;
@@ -429,7 +429,7 @@
           };
           if (body) opts.body = JSON.stringify(body);
           if (app.state.token) opts.headers.Authorization = `Bearer ${app.state.token}`;
-
+    
           const controller = new AbortController();
           const timeoutId = setTimeout(() => controller.abort(), 10000);
           
@@ -449,7 +449,8 @@
       }
       throw lastError;
     }
-
+    
+    // ========== WINS ==========
     async function loadWins() {
       try {
         const res = await api('/stats/leaderboard');
@@ -457,14 +458,14 @@
           app.dom.winsScroll.innerHTML = '<div class="win-empty">Нет игроков</div>';
           return;
         }
-
+    
         const richestPlayers = res.leaderboard.slice(0, 10);
-
+    
         if (richestPlayers.length === 0) {
           app.dom.winsScroll.innerHTML = '<div class="win-empty">Нет данных</div>';
           return;
         }
-
+    
         const medals = ['🥇', '🥈', '🥉', '⭐', '✨', '💫', '🌟', '💎', '👑', '🏆'];
         app.dom.winsScroll.innerHTML = richestPlayers.map((player, i) => {
           const medal = medals[i];
@@ -486,8 +487,8 @@
         app.dom.winsScroll.innerHTML = '<div class="win-empty">Ошибка загрузки</div>';
       }
     }
-
-    // ========== MAIN FUNCTIONS ==========
+    
+    // ========== AUTH ==========
     async function auth() {
       try {
         app.dom.container.innerHTML = '<div class="message"><div class="loading-spinner"></div></div>';
@@ -495,11 +496,11 @@
         const res = await api('/auth/init', 'POST', { initData: app.state.tg.initData });
         app.state.user = res.user;
         app.state.token = res.token;
-
+    
         localStorage.setItem('token', app.state.token);
         localStorage.setItem('user_id', app.state.user.id);
         localStorage.setItem('user_balance', app.state.user.balance);
-
+    
         updateUI();
         loadGames();
         loadWins();
@@ -510,10 +511,10 @@
         app.dom.container.innerHTML = `<div class="message">⌛ ${e.message}</div>`;
       }
     }
-
+    
     function updateUI() {
       app.dom.balance.textContent = app.state.user.balance.toLocaleString();
-
+    
       const avatar = app.dom.userAvatar;
       if (app.state.user.photo_url) {
         const img = document.createElement('img');
@@ -524,45 +525,76 @@
       } else {
         setAvatarText();
       }
-
+    
       app.dom.userMenu.onclick = () => app.state.tg.showAlert(
         `👤 ${app.state.user.name}\n💰 ${app.state.user.balance}\n🎮 ${app.state.user.gamesPlayed}\n🏆 ${app.state.user.gamesWon}`
       );
     }
-
+    
     function setAvatarText() {
       app.dom.userAvatar.innerHTML = `<div class="user-avatar-placeholder">${app.state.user.name?.charAt(0).toUpperCase() || '👤'}</div>`;
     }
-
+    
+    // ========== CREATE CARD WITH LOTTIE ==========
     function createCard(g) {
       const ready = g.ready !== false;
       const style = g.gradient ? `--g1: ${g.gradient[0]}; --g2: ${g.gradient[1]};` : '';
+    
       return `
         <div class="game-card ${!ready ? 'disabled' : ''}">
-          <a href="${ready ? `/game/mini-games/${g.id}.html` : '#'}" class="game-link" ${ready ? '' : 'onclick="return false"'}>
+          <a href="${ready ? `/game/mini-games/${g.id}.html` : '#'}"
+             class="game-link"
+             ${ready ? '' : 'onclick="return false"'}>
+             
             <div class="game-thumb" style="${style}">
-              <div class="game-emoji">${g.emoji}</div>
+                <div class="game-lottie" id="lottie-${g.id}"></div>
             </div>
+    
             <div class="game-info">
               <div class="game-title">${g.title}</div>
               <div class="game-desc">${g.desc}</div>
             </div>
+    
             ${!ready ? '<div class="soon-badge">SOON</div>' : ''}
           </a>
         </div>
       `;
     }
-
+    
+    // ========== LOAD GAMES + LOTTIE ==========
     async function loadGames() {
       try {
         const res = await fetch(`/game/mini-games/games.json?t=${Date.now()}`);
         const games = await res.json();
-        app.dom.container.innerHTML = games?.length ? games.map(createCard).join('') : '<div class="message">Нет игр</div>';
+    
+        if (!games?.length) {
+          app.dom.container.innerHTML = '<div class="message">Нет игр</div>';
+          return;
+        }
+    
+        app.dom.container.innerHTML = games.map(createCard).join('');
+    
+        // Подключение Lottie-анимаций
+        games.forEach(g => {
+          if (g.animation) {
+            const container = document.getElementById(`lottie-${g.id}`);
+            if (container) {
+              lottie.loadAnimation({
+                container,
+                renderer: "svg",
+                loop: true,
+                autoplay: true,
+                path: g.animation
+              });
+            }
+          }
+        });
+    
       } catch (e) {
         app.dom.container.innerHTML = `<div class="message">⌛ ${e.message}</div>`;
       }
     }
-
+    
     // ========== START ==========
     app.state.tg.ready();
     app.state.tg.expand();
@@ -570,3 +602,4 @@
   </script>
 </body>
 </html>
+
