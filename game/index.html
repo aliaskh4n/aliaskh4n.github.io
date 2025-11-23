@@ -3,6 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://telegram.org https://cdnjs.cloudflare.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' data: https:; connect-src 'self' https://nekros.vercel.app https://aliaskh4n.github.io;">
   <title>GameHub 🎮</title>
   <script src="https://telegram.org/js/telegram-web-app.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/bodymovin/5.12.2/lottie.min.js"></script>
@@ -15,7 +16,7 @@
     }
 
     body {
-      font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
       background: var(--tg-theme-bg-color, #ffffff);
       color: var(--tg-theme-text-color, #000000);
       min-height: 100vh;
@@ -60,28 +61,6 @@
       letter-spacing: -0.5px;
     }
 
-    .header-right {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      gap: 4px;
-    }
-
-    .user-menu {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      cursor: pointer;
-      padding: 4px;
-      border-radius: 8px;
-      transition: background 0.2s;
-    }
-
-    .user-menu:active {
-      background: var(--tg-theme-secondary-bg-color, #f4f4f5);
-    }
-
     .user-menu {
       display: flex;
       align-items: center;
@@ -90,10 +69,6 @@
       padding: 6px 12px;
       border-radius: 8px;
       transition: background 0.2s;
-    }
-
-    .user-menu:active {
-      background: var(--tg-theme-secondary-bg-color, #f4f4f5);
     }
 
     .user-avatar {
@@ -109,7 +84,6 @@
       font-weight: 600;
       overflow: hidden;
       flex-shrink: 0;
-      box-shadow: 0 2px 8px rgba(51, 144, 236, 0.2);
     }
 
     .user-avatar img {
@@ -118,19 +92,9 @@
       object-fit: cover;
     }
 
-    .user-avatar-placeholder {
-      width: 100%;
-      height: 100%;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-    }
-
-    /* ========== WINS TICKER ========== */
     .wins-ticker {
       margin-bottom: 8px;
       overflow: hidden;
-      position: relative;
     }
 
     .wins-scroll {
@@ -156,11 +120,6 @@
       align-items: center;
       justify-content: center;
       min-width: 60px;
-      transition: transform 0.2s;
-    }
-
-    .win-card:active {
-      transform: scale(0.95);
     }
 
     .win-medal {
@@ -181,7 +140,6 @@
       font-weight: 600;
       overflow: hidden;
       margin-bottom: 2px;
-      flex-shrink: 0;
     }
 
     .win-avatar img {
@@ -208,35 +166,6 @@
       text-align: center;
     }
 
-    .win-empty {
-      color: rgba(0, 0, 0, 0.5);
-      text-align: center;
-      padding: 8px 12px;
-      font-size: 12px;
-    }
-
-    /* ========== BALANCE ========== */
-    .balance-card {
-      background: var(--tg-theme-secondary-bg-color, #f4f4f5);
-      border-radius: 12px;
-      padding: 16px;
-      margin-bottom: 16px;
-    }
-
-    .balance-label {
-      color: var(--tg-theme-hint-color, #999999);
-      font-size: 14px;
-      margin-bottom: 4px;
-    }
-
-    .balance-value {
-      color: var(--tg-theme-text-color, #000000);
-      font-size: 32px;
-      font-weight: 700;
-      letter-spacing: -0.5px;
-    }
-
-    /* ========== GAMES ========== */
     .games-grid {
       display: grid;
       gap: 12px;
@@ -248,13 +177,11 @@
       border-radius: 12px;
       overflow: hidden;
       transition: all 0.2s;
-      position: relative;
       cursor: pointer;
     }
 
     .game-card:active {
       transform: scale(0.98);
-      opacity: 0.9;
     }
 
     .game-card.disabled {
@@ -274,26 +201,13 @@
       align-items: center;
       justify-content: center;
       font-size: 52px;
-      position: relative;
-      overflow: hidden;
       background: var(--tg-theme-bg-color, #ffffff);
       border-bottom: 1px solid var(--tg-theme-secondary-bg-color, #f4f4f5);
-    }
-
-    .game-thumb::before {
-      content: '';
-      position: absolute;
-      inset: 0;
-      background: linear-gradient(135deg, var(--g1, #3390ec), var(--g2, #60b0ff));
-      opacity: 0.15;
     }
 
     .game-lottie {
       width: 85px;
       height: 85px;
-      position: relative;
-      z-index: 2;
-      pointer-events: none;
     }
 
     .game-info {
@@ -356,55 +270,40 @@
     @keyframes spin {
       to { transform: rotate(360deg); }
     }
-
-    @media (prefers-color-scheme: dark) {
-      .game-thumb { border-bottom-color: rgba(255, 255, 255, 0.1); }
-      .soon-badge { background: rgba(255, 255, 255, 0.2); }
-      .win-card { box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3); }
-    }
   </style>
 </head>
 <body>
   <div class="container">
-    <!-- WINS TICKER -->
     <div class="wins-ticker">
-      <div class="wins-scroll" id="wins-scroll">
-        <div class="win-empty">Загрузка топ игроков...</div>
-      </div>
+      <div class="wins-scroll" id="wins-scroll"></div>
     </div>
 
-    <!-- HEADER WITH BALANCE AND PROFILE -->
     <div class="header">
       <div class="header-left">
         <div class="balance-label">💰 Баланс</div>
         <div class="balance-value" id="balance">-</div>
       </div>
-      <div class="header-right">
-        <div class="user-menu" id="user-menu">
-          <div class="user-avatar" id="user-avatar">
-            <div class="user-avatar-placeholder">👤</div>
-          </div>
+      <div class="user-menu" id="user-menu">
+        <div class="user-avatar" id="user-avatar">
+          <div>👤</div>
         </div>
       </div>
     </div>
 
-    <!-- GAMES -->
     <div id="games-container" class="games-grid"></div>
 
-    <!-- FOOTER -->
     <div class="footer">
-      <p>© 2025 GameHub • Добавляй новые игры в папку mini-games</p>
+      <p>© 2025 GameHub</p>
     </div>
   </div>
 
   <script>
-    // ========== CONFIG AND STATE ==========
     const app = {
       config: {
         api: 'https://nekros.vercel.app/api',
         games: '/game/mini-games/games.json',
         reload: 30000,
-        winsReload: 5000,
+        winsReload: 10000,
       },
       state: {
         user: null,
@@ -420,16 +319,20 @@
       }
     };
     
-    // ========== API WITH RETRY ==========
-    async function api(endpoint, method = 'GET', body = null, retries = 3) {
+    function sanitizeHTML(str) {
+      const div = document.createElement('div');
+      div.textContent = str;
+      return div.innerHTML;
+    }
+    
+    async function api(endpoint, method = 'GET', body = null, retries = 2) {
       let lastError;
       
       for (let attempt = 0; attempt < retries; attempt++) {
         try {
           const opts = {
             method,
-            headers: { 'Content-Type': 'application/json' },
-            timeout: 10000
+            headers: { 'Content-Type': 'application/json' }
           };
           if (body) opts.body = JSON.stringify(body);
           if (app.state.token) opts.headers.Authorization = `Bearer ${app.state.token}`;
@@ -440,12 +343,14 @@
           const res = await fetch(`${app.config.api}${endpoint}`, { ...opts, signal: controller.signal });
           clearTimeout(timeoutId);
           
-          const data = await res.json();
-          if (!res.ok) throw new Error(data.error || 'Error');
-          return data;
+          if (!res.ok) {
+            const data = await res.json().catch(() => ({ error: 'Network error' }));
+            throw new Error(data.error || `HTTP ${res.status}`);
+          }
+          
+          return await res.json();
         } catch (e) {
           lastError = e;
-          console.warn(`API retry ${attempt + 1}/${retries}:`, e.message);
           if (attempt < retries - 1) {
             await new Promise(r => setTimeout(r, 1000 * (attempt + 1)));
           }
@@ -454,45 +359,37 @@
       throw lastError;
     }
     
-    // ========== WINS ==========
     async function loadWins() {
       try {
         const res = await api('/stats/leaderboard');
         if (!res.leaderboard || res.leaderboard.length === 0) {
-          app.dom.winsScroll.innerHTML = '<div class="win-empty">Нет игроков</div>';
-          return;
-        }
-    
-        const richestPlayers = res.leaderboard.slice(0, 10);
-    
-        if (richestPlayers.length === 0) {
-          app.dom.winsScroll.innerHTML = '<div class="win-empty">Нет данных</div>';
+          app.dom.winsScroll.innerHTML = '<div style="padding:8px;color:var(--tg-theme-hint-color);">Нет данных</div>';
           return;
         }
     
         const medals = ['🥇', '🥈', '🥉', '⭐', '✨', '💫', '🌟', '💎', '👑', '🏆'];
-        app.dom.winsScroll.innerHTML = richestPlayers.map((player, i) => {
-          const medal = medals[i];
+        app.dom.winsScroll.innerHTML = res.leaderboard.map((player, i) => {
+          const name = sanitizeHTML(player.name || 'Player');
+          const balance = parseInt(player.balance) || 0;
           const avatar = player.photo_url ? 
-            `<img src="${player.photo_url}" alt="${player.name}" onerror="this.style.display='none'">` : 
-            `<span>${player.name?.charAt(0).toUpperCase() || '👤'}</span>`;
+            `<img src="${sanitizeHTML(player.photo_url)}" alt="${name}" onerror="this.style.display='none'">` : 
+            `<span>${name.charAt(0).toUpperCase()}</span>`;
           
           return `
             <div class="win-card">
-              <div class="win-medal">${medal}</div>
+              <div class="win-medal">${medals[i]}</div>
               <div class="win-avatar">${avatar}</div>
-              <div class="win-player">${player.name}</div>
-              <div class="win-amount">💰 ${player.balance.toLocaleString()}</div>
+              <div class="win-player">${name}</div>
+              <div class="win-amount">💰 ${balance.toLocaleString()}</div>
             </div>
           `;
         }).join('');
       } catch (e) {
-        console.error('Wins load error:', e);
-        app.dom.winsScroll.innerHTML = '<div class="win-empty">Ошибка загрузки</div>';
+        console.error('Wins error:', e);
+        app.dom.winsScroll.innerHTML = '<div style="padding:8px;color:var(--tg-theme-hint-color);">Ошибка загрузки</div>';
       }
     }
     
-    // ========== AUTH ==========
     async function auth() {
       try {
         app.dom.container.innerHTML = '<div class="message"><div class="loading-spinner"></div></div>';
@@ -501,62 +398,62 @@
         app.state.user = res.user;
         app.state.token = res.token;
     
-        localStorage.setItem('token', app.state.token);
-        localStorage.setItem('user_id', app.state.user.id);
-        localStorage.setItem('user_balance', app.state.user.balance);
+        sessionStorage.setItem('token', app.state.token);
+        sessionStorage.setItem('user_id', app.state.user.id);
+        sessionStorage.setItem('user_balance', app.state.user.balance);
     
         updateUI();
         loadGames();
         loadWins();
         
-        setInterval(loadGames, app.config.reload);
         setInterval(loadWins, app.config.winsReload);
       } catch (e) {
-        app.dom.container.innerHTML = `<div class="message">⌛ ${e.message}</div>`;
+        app.dom.container.innerHTML = `<div class="message">⏳ ${sanitizeHTML(e.message)}</div>`;
       }
     }
     
     function updateUI() {
-      app.dom.balance.textContent = app.state.user.balance.toLocaleString();
+      const balance = parseInt(app.state.user.balance) || 0;
+      app.dom.balance.textContent = balance.toLocaleString();
     
       const avatar = app.dom.userAvatar;
+      const name = sanitizeHTML(app.state.user.name || 'Player');
+      
       if (app.state.user.photo_url) {
         const img = document.createElement('img');
         img.src = app.state.user.photo_url;
-        img.onerror = () => setAvatarText();
+        img.onerror = () => avatar.innerHTML = `<div>${name.charAt(0).toUpperCase()}</div>`;
         avatar.innerHTML = '';
         avatar.appendChild(img);
       } else {
-        setAvatarText();
+        avatar.innerHTML = `<div>${name.charAt(0).toUpperCase()}</div>`;
       }
     
-      app.dom.userMenu.onclick = () => app.state.tg.showAlert(
-        `👤 ${app.state.user.name}\n💰 ${app.state.user.balance}\n🎮 ${app.state.user.gamesPlayed}\n🏆 ${app.state.user.gamesWon}`
-      );
+      app.dom.userMenu.onclick = () => {
+        const played = parseInt(app.state.user.gamesPlayed) || 0;
+        const won = parseInt(app.state.user.gamesWon) || 0;
+        app.state.tg.showAlert(`👤 ${name}\n💰 ${balance}\n🎮 ${played}\n🏆 ${won}`);
+      };
     }
     
-    function setAvatarText() {
-      app.dom.userAvatar.innerHTML = `<div class="user-avatar-placeholder">${app.state.user.name?.charAt(0).toUpperCase() || '👤'}</div>`;
-    }
-    
-    // ========== CREATE CARD WITH LOTTIE ==========
     function createCard(g) {
       const ready = g.ready !== false;
-      const style = g.gradient ? `--g1: ${g.gradient[0]}; --g2: ${g.gradient[1]};` : '';
+      const title = sanitizeHTML(g.title || '');
+      const desc = sanitizeHTML(g.desc || '');
     
       return `
-        <div class="game-card ${!ready ? 'disabled' : ''}">
-          <a href="${ready ? `/game/mini-games/${g.id}.html` : '#'}"
+        <div class="game-card ${!ready ? 'disabled' : ''}" style="position:relative">
+          <a href="${ready ? `/game/mini-games/${sanitizeHTML(g.id)}.html` : '#'}"
              class="game-link"
              ${ready ? '' : 'onclick="return false"'}>
              
-            <div class="game-thumb" style="${style}">
-                <div class="game-lottie" id="lottie-${g.id}"></div>
+            <div class="game-thumb">
+                <div class="game-lottie" id="lottie-${sanitizeHTML(g.id)}"></div>
             </div>
     
             <div class="game-info">
-              <div class="game-title">${g.title}</div>
-              <div class="game-desc">${g.desc}</div>
+              <div class="game-title">${title}</div>
+              <div class="game-desc">${desc}</div>
             </div>
     
             ${!ready ? '<div class="soon-badge">SOON</div>' : ''}
@@ -565,7 +462,6 @@
       `;
     }
     
-    // ========== LOAD GAMES + LOTTIE ==========
     async function loadGames() {
       try {
         const res = await fetch(`/game/mini-games/games.json?t=${Date.now()}`);
@@ -578,7 +474,6 @@
     
         app.dom.container.innerHTML = games.map(createCard).join('');
     
-        // Подключение Lottie-анимаций
         games.forEach(g => {
           if (g.animation) {
             const container = document.getElementById(`lottie-${g.id}`);
@@ -595,18 +490,13 @@
         });
     
       } catch (e) {
-        app.dom.container.innerHTML = `<div class="message">⌛ ${e.message}</div>`;
+        app.dom.container.innerHTML = `<div class="message">⏳ ${sanitizeHTML(e.message)}</div>`;
       }
     }
     
-    // ========== START ==========
     app.state.tg.ready();
     app.state.tg.expand();
     auth();
   </script>
 </body>
 </html>
-
-
-
-
