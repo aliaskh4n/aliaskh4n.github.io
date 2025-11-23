@@ -155,21 +155,18 @@
       align-items: center;
       justify-content: center;
       min-width: 60px;
-      transition: none;           /* убрали анимацию */
-      background: none !important; /* убрали фон */
-      border: none !important;     /* убрали границы */
-      box-shadow: none !important; /* убрали тень */
+      transition: transform 0.2s;
     }
-    
+
     .win-card:active {
-      transform: none !important; /* убираем нажатие */
+      transform: scale(0.95);
     }
-    
+
     .win-medal {
       font-size: 12px;
       margin-bottom: 1px;
     }
-    
+
     .win-avatar {
       width: 36px;
       height: 36px;
@@ -185,13 +182,13 @@
       margin-bottom: 2px;
       flex-shrink: 0;
     }
-    
+
     .win-avatar img {
       width: 100%;
       height: 100%;
       object-fit: cover;
     }
-    
+
     .win-player {
       font-size: 9px;
       color: var(--tg-theme-hint-color, #999999);
@@ -202,14 +199,14 @@
       max-width: 55px;
       margin-bottom: 1px;
     }
-    
+
     .win-amount {
       font-size: 10px;
       font-weight: 700;
       color: var(--tg-theme-text-color, #000000);
       text-align: center;
     }
-    
+
     .win-empty {
       color: rgba(0, 0, 0, 0.5);
       text-align: center;
@@ -419,19 +416,38 @@
       }
     };
 
-    // ========== API ==========
-    async function api(endpoint, method = 'GET', body = null) {
-      const opts = {
-        method,
-        headers: { 'Content-Type': 'application/json' },
-      };
-      if (body) opts.body = JSON.stringify(body);
-      if (app.state.token) opts.headers.Authorization = `Bearer ${app.state.token}`;
+    // ========== API WITH RETRY ==========
+    async function api(endpoint, method = 'GET', body = null, retries = 3) {
+      let lastError;
+      
+      for (let attempt = 0; attempt < retries; attempt++) {
+        try {
+          const opts = {
+            method,
+            headers: { 'Content-Type': 'application/json' },
+            timeout: 10000
+          };
+          if (body) opts.body = JSON.stringify(body);
+          if (app.state.token) opts.headers.Authorization = `Bearer ${app.state.token}`;
 
-      const res = await fetch(`${app.config.api}${endpoint}`, opts);
-      const data = await res.json();
-      if (!res.ok) throw new Error(data.error || 'Error');
-      return data;
+          const controller = new AbortController();
+          const timeoutId = setTimeout(() => controller.abort(), 10000);
+          
+          const res = await fetch(`${app.config.api}${endpoint}`, { ...opts, signal: controller.signal });
+          clearTimeout(timeoutId);
+          
+          const data = await res.json();
+          if (!res.ok) throw new Error(data.error || 'Error');
+          return data;
+        } catch (e) {
+          lastError = e;
+          console.warn(`API retry ${attempt + 1}/${retries}:`, e.message);
+          if (attempt < retries - 1) {
+            await new Promise(r => setTimeout(r, 1000 * (attempt + 1)));
+          }
+        }
+      }
+      throw lastError;
     }
 
     async function loadWins() {
@@ -554,4 +570,3 @@
   </script>
 </body>
 </html>
-
