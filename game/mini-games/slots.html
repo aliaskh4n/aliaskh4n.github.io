@@ -371,18 +371,20 @@
             </div>
         </div>
 
-        <div class="slot-machine" id="slotMachine">
-            <div class="bet-selector" id="betSelector">
-                <button class="bet-btn active" onclick="changeBet(50)">50</button>
-                <button class="bet-btn" onclick="changeBet(100)">100</button>
-                <button class="bet-btn" onclick="changeBet(150)">150</button>
-                <button class="bet-btn" onclick="changeBet(200)">200</button>
-                <button class="bet-btn" onclick="changeBet(300)">300</button>
-                <button class="bet-btn" onclick="changeBet(500)">500</button>
-                <button class="bet-btn" onclick="changeBet(750)">750</button>
-                <button class="bet-btn" onclick="changeBet(1000)">1000</button>
+        <div class="settings-panel">
+            <div class="setting-row">
+                <label class="setting-label">Ставка</label>
+                <div class="setting-buttons">
+                    <button class="setting-btn active" onclick="changeBet(50)">50</button>
+                    <button class="setting-btn" onclick="changeBet(100)">100</button>
+                    <button class="setting-btn" onclick="changeBet(200)">200</button>
+                    <button class="setting-btn" onclick="changeBet(500)">500</button>
+                    <button class="setting-btn" onclick="changeBet(1000)">1000</button>
+                </div>
             </div>
+        </div>        
 
+        <div class="slot-machine" id="slotMachine">
             <div class="reels">
                 <div class="reel" id="reel1">🍒</div>
                 <div class="reel" id="reel2">🍋</div>
