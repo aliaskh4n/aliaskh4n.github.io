@@ -3,10 +3,11 @@
     "id": "slots",
     "title": "Слоты",
     "emoji": "🎰",
-    "animation": "/game/animations/slots.json",
+    "animation": "https://aliaskh4n.github.io/game/animations/slots.json",
     "desc": "Крути барабаны и срывай джекпот",
     "gradient": ["#ff6b6b", "#ff8e8e"],
     "ready": true
   }
 ]
+
 
