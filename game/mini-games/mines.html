@@ -1,11 +1,8 @@
 <!DOCTYPE html>
 <html lang="ru">
-
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
-    <meta http-equiv="Content-Security-Policy"
-        content="default-src 'self';script-src 'self' 'unsafe-inline' https://telegram.org;style-src 'self' 'unsafe-inline' https://fonts.googleapis.com;font-src https://fonts.gstatic.com;img-src 'self' data: https:;connect-src 'self' https://nekros.vercel.app;">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Mines 💎</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -13,35 +10,35 @@
         * {
             margin: 0;
             padding: 0;
-            box-sizing: border-box
+            box-sizing: border-box;
         }
 
         body {
-            font-family: Inter, -apple-system, BlinkMacSystemFont, sans-serif;
-            background: var(--tg-theme-bg-color, #fff);
-            color: var(--tg-theme-text-color, #000);
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background: var(--tg-theme-bg-color, #ffffff);
+            color: var(--tg-theme-text-color, #000000);
             min-height: 100vh;
             overflow-x: hidden;
-            -webkit-tap-highlight-color: transparent
+            -webkit-tap-highlight-color: transparent;
         }
 
         .container {
             max-width: 100%;
-            padding: 12px
+            padding: 12px;
         }
 
         .header {
-            padding: 8px 0 12px;
+            padding: 8px 0 12px 0;
             display: flex;
             align-items: center;
             justify-content: space-between;
-            margin-bottom: 12px
+            margin-bottom: 12px;
         }
 
         .header-left {
             display: flex;
             align-items: center;
-            gap: 12px
+            gap: 12px;
         }
 
         .header-icon {
@@ -53,22 +50,25 @@
             align-items: center;
             justify-content: center;
             font-size: 24px;
-            box-shadow: 0 4px 12px rgba(147, 51, 234, .3)
+            box-shadow: 0 4px 12px rgba(147, 51, 234, 0.3);
         }
 
         .header-info {
             display: flex;
-            flex-direction: column
+            flex-direction: column;
         }
 
         .header-title {
+            color: var(--tg-theme-text-color, #000000);
             font-size: 18px;
-            font-weight: 700
+            font-weight: 700;
+            letter-spacing: -0.3px;
         }
 
         .header-subtitle {
-            color: var(--tg-theme-hint-color, #999);
-            font-size: 12px
+            color: var(--tg-theme-hint-color, #999999);
+            font-size: 12px;
+            margin-top: 1px;
         }
 
         .balance-mini {
@@ -77,54 +77,63 @@
             padding: 8px 14px;
             display: flex;
             flex-direction: column;
-            align-items: flex-end
+            align-items: flex-end;
         }
 
         .balance-mini-label {
-            color: var(--tg-theme-hint-color, #999);
+            color: var(--tg-theme-hint-color, #999999);
             font-size: 10px;
             text-transform: uppercase;
-            letter-spacing: .5px;
-            margin-bottom: 2px
+            letter-spacing: 0.5px;
+            margin-bottom: 2px;
         }
 
         .balance-mini-value {
+            color: var(--tg-theme-text-color, #000000);
             font-size: 16px;
-            font-weight: 700
+            font-weight: 700;
+            letter-spacing: -0.3px;
         }
 
         .stats-row {
             display: grid;
             grid-template-columns: repeat(3, 1fr);
             gap: 8px;
-            margin-bottom: 12px
+            margin-bottom: 12px;
         }
 
         .stat-card {
             background: var(--tg-theme-secondary-bg-color, #f4f4f5);
             border-radius: 12px;
             padding: 12px;
-            text-align: center
+            text-align: center;
+            transition: all 0.2s;
+        }
+
+        .stat-card:active {
+            transform: scale(0.97);
         }
 
         .stat-label {
-            color: var(--tg-theme-hint-color, #999);
+            color: var(--tg-theme-hint-color, #999999);
             font-size: 11px;
             margin-bottom: 4px;
-            text-transform: uppercase
+            text-transform: uppercase;
+            letter-spacing: 0.3px;
         }
 
         .stat-value {
+            color: var(--tg-theme-text-color, #000000);
             font-size: 20px;
             font-weight: 700;
-            letter-spacing: -.5px
+            letter-spacing: -0.5px;
         }
 
         .stat-value.highlight {
             background: linear-gradient(135deg, #9333ea, #c084fc);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
-            background-clip: text
+            background-clip: text;
         }
 
         .settings-panel {
@@ -132,171 +141,172 @@
             border-radius: 16px;
             padding: 16px;
             margin-bottom: 12px;
-            transition: opacity .3s
+            transition: opacity 0.3s;
         }
 
         .setting-row {
-            margin-bottom: 14px
+            margin-bottom: 14px;
         }
 
         .setting-row:last-child {
-            margin-bottom: 0
+            margin-bottom: 0;
         }
 
         .setting-label {
+            color: var(--tg-theme-text-color, #000000);
             font-size: 13px;
             font-weight: 600;
             margin-bottom: 8px;
-            display: block
+            display: block;
         }
 
         .setting-buttons {
             display: flex;
-            gap: 8px
+            gap: 8px;
         }
 
         .setting-btn {
             flex: 1;
-            background: var(--tg-theme-bg-color, #fff);
+            background: var(--tg-theme-bg-color, #ffffff);
             border: 2px solid transparent;
+            color: var(--tg-theme-text-color, #000000);
             padding: 10px;
             border-radius: 10px;
             font-size: 14px;
             font-weight: 600;
             cursor: pointer;
-            transition: all .2s
+            transition: all 0.2s;
         }
 
         .setting-btn:active {
-            transform: scale(.95)
+            transform: scale(0.95);
         }
 
         .setting-btn.active {
             background: linear-gradient(135deg, #9333ea, #c084fc);
-            color: #fff;
-            box-shadow: 0 4px 12px rgba(147, 51, 234, .3)
+            color: white;
+            border-color: #9333ea;
+            box-shadow: 0 4px 12px rgba(147, 51, 234, 0.3);
         }
 
         .game-board {
             background: var(--tg-theme-secondary-bg-color, #f4f4f5);
             border-radius: 16px;
             padding: 16px;
-            margin-bottom: 12px
+            margin-bottom: 12px;
         }
 
         .mines-grid {
             display: grid;
             grid-template-columns: repeat(5, 1fr);
             gap: 8px;
-            margin-bottom: 16px
+            margin-bottom: 16px;
         }
 
         .mine-cell {
             aspect-ratio: 1;
-            background: var(--tg-theme-bg-color, #fff);
+            background: var(--tg-theme-bg-color, #ffffff);
             border-radius: 10px;
             display: flex;
             align-items: center;
             justify-content: center;
             font-size: 28px;
             cursor: pointer;
-            transition: all .2s;
+            transition: all 0.2s;
             border: 2px solid transparent;
-            box-shadow: 0 2px 6px rgba(0, 0, 0, .08)
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
+        }
+
+        .mine-cell::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(135deg, rgba(147, 51, 234, 0.1), rgba(192, 132, 252, 0.1));
+            opacity: 0;
+            transition: opacity 0.2s;
+        }
+
+        .mine-cell:hover::before {
+            opacity: 1;
         }
 
         .mine-cell:active {
-            transform: scale(.92)
+            transform: scale(0.92);
         }
 
         .mine-cell.revealed {
-            pointer-events: none
+            pointer-events: none;
         }
 
         .mine-cell.revealed.safe {
             background: linear-gradient(135deg, #34c759, #30d158);
-            color: #fff;
-            animation: revealSafe .4s cubic-bezier(.68, -.55, .265, 1.55);
-            box-shadow: 0 4px 12px rgba(52, 199, 89, .4)
+            border-color: #34c759;
+            color: white;
+            animation: revealSafe 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+            box-shadow: 0 4px 12px rgba(52, 199, 89, 0.4);
         }
 
         .mine-cell.revealed.bomb {
             background: linear-gradient(135deg, #ff3b30, #ff453a);
-            color: #fff;
-            animation: explode .5s ease;
-            box-shadow: 0 4px 12px rgba(255, 59, 48, .4)
+            border-color: #ff3b30;
+            color: white;
+            animation: explode 0.5s ease;
+            box-shadow: 0 4px 12px rgba(255, 59, 48, 0.4);
         }
 
         .mine-cell.disabled {
-            opacity: .5;
-            pointer-events: none
+            opacity: 0.5;
+            pointer-events: none;
         }
 
         @keyframes revealSafe {
-            0% {
-                transform: scale(.7)rotate(-10deg);
-                opacity: 0
-            }
-
-            50% {
-                transform: scale(1.15)rotate(5deg)
-            }
-
-            100% {
-                transform: scale(1)rotate(0);
-                opacity: 1
-            }
+            0% { transform: scale(0.7) rotate(-10deg); opacity: 0; }
+            50% { transform: scale(1.15) rotate(5deg); }
+            100% { transform: scale(1) rotate(0deg); opacity: 1; }
         }
 
         @keyframes explode {
-
-            0%,
-            100% {
-                transform: scale(1)
-            }
-
-            25% {
-                transform: scale(1.25)rotate(5deg)
-            }
-
-            75% {
-                transform: scale(1.25)rotate(-5deg)
-            }
+            0%, 100% { transform: scale(1); }
+            25% { transform: scale(1.25) rotate(5deg); }
+            75% { transform: scale(1.25) rotate(-5deg); }
         }
 
         .controls {
             display: grid;
             grid-template-columns: 1fr 1fr;
-            gap: 10px
+            gap: 10px;
         }
 
         .control-btn {
             background: var(--tg-theme-button-color, #3390ec);
-            color: #fff;
+            color: white;
             border: none;
             padding: 16px;
             font-size: 15px;
             border-radius: 12px;
             cursor: pointer;
             font-weight: 700;
-            transition: all .2s;
-            box-shadow: 0 4px 12px rgba(51, 144, 236, .3)
+            transition: all 0.2s;
+            box-shadow: 0 4px 12px rgba(51, 144, 236, 0.3);
+            letter-spacing: 0.3px;
         }
 
         .control-btn:active {
-            transform: scale(.96)
+            transform: scale(0.96);
         }
 
         .control-btn:disabled {
-            background: var(--tg-theme-hint-color, #999);
-            opacity: .4;
+            background: var(--tg-theme-hint-color, #999999);
+            opacity: 0.4;
             cursor: not-allowed;
-            box-shadow: none
+            box-shadow: none;
         }
 
         .control-btn.cashout {
             background: linear-gradient(135deg, #34c759, #30d158);
-            box-shadow: 0 4px 12px rgba(52, 199, 89, .3)
+            box-shadow: 0 4px 12px rgba(52, 199, 89, 0.3);
         }
 
         .message {
@@ -304,26 +314,33 @@
             border-radius: 12px;
             padding: 14px 16px;
             text-align: center;
+            color: var(--tg-theme-text-color, #000000);
             font-size: 13px;
             font-weight: 600;
             min-height: 44px;
             display: flex;
             align-items: center;
-            justify-content: center
+            justify-content: center;
+            line-height: 1.4;
         }
 
         .message.win {
-            background: linear-gradient(135deg, rgba(52, 199, 89, .15), rgba(48, 209, 88, .15));
-            color: #34c759
+            background: linear-gradient(135deg, rgba(52, 199, 89, 0.15), rgba(48, 209, 88, 0.15));
+            color: #34c759;
         }
 
         .message.lose {
-            background: linear-gradient(135deg, rgba(255, 59, 48, .15), rgba(255, 69, 58, .15));
-            color: #ff3b30
+            background: linear-gradient(135deg, rgba(255, 59, 48, 0.15), rgba(255, 69, 58, 0.15));
+            color: #ff3b30;
+        }
+
+        @media (prefers-color-scheme: dark) {
+            .mine-cell { 
+                box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3); 
+            }
         }
     </style>
 </head>
-
 <body>
     <div class="container">
         <div class="header">
@@ -339,6 +356,7 @@
                 <div class="balance-mini-value" id="balance">-</div>
             </div>
         </div>
+
         <div class="stats-row">
             <div class="stat-card">
                 <div class="stat-label">Ставка</div>
@@ -353,10 +371,11 @@
                 <div class="stat-value" id="potentialWin">0</div>
             </div>
         </div>
+
         <div class="settings-panel" id="settingsPanel">
             <div class="setting-row">
                 <label class="setting-label">Ставка</label>
-                <div class="setting-buttons">
+                <div class="setting-buttons" style="overflow-x: auto; scrollbar-width: none;">
                     <button class="setting-btn active" onclick="changeBet(50)">50</button>
                     <button class="setting-btn" onclick="changeBet(100)">100</button>
                     <button class="setting-btn" onclick="changeBet(200)">200</button>
@@ -365,7 +384,7 @@
                 </div>
             </div>
             <div class="setting-row">
-                <label class="setting-label">Бомб</label>
+                <label class="setting-label">Количество бомб</label>
                 <div class="setting-buttons">
                     <button class="setting-btn" onclick="changeMines(3)">3</button>
                     <button class="setting-btn active" onclick="changeMines(5)">5</button>
@@ -373,200 +392,298 @@
                 </div>
             </div>
         </div>
+
         <div class="game-board">
             <div class="mines-grid" id="minesGrid"></div>
+
             <div class="controls">
-                <button class="control-btn" id="startBtn" onclick="startGame()">Начать</button>
+                <button class="control-btn" id="startBtn" onclick="startGame()">Начать игру</button>
                 <button class="control-btn cashout" id="cashoutBtn" onclick="cashout()" disabled>Забрать 💰</button>
             </div>
         </div>
+
         <div class="message" id="message">Выберите настройки и начните игру</div>
     </div>
+
     <script>
-        const g = {
+        const game = {
             api: 'https://nekros.vercel.app/api',
             tg: window.Telegram.WebApp,
-            user: { id: sessionStorage.getItem('user_id'), token: sessionStorage.getItem('token'), balance: parseInt(sessionStorage.getItem('user_balance') || '0') },
-            bet: 50,
-            mines: 5,
-            active: false,
-            id: null,
-            revealed: 0,
-            mults: { 3: [1.2, 1.5, 1.9, 2.4, 3.0, 3.8, 4.8, 6.0, 7.5, 9.4, 11.8, 14.8, 18.5, 23.1, 28.9, 36.1, 45.2, 56.5, 70.6, 88.3, 110.4, 138.0], 5: [1.3, 1.7, 2.2, 2.9, 3.8, 5.0, 6.5, 8.5, 11.1, 14.5, 18.9, 24.6, 32.0, 41.6, 54.1, 70.4, 91.5, 119.0, 154.7, 201.1], 7: [1.4, 1.9, 2.6, 3.5, 4.8, 6.5, 8.8, 12.0, 16.3, 22.1, 30.0, 40.8, 55.4, 75.3, 102.3, 139.0, 188.9, 256.7] }
+            user: {
+                id: localStorage.getItem('user_id'),
+                token: localStorage.getItem('token'),
+                balance: parseInt(localStorage.getItem('user_balance') || '0')
+            },
+            currentBet: 50,
+            minesCount: 5,
+            gameActive: false,
+            gameId: null,
+            revealedCount: 0,
+            bombPositions: [],
+            multipliers: {
+                3: [1.2, 1.5, 1.9, 2.4, 3.0, 3.8, 4.8, 6.0, 7.5, 9.4, 11.8, 14.8, 18.5, 23.1, 28.9, 36.1, 45.2, 56.5, 70.6, 88.3, 110.4, 138.0],
+                5: [1.3, 1.7, 2.2, 2.9, 3.8, 5.0, 6.5, 8.5, 11.1, 14.5, 18.9, 24.6, 32.0, 41.6, 54.1, 70.4, 91.5, 119.0, 154.7, 201.1],
+                7: [1.4, 1.9, 2.6, 3.5, 4.8, 6.5, 8.8, 12.0, 16.3, 22.1, 30.0, 40.8, 55.4, 75.3, 102.3, 139.0, 188.9, 256.7]
+            }
         };
+
         const ui = {
             balance: document.getElementById('balance'),
-            bet: document.getElementById('currentBet'),
-            mult: document.getElementById('multiplier'),
-            win: document.getElementById('potentialWin'),
+            currentBet: document.getElementById('currentBet'),
+            multiplier: document.getElementById('multiplier'),
+            potentialWin: document.getElementById('potentialWin'),
             grid: document.getElementById('minesGrid'),
-            start: document.getElementById('startBtn'),
-            cashout: document.getElementById('cashoutBtn'),
-            msg: document.getElementById('message'),
-            settings: document.getElementById('settingsPanel')
+            startBtn: document.getElementById('startBtn'),
+            cashoutBtn: document.getElementById('cashoutBtn'),
+            message: document.getElementById('message'),
+            settingsPanel: document.getElementById('settingsPanel')
         };
+
         function init() {
-            g.tg.ready();
-            g.tg.expand();
-            g.tg.BackButton.show();
-            g.tg.BackButton.onClick(() => window.history.back());
-            if (!g.user.id || !g.user.token) {
-                showMsg('Вернитесь на главную', 'lose');
-                ui.start.disabled = true;
+            game.tg.ready();
+            game.tg.expand();
+            game.tg.BackButton.show();
+            game.tg.BackButton.onClick(() => window.history.back());
+
+            if (!game.user.id || !game.user.token) {
+                showMsg('Пожалуйста, вернитесь на главную', 'lose');
+                ui.startBtn.disabled = true;
                 return;
             }
-            ui.balance.textContent = g.user.balance.toLocaleString();
+
+            ui.balance.textContent = game.user.balance.toLocaleString();
             createGrid();
         }
+
         function createGrid() {
             ui.grid.innerHTML = '';
             for (let i = 0; i < 25; i++) {
-                const c = document.createElement('div');
-                c.className = 'mine-cell';
-                c.textContent = '❓';
-                c.onclick = () => revealCell(i);
-                ui.grid.appendChild(c);
+                const cell = document.createElement('div');
+                cell.className = 'mine-cell';
+                cell.textContent = '❓';
+                cell.onclick = () => revealCell(i);
+                ui.grid.appendChild(cell);
             }
         }
-        function changeBet(a) {
-            if (g.active) return;
-            g.bet = a;
-            ui.bet.textContent = a;
-            document.querySelectorAll('.setting-row:first-child .setting-btn').forEach(b => b.classList.toggle('active', parseInt(b.textContent) === a));
-            updateWin();
+
+        function changeBet(amount) {
+            if (game.gameActive) return;
+            game.currentBet = amount;
+            ui.currentBet.textContent = amount;
+            
+            document.querySelectorAll('.setting-row:first-child .setting-btn').forEach(btn => {
+                btn.classList.toggle('active', parseInt(btn.textContent) === amount);
+            });
+            
+            updatePotentialWin();
         }
-        function changeMines(c) {
-            if (g.active) return;
-            g.mines = c;
-            document.querySelectorAll('.setting-row:last-child .setting-btn').forEach(b => b.classList.toggle('active', parseInt(b.textContent) === c));
-            updateWin();
+
+        function changeMines(count) {
+            if (game.gameActive) return;
+            game.minesCount = count;
+            
+            document.querySelectorAll('.setting-row:last-child .setting-btn').forEach(btn => {
+                btn.classList.toggle('active', parseInt(btn.textContent) === count);
+            });
+            
+            updatePotentialWin();
         }
-        function updateWin() {
-            const m = g.mults[g.mines];
-            if (!m) return;
-            const idx = Math.max(0, g.revealed);
-            if (idx >= m.length) return;
-            const mult = m[idx] || 1;
-            ui.mult.textContent = mult.toFixed(1) + 'x';
-            ui.win.textContent = Math.floor(g.bet * mult).toLocaleString();
+
+        function updatePotentialWin() {
+            const multipliersArray = game.multipliers[game.minesCount];
+            if (!multipliersArray) return;
+            
+            const index = Math.max(0, game.revealedCount);
+            if (index >= multipliersArray.length) return;
+            
+            const mult = multipliersArray[index] || 1;
+            ui.multiplier.textContent = mult.toFixed(1) + 'x';
+            ui.potentialWin.textContent = Math.floor(game.currentBet * mult).toLocaleString();
         }
-        async function api(e, m, b) {
+
+        async function apiCall(endpoint, method, body) {
             try {
-                const o = { method: m, headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${g.user.token}` } };
-                if (b) o.body = JSON.stringify(b);
-                const r = await fetch(`${g.api}${e}`, o);
-                if (!r.ok) {
-                    const d = await r.json().catch(() => ({ error: 'Network error' }));
-                    throw new Error(d.error || `HTTP ${r.status}`);
+                const opts = {
+                    method,
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${game.user.token}`
+                    }
+                };
+                if (body) opts.body = JSON.stringify(body);
+
+                const res = await fetch(`${game.api}${endpoint}`, opts);
+                
+                if (!res.ok) {
+                    const errorData = await res.json().catch(() => ({ error: 'Network error' }));
+                    throw new Error(errorData.error || `HTTP ${res.status}`);
                 }
-                return await r.json();
-            } catch (err) {
-                throw err;
+                
+                return await res.json();
+            } catch (error) {
+                console.error('API Error:', error);
+                throw error;
             }
         }
+
         async function startGame() {
-            if (g.bet > g.user.balance) {
+            if (game.currentBet > game.user.balance) {
                 showMsg('Недостаточно средств', 'lose');
-                g.tg.HapticFeedback.notificationOccurred('error');
+                game.tg.HapticFeedback.notificationOccurred('error');
                 return;
             }
+
             try {
-                ui.start.disabled = true;
-                showMsg('Начинаем...');
-                const res = await api('/game/mines/start', 'POST', { userId: g.user.id, bet: g.bet, minesCount: g.mines });
-                g.active = true;
-                g.id = res.gameId;
-                g.revealed = 0;
-                g.user.balance = res.newBalance;
-                ui.balance.textContent = g.user.balance.toLocaleString();
-                sessionStorage.setItem('user_balance', g.user.balance);
-                ui.start.textContent = 'Новая игра';
-                ui.cashout.disabled = false;
-                ui.settings.style.opacity = '0.5';
-                ui.settings.style.pointerEvents = 'none';
+                ui.startBtn.disabled = true;
+                showMsg('Начинаем игру...');
+
+                const result = await apiCall('/game/mines/start', 'POST', {
+                    userId: game.user.id,
+                    bet: game.currentBet,
+                    minesCount: game.minesCount
+                });
+
+                game.gameActive = true;
+                game.gameId = result.gameId;
+                game.revealedCount = 0;
+                game.bombPositions = result.bombPositions;
+                
+                game.user.balance = result.newBalance;
+                ui.balance.textContent = game.user.balance.toLocaleString();
+                localStorage.setItem('user_balance', game.user.balance);
+
+                ui.startBtn.textContent = 'Новая игра';
+                ui.cashoutBtn.disabled = false;
+                ui.settingsPanel.style.opacity = '0.5';
+                ui.settingsPanel.style.pointerEvents = 'none';
+
                 createGrid();
-                updateWin();
-                showMsg('Выбирайте ячейки! 🍀');
-                g.tg.HapticFeedback.impactOccurred('medium');
+                updatePotentialWin();
+                showMsg('Выбирайте ячейки! Удачи! 🍀');
+                game.tg.HapticFeedback.impactOccurred('medium');
+
             } catch (e) {
                 showMsg(`Ошибка: ${e.message}`, 'lose');
-                ui.start.disabled = false;
-                g.tg.HapticFeedback.notificationOccurred('error');
+                ui.startBtn.disabled = false;
+                game.tg.HapticFeedback.notificationOccurred('error');
             }
         }
-        async function revealCell(idx) {
-            if (!g.active) return;
+
+        async function revealCell(index) {
+            if (!game.gameActive) return;
+
             const cells = ui.grid.children;
-            const cell = cells[idx];
+            const cell = cells[index];
+            
             if (cell.classList.contains('revealed')) return;
+
             try {
                 cell.classList.add('disabled');
-                g.tg.HapticFeedback.impactOccurred('light');
-                const res = await api('/game/mines/reveal', 'POST', { userId: g.user.id, gameId: g.id, position: idx });
-                if (res.hit === 'bomb') {
+                game.tg.HapticFeedback.impactOccurred('light');
+
+                const result = await apiCall('/game/mines/reveal', 'POST', {
+                    userId: game.user.id,
+                    gameId: game.gameId,
+                    position: index
+                });
+
+                if (result.hit === 'bomb') {
                     cell.classList.add('revealed', 'bomb');
                     cell.textContent = '💣';
-                    endGame(false, res);
-                    g.tg.HapticFeedback.notificationOccurred('error');
+                    
+                    setTimeout(() => {
+                        game.bombPositions.forEach(pos => {
+                            if (pos !== index) {
+                                cells[pos].classList.add('revealed', 'bomb');
+                                cells[pos].textContent = '💣';
+                            }
+                        });
+                    }, 300);
+
+                    endGame(false, result);
+                    game.tg.HapticFeedback.notificationOccurred('error');
+
                 } else {
                     cell.classList.add('revealed', 'safe');
                     cell.textContent = '💎';
-                    g.revealed = res.revealedCount || (g.revealed + 1);
-                    updateWin();
-                    showMsg(`Алмаз найден! 💎 ${g.revealed}`, 'win');
-                    g.tg.HapticFeedback.notificationOccurred('success');
+                    game.revealedCount = result.revealedCount || (game.revealedCount + 1);
+                    
+                    updatePotentialWin();
+                    
+                    showMsg(`Алмаз найден! 💎 Открыто: ${game.revealedCount}`, 'win');
+                    game.tg.HapticFeedback.notificationOccurred('success');
                 }
+
             } catch (e) {
+                console.error('Reveal error:', e);
                 cell.classList.remove('disabled');
                 showMsg(`Ошибка: ${e.message}`, 'lose');
-                g.tg.HapticFeedback.notificationOccurred('error');
+                game.tg.HapticFeedback.notificationOccurred('error');
             }
         }
+
         async function cashout() {
-            if (!g.active || g.revealed === 0) {
-                showMsg('Откройте хотя бы одну ячейку', 'lose');
-                g.tg.HapticFeedback.notificationOccurred('error');
+            if (!game.gameActive || game.revealedCount === 0) {
+                showMsg('Сначала откройте хотя бы одну ячейку', 'lose');
+                game.tg.HapticFeedback.notificationOccurred('error');
                 return;
             }
+
             try {
-                ui.cashout.disabled = true;
-                showMsg('Забираем...');
-                const res = await api('/game/mines/cashout', 'POST', { userId: g.user.id, gameId: g.id });
-                endGame(true, res);
-                g.tg.HapticFeedback.notificationOccurred('success');
+                ui.cashoutBtn.disabled = true;
+                showMsg('Забираем выигрыш...');
+
+                const result = await apiCall('/game/mines/cashout', 'POST', {
+                    userId: game.user.id,
+                    gameId: game.gameId
+                });
+
+                endGame(true, result);
+                game.tg.HapticFeedback.notificationOccurred('success');
+
             } catch (e) {
+                console.error('Cashout error:', e);
                 showMsg(`Ошибка: ${e.message}`, 'lose');
-                ui.cashout.disabled = false;
-                g.tg.HapticFeedback.notificationOccurred('error');
+                ui.cashoutBtn.disabled = false;
+                game.tg.HapticFeedback.notificationOccurred('error');
             }
         }
-        function endGame(won, res) {
-            g.active = false;
-            g.id = null;
-            g.revealed = 0;
-            g.user.balance = res.newBalance;
-            ui.balance.textContent = g.user.balance.toLocaleString();
-            sessionStorage.setItem('user_balance', g.user.balance);
-            ui.start.disabled = false;
-            ui.start.textContent = 'Начать';
-            ui.cashout.disabled = true;
-            ui.settings.style.opacity = '1';
-            ui.settings.style.pointerEvents = 'auto';
-            Array.from(ui.grid.children).forEach(c => c.classList.add('disabled'));
+
+        function endGame(won, result) {
+            game.gameActive = false;
+            game.gameId = null;
+            game.revealedCount = 0;
+
+            game.user.balance = result.newBalance;
+            ui.balance.textContent = game.user.balance.toLocaleString();
+            localStorage.setItem('user_balance', game.user.balance);
+
+            ui.startBtn.disabled = false;
+            ui.startBtn.textContent = 'Начать игру';
+            ui.cashoutBtn.disabled = true;
+            ui.settingsPanel.style.opacity = '1';
+            ui.settingsPanel.style.pointerEvents = 'auto';
+
+            Array.from(ui.grid.children).forEach(cell => {
+                cell.classList.add('disabled');
+            });
+
             if (won) {
-                showMsg(`🎉 Выигрыш: +${res.winAmount} 💰`, 'win');
+                showMsg(`🎉 Выигрыш забран! +${result.winAmount} 💰`, 'win');
             } else {
-                showMsg(`💣 Бомба! Потеряно: ${g.bet}`, 'lose');
+                showMsg(`💣 Бомба! Потеряно: ${game.currentBet}`, 'lose');
             }
-            g.revealed = 0;
-            updateWin();
+
+            game.revealedCount = 0;
+            updatePotentialWin();
         }
-        function showMsg(t, type = '') {
-            ui.msg.textContent = t;
-            ui.msg.className = 'message ' + type;
+
+        function showMsg(text, type = '') {
+            ui.message.textContent = text;
+            ui.message.className = 'message ' + type;
         }
+
         init();
     </script>
 </body>
-
 </html>
