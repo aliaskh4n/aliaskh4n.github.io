@@ -540,11 +540,20 @@
                 cell.classList.add('disabled');
                 game.tg.HapticFeedback.impactOccurred('light');
 
+                console.log('Reveal request:', {
+                    userId: game.user.id,
+                    gameId: game.gameId,
+                    position: index,
+                    currentRevealedCount: game.revealedCount
+                });
+
                 const result = await apiCall('/game/mines/reveal', 'POST', {
                     userId: game.user.id,
                     gameId: game.gameId,
                     position: index
                 });
+
+                console.log('Reveal result:', result);
 
                 if (result.hit === 'bomb') {
                     // Попали на бомбу
@@ -568,7 +577,10 @@
                     // Нашли алмаз
                     cell.classList.add('revealed', 'safe');
                     cell.textContent = '💎';
-                    game.revealedCount++;
+                    game.revealedCount = result.revealedCount || (game.revealedCount + 1);
+                    
+                    console.log('Updated revealedCount:', game.revealedCount);
+                    
                     updatePotentialWin();
                     
                     showMsg(`Алмаз найден! 💎 Открыто: ${game.revealedCount}`, 'win');
@@ -576,6 +588,7 @@
                 }
 
             } catch (e) {
+                console.error('Reveal error:', e);
                 cell.classList.remove('disabled');
                 showMsg(`Ошибка: ${e.message}`, 'lose');
                 game.tg.HapticFeedback.notificationOccurred('error');
@@ -584,21 +597,34 @@
 
         // ========== ЗАБРАТЬ ВЫИГРЫШ ==========
         async function cashout() {
-            if (!game.gameActive || game.revealedCount === 0) return;
+            if (!game.gameActive || game.revealedCount === 0) {
+                showMsg('Сначала откройте хотя бы одну ячейку', 'lose');
+                game.tg.HapticFeedback.notificationOccurred('error');
+                return;
+            }
 
             try {
                 ui.cashoutBtn.disabled = true;
                 showMsg('Забираем выигрыш...');
+
+                console.log('Cashout request:', {
+                    userId: game.user.id,
+                    gameId: game.gameId,
+                    revealedCount: game.revealedCount
+                });
 
                 const result = await apiCall('/game/mines/cashout', 'POST', {
                     userId: game.user.id,
                     gameId: game.gameId
                 });
 
+                console.log('Cashout result:', result);
+
                 endGame(true, result);
                 game.tg.HapticFeedback.notificationOccurred('success');
 
             } catch (e) {
+                console.error('Cashout error:', e);
                 showMsg(`Ошибка: ${e.message}`, 'lose');
                 ui.cashoutBtn.disabled = false;
                 game.tg.HapticFeedback.notificationOccurred('error');
