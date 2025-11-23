@@ -2,12 +2,17 @@
   {
     "id": "slots",
     "title": "Слоты",
-    "emoji": "🎰",
     "animation": "https://aliaskh4n.github.io/game/animations/slots.json",
     "desc": "Крути барабаны и срывай джекпот",
     "gradient": ["#ff6b6b", "#ff8e8e"],
     "ready": true
+  },
+  {
+    "id": "mines",
+    "title": "Mines",
+    "animation": "https://aliaskh4n.github.io/game/animations/mines.json",
+    "desc": "Найди алмазы и избегай бомб",
+    "gradient": ["#9333ea", "#c084fc"],
+    "ready": true
   }
 ]
-
-
