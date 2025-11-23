@@ -1,11 +1,11 @@
 [
   {
     "id": "slots",
-    "title": "Слоты 777",
+    "title": "Слоты",
     "emoji": "🎰",
+    "animation": "/game/animations/slots.json",
     "desc": "Крути барабаны и срывай джекпот",
     "gradient": ["#ff6b6b", "#ff8e8e"],
     "ready": true
   }
 ]
-
