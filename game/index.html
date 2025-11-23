@@ -113,13 +113,13 @@
 
     .win-card {
       flex-shrink: 0;
-      border-radius: 8px;
-      padding: 6px 10px;
+      border-radius: 10px;
+      padding: 8px;
       display: flex;
       flex-direction: column;
       align-items: center;
       justify-content: center;
-      min-width: 70px;
+      min-width: 75px;
       transition: transform 0.2s;
     }
 
@@ -127,9 +127,26 @@
       transform: scale(0.95);
     }
 
-    .win-emoji {
+    .win-avatar {
+      width: 48px;
+      height: 48px;
+      border-radius: 50%;
+      background: var(--tg-theme-button-color, #3390ec);
+      color: white;
+      display: flex;
+      align-items: center;
+      justify-content: center;
       font-size: 20px;
-      margin-bottom: 2px;
+      font-weight: 600;
+      overflow: hidden;
+      margin-bottom: 4px;
+      flex-shrink: 0;
+    }
+
+    .win-avatar img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
     }
 
     .win-player {
@@ -139,15 +156,20 @@
       white-space: nowrap;
       overflow: hidden;
       text-overflow: ellipsis;
-      max-width: 65px;
+      max-width: 70px;
       margin-bottom: 2px;
     }
 
     .win-amount {
-      font-size: 11px;
+      font-size: 12px;
       font-weight: 700;
       color: var(--tg-theme-text-color, #000000);
       text-align: center;
+    }
+
+    .win-medal {
+      font-size: 14px;
+      margin-bottom: 2px;
     }
 
     .win-empty {
@@ -308,7 +330,7 @@
     <!-- WINS TICKER -->
     <div class="wins-ticker">
       <div class="wins-scroll" id="wins-scroll">
-        <div class="win-empty">Загрузка выигрышей...</div>
+        <div class="win-empty">Загрузка топ игроков...</div>
       </div>
     </div>
 
@@ -377,38 +399,37 @@
       return data;
     }
 
-    // ========== WINS TICKER ==========
     async function loadWins() {
       try {
         const res = await api('/stats/leaderboard');
         if (!res.leaderboard || res.leaderboard.length === 0) {
-          app.dom.winsScroll.innerHTML = '<div class="win-empty">Нет выигрышей</div>';
+          app.dom.winsScroll.innerHTML = '<div class="win-empty">Нет игроков</div>';
           return;
         }
 
-        // Фильтруем только игроков с выигрышами
-        const winnersData = res.leaderboard
-          .filter(u => u.balance > 1000)
-          .map(u => ({
-            name: u.name || 'Неизвестный',
-            balance: u.balance,
-            winRate: u.winRate
-          }))
-          .slice(0, 15);
+        const richestPlayers = res.leaderboard.slice(0, 10);
 
-        if (winnersData.length === 0) {
-          app.dom.winsScroll.innerHTML = '<div class="win-empty">Нет выигрышей</div>';
+        if (richestPlayers.length === 0) {
+          app.dom.winsScroll.innerHTML = '<div class="win-empty">Нет данных</div>';
           return;
         }
 
-        const emojis = ['🎰', '🎲', '💎', '🌟', '✨', '🎯', '🏆', '🎊'];
-        app.dom.winsScroll.innerHTML = winnersData.map((w, i) => `
-          <div class="win-card">
-            <div class="win-emoji">${emojis[i % emojis.length]}</div>
-            <div class="win-player">${w.name}</div>
-            <div class="win-amount">+${w.balance.toLocaleString()}</div>
-          </div>
-        `).join('');
+        const medals = ['🥇', '🥈', '🥉', '⭐', '✨', '💫', '🌟', '💎', '👑', '🏆'];
+        app.dom.winsScroll.innerHTML = richestPlayers.map((player, i) => {
+          const medal = medals[i];
+          const avatar = player.photo_url ? 
+            `<img src="${player.photo_url}" alt="${player.name}" onerror="this.style.display='none'">` : 
+            `<span>${player.name?.charAt(0).toUpperCase() || '👤'}</span>`;
+          
+          return `
+            <div class="win-card">
+              <div class="win-medal">${medal}</div>
+              <div class="win-avatar">${avatar}</div>
+              <div class="win-player">${player.name}</div>
+              <div class="win-amount">💰 ${player.balance.toLocaleString()}</div>
+            </div>
+          `;
+        }).join('');
       } catch (e) {
         console.error('Wins load error:', e);
         app.dom.winsScroll.innerHTML = '<div class="win-empty">Ошибка загрузки</div>';
