@@ -194,10 +194,9 @@
         }
 
         .setting-btn.active {
-            background: linear-gradient(135deg, #9333ea, #c084fc);
+            background: linear-gradient(135deg, #ff6b6b, #ff8e8e);
             color: white;
-            border-color: #9333ea;
-            box-shadow: 0 4px 12px rgba(147, 51, 234, 0.3);
+            box-shadow: 0 4px 12px rgba(255, 107, 107, 0.3);
         }
 
         .slot-machine {
@@ -458,13 +457,15 @@
         }
 
         function changeBet(amount) {
-            if (game.spinning) return;
+            if (game.gameActive) return;
             game.currentBet = amount;
-            ui.currentBetDisplay.textContent = amount;
-
-            document.querySelectorAll('.bet-btn').forEach(btn => {
+            ui.currentBet.textContent = amount;
+            
+            document.querySelectorAll('.setting-row:first-child .setting-btn').forEach(btn => {
                 btn.classList.toggle('active', parseInt(btn.textContent) === amount);
             });
+            
+            updatePotentialWin();
         }
 
         function cycleBet() {
