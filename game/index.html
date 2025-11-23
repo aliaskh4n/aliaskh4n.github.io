@@ -32,6 +32,7 @@
       display: flex;
       align-items: center;
       justify-content: space-between;
+      margin-bottom: 16px;
     }
 
     .header-left {
@@ -89,6 +90,90 @@
       justify-content: center;
     }
 
+    /* ========== WINS TICKER ========== */
+    .wins-ticker {
+      background: linear-gradient(135deg, var(--tg-theme-button-color, #3390ec), var(--tg-theme-secondary-bg-color, #f4f4f5));
+      border-radius: 12px;
+      padding: 12px 0;
+      margin-bottom: 16px;
+      overflow: hidden;
+      position: relative;
+    }
+
+    .wins-ticker::before {
+      content: '🏆';
+      position: absolute;
+      left: 12px;
+      top: 50%;
+      transform: translateY(-50%);
+      font-size: 18px;
+      z-index: 10;
+      background: inherit;
+      padding: 0 8px;
+    }
+
+    .wins-scroll {
+      display: flex;
+      gap: 12px;
+      overflow-x: auto;
+      scroll-behavior: smooth;
+      padding: 0 50px 0 50px;
+      -webkit-overflow-scrolling: touch;
+      scrollbar-width: none;
+    }
+
+    .wins-scroll::-webkit-scrollbar {
+      display: none;
+    }
+
+    .win-card {
+      flex-shrink: 0;
+      background: var(--tg-theme-bg-color, #ffffff);
+      border-radius: 10px;
+      padding: 10px 14px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      min-width: 100px;
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+      transition: transform 0.2s;
+    }
+
+    .win-card:active {
+      transform: scale(0.95);
+    }
+
+    .win-emoji {
+      font-size: 24px;
+      margin-bottom: 4px;
+    }
+
+    .win-player {
+      font-size: 11px;
+      color: var(--tg-theme-hint-color, #999999);
+      text-align: center;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      max-width: 90px;
+      margin-bottom: 3px;
+    }
+
+    .win-amount {
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--tg-theme-text-color, #000000);
+      text-align: center;
+    }
+
+    .win-empty {
+      color: rgba(0, 0, 0, 0.5);
+      text-align: center;
+      padding: 20px 12px;
+      font-size: 13px;
+    }
+
+    /* ========== BALANCE ========== */
     .balance-card {
       background: var(--tg-theme-secondary-bg-color, #f4f4f5);
       border-radius: 12px;
@@ -109,6 +194,7 @@
       letter-spacing: -0.5px;
     }
 
+    /* ========== GAMES ========== */
     .games-grid {
       display: grid;
       gap: 12px;
@@ -229,11 +315,20 @@
     @media (prefers-color-scheme: dark) {
       .game-thumb { border-bottom-color: rgba(255, 255, 255, 0.1); }
       .soon-badge { background: rgba(255, 255, 255, 0.2); }
+      .win-card { box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3); }
     }
   </style>
 </head>
 <body>
   <div class="container">
+    <!-- WINS TICKER -->
+    <div class="wins-ticker">
+      <div class="wins-scroll" id="wins-scroll">
+        <div class="win-empty">Загрузка выигрышей...</div>
+      </div>
+    </div>
+
+    <!-- HEADER -->
     <div class="header">
       <div class="header-left">
         <div class="header-title">GameHub</div>
@@ -245,25 +340,29 @@
       </div>
     </div>
 
+    <!-- BALANCE -->
     <div class="balance-card">
       <div class="balance-label">Ваш баланс</div>
       <div class="balance-value" id="balance">-</div>
     </div>
 
+    <!-- GAMES -->
     <div id="games-container" class="games-grid"></div>
 
+    <!-- FOOTER -->
     <div class="footer">
       <p>© 2025 GameHub • Добавляй новые игры в папку mini-games</p>
     </div>
   </div>
 
   <script>
-    // ========== КОНФИГ И СОСТОЯНИЕ ==========
+    // ========== CONFIG AND STATE ==========
     const app = {
       config: {
         api: 'https://api.n-aliaskhan.workers.dev/api',
         games: '/game/mini-games/games.json',
         reload: 30000,
+        winsReload: 5000,
       },
       state: {
         user: null,
@@ -275,6 +374,7 @@
         balance: document.getElementById('balance'),
         userMenu: document.getElementById('user-menu'),
         userAvatar: document.getElementById('user-avatar'),
+        winsScroll: document.getElementById('wins-scroll'),
       }
     };
 
@@ -293,7 +393,58 @@
       return data;
     }
 
-    // ========== ГЛАВНЫЕ ФУНКЦИИ ==========
+    // ========== WINS TICKER ==========
+    async function loadWins() {
+      try {
+        const res = await api('/stats/leaderboard');
+        if (!res.leaderboard || res.leaderboard.length === 0) {
+          app.dom.winsScroll.innerHTML = '<div class="win-empty">Нет выигрышей</div>';
+          return;
+        }
+
+        // Фильтруем только игроков с выигрышами
+        const winnersData = res.leaderboard
+          .filter(u => u.balance > 1000)
+          .map(u => ({
+            name: u.name || 'Неизвестный',
+            balance: u.balance,
+            winRate: u.winRate
+          }))
+          .slice(0, 15);
+
+        if (winnersData.length === 0) {
+          app.dom.winsScroll.innerHTML = '<div class="win-empty">Нет крупных выигрышей</div>';
+          return;
+        }
+
+        const emojis = ['🎰', '🎲', '💎', '🌟', '✨', '🎯', '🏆', '🎊'];
+        app.dom.winsScroll.innerHTML = winnersData.map((w, i) => `
+          <div class="win-card">
+            <div class="win-emoji">${emojis[i % emojis.length]}</div>
+            <div class="win-player">${w.name}</div>
+            <div class="win-amount">+${w.balance.toLocaleString()}</div>
+          </div>
+        `).join('');
+
+        // Auto scroll
+        const scroll = app.dom.winsScroll;
+        if (scroll.scrollWidth > scroll.clientWidth) {
+          let scrollPos = 0;
+          setInterval(() => {
+            scrollPos += 1;
+            if (scrollPos > scroll.scrollWidth - scroll.clientWidth) {
+              scrollPos = 0;
+            }
+            scroll.scrollLeft = scrollPos;
+          }, 50);
+        }
+      } catch (e) {
+        console.error('Wins load error:', e);
+        app.dom.winsScroll.innerHTML = '<div class="win-empty">Ошибка загрузки</div>';
+      }
+    }
+
+    // ========== MAIN FUNCTIONS ==========
     async function auth() {
       try {
         app.dom.container.innerHTML = '<div class="message"><div class="loading-spinner"></div></div>';
@@ -308,9 +459,12 @@
 
         updateUI();
         loadGames();
+        loadWins();
+        
         setInterval(loadGames, app.config.reload);
+        setInterval(loadWins, app.config.winsReload);
       } catch (e) {
-        app.dom.container.innerHTML = `<div class="message">❌ ${e.message}</div>`;
+        app.dom.container.innerHTML = `<div class="message">⌛ ${e.message}</div>`;
       }
     }
 
@@ -358,19 +512,18 @@
 
     async function loadGames() {
       try {
-        const res = await fetch(`${app.config.games}?t=${Date.now()}`);
+        const res = await fetch(`/game/mini-games/games.json?t=${Date.now()}`);
         const games = await res.json();
         app.dom.container.innerHTML = games?.length ? games.map(createCard).join('') : '<div class="message">Нет игр</div>';
       } catch (e) {
-        app.dom.container.innerHTML = `<div class="message">❌ ${e.message}</div>`;
+        app.dom.container.innerHTML = `<div class="message">⌛ ${e.message}</div>`;
       }
     }
 
-    // ========== СТАРТ ==========
+    // ========== START ==========
     app.state.tg.ready();
     app.state.tg.expand();
     auth();
   </script>
 </body>
 </html>
-
