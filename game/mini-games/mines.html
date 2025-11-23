@@ -445,26 +445,41 @@
         }
 
         function updatePotentialWin() {
-            const mult = game.multipliers[game.minesCount][game.revealedCount] || 1;
+            const multipliersArray = game.multipliers[game.minesCount];
+            if (!multipliersArray) return;
+            
+            const index = Math.max(0, game.revealedCount);
+            if (index >= multipliersArray.length) return;
+            
+            const mult = multipliersArray[index] || 1;
             ui.multiplier.textContent = mult.toFixed(1) + 'x';
             ui.potentialWin.textContent = Math.floor(game.currentBet * mult).toLocaleString();
         }
 
         // ========== API ==========
         async function apiCall(endpoint, method, body) {
-            const opts = {
-                method,
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${game.user.token}`
-                }
-            };
-            if (body) opts.body = JSON.stringify(body);
+            try {
+                const opts = {
+                    method,
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${game.user.token}`
+                    }
+                };
+                if (body) opts.body = JSON.stringify(body);
 
-            const res = await fetch(`${game.api}${endpoint}`, opts);
-            const data = await res.json();
-            if (!res.ok) throw new Error(data.error || 'API Error');
-            return data;
+                const res = await fetch(`${game.api}${endpoint}`, opts);
+                
+                if (!res.ok) {
+                    const errorData = await res.json().catch(() => ({ error: 'Network error' }));
+                    throw new Error(errorData.error || `HTTP ${res.status}`);
+                }
+                
+                return await res.json();
+            } catch (error) {
+                console.error('API Error:', error);
+                throw error;
+            }
         }
 
         // ========== НАЧАТЬ ИГРУ ==========
