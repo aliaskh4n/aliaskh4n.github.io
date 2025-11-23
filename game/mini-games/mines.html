@@ -2,9 +2,10 @@
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Mines 💎</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
         * {
             margin: 0;
@@ -13,13 +14,12 @@
         }
 
         body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
             background: var(--tg-theme-bg-color, #ffffff);
             color: var(--tg-theme-text-color, #000000);
             min-height: 100vh;
-            padding: 0;
-            margin: 0;
             overflow-x: hidden;
+            -webkit-tap-highlight-color: transparent;
         }
 
         .container {
@@ -28,51 +28,74 @@
         }
 
         .header {
-            padding: 8px 0 16px 0;
+            padding: 8px 0 12px 0;
             display: flex;
             align-items: center;
-            gap: 12px;
+            justify-content: space-between;
             margin-bottom: 12px;
         }
 
+        .header-left {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
         .header-icon {
-            width: 40px;
-            height: 40px;
+            width: 44px;
+            height: 44px;
             background: linear-gradient(135deg, #9333ea, #c084fc);
-            border-radius: 50%;
+            border-radius: 12px;
             display: flex;
             align-items: center;
             justify-content: center;
             font-size: 24px;
+            box-shadow: 0 4px 12px rgba(147, 51, 234, 0.3);
+        }
+
+        .header-info {
+            display: flex;
+            flex-direction: column;
         }
 
         .header-title {
             color: var(--tg-theme-text-color, #000000);
-            font-size: 20px;
-            font-weight: 600;
-        }
-
-        .balance-card {
-            background: var(--tg-theme-secondary-bg-color, #f4f4f5);
-            border-radius: 12px;
-            padding: 16px;
-            margin-bottom: 8px;
-        }
-
-        .balance-label {
-            color: var(--tg-theme-hint-color, #999999);
-            font-size: 14px;
-            margin-bottom: 4px;
-        }
-
-        .balance-value {
-            color: var(--tg-theme-text-color, #000000);
-            font-size: 32px;
+            font-size: 18px;
             font-weight: 700;
-            letter-spacing: -0.5px;
+            letter-spacing: -0.3px;
         }
 
-        .stats {
+        .header-subtitle {
+            color: var(--tg-theme-hint-color, #999999);
+            font-size: 12px;
+            margin-top: 1px;
+        }
+
+        .balance-mini {
+            background: var(--tg-theme-secondary-bg-color, #f4f4f5);
+            border-radius: 10px;
+            padding: 8px 14px;
+            display: flex;
+            flex-direction: column;
+            align-items: flex-end;
+        }
+
+        .balance-mini-label {
+            color: var(--tg-theme-hint-color, #999999);
+            font-size: 10px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 2px;
+        }
+
+        .balance-mini-value {
+            color: var(--tg-theme-text-color, #000000);
+            font-size: 16px;
+            font-weight: 700;
+            letter-spacing: -0.3px;
+        }
+
+        .stats-row {
             display: grid;
             grid-template-columns: repeat(3, 1fr);
             gap: 8px;
@@ -84,27 +107,91 @@
             border-radius: 12px;
             padding: 12px;
             text-align: center;
+            transition: all 0.2s;
+        }
+
+        .stat-card:active {
+            transform: scale(0.97);
         }
 
         .stat-label {
             color: var(--tg-theme-hint-color, #999999);
-            font-size: 12px;
+            font-size: 11px;
             margin-bottom: 4px;
+            text-transform: uppercase;
+            letter-spacing: 0.3px;
         }
 
         .stat-value {
             color: var(--tg-theme-text-color, #000000);
             font-size: 20px;
             font-weight: 700;
+            letter-spacing: -0.5px;
         }
 
-        .stat-value.positive {
-            color: #34c759;
+        .stat-value.highlight {
+            background: linear-gradient(135deg, #9333ea, #c084fc);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .settings-panel {
+            background: var(--tg-theme-secondary-bg-color, #f4f4f5);
+            border-radius: 16px;
+            padding: 16px;
+            margin-bottom: 12px;
+            transition: opacity 0.3s;
+        }
+
+        .setting-row {
+            margin-bottom: 14px;
+        }
+
+        .setting-row:last-child {
+            margin-bottom: 0;
+        }
+
+        .setting-label {
+            color: var(--tg-theme-text-color, #000000);
+            font-size: 13px;
+            font-weight: 600;
+            margin-bottom: 8px;
+            display: block;
+        }
+
+        .setting-buttons {
+            display: flex;
+            gap: 8px;
+        }
+
+        .setting-btn {
+            flex: 1;
+            background: var(--tg-theme-bg-color, #ffffff);
+            border: 2px solid transparent;
+            color: var(--tg-theme-text-color, #000000);
+            padding: 10px;
+            border-radius: 10px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .setting-btn:active {
+            transform: scale(0.95);
+        }
+
+        .setting-btn.active {
+            background: linear-gradient(135deg, #9333ea, #c084fc);
+            color: white;
+            border-color: #9333ea;
+            box-shadow: 0 4px 12px rgba(147, 51, 234, 0.3);
         }
 
         .game-board {
             background: var(--tg-theme-secondary-bg-color, #f4f4f5);
-            border-radius: 12px;
+            border-radius: 16px;
             padding: 16px;
             margin-bottom: 12px;
         }
@@ -119,16 +206,17 @@
         .mine-cell {
             aspect-ratio: 1;
             background: var(--tg-theme-bg-color, #ffffff);
-            border-radius: 8px;
+            border-radius: 10px;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 24px;
+            font-size: 28px;
             cursor: pointer;
             transition: all 0.2s;
-            border: 2px solid var(--tg-theme-secondary-bg-color, #f4f4f5);
+            border: 2px solid transparent;
             position: relative;
             overflow: hidden;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
         }
 
         .mine-cell::before {
@@ -145,7 +233,7 @@
         }
 
         .mine-cell:active {
-            transform: scale(0.95);
+            transform: scale(0.92);
         }
 
         .mine-cell.revealed {
@@ -155,13 +243,17 @@
         .mine-cell.revealed.safe {
             background: linear-gradient(135deg, #34c759, #30d158);
             border-color: #34c759;
-            animation: reveal 0.3s ease;
+            color: white;
+            animation: revealSafe 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+            box-shadow: 0 4px 12px rgba(52, 199, 89, 0.4);
         }
 
         .mine-cell.revealed.bomb {
             background: linear-gradient(135deg, #ff3b30, #ff453a);
             border-color: #ff3b30;
+            color: white;
             animation: explode 0.5s ease;
+            box-shadow: 0 4px 12px rgba(255, 59, 48, 0.4);
         }
 
         .mine-cell.disabled {
@@ -169,154 +261,110 @@
             pointer-events: none;
         }
 
-        @keyframes reveal {
-            0% { transform: scale(0.8); opacity: 0; }
-            50% { transform: scale(1.1); }
-            100% { transform: scale(1); opacity: 1; }
+        @keyframes revealSafe {
+            0% { transform: scale(0.7) rotate(-10deg); opacity: 0; }
+            50% { transform: scale(1.15) rotate(5deg); }
+            100% { transform: scale(1) rotate(0deg); opacity: 1; }
         }
 
         @keyframes explode {
-            0% { transform: scale(1); }
-            50% { transform: scale(1.2); }
-            100% { transform: scale(1); }
+            0%, 100% { transform: scale(1); }
+            25% { transform: scale(1.25) rotate(5deg); }
+            75% { transform: scale(1.25) rotate(-5deg); }
         }
 
         .controls {
             display: grid;
             grid-template-columns: 1fr 1fr;
-            gap: 8px;
+            gap: 10px;
         }
 
         .control-btn {
             background: var(--tg-theme-button-color, #3390ec);
-            color: var(--tg-theme-button-text-color, #ffffff);
+            color: white;
             border: none;
-            padding: 14px;
-            font-size: 16px;
-            border-radius: 10px;
+            padding: 16px;
+            font-size: 15px;
+            border-radius: 12px;
             cursor: pointer;
-            font-weight: 600;
+            font-weight: 700;
             transition: all 0.2s;
-            box-shadow: 0 2px 8px rgba(51, 144, 236, 0.3);
+            box-shadow: 0 4px 12px rgba(51, 144, 236, 0.3);
+            letter-spacing: 0.3px;
         }
 
         .control-btn:active {
-            transform: scale(0.98);
-            opacity: 0.9;
+            transform: scale(0.96);
         }
 
         .control-btn:disabled {
             background: var(--tg-theme-hint-color, #999999);
-            opacity: 0.5;
+            opacity: 0.4;
             cursor: not-allowed;
             box-shadow: none;
         }
 
         .control-btn.cashout {
             background: linear-gradient(135deg, #34c759, #30d158);
-        }
-
-        .settings-panel {
-            background: var(--tg-theme-secondary-bg-color, #f4f4f5);
-            border-radius: 12px;
-            padding: 16px;
-            margin-bottom: 12px;
-        }
-
-        .setting-row {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 12px;
-        }
-
-        .setting-row:last-child {
-            margin-bottom: 0;
-        }
-
-        .setting-label {
-            color: var(--tg-theme-text-color, #000000);
-            font-size: 14px;
-            font-weight: 500;
-        }
-
-        .setting-buttons {
-            display: flex;
-            gap: 8px;
-        }
-
-        .setting-btn {
-            background: var(--tg-theme-bg-color, #ffffff);
-            border: 2px solid var(--tg-theme-secondary-bg-color, #f4f4f5);
-            color: var(--tg-theme-text-color, #000000);
-            padding: 8px 16px;
-            border-radius: 8px;
-            font-size: 14px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.2s;
-            min-width: 60px;
-        }
-
-        .setting-btn:active {
-            transform: scale(0.95);
-        }
-
-        .setting-btn.active {
-            background: var(--tg-theme-button-color, #3390ec);
-            color: var(--tg-theme-button-text-color, #ffffff);
-            border-color: var(--tg-theme-button-color, #3390ec);
+            box-shadow: 0 4px 12px rgba(52, 199, 89, 0.3);
         }
 
         .message {
             background: var(--tg-theme-secondary-bg-color, #f4f4f5);
             border-radius: 12px;
-            padding: 12px;
+            padding: 14px 16px;
             text-align: center;
             color: var(--tg-theme-text-color, #000000);
-            font-size: 14px;
-            font-weight: 500;
-            min-height: 40px;
+            font-size: 13px;
+            font-weight: 600;
+            min-height: 44px;
             display: flex;
             align-items: center;
             justify-content: center;
+            line-height: 1.4;
         }
 
         .message.win {
-            background: rgba(52, 199, 89, 0.15);
+            background: linear-gradient(135deg, rgba(52, 199, 89, 0.15), rgba(48, 209, 88, 0.15));
             color: #34c759;
         }
 
         .message.lose {
-            background: rgba(255, 59, 48, 0.15);
+            background: linear-gradient(135deg, rgba(255, 59, 48, 0.15), rgba(255, 69, 58, 0.15));
             color: #ff3b30;
         }
 
         @media (prefers-color-scheme: dark) {
-            .mine-cell { box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3); }
+            .mine-cell { 
+                box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3); 
+            }
         }
     </style>
 </head>
 <body>
     <div class="container">
         <div class="header">
-            <div class="header-icon">💎</div>
-            <div class="header-title">Mines</div>
+            <div class="header-left">
+                <div class="header-icon">💎</div>
+                <div class="header-info">
+                    <div class="header-title">Mines</div>
+                    <div class="header-subtitle">Найди алмазы</div>
+                </div>
+            </div>
+            <div class="balance-mini">
+                <div class="balance-mini-label">Баланс</div>
+                <div class="balance-mini-value" id="balance">-</div>
+            </div>
         </div>
 
-        <div class="balance-card">
-            <div class="balance-label">Ваш баланс</div>
-            <div class="balance-value" id="balance">-</div>
-        </div>
-
-        <div class="stats">
+        <div class="stats-row">
             <div class="stat-card">
                 <div class="stat-label">Ставка</div>
                 <div class="stat-value" id="currentBet">50</div>
             </div>
             <div class="stat-card">
                 <div class="stat-label">Множитель</div>
-                <div class="stat-value positive" id="multiplier">1.0x</div>
+                <div class="stat-value highlight" id="multiplier">1.0x</div>
             </div>
             <div class="stat-card">
                 <div class="stat-label">Выигрыш</div>
@@ -326,15 +374,17 @@
 
         <div class="settings-panel" id="settingsPanel">
             <div class="setting-row">
-                <div class="setting-label">Ставка</div>
-                <div class="setting-buttons">
+                <label class="setting-label">Ставка</label>
+                <div class="setting-buttons" style="overflow-x: auto; scrollbar-width: none;">
                     <button class="setting-btn active" onclick="changeBet(50)">50</button>
                     <button class="setting-btn" onclick="changeBet(100)">100</button>
                     <button class="setting-btn" onclick="changeBet(200)">200</button>
+                    <button class="setting-btn" onclick="changeBet(500)">500</button>
+                    <button class="setting-btn" onclick="changeBet(1000)">1000</button>
                 </div>
             </div>
             <div class="setting-row">
-                <div class="setting-label">Бомбы</div>
+                <label class="setting-label">Количество бомб</label>
                 <div class="setting-buttons">
                     <button class="setting-btn" onclick="changeMines(3)">3</button>
                     <button class="setting-btn active" onclick="changeMines(5)">5</button>
@@ -356,7 +406,6 @@
     </div>
 
     <script>
-        // ========== КОНФИГ ==========
         const game = {
             api: 'https://nekros.vercel.app/api',
             tg: window.Telegram.WebApp,
@@ -378,7 +427,6 @@
             }
         };
 
-        // ========== DOM ==========
         const ui = {
             balance: document.getElementById('balance'),
             currentBet: document.getElementById('currentBet'),
@@ -391,7 +439,6 @@
             settingsPanel: document.getElementById('settingsPanel')
         };
 
-        // ========== ИНИЦИАЛИЗАЦИЯ ==========
         function init() {
             game.tg.ready();
             game.tg.expand();
@@ -408,7 +455,6 @@
             createGrid();
         }
 
-        // ========== СОЗДАНИЕ СЕТКИ ==========
         function createGrid() {
             ui.grid.innerHTML = '';
             for (let i = 0; i < 25; i++) {
@@ -420,7 +466,6 @@
             }
         }
 
-        // ========== СМЕНА НАСТРОЕК ==========
         function changeBet(amount) {
             if (game.gameActive) return;
             game.currentBet = amount;
@@ -456,7 +501,6 @@
             ui.potentialWin.textContent = Math.floor(game.currentBet * mult).toLocaleString();
         }
 
-        // ========== API ==========
         async function apiCall(endpoint, method, body) {
             try {
                 const opts = {
@@ -482,7 +526,6 @@
             }
         }
 
-        // ========== НАЧАТЬ ИГРУ ==========
         async function startGame() {
             if (game.currentBet > game.user.balance) {
                 showMsg('Недостаточно средств', 'lose');
@@ -505,7 +548,6 @@
                 game.revealedCount = 0;
                 game.bombPositions = result.bombPositions;
                 
-                // Обновляем баланс
                 game.user.balance = result.newBalance;
                 ui.balance.textContent = game.user.balance.toLocaleString();
                 localStorage.setItem('user_balance', game.user.balance);
@@ -527,7 +569,6 @@
             }
         }
 
-        // ========== ОТКРЫТЬ ЯЧЕЙКУ ==========
         async function revealCell(index) {
             if (!game.gameActive) return;
 
@@ -540,27 +581,16 @@
                 cell.classList.add('disabled');
                 game.tg.HapticFeedback.impactOccurred('light');
 
-                console.log('Reveal request:', {
-                    userId: game.user.id,
-                    gameId: game.gameId,
-                    position: index,
-                    currentRevealedCount: game.revealedCount
-                });
-
                 const result = await apiCall('/game/mines/reveal', 'POST', {
                     userId: game.user.id,
                     gameId: game.gameId,
                     position: index
                 });
 
-                console.log('Reveal result:', result);
-
                 if (result.hit === 'bomb') {
-                    // Попали на бомбу
                     cell.classList.add('revealed', 'bomb');
                     cell.textContent = '💣';
                     
-                    // Показываем все бомбы
                     setTimeout(() => {
                         game.bombPositions.forEach(pos => {
                             if (pos !== index) {
@@ -574,12 +604,9 @@
                     game.tg.HapticFeedback.notificationOccurred('error');
 
                 } else {
-                    // Нашли алмаз
                     cell.classList.add('revealed', 'safe');
                     cell.textContent = '💎';
                     game.revealedCount = result.revealedCount || (game.revealedCount + 1);
-                    
-                    console.log('Updated revealedCount:', game.revealedCount);
                     
                     updatePotentialWin();
                     
@@ -595,7 +622,6 @@
             }
         }
 
-        // ========== ЗАБРАТЬ ВЫИГРЫШ ==========
         async function cashout() {
             if (!game.gameActive || game.revealedCount === 0) {
                 showMsg('Сначала откройте хотя бы одну ячейку', 'lose');
@@ -607,18 +633,10 @@
                 ui.cashoutBtn.disabled = true;
                 showMsg('Забираем выигрыш...');
 
-                console.log('Cashout request:', {
-                    userId: game.user.id,
-                    gameId: game.gameId,
-                    revealedCount: game.revealedCount
-                });
-
                 const result = await apiCall('/game/mines/cashout', 'POST', {
                     userId: game.user.id,
                     gameId: game.gameId
                 });
-
-                console.log('Cashout result:', result);
 
                 endGame(true, result);
                 game.tg.HapticFeedback.notificationOccurred('success');
@@ -631,13 +649,11 @@
             }
         }
 
-        // ========== ЗАВЕРШИТЬ ИГРУ ==========
         function endGame(won, result) {
             game.gameActive = false;
             game.gameId = null;
             game.revealedCount = 0;
 
-            // Обновляем баланс
             game.user.balance = result.newBalance;
             ui.balance.textContent = game.user.balance.toLocaleString();
             localStorage.setItem('user_balance', game.user.balance);
@@ -648,7 +664,6 @@
             ui.settingsPanel.style.opacity = '1';
             ui.settingsPanel.style.pointerEvents = 'auto';
 
-            // Блокируем все ячейки
             Array.from(ui.grid.children).forEach(cell => {
                 cell.classList.add('disabled');
             });
@@ -659,7 +674,6 @@
                 showMsg(`💣 Бомба! Потеряно: ${game.currentBet}`, 'lose');
             }
 
-            // Сброс множителя
             game.revealedCount = 0;
             updatePotentialWin();
         }
