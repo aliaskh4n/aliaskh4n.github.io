@@ -156,6 +156,10 @@
         }
 
         .setting-row {
+            margin-bottom: 14px;
+        }
+
+        .setting-row:last-child {
             margin-bottom: 0;
         }
 
@@ -170,18 +174,10 @@
         .setting-buttons {
             display: flex;
             gap: 8px;
-            overflow-x: auto;
-            scrollbar-width: none;
-            -webkit-overflow-scrolling: touch;
-        }
-
-        .setting-buttons::-webkit-scrollbar {
-            display: none;
         }
 
         .setting-btn {
-            flex: 0 0 auto;
-            min-width: 70px;
+            flex: 1;
             background: var(--tg-theme-bg-color, #ffffff);
             border: 2px solid transparent;
             color: var(--tg-theme-text-color, #000000);
@@ -198,10 +194,10 @@
         }
 
         .setting-btn.active {
-            background: linear-gradient(135deg, #ff6b6b, #ff8e8e);
+            background: linear-gradient(135deg, #9333ea, #c084fc);
             color: white;
-            border-color: #ff6b6b;
-            box-shadow: 0 4px 12px rgba(255, 107, 107, 0.3);
+            border-color: #9333ea;
+            box-shadow: 0 4px 12px rgba(147, 51, 234, 0.3);
         }
 
         .slot-machine {
