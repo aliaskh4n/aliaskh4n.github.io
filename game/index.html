@@ -92,32 +92,17 @@
 
     /* ========== WINS TICKER ========== */
     .wins-ticker {
-      background: linear-gradient(135deg, var(--tg-theme-button-color, #3390ec), var(--tg-theme-secondary-bg-color, #f4f4f5));
-      border-radius: 12px;
-      padding: 12px 0;
-      margin-bottom: 16px;
+      margin-bottom: 12px;
       overflow: hidden;
       position: relative;
     }
 
-    .wins-ticker::before {
-      content: '🏆';
-      position: absolute;
-      left: 12px;
-      top: 50%;
-      transform: translateY(-50%);
-      font-size: 18px;
-      z-index: 10;
-      background: inherit;
-      padding: 0 8px;
-    }
-
     .wins-scroll {
       display: flex;
-      gap: 12px;
+      gap: 8px;
       overflow-x: auto;
       scroll-behavior: smooth;
-      padding: 0 50px 0 50px;
+      padding: 8px 0;
       -webkit-overflow-scrolling: touch;
       scrollbar-width: none;
     }
@@ -128,14 +113,13 @@
 
     .win-card {
       flex-shrink: 0;
-      background: var(--tg-theme-bg-color, #ffffff);
-      border-radius: 10px;
-      padding: 10px 14px;
+      border-radius: 8px;
+      padding: 6px 10px;
       display: flex;
       flex-direction: column;
       align-items: center;
-      min-width: 100px;
-      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+      justify-content: center;
+      min-width: 70px;
       transition: transform 0.2s;
     }
 
@@ -144,23 +128,23 @@
     }
 
     .win-emoji {
-      font-size: 24px;
-      margin-bottom: 4px;
+      font-size: 20px;
+      margin-bottom: 2px;
     }
 
     .win-player {
-      font-size: 11px;
+      font-size: 10px;
       color: var(--tg-theme-hint-color, #999999);
       text-align: center;
       white-space: nowrap;
       overflow: hidden;
       text-overflow: ellipsis;
-      max-width: 90px;
-      margin-bottom: 3px;
+      max-width: 65px;
+      margin-bottom: 2px;
     }
 
     .win-amount {
-      font-size: 13px;
+      font-size: 11px;
       font-weight: 700;
       color: var(--tg-theme-text-color, #000000);
       text-align: center;
@@ -169,8 +153,8 @@
     .win-empty {
       color: rgba(0, 0, 0, 0.5);
       text-align: center;
-      padding: 20px 12px;
-      font-size: 13px;
+      padding: 8px 12px;
+      font-size: 12px;
     }
 
     /* ========== BALANCE ========== */
@@ -413,7 +397,7 @@
           .slice(0, 15);
 
         if (winnersData.length === 0) {
-          app.dom.winsScroll.innerHTML = '<div class="win-empty">Нет крупных выигрышей</div>';
+          app.dom.winsScroll.innerHTML = '<div class="win-empty">Нет выигрышей</div>';
           return;
         }
 
@@ -425,19 +409,6 @@
             <div class="win-amount">+${w.balance.toLocaleString()}</div>
           </div>
         `).join('');
-
-        // Auto scroll
-        const scroll = app.dom.winsScroll;
-        if (scroll.scrollWidth > scroll.clientWidth) {
-          let scrollPos = 0;
-          setInterval(() => {
-            scrollPos += 1;
-            if (scrollPos > scroll.scrollWidth - scroll.clientWidth) {
-              scrollPos = 0;
-            }
-            scroll.scrollLeft = scrollPos;
-          }, 50);
-        }
       } catch (e) {
         console.error('Wins load error:', e);
         app.dom.winsScroll.innerHTML = '<div class="win-empty">Ошибка загрузки</div>';
