@@ -155,18 +155,21 @@
       align-items: center;
       justify-content: center;
       min-width: 60px;
-      transition: transform 0.2s;
+      transition: none;           /* убрали анимацию */
+      background: none !important; /* убрали фон */
+      border: none !important;     /* убрали границы */
+      box-shadow: none !important; /* убрали тень */
     }
-
+    
     .win-card:active {
-      transform: scale(0.95);
+      transform: none !important; /* убираем нажатие */
     }
-
+    
     .win-medal {
       font-size: 12px;
       margin-bottom: 1px;
     }
-
+    
     .win-avatar {
       width: 36px;
       height: 36px;
@@ -182,13 +185,13 @@
       margin-bottom: 2px;
       flex-shrink: 0;
     }
-
+    
     .win-avatar img {
       width: 100%;
       height: 100%;
       object-fit: cover;
     }
-
+    
     .win-player {
       font-size: 9px;
       color: var(--tg-theme-hint-color, #999999);
@@ -199,14 +202,14 @@
       max-width: 55px;
       margin-bottom: 1px;
     }
-
+    
     .win-amount {
       font-size: 10px;
       font-weight: 700;
       color: var(--tg-theme-text-color, #000000);
       text-align: center;
     }
-
+    
     .win-empty {
       color: rgba(0, 0, 0, 0.5);
       text-align: center;
@@ -551,3 +554,4 @@
   </script>
 </body>
 </html>
+
