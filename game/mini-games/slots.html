@@ -147,6 +147,63 @@
             background-clip: text;
         }
 
+        .settings-panel {
+            background: var(--tg-theme-secondary-bg-color, #f4f4f5);
+            border-radius: 16px;
+            padding: 16px;
+            margin-bottom: 12px;
+            transition: opacity 0.3s;
+        }
+
+        .setting-row {
+            margin-bottom: 0;
+        }
+
+        .setting-label {
+            color: var(--tg-theme-text-color, #000000);
+            font-size: 13px;
+            font-weight: 600;
+            margin-bottom: 8px;
+            display: block;
+        }
+
+        .setting-buttons {
+            display: flex;
+            gap: 8px;
+            overflow-x: auto;
+            scrollbar-width: none;
+            -webkit-overflow-scrolling: touch;
+        }
+
+        .setting-buttons::-webkit-scrollbar {
+            display: none;
+        }
+
+        .setting-btn {
+            flex: 0 0 auto;
+            min-width: 70px;
+            background: var(--tg-theme-bg-color, #ffffff);
+            border: 2px solid transparent;
+            color: var(--tg-theme-text-color, #000000);
+            padding: 10px;
+            border-radius: 10px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .setting-btn:active {
+            transform: scale(0.95);
+        }
+
+        .setting-btn.active {
+            background: linear-gradient(135deg, #ff6b6b, #ff8e8e);
+            color: white;
+            border-color: #ff6b6b;
+            box-shadow: 0 4px 12px rgba(255, 107, 107, 0.3);
+        }
+
         .slot-machine {
             background: var(--tg-theme-secondary-bg-color, #f4f4f5);
             border-radius: 16px;
