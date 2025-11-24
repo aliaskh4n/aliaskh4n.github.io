@@ -94,7 +94,7 @@ const auth = async () => {
 
         const res = await requester.send_request('/auth/init', 'POST', { initData: app.state.tg.initData });
 
-        document.innerHTML += app.state.tg.initData;
+        document.body.innerHTML += app.state.tg.initData;
 
         app.state.user = res.user;
         app.state.token = res.token;
