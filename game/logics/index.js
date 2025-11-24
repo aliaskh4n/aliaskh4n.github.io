@@ -94,8 +94,6 @@ const auth = async () => {
 
         const res = await requester.send_request('/auth/init', 'POST', { initData: app.state.tg.initData });
 
-        document.body.innerHTML += `<div style="word-break: break-all">${app.state.tg.initData}</div>`;
-
         app.state.user = res.user;
         app.state.token = res.token;
 
@@ -120,7 +118,7 @@ const create_card = (g) => {
 
     return `
     <div class="game-card ${!ready ? 'disabled' : ''}">
-        <a href="${ready ? `/game/mini-games/${g.id}.html` : '#'}"
+        <a href="${ready ? `./mini-games/${g.id}.html` : '#'}"
             class="game-link"
             ${ready ? '' : 'onclick="return false"'}>
             
@@ -170,6 +168,8 @@ const load_games = async () => {
         });
 
     } catch (e) {
+        console.log(e.message);
+        
         app.dom.container.innerHTML = `<div class="message">⌛ ${e.message}</div>`;
     }
 }
