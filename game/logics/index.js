@@ -52,10 +52,10 @@ const load_leaderboard = async () => {
 
             return `
                 <div class="win-card">
-                <div class="win-medal">${medal}</div>
-                <div class="win-avatar">${avatar}</div>
-                <div class="win-player">${player.name}</div>
-                <div class="win-amount">💰 ${player.balance.toLocaleString()}</div>
+                    <div class="win-medal">${medal}</div>
+                    <div class="win-avatar">${avatar}</div>
+                    <div class="win-player">${player.name}</div>
+                    <div class="win-amount">💰 ${player.balance.toLocaleString()}</div>
                 </div>
             `;
             }).join('');
@@ -132,7 +132,7 @@ const create_card = (g) => {
             <div class="game-desc">${g.desc}</div>
         </div>
 
-        ${!ready ? '<div class="soon-badge">SOON</div>' : ''}
+        ${ready ? '<div class="soon-badge">SOON</div>' : ''}
         </a>
     </div>
     `;

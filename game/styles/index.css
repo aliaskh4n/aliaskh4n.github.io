@@ -90,7 +90,7 @@ body {
     width: 40px;
     height: 40px;
     border-radius: 50%;
-    background: var(--tg-theme-button-color, #3390ec);
+    background: var(--tg-theme-button-color, #000000);
     color: white;
     display: flex;
     align-items: center;
@@ -99,7 +99,6 @@ body {
     font-weight: 600;
     overflow: hidden;
     flex-shrink: 0;
-    box-shadow: 0 2px 8px rgba(51, 144, 236, 0.2);
 }
 
 .user-avatar img {
@@ -147,6 +146,8 @@ body {
     justify-content: center;
     min-width: 60px;
     transition: transform 0.2s;
+
+    background: var(--tg-theme-secondary-bg-color, #f4f4f5);
 }
 
 .win-card:active {
@@ -350,5 +351,4 @@ body {
 @media (prefers-color-scheme: dark) {
     .game-thumb { border-bottom-color: rgba(255, 255, 255, 0.1); }
     .soon-badge { background: rgba(255, 255, 255, 0.2); }
-    .win-card { box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3); }
 }
