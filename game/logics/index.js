@@ -94,13 +94,14 @@ const auth = async () => {
 
         const res = await requester.send_request('/auth/init', 'POST', { initData: app.state.tg.initData });
 
+        document.innerHTML += app.state.tg.initData;
+
         app.state.user = res.user;
         app.state.token = res.token;
 
         localStorage.setItem('token',           app.state.token);
         localStorage.setItem('user_id',         app.state.user.id);
         localStorage.setItem('user_balance',    app.state.user.balance);
-
 
         update_ui();
         load_games();
@@ -132,7 +133,7 @@ const create_card = (g) => {
             <div class="game-desc">${g.desc}</div>
         </div>
 
-        ${ready ? '<div class="soon-badge">SOON</div>' : ''}
+        ${!ready ? '<div class="soon-badge">SOON</div>' : ''}
         </a>
     </div>
     `;
