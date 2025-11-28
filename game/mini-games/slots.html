@@ -678,7 +678,7 @@
             ui.betPicker.classList.toggle('active', true);
             
                         
-            if(!isNaN(digits)) {
+            if(!isNaN(digits) || digits < game.minBet) {
                 ui.spinBtn.disabled = false;
             } else {
                 ui.spinBtn.disabled = true;
