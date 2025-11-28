@@ -164,7 +164,7 @@
 
         .settings-panel {
             background: var(--tg-theme-secondary-bg-color, #f4f4f5);
-            border-bottom: 1px solid var(--tg-theme-secondary-bg-color, #ddd);
+            border-bottom: 1px solid var(--tg-theme-bg-color, #ddd);
             border-radius: 16px 16px 0 0;
             padding: 10px;
             transition: opacity 0.3s;
@@ -187,6 +187,7 @@
             padding: 10px;
             border-radius: 6px;
             background: var(--tg-theme-bg-color, white);
+            color: var(--tg-theme-text-color, #000000);
             text-align: center;
             font-weight: 600;
         }
@@ -209,6 +210,7 @@
             font-size: 18px;
             border-radius: 6px;
             background: var(--tg-theme-bg-color, white);
+            color: var(--tg-theme-text-color, #000000);
             text-align: center;
             font-weight: 600;
         }
@@ -383,7 +385,7 @@
             justify-content: center;
             line-height: 1.4;
             margin-bottom: 10px;
-            border-top: 1px solid var(--tg-theme-secondary-bg-color, #ddd);
+            border-top: 1px solid var(--tg-theme-bg-color, #ddd);
         }
 
         .message.win {
@@ -693,17 +695,21 @@
         ui.betPicker.oninput = (e) => {
             let rawValue = ui.betPicker.value.replace(/\s/g, '');
             let digits = parseInt(rawValue);
+
+            ui.spinBtn.disabled = false;
             
             if(isNaN(digits) || digits < game.minBet) {
-                digits = game.minBet;
-            } else if(digits > game.maxBet) {
+                ui.spinBtn.disabled = true;
+            }
+            
+            if(digits > game.maxBet) {
                 digits = game.maxBet;
             }
 
-            ui.spinBtn.disabled = false;
-
-            ui.betPicker.value = format_number(digits.toString());
-            game.currentBet = digits;
+            if(!isNaN(digits)) {
+                ui.betPicker.value = format_number(digits.toString());
+                game.currentBet = digits;
+            }
         };
 
         ui.betPickerIncrease.onclick = () => {
