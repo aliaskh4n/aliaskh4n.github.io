@@ -450,9 +450,9 @@
         </div>
 
         <div class="settings-panel-input">
-            <button class="increase">+</button>
-            <input type="text" placeholder="Или... Введите свой вариант">
             <button class="decrease">-</button>
+            <input type="text" placeholder="Своя сумма">
+            <button class="increase">+</button>
         </div>
 
         <div class="stats-row">
@@ -677,7 +677,7 @@
 
             ui.betPicker.classList.toggle('active', true);
             
-            if(!isNaN(digits) && digits > game.minBet) {
+            if(!isNaN(digits) && digits >= game.minBet) {
                 ui.spinBtn.disabled = false;
             } else {
                 ui.spinBtn.disabled = true;
