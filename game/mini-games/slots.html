@@ -103,12 +103,11 @@
         .stats-row {
             display: grid;
             gap: 8px;
-            margin-bottom: 10px;
         }
 
         .stat-card {
             background: var(--tg-theme-secondary-bg-color, #f4f4f5);
-            border-radius: 16px;
+            border-radius: 16px 16px 0 0;
             padding: 10px;
             transition: all 0.2s;
             cursor: pointer;
@@ -320,7 +319,7 @@
 
         .message {
             background: var(--tg-theme-secondary-bg-color, #f4f4f5);
-            border-radius: 16px;
+            border-radius: 0 0 16px 16px;
             padding: 14px 16px;
             text-align: center;
             color: var(--tg-theme-text-color, #000000);
@@ -332,6 +331,7 @@
             justify-content: center;
             line-height: 1.4;
             margin-bottom: 10px;
+            border-top: 1px solid var(--tg-theme-section-separator-color, #dddddd);
         }
 
         .message.win {
