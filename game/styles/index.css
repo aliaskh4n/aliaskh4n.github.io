@@ -63,23 +63,12 @@ body {
     align-items: center;
     justify-content: center;
     cursor: pointer;
-    padding: 4px;
     border-radius: 8px;
     transition: background 0.2s;
 }
 
 .user-menu:active {
     background: var(--tg-theme-secondary-bg-color, #f4f4f5);
-}
-
-.user-menu {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    cursor: pointer;
-    padding: 6px 12px;
-    border-radius: 8px;
-    transition: background 0.2s;
 }
 
 .user-menu:active {
@@ -200,7 +189,7 @@ body {
 }
 
 .win-empty {
-    color: rgba(0, 0, 0, 0.5);
+    color: var(--tg-theme-hint-color, #999999);;
     text-align: center;
     padding: 8px 12px;
     font-size: 12px;
@@ -228,7 +217,7 @@ body {
 }
 
 /* ========== GAMES ========== */
-.games-grid {
+.games-grid > *:not(:only-child) {
     display: grid;
     gap: 12px;
     grid-template-columns: repeat(2, 1fr);
@@ -332,6 +321,9 @@ body {
     font-size: 13px;
     color: var(--tg-theme-hint-color, #999999);
     border-top: 1px solid var(--tg-theme-secondary-bg-color, #f4f4f5);
+    width: 100%;
+    position: absolute;
+    bottom: 50px;
 }
 
 .loading-spinner {
