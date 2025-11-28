@@ -63,23 +63,12 @@ body {
     align-items: center;
     justify-content: center;
     cursor: pointer;
-    padding: 4px;
     border-radius: 8px;
     transition: background 0.2s;
 }
 
 .user-menu:active {
     background: var(--tg-theme-secondary-bg-color, #f4f4f5);
-}
-
-.user-menu {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    cursor: pointer;
-    padding: 6px 12px;
-    border-radius: 8px;
-    transition: background 0.2s;
 }
 
 .user-menu:active {
