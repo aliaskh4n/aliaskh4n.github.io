@@ -18,13 +18,21 @@
         }
 
         body {
-            font-family:system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
-            /* font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif; */
+            font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
             background: var(--tg-theme-bg-color, #ffffff);
             color: var(--tg-theme-text-color, #000000);
             min-height: 100vh;
             overflow-x: hidden;
             -webkit-tap-highlight-color: transparent;
+        }
+
+        input[type='number'] {
+            -moz-appearance:textfield;
+        }
+
+        input::-webkit-outer-spin-button,
+        input::-webkit-inner-spin-button {
+            -webkit-appearance: none;
         }
 
         .container {
@@ -156,10 +164,53 @@
 
         .settings-panel {
             background: var(--tg-theme-secondary-bg-color, #f4f4f5);
-            border-radius: 16px;
+            border-bottom: 1px solid var(--tg-theme-secondary-bg-color, #ddd);
+            border-radius: 16px 16px 0 0;
+            padding: 10px;
+            transition: opacity 0.3s;
+        }
+
+        .settings-panel-input {
+            background: var(--tg-theme-secondary-bg-color, #f4f4f5);
+            border-radius: 0 0 16px 16px;
             padding: 10px;
             margin-bottom: 10px;
             transition: opacity 0.3s;
+            display: flex;
+            gap: 8px;
+        }
+        
+        .settings-panel-input input {
+            border: none;
+            font-size: 18px;
+            width: 100%;
+            padding: 10px;
+            border-radius: 6px;
+            background: var(--tg-theme-bg-color, white);
+            text-align: center;
+            font-weight: 600;
+        }
+
+        .settings-panel-input input.active {
+            color: var(--primary-color);
+        }
+
+        .settings-panel-input input:focus {
+            outline: 2px solid var(--tg-theme-secondary-bg-color, #ddd);
+        }
+
+        .settings-panel-input input::placeholder {
+            color: var(--tg-theme-hint-color, #999999);
+        }
+
+        .increase, .decrease {
+            min-width: 42px;
+            border: none;
+            font-size: 18px;
+            border-radius: 6px;
+            background: var(--tg-theme-bg-color, white);
+            text-align: center;
+            font-weight: 600;
         }
 
         .setting-row {
@@ -180,7 +231,8 @@
         }
 
         .setting-buttons {
-            display: flex;
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
             gap: 8px;
         }
 
@@ -331,7 +383,7 @@
             justify-content: center;
             line-height: 1.4;
             margin-bottom: 10px;
-            border-top: 1px solid var(--tg-theme-section-separator-color, #dddddd);
+            border-top: 1px solid var(--tg-theme-secondary-bg-color, #ddd);
         }
 
         .message.win {
@@ -386,13 +438,19 @@
             <div class="setting-row">
                 <label class="setting-label">Ставка</label>
                 <div class="setting-buttons">
-                    <button class="setting-btn active" onclick="changeBet(50)">50</button>
-                    <button class="setting-btn" onclick="changeBet(100)">100</button>
-                    <button class="setting-btn" onclick="changeBet(200)">200</button>
-                    <button class="setting-btn" onclick="changeBet(500)">500</button>
-                    <button class="setting-btn" onclick="changeBet(1000)">1000</button>
+                    <button class="setting-btn active" onclick="changeBet(this, 50)">50</button>
+                    <button class="setting-btn" onclick="changeBet(this, 100)">100</button>
+                    <button class="setting-btn" onclick="changeBet(this, 200)">200</button>
+                    <button class="setting-btn" onclick="changeBet(this, 500)">500</button>
+                    <button class="setting-btn" onclick="changeBet(this, 1000)">1000</button>
                 </div>
             </div>
+        </div>
+
+        <div class="settings-panel-input">
+            <button class="increase">+</button>
+            <input type="text" placeholder="Или... Введите свой вариант">
+            <button class="decrease">-</button>
         </div>
 
         <div class="stats-row">
@@ -418,6 +476,8 @@
             },
             spinning: false,
             currentBet: 50,
+            minBet: 50,
+            maxBet: 100_000,
             bets: [50, 100, 150, 200, 300, 500, 750, 1000],
             symbols: ['🍒', '🍋', '🔔', '7️⃣']
         };
@@ -428,6 +488,9 @@
             currentBetDisplay: document.getElementById('currentBetDisplay'),
             spinBtn: document.getElementById('spinButton'),
             message: document.getElementById('message'),
+            betPicker: document.querySelector('.settings-panel-input input'),
+            betPickerIncrease: document.querySelector('.settings-panel-input .increase'),
+            betPickerDecrease: document.querySelector('.settings-panel-input .decrease'),
             slotMachine: document.getElementById('slotMachine'),
             reels: [
                 document.getElementById('reel1'),
@@ -435,6 +498,12 @@
                 document.getElementById('reel3')
             ]
         };
+
+        const format_number = (value) => {
+            let res;
+            (value.indexOf(',') != -1) ? res = new Intl.NumberFormat('ru-RU').format(value.replace(',', '.')).replace('.', ',') : res = new Intl.NumberFormat('ru-RU').format(value).replace(',', '.');
+            return res;
+        }
 
         function init() {
             game.tg.ready();
@@ -448,18 +517,24 @@
                 return;
             }
 
+            ui.betPicker.value = '';
+
             ui.balance.textContent = game.user.balance.toLocaleString();
             ui.spinBtn.onclick = spin;
         }
 
-        function changeBet(amount) {
+        function changeBet(element, amount) {
             if (game.gameActive) return;
             game.currentBet = amount;
-            // ui.currentBet.textContent = amount;
-            
-            document.querySelectorAll('.setting-row:first-child .setting-btn').forEach(btn => {
-                btn.classList.toggle('active', parseInt(btn.textContent) === amount);
+
+            element.parentElement.querySelectorAll('.setting-btn').forEach(btn => {
+                btn.classList.toggle('active', false);
             });
+
+            element.classList.toggle('active', true);
+            ui.betPicker.classList.toggle('active', false);
+
+            ui.spinBtn.disabled = false;
         }
 
         async function apiCall(endpoint, method, body) {
@@ -496,7 +571,7 @@
             ui.balance.textContent = (game.user.balance - game.currentBet).toLocaleString();
 
             ui.lastWin.setAttribute('color', 'red');
-            ui.lastWin.textContent = `-${game.currentBet}`;
+            ui.lastWin.textContent = format_number(`-${game.currentBet}`).toLocaleString();
         
             ui.reels.forEach(r => r.classList.add('spinning'));
 
@@ -589,6 +664,79 @@
         }
 
         init();
+
+        const change_input = (data) => {
+            let rawValue = ui.betPicker.value.replace(/\s/g, '');
+            let digits = parseInt(rawValue);
+
+            document.querySelectorAll('.settings-panel .setting-btn').forEach(btn => 
+                btn.classList.toggle('active', false)
+            );
+
+            ui.betPicker.classList.toggle('active', true);
+            
+                        
+            if(!isNaN(digits)) {
+                ui.spinBtn.disabled = false;
+            } else {
+                ui.spinBtn.disabled = true;
+            }
+        }
+
+        ui.betPicker.parentElement.onclick = change_input;
+        ui.betPicker.onkeydown = (e) => {
+            if(!(e.keyCode == 8 || !isNaN(e.key))) {
+                e.preventDefault();
+            }
+        };
+
+        ui.betPicker.oninput = (e) => {
+            let rawValue = ui.betPicker.value.replace(/\s/g, '');
+            let digits = parseInt(rawValue);
+            
+            if(isNaN(digits) || digits < game.minBet) {
+                digits = game.minBet;
+            } else if(digits > game.maxBet) {
+                digits = game.maxBet;
+            }
+
+            ui.spinBtn.disabled = false;
+
+            ui.betPicker.value = format_number(digits.toString());
+            game.currentBet = digits;
+        };
+
+        ui.betPickerIncrease.onclick = () => {
+            let rawValue = ui.betPicker.value.replace(/\s/g, '');
+            let digits = parseInt(rawValue);
+
+            digits += game.minBet;
+
+            if(isNaN(digits) || digits < game.minBet) {
+                digits = game.minBet;
+            } else if(digits > game.maxBet) {
+                digits = game.maxBet;
+            }
+
+            ui.betPicker.value = format_number(digits.toString());
+            game.currentBet = digits;
+        }
+
+        ui.betPickerDecrease.onclick = () => {
+            let rawValue = ui.betPicker.value.replace(/\s/g, '');
+            let digits = parseInt(rawValue);
+
+            digits -= game.minBet;
+
+            if(isNaN(digits) || digits < game.minBet) {
+                digits = game.minBet;
+            } else if(digits > game.maxBet) {
+                digits = game.maxBet;
+            }
+
+            ui.betPicker.value = format_number(digits.toString());
+            game.currentBet = digits;
+        }
     </script>
 </body>
 </html>
