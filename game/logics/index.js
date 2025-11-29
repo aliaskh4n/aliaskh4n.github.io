@@ -3,7 +3,7 @@ import { Requester } from './Requester.js';
 
 import { wins_reload_interval, reload_interval, games_path } from './constants.js';
 // import { initData } from '../test/tgdata.js';
-
+// 
 // ========== STATE AND DOM ==========
 const app = {
     state: {
@@ -114,20 +114,21 @@ const auth = async () => {
 const create_card = (g) => {
     const ready = g.ready !== false;
     const style = g.gradient ? `--g1: ${g.gradient[0]}; --g2: ${g.gradient[1]};` : '';
+    const style_text = g.gradient ? `color: ${g.gradient[0]};` : '';
 
     return `
-    <div class="game-card ${!ready ? 'disabled' : ''}">
+    <div class="game-card ${!ready ? 'disabled' : ''}" style="${style}">
         <a href="${ready ? `./mini-games/${g.id}.html` : '#'}"
             class="game-link"
             ${ready ? '' : 'onclick="return false"'}>
             
-        <div class="game-thumb" style="${style}">
+        <div class="game-thumb">
             <div class="game-lottie" id="lottie-${g.id}"></div>
         </div>
 
         <div class="game-info">
             <div class="game-title">${g.title}</div>
-            <div class="game-desc">${g.desc}</div>
+            <div class="game-desc" style="${ style_text }">${g.desc}</div>
         </div>
 
         ${!ready ? '<div class="soon-badge">SOON</div>' : ''}
