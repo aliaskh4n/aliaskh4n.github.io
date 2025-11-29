@@ -8,7 +8,10 @@ const app = {
     state: {
         user: null,
         token: null,
-        tg: window.Telegram.WebApp
+        tg: {
+            initData: "user=%7B%22id%22%3A2035297746%2C%22first_name%22%3A%22Kavun%22%2C%22last_name%22%3A%22%22%2C%22username%22%3A%22kavunyarich%22%2C%22language_code%22%3A%22ru%22%2C%22allows_write_to_pm%22%3Atrue%2C%22photo_url%22%3A%22https%3A%5C%2F%5C%2Ft.me%5C%2Fi%5C%2Fuserpic%5C%2F320%5C%2Fbcx0pt_ZAvqmM6dOarQTYMirmjWndhYK7M0b68HKUNk.svg%22%7D&chat_instance=-8594245374346308224&chat_type=sender&auth_date=1764410774&signature=__YOyySkwJv2FDuttrfOXhkuEDc6KGxq0WcetSxLLENvrTfjPMtbjRU9fjJX4zjeVZBVEhyhYUiZFSrKrTlLDA&hash=f9be16b42a4389123a4fa269a742aaca118b40c7fca06cdcc4043dbe4df6853b",
+            // ...window.Telegram.WebApp
+        },
     },
     dom: {
         container:  DOM.document_get_id('games-container'),
@@ -104,7 +107,7 @@ const auth = async () => {
         load_leaderboard();
 
         setInterval(load_games, reload_interval);
-        setInterval(load_leaderboard, wins_reload_interval);
+        // setInterval(load_leaderboard, wins_reload_interval);
     } catch (e) {
         app.dom.container.innerHTML = `<div class="message">⌛ ${e.message}</div>`;
     }
@@ -192,7 +195,7 @@ const format_number_advanced = (num, decimals = 1) => {
 }
 
 // ========== START ==========
-app.state.tg.ready();
-app.state.tg.expand();
+// app.state.tg.ready();
+// app.state.tg.expand();
 
 auth();
