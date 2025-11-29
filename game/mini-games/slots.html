@@ -190,14 +190,16 @@
             color: var(--tg-theme-text-color, #000000);
             text-align: center;
             font-weight: 600;
+            z-index: 1;
         }
 
         .settings-panel-input input.active {
             color: var(--primary-color);
         }
 
-        .settings-panel-input input:focus {
-            outline: 2px solid var(--tg-theme-secondary-bg-color, #ddd);
+        .settings-panel-input input:focus,
+        .settings-panel-input input.active {
+            outline: 10px ridge var(--primary-color);
         }
 
         .settings-panel-input input::placeholder {
@@ -677,13 +679,17 @@
 
             ui.betPicker.classList.toggle('active', true);
             
-            if(!isNaN(digits) && digits >= game.minBet) {
+            if(!isNaN(digits) && digits >= game.minBet && !game.spinning) {
                 ui.spinBtn.disabled = false;
             } else {
                 ui.spinBtn.disabled = true;
             }
 
             game.currentBet = digits;
+
+            if(data.target.value) {
+                ui.betPicker.value = data.target.value;
+            }
         }
 
         ui.betPicker.parentElement.onclick = change_input;
@@ -693,7 +699,7 @@
             }
         };
 
-        ui.betPicker.oninput = (e) => {
+        ui.betPicker.oninput = (e) => {            
             let rawValue = ui.betPicker.value.replace(/\s/g, '');
             let digits = parseInt(rawValue);
 
