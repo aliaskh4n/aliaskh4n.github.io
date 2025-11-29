@@ -2,13 +2,14 @@ import { DOM } from './DOM.js';
 import { Requester } from './Requester.js';
 
 import { wins_reload_interval, reload_interval, games_path } from './constants.js';
+import { initData } from '../test/tgdata.js';
 
 // ========== STATE AND DOM ==========
 const app = {
     state: {
         user: null,
         token: null,
-        tg: window.Telegram.WebApp
+        tg: window.Telegram.WebApp,
     },
     dom: {
         container:  DOM.document_get_id('games-container'),
