@@ -136,6 +136,7 @@ body, html {
     gap: 8px;
     overflow-x: auto;
     scroll-behavior: smooth;
+    padding: 4px 0;
     -webkit-overflow-scrolling: touch;
     scrollbar-width: none;
 }
@@ -155,17 +156,16 @@ body, html {
     min-width: 100px;
     transition: transform 0.2s;
     background: var(--tg-theme-secondary-bg-color, #f4f4f5);
-    overflow: hidden;
 }
 
 .win-medal {
     font-size: 75px;
-    font-weight: 800;
     position: absolute;
     z-index: 0;
-    top: -40px;
+    top: 20px;
     transform: translateX(20px);
     color: var(--primary-color);
+    opacity: 0.1;
 }
 
 .win-avatar {
@@ -193,27 +193,22 @@ body, html {
 
 .win-player {
     font-size: 12px;
-    color: var(--tg-theme-text-color, #000000);
+    color: var(--tg-theme-hint-color, #999999);
     text-align: center;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
-    max-width: 65px;
+    max-width: 55px;
+    margin-bottom: 1px;
     z-index: 1;
-    background: var(--tg-theme-secondary-bg-color, #f4f4f5);
-    border-radius: 3px;
-    padding: 0 5px;
 }
 
 .win-amount {
     font-size: 12px;
     font-weight: 600;
     color: var(--tg-theme-text-color, #000000);
-    background: var(--tg-theme-secondary-bg-color, #f4f4f5);
     text-align: center;
     z-index: 1;
-    border-radius: 3px;
-    padding: 0 3px;
 }
 
 .win-empty {
