@@ -9,10 +9,7 @@ const app = {
     state: {
         user: null,
         token: null,
-        tg: {
-            initData,
-            // ...window.Telegram.WebApp
-        },
+        tg: window.Telegram.WebApp
     },
     dom: {
         container:  DOM.document_get_id('games-container'),
