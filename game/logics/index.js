@@ -8,7 +8,7 @@ const app = {
     state: {
         user: null,
         token: null,
-        tg: window.Telegram.WebApp,
+        tg: window.Telegram.WebApp
     },
     dom: {
         container:  DOM.document_get_id('games-container'),
@@ -19,7 +19,6 @@ const app = {
     }
 };
 
-const medals = ['🥇', '🥈', '🥉', '⭐', '✨', '💫', '🌟', '💎', '👑', '🏆'];
 const requester = new Requester(app);
 
 const set_avatar_text = () => {
@@ -43,7 +42,6 @@ const load_leaderboard = async () => {
         }
         
         app.dom.winsScroll.innerHTML = richestPlayers.map((player, i) => {
-            const medal = medals[i];
             let avatar = `<span>${ player.name?.charAt(0).toUpperCase() || '👤' }</span>`;
 
             if(player.photo_url) {
@@ -52,10 +50,10 @@ const load_leaderboard = async () => {
 
             return `
                 <div class="win-card">
-                    <div class="win-medal">${medal}</div>
+                    <div class="win-medal">${ i+1 }</div>
                     <div class="win-avatar">${avatar}</div>
                     <div class="win-player">${player.name}</div>
-                    <div class="win-amount">💰 ${player.balance.toLocaleString()}</div>
+                    <div class="win-amount">${format_number_advanced(player.balance).toLocaleString()}</div>
                 </div>
             `;
             }).join('');
@@ -155,7 +153,12 @@ const load_games = async () => {
             if (g.animation) {
                 const container = document.getElementById(`lottie-${g.id}`);
 
+                console.log(g.id, g.animation_speed);
+                
                 if (container) {
+                    lottie.setSpeed(g.animation_speed);
+                    lottie.setQuality('low');
+
                     lottie.loadAnimation({
                         container,
                         renderer: "svg",
@@ -167,11 +170,25 @@ const load_games = async () => {
             }
         });
 
-    } catch (e) {
-        console.log(e.message);
-        
+    } catch (e) {        
         app.dom.container.innerHTML = `<div class="message">⌛ ${e.message}</div>`;
     }
+}
+
+const format_number_advanced = (num, decimals = 1) => {
+    const units = [
+        { value: 1e9, suffix: ' млрд' },
+        { value: 1e6, suffix: ' млн' },
+        { value: 1e3, suffix: ' тыс' }
+    ];
+
+    for (const unit of units) {
+        if (num >= unit.value) {
+            return (num / unit.value).toFixed(decimals).replace(/\.0$/, '') + unit.suffix;
+        }
+    }
+    
+    return num.toString();
 }
 
 // ========== START ==========

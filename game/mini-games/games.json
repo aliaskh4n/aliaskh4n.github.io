@@ -2,7 +2,8 @@
   {
     "id": "slots",
     "title": "Слоты",
-    "animation": "https://aliaskh4n.github.io/game/animations/slots.json",
+    "animation": "./animations/slots.json",
+    "animation_speed": 0.2,
     "desc": "Крути барабаны и срывай джекпот",
     "gradient": ["#ff6b6b", "#ff8e8e"],
     "ready": true
@@ -10,7 +11,8 @@
   {
     "id": "mines",
     "title": "Mines",
-    "animation": "https://aliaskh4n.github.io/game/animations/mines.json",
+    "animation": "./animations/mines.json",
+    "animation_speed": 1,
     "desc": "Найди алмазы и избегай бомб",
     "gradient": ["#9333ea", "#c084fc"],
     "ready": true
