@@ -443,7 +443,10 @@
             game.tg.ready();
             game.tg.expand();
             game.tg.BackButton.show();
-            game.tg.BackButton.onClick(() => window.history.back());
+            game.tg.BackButton.onClick(() => {
+                window.history.back();
+                game.tg.BackButton.hide();
+            });
 
             if (!game.user.id || !game.user.token) {
                 showMsg('Пожалуйста, вернитесь на главную', 'lose');
