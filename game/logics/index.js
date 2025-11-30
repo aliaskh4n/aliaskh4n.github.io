@@ -119,19 +119,19 @@ const create_card = (g) => {
     return `
     <div class="game-card ${!ready ? 'disabled' : ''}" style="${style}">
         <a href="${ready ? `./mini-games/${g.id}.html` : '#'}"
-            class="game-link"
-            ${ready ? '' : 'onclick="return false"'}>
-            
-        <div class="game-thumb">
-            <div class="game-lottie" id="lottie-${g.id}"></div>
-        </div>
+                class="game-link"
+                ${ready ? '' : 'onclick="return false"'}>
+                
+            <div class="game-thumb">
+                <div class="game-lottie" id="lottie-${g.id}"></div>
+            </div>
 
-        <div class="game-info">
-            <div class="game-title">${g.title}</div>
-            <div class="game-desc" style="${ style_text }">${g.desc}</div>
-        </div>
+            <div class="game-info">
+                <div class="game-title">${g.title}</div>
+                <div class="game-desc" style="${ style_text }">${g.desc}</div>
+            </div>
 
-        ${!ready ? '<div class="soon-badge">SOON</div>' : ''}
+            ${!ready ? '<div class="soon-badge">SOON</div>' : ''}
         </a>
     </div>
     `;
@@ -154,8 +154,6 @@ const load_games = async () => {
         games.forEach(g => {
             if (g.animation) {
                 const container = document.getElementById(`lottie-${g.id}`);
-
-                console.log(g.id, g.animation_speed);
                 
                 if (container) {
                     lottie.setSpeed(g.animation_speed);
