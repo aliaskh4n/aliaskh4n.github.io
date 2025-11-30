@@ -18,7 +18,7 @@
         }
 
         body {
-            font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+            font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, "Open Sans", "Helvetica Neue", sans-serif;
             background: var(--tg-theme-bg-color, #ffffff);
             color: var(--tg-theme-text-color, #000000);
             min-height: 100vh;
@@ -26,7 +26,7 @@
             -webkit-tap-highlight-color: transparent;
         }
 
-        input[type='number'] {
+        input[type="number"] {
             -moz-appearance:textfield;
         }
 
@@ -272,7 +272,7 @@
         }
 
         .slot-machine::before {
-            content: '';
+            content: "";
             position: absolute;
             top: 0;
             left: 0;
@@ -315,7 +315,7 @@
         }
 
         .reel::before {
-            content: '';
+            content: "";
             position: absolute;
             inset: -3px;
             background: var(--primary-color);
@@ -471,57 +471,69 @@
 
     <script>
         const game = {
-            api: 'https://nekros.vercel.app/api',
+            api: "https://nekros.vercel.app/api",
             tg: window.Telegram.WebApp,
             user: {
-                id: localStorage.getItem('user_id'),
-                token: localStorage.getItem('token'),
-                balance: parseInt(localStorage.getItem('user_balance') || '0')
+                id: localStorage.getItem("user_id"),
+                token: localStorage.getItem("token"),
+                balance: parseInt(localStorage.getItem("user_balance") || "0")
             },
             spinning: false,
             currentBet: 50,
             minBet: 50,
             maxBet: 100_000,
             bets: [50, 100, 150, 200, 300, 500, 750, 1000],
-            symbols: ['🍒', '🍋', '🔔', '7️⃣']
+            symbols: {
+                "cherry":   "🍒", 
+                "lemon":    "🍋", 
+                "bell":     "🔔", 
+                "7":        "7️⃣"
+            }
         };
 
+        const symbols = Object.values(game.symbols);
+        const symbolsCount = symbols.length;
+
         const ui = {
-            balance: document.getElementById('balance'),
-            lastWin: document.getElementById('lastWin'),
-            currentBetDisplay: document.getElementById('currentBetDisplay'),
-            spinBtn: document.getElementById('spinButton'),
-            message: document.getElementById('message'),
-            betPicker: document.querySelector('.settings-panel-input input'),
-            betPickerIncrease: document.querySelector('.settings-panel-input .increase'),
-            betPickerDecrease: document.querySelector('.settings-panel-input .decrease'),
-            slotMachine: document.getElementById('slotMachine'),
+            balance: document.getElementById("balance"),
+            lastWin: document.getElementById("lastWin"),
+            currentBetDisplay: document.getElementById("currentBetDisplay"),
+            spinBtn: document.getElementById("spinButton"),
+            message: document.getElementById("message"),
+            betPicker: document.querySelector(".settings-panel-input input"),
+            betPickerIncrease: document.querySelector(".settings-panel-input .increase"),
+            betPickerDecrease: document.querySelector(".settings-panel-input .decrease"),
+            slotMachine: document.getElementById("slotMachine"),
             reels: [
-                document.getElementById('reel1'),
-                document.getElementById('reel2'),
-                document.getElementById('reel3')
+                document.getElementById("reel1"),
+                document.getElementById("reel2"),
+                document.getElementById("reel3")
             ]
         };
 
         const format_number = (value) => {
             let res;
-            (value.indexOf(',') != -1) ? res = new Intl.NumberFormat('ru-RU').format(value.replace(',', '.')).replace('.', ',') : res = new Intl.NumberFormat('ru-RU').format(value).replace(',', '.');
+            (value.indexOf(",") != -1) ? res = new Intl.NumberFormat("ru-RU").format(value.replace(",", ".")).replace(".", ",") : res = new Intl.NumberFormat("ru-RU").format(value).replace(",", ".");
             return res;
         }
 
         function init() {
             game.tg.ready();
             game.tg.expand();
+
             game.tg.BackButton.show();
-            game.tg.BackButton.onClick(() => window.history.back());
+            game.tg.BackButton.onClick(() => {
+                game.tg.BackButton.hide();
+                window.history.back();
+            });
 
             if (!game.user.id || !game.user.token) {
-                showMsg('Пожалуйста, вернитесь на главную', 'lose');
+                showMsg("Пожалуйста, вернитесь на главную", "lose");
                 ui.spinBtn.disabled = true;
                 return;
             }
 
-            ui.betPicker.value = '';
+            ui.betPicker.value = "";
 
             ui.balance.textContent = game.user.balance.toLocaleString();
             ui.spinBtn.onclick = spin;
@@ -531,12 +543,12 @@
             if (game.gameActive) return;
             game.currentBet = amount;
 
-            element.parentElement.querySelectorAll('.setting-btn').forEach(btn => {
-                btn.classList.toggle('active', false);
+            element.parentElement.querySelectorAll(".setting-btn").forEach(btn => {
+                btn.classList.toggle("active", false);
             });
 
-            element.classList.toggle('active', true);
-            ui.betPicker.classList.toggle('active', false);
+            element.classList.toggle("active", true);
+            ui.betPicker.classList.toggle("active", false);
 
             ui.spinBtn.disabled = false;
         }
@@ -545,15 +557,15 @@
             const opts = {
                 method,
                 headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${game.user.token}`
+                    "Content-Type": "application/json",
+                    "Authorization": `Bearer ${game.user.token}`
                 }
             };
             if (body) opts.body = JSON.stringify(body);
 
             const res = await fetch(`${game.api}${endpoint}`, opts);
             const data = await res.json();
-            if (!res.ok) throw new Error(data.error || 'API Error');
+            if (!res.ok) throw new Error(data.error || "API Error");
             return data;
         }
 
@@ -561,30 +573,32 @@
             if (game.spinning) return;
 
             if (game.currentBet > game.user.balance) {
-                showMsg('Недостаточно средств', 'lose');
-                game.tg.HapticFeedback.notificationOccurred('error');
+                showMsg("Недостаточно средств", "lose");
+                game.tg.HapticFeedback.notificationOccurred("error");
                 return;
             }
 
             game.spinning = true;
             ui.spinBtn.disabled = true;
-            ui.slotMachine.classList.add('spinning');
-            game.tg.HapticFeedback.impactOccurred('medium');
-            showMsg('Крутим барабаны...');
+            ui.slotMachine.classList.add("spinning");
+            game.tg.HapticFeedback.impactOccurred("medium");
+            showMsg("Крутим барабаны...");
 
             ui.balance.textContent = (game.user.balance - game.currentBet).toLocaleString();
 
-            ui.lastWin.setAttribute('color', 'red');
+            ui.lastWin.setAttribute("color", "red");
             ui.lastWin.textContent = format_number(`-${game.currentBet}`).toLocaleString();
         
-            ui.reels.forEach(r => r.classList.add('spinning'));
+            ui.reels.forEach(r => r.classList.add("spinning"));
 
             const interval = setInterval(() => {
-                ui.reels.forEach(r => r.textContent = game.symbols[Math.floor(Math.random() * game.symbols.length)]);
+                ui.reels.forEach((reel, i) => {
+                    reel.textContent = symbols[Math.floor(Math.random() * symbolsCount)];
+                });
             }, 80);
 
             try {
-                const result = await apiCall('/game/slots/play', 'POST', {
+                const result = await apiCall("/game/slots/play", "POST", {
                     userId: game.user.id,
                     bet: game.currentBet
                 });
@@ -593,24 +607,24 @@
                 clearInterval(interval);
             } catch (e) {
                 clearInterval(interval);
-                showMsg(`Ошибка: ${e.message}`, 'lose');
+                showMsg(`Ошибка: ${e.message}`, "lose");
                 game.spinning = false;
                 ui.spinBtn.disabled = false;
-                ui.slotMachine.classList.remove('spinning');
-                ui.reels.forEach(r => r.classList.remove('spinning'));
-                game.tg.HapticFeedback.notificationOccurred('error');
+                ui.slotMachine.classList.remove("spinning");
+                ui.reels.forEach(r => r.classList.remove("spinning"));
+                game.tg.HapticFeedback.notificationOccurred("error");
             }
         }
 
         function stopSpin(result) {
             ui.reels.forEach((reel, i) => {
                 setTimeout(() => {
-                    reel.textContent = result.symbols[i];
-                    reel.classList.remove('spinning');
+                    reel.textContent = game.symbols[result.symbols[i]];
+                    reel.classList.remove("spinning");
                     
                     if (result.winAmount > 0) {
-                        reel.classList.add('winner');
-                        setTimeout(() => reel.classList.remove('winner'), 600);
+                        reel.classList.add("winner");
+                        setTimeout(() => reel.classList.remove("winner"), 600);
                     }
                 }, i * 200);
             });
@@ -619,26 +633,26 @@
                 showResult(result);
                 game.user.balance = result.newBalance;
                 ui.balance.textContent = game.user.balance.toLocaleString();
-                localStorage.setItem('user_balance', game.user.balance);
+                localStorage.setItem("user_balance", game.user.balance);
                 
                 game.spinning = false;
                 ui.spinBtn.disabled = false;
-                ui.slotMachine.classList.remove('spinning');
+                ui.slotMachine.classList.remove("spinning");
             }, 800);
         }
 
         function showResult(result) {
-            let msg = '';
-            let type = result.winAmount > 0 ? 'win' : 'lose';
+            let msg = "";
+            let type = result.winAmount > 0 ? "win" : "lose";
             let isJackpot = false;
 
             const messages = {
-                'jackpot_777': { text: `🎉 ДЖЕКПОТ 777! +${result.winAmount} 💰`, jackpot: true },
-                'jackpot_lemon': { text: `🍋 ЛИМОНЫ! +${result.winAmount} 💰`, jackpot: false },
-                'jackpot_cherry': { text: `🍒 ВИШНИ! +${result.winAmount} 💰`, jackpot: false },
-                'jackpot_bell': { text: `🔔 КОЛОКОЛА! +${result.winAmount} 💰`, jackpot: false },
-                'pair': { text: `✨ Пара! +${result.winAmount} 💰`, jackpot: false },
-                'lose': { text: `😔 Не повезло. Попробуйте ещё!`, jackpot: false }
+                "jackpot_777": { text: `🎉 ДЖЕКПОТ 777! +${result.winAmount} 💰`, jackpot: true },
+                "jackpot_lemon": { text: `🍋 ЛИМОНЫ! +${result.winAmount} 💰`, jackpot: false },
+                "jackpot_cherry": { text: `🍒 ВИШНИ! +${result.winAmount} 💰`, jackpot: false },
+                "jackpot_bell": { text: `🔔 КОЛОКОЛА! +${result.winAmount} 💰`, jackpot: false },
+                "pair": { text: `✨ Пара! +${result.winAmount} 💰`, jackpot: false },
+                "lose": { text: `😔 Не повезло. Попробуйте ещё!`, jackpot: false }
             };
 
             const msgData = messages[result.winType] || messages.lose;
@@ -646,38 +660,39 @@
             isJackpot = msgData.jackpot;
 
             if (result.winAmount > 0) {
-                ui.lastWin.setAttribute('color', 'green');
+                ui.lastWin.setAttribute("color", "green");
                 ui.lastWin.textContent = result.winAmount.toLocaleString();
                 
-                game.tg.HapticFeedback.notificationOccurred('success');
+                game.tg.HapticFeedback.notificationOccurred("success");
+
                 if (isJackpot) {
-                    type = 'jackpot';
-                    game.tg.HapticFeedback.notificationOccurred('success');
-                    setTimeout(() => game.tg.HapticFeedback.notificationOccurred('success'), 200);
+                    type = "jackpot";
+                    game.tg.HapticFeedback.notificationOccurred("success");
+                    setTimeout(() => game.tg.HapticFeedback.notificationOccurred("success"), 200);
                 }
             } else {
-                game.tg.HapticFeedback.notificationOccurred('error');
+                game.tg.HapticFeedback.notificationOccurred("error");
             }
 
             showMsg(msg, type);
         }
 
-        function showMsg(text, type = '') {
+        function showMsg(text, type = "") {
             ui.message.textContent = text;
-            ui.message.className = 'message ' + type;
+            ui.message.className = "message " + type;
         }
 
         init();
 
         const change_input = (data) => {
-            let rawValue = ui.betPicker.value.replace(/\s/g, '');
+            let rawValue = ui.betPicker.value.replace(/\s/g, "");
             let digits = parseInt(rawValue);
 
-            document.querySelectorAll('.settings-panel .setting-btn').forEach(btn => 
-                btn.classList.toggle('active', false)
+            document.querySelectorAll(".settings-panel .setting-btn").forEach(btn => 
+                btn.classList.toggle("active", false)
             );
 
-            ui.betPicker.classList.toggle('active', true);
+            ui.betPicker.classList.toggle("active", true);
             
             if(!isNaN(digits) && digits >= game.minBet && !game.spinning) {
                 ui.spinBtn.disabled = false;
@@ -700,7 +715,7 @@
         };
 
         ui.betPicker.oninput = (e) => {            
-            let rawValue = ui.betPicker.value.replace(/\s/g, '');
+            let rawValue = ui.betPicker.value.replace(/\s/g, "");
             let digits = parseInt(rawValue);
 
             ui.spinBtn.disabled = false;
@@ -720,7 +735,7 @@
         };
 
         ui.betPickerIncrease.onclick = () => {
-            let rawValue = ui.betPicker.value.replace(/\s/g, '');
+            let rawValue = ui.betPicker.value.replace(/\s/g, "");
             let digits = parseInt(rawValue);
 
             digits += game.minBet;
@@ -736,7 +751,7 @@
         }
 
         ui.betPickerDecrease.onclick = () => {
-            let rawValue = ui.betPicker.value.replace(/\s/g, '');
+            let rawValue = ui.betPicker.value.replace(/\s/g, "");
             let digits = parseInt(rawValue);
 
             digits -= game.minBet;
