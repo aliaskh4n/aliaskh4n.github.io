@@ -1,4 +1,5 @@
 import { api_url } from './constants.js';
+import { routes } from './constants.js';
 
 export class Requester {
     constructor(App) {
@@ -47,5 +48,26 @@ export class Requester {
         }
 
         throw lastError;
+    }
+
+    async get_leaderboard(limit) {
+        const res = await this.send_request(routes.leaderboard);
+
+        if (!res.leaderboard || res.leaderboard.length === 0) {
+            return {};
+        }
+
+        const richestPlayers = res.leaderboard.slice(0, limit);
+
+        if (richestPlayers.length === 0) {
+            return {};
+        }
+        
+        return richestPlayers;
+    }
+
+    async get_version_leaderboard() {
+        const res = await this.send_request(routes.version_leaderboard);
+        return res.version ?? 0;
     }
 }

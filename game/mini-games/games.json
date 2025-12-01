@@ -1,20 +1,18 @@
 [
   {
-    "id": "slots",
-    "title": "Слоты",
+    "id":     "slots",
+    "title":  "Слоты",
     "animation": "./animations/slots.json",
-    "animation_speed": 0.2,
     "desc": "Крути барабаны и срывай джекпот",
-    "gradient": ["#ff6b6b", "#ff8e8e"],
+    "gradient": [ "#ff6b6b", "#ff8e8e" ],
     "ready": true
   },
   {
-    "id": "mines",
-    "title": "Mines",
+    "id":     "mines",
+    "title":  "Мины",
     "animation": "./animations/mines.json",
-    "animation_speed": 1,
     "desc": "Найди алмазы и избегай бомб",
-    "gradient": ["#9333ea", "#c084fc"],
+    "gradient": [ "#9333ea", "#c084fc" ],
     "ready": true
   }
 ]
