@@ -1,0 +1,671 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>Aviator</title>
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            background: var(--tg-theme-bg-color, #ffffff);
+            color: var(--tg-theme-text-color, #000000);
+            overflow-x: hidden;
+            padding-bottom: 20px;
+        }
+
+        .header {
+            background: var(--tg-theme-secondary-bg-color, #f4f4f5);
+            padding: 12px 16px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid var(--tg-theme-section-separator-color, #e5e5ea);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .header-title {
+            font-size: 17px;
+            font-weight: 600;
+            color: var(--tg-theme-text-color);
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .balance {
+            font-size: 15px;
+            font-weight: 600;
+            color: var(--tg-theme-button-color, #3390ec);
+            background: var(--tg-theme-bg-color);
+            padding: 6px 12px;
+            border-radius: 12px;
+        }
+
+        .game-container {
+            padding: 0;
+        }
+
+        .game-canvas {
+            position: relative;
+            background: var(--tg-theme-secondary-bg-color, #f4f4f5);
+            margin: 8px;
+            border-radius: 12px;
+            min-height: 320px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            overflow: hidden;
+        }
+
+        .plane {
+            font-size: 48px;
+            position: absolute;
+            transition: all 0.1s linear;
+            left: 10%;
+            bottom: 10%;
+        }
+
+        .multiplier-display {
+            font-size: 56px;
+            font-weight: 700;
+            color: var(--tg-theme-button-color, #3390ec);
+            z-index: 10;
+            letter-spacing: -2px;
+        }
+
+        .multiplier-display.crashed {
+            color: var(--tg-theme-destructive-text-color, #ff3b30);
+        }
+
+        .status-text {
+            font-size: 15px;
+            margin-top: 12px;
+            color: var(--tg-theme-hint-color, #999999);
+        }
+
+        .waiting-timer {
+            font-size: 28px;
+            font-weight: 600;
+            color: var(--tg-theme-button-color);
+            margin-top: 8px;
+        }
+
+        .section {
+            background: var(--tg-theme-bg-color);
+            margin: 8px;
+            border-radius: 12px;
+            overflow: hidden;
+        }
+
+        .section-header {
+            padding: 12px 16px;
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--tg-theme-hint-color);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .input-group {
+            padding: 12px 16px;
+            border-bottom: 1px solid var(--tg-theme-section-separator-color, #e5e5ea);
+        }
+
+        .input-group:last-child {
+            border-bottom: none;
+        }
+
+        .input-group label {
+            display: block;
+            margin-bottom: 8px;
+            color: var(--tg-theme-text-color);
+            font-size: 15px;
+        }
+
+        .input-group input {
+            width: 100%;
+            padding: 12px 16px;
+            background: var(--tg-theme-secondary-bg-color, #f4f4f5);
+            border: none;
+            border-radius: 10px;
+            color: var(--tg-theme-text-color);
+            font-size: 17px;
+            font-weight: 500;
+        }
+
+        .input-group input:focus {
+            outline: none;
+            background: var(--tg-theme-section-separator-color, #e5e5ea);
+        }
+
+        .btn {
+            width: calc(100% - 32px);
+            margin: 8px 16px 16px;
+            padding: 14px;
+            border: none;
+            border-radius: 10px;
+            font-size: 17px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: opacity 0.2s;
+            -webkit-appearance: none;
+        }
+
+        .btn:active:not(:disabled) {
+            opacity: 0.7;
+        }
+
+        .btn-primary {
+            background: var(--tg-theme-button-color, #3390ec);
+            color: var(--tg-theme-button-text-color, #ffffff);
+        }
+
+        .btn-success {
+            background: #34c759;
+            color: #ffffff;
+        }
+
+        .btn:disabled {
+            opacity: 0.4;
+            cursor: not-allowed;
+        }
+
+        .stats {
+            display: flex;
+            gap: 8px;
+            padding: 0 8px;
+        }
+
+        .stat-card {
+            flex: 1;
+            background: var(--tg-theme-bg-color);
+            padding: 12px;
+            border-radius: 12px;
+            text-align: center;
+        }
+
+        .stat-label {
+            color: var(--tg-theme-hint-color);
+            font-size: 12px;
+            margin-bottom: 4px;
+        }
+
+        .stat-value {
+            font-size: 20px;
+            font-weight: 700;
+            color: var(--tg-theme-text-color);
+        }
+
+        .info-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 16px;
+            border-bottom: 1px solid var(--tg-theme-section-separator-color, #e5e5ea);
+        }
+
+        .info-row:last-child {
+            border-bottom: none;
+        }
+
+        .info-label {
+            color: var(--tg-theme-text-color);
+            font-size: 15px;
+        }
+
+        .info-value {
+            color: var(--tg-theme-hint-color);
+            font-size: 15px;
+            font-weight: 600;
+        }
+
+        .info-value.highlight {
+            color: var(--tg-theme-button-color);
+        }
+
+        .alert {
+            position: fixed;
+            top: 60px;
+            left: 16px;
+            right: 16px;
+            padding: 12px 16px;
+            border-radius: 12px;
+            font-size: 15px;
+            font-weight: 500;
+            animation: slideDown 0.3s ease-out;
+            z-index: 1000;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        @keyframes slideDown {
+            from {
+                transform: translateY(-100px);
+                opacity: 0;
+            }
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+
+        .alert.success {
+            background: #34c759;
+            color: #ffffff;
+        }
+
+        .alert.error {
+            background: #ff3b30;
+            color: #ffffff;
+        }
+
+        .graph-line {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+        }
+
+        .graph-path {
+            stroke: var(--tg-theme-button-color, #3390ec);
+            stroke-width: 3;
+            fill: none;
+            stroke-linecap: round;
+            stroke-linejoin: round;
+        }
+
+        .graph-path.crashed {
+            stroke: var(--tg-theme-destructive-text-color, #ff3b30);
+        }
+
+        .quick-bet {
+            display: flex;
+            gap: 8px;
+            padding: 0 16px 12px;
+        }
+
+        .quick-bet-btn {
+            flex: 1;
+            padding: 8px;
+            background: var(--tg-theme-secondary-bg-color);
+            border: 1px solid var(--tg-theme-section-separator-color);
+            border-radius: 8px;
+            color: var(--tg-theme-text-color);
+            font-size: 15px;
+            font-weight: 500;
+            cursor: pointer;
+        }
+
+        .quick-bet-btn:active {
+            opacity: 0.7;
+        }
+
+        @media (max-width: 380px) {
+            .multiplier-display {
+                font-size: 48px;
+            }
+            
+            .plane {
+                font-size: 36px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <div class="header-title">
+            ✈️ Aviator
+        </div>
+        <div class="balance">
+            <span id="balance">0</span> ₽
+        </div>
+    </div>
+
+    <div class="game-container">
+        <div class="game-canvas" id="gameCanvas">
+            <svg class="graph-line" id="graphSvg">
+                <path class="graph-path" id="graphPath" d=""></path>
+            </svg>
+            <div class="plane" id="plane">✈️</div>
+            <div class="multiplier-display" id="multiplier">1.00x</div>
+            <div class="status-text" id="statusText">Загрузка...</div>
+            <div class="waiting-timer" id="waitingTimer"></div>
+        </div>
+
+        <div class="stats">
+            <div class="stat-card">
+                <div class="stat-label">Последний</div>
+                <div class="stat-value" id="lastCrash">—</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-label">Игроков</div>
+                <div class="stat-value" id="playersCount">0</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-label">Моя ставка</div>
+                <div class="stat-value" id="myBet">0</div>
+            </div>
+        </div>
+
+        <div class="section">
+            <div class="section-header">Ставка</div>
+            <div class="input-group">
+                <label>Сумма</label>
+                <input type="number" id="betAmount" value="100" min="10" step="10" inputmode="numeric">
+            </div>
+            <div class="quick-bet">
+                <button class="quick-bet-btn" onclick="setBetAmount(50)">50</button>
+                <button class="quick-bet-btn" onclick="setBetAmount(100)">100</button>
+                <button class="quick-bet-btn" onclick="setBetAmount(500)">500</button>
+                <button class="quick-bet-btn" onclick="setBetAmount(1000)">1000</button>
+            </div>
+            <div class="input-group">
+                <label>Авто-вывод (необязательно)</label>
+                <input type="number" id="autoCashout" placeholder="Например: 2.00" step="0.1" min="1.1" inputmode="decimal">
+            </div>
+        </div>
+
+        <button class="btn btn-primary" id="betBtn">Сделать ставку</button>
+
+        <div class="section" id="activeSection" style="display: none;">
+            <div class="section-header">Активная ставка</div>
+            <div class="info-row">
+                <span class="info-label">Ставка</span>
+                <span class="info-value highlight" id="activeBet">0</span>
+            </div>
+            <div class="info-row">
+                <span class="info-label">Потенциальный выигрыш</span>
+                <span class="info-value highlight" id="potentialWin">0</span>
+            </div>
+        </div>
+
+        <button class="btn btn-success" id="cashoutBtn" style="display: none;">Забрать</button>
+    </div>
+
+    <script>
+        // Инициализация Telegram WebApp
+        let tg = window.Telegram.WebApp;
+        tg.expand();
+        tg.ready();
+
+        // Применяем тему
+        document.body.style.backgroundColor = tg.themeParams.bg_color || '#ffffff';
+
+        // Конфигурация
+        const API_URL = 'https://nekros.vercel.app'; // Замени на свой URL
+        const UPDATE_INTERVAL = 100;
+        let userId = tg.initDataUnsafe?.user?.id?.toString() || 'test_' + Date.now();
+        
+        // Состояние
+        let gameState = {
+            status: 'waiting',
+            multiplier: 1.0,
+            hasBet: false,
+            betAmount: 0,
+            gameId: null
+        };
+
+        let graphPoints = [];
+
+        // DOM элементы
+        const elements = {
+            balance: document.getElementById('balance'),
+            multiplier: document.getElementById('multiplier'),
+            statusText: document.getElementById('statusText'),
+            waitingTimer: document.getElementById('waitingTimer'),
+            betBtn: document.getElementById('betBtn'),
+            cashoutBtn: document.getElementById('cashoutBtn'),
+            betAmount: document.getElementById('betAmount'),
+            autoCashout: document.getElementById('autoCashout'),
+            potentialWin: document.getElementById('potentialWin'),
+            lastCrash: document.getElementById('lastCrash'),
+            playersCount: document.getElementById('playersCount'),
+            myBet: document.getElementById('myBet'),
+            plane: document.getElementById('plane'),
+            graphPath: document.getElementById('graphPath'),
+            activeBet: document.getElementById('activeBet'),
+            activeSection: document.getElementById('activeSection')
+        };
+
+        // Показать алерт
+        function showAlert(message, type = 'success') {
+            const alert = document.createElement('div');
+            alert.className = `alert ${type}`;
+            alert.innerHTML = `<span>${type === 'success' ? '✓' : '✕'}</span> ${message}`;
+            document.body.appendChild(alert);
+            
+            // Вибрация
+            if (tg.HapticFeedback) {
+                tg.HapticFeedback.notificationOccurred(type === 'success' ? 'success' : 'error');
+            }
+            
+            setTimeout(() => alert.remove(), 3000);
+        }
+
+        // Установить сумму ставки
+        function setBetAmount(amount) {
+            elements.betAmount.value = amount;
+            if (tg.HapticFeedback) {
+                tg.HapticFeedback.impactOccurred('light');
+            }
+        }
+
+        // Обновить график
+        function updateGraph() {
+            if (gameState.status !== 'active') {
+                graphPoints = [];
+                elements.graphPath.setAttribute('d', '');
+                return;
+            }
+
+            const canvas = document.getElementById('gameCanvas');
+            const width = canvas.offsetWidth;
+            const height = canvas.offsetHeight;
+
+            const x = Math.min((gameState.multiplier - 1) * width / 10, width - 20);
+            const y = height - Math.min((gameState.multiplier - 1) * height / 10, height - 50);
+
+            graphPoints.push({ x, y });
+
+            // Ограничиваем количество точек
+            if (graphPoints.length > 100) {
+                graphPoints.shift();
+            }
+
+            // Строим путь
+            let path = `M ${graphPoints[0].x} ${graphPoints[0].y}`;
+            for (let i = 1; i < graphPoints.length; i++) {
+                path += ` L ${graphPoints[i].x} ${graphPoints[i].y}`;
+            }
+
+            elements.graphPath.setAttribute('d', path);
+        }
+
+        // Обновить баланс
+        async function updateBalance() {
+            try {
+                const response = await fetch(`${API_URL}/api/user/${userId}/balance`);
+                const data = await response.json();
+                if (data.success) {
+                    elements.balance.textContent = data.balance;
+                }
+            } catch (error) {
+                console.error('Balance error:', error);
+            }
+        }
+
+        // Получить состояние игры
+        async function getGameState() {
+            try {
+                const response = await fetch(`${API_URL}/api/game/aviator/state`);
+                const data = await response.json();
+                
+                if (data.success) {
+                    updateUI(data);
+                }
+            } catch (error) {
+                console.error('State error:', error);
+            }
+        }
+
+        // Обновить UI
+        function updateUI(data) {
+            gameState.status = data.status;
+            gameState.multiplier = data.multiplier || 1.0;
+            
+            if (data.status === 'active') {
+                elements.multiplier.textContent = gameState.multiplier.toFixed(2) + 'x';
+                elements.multiplier.classList.remove('crashed');
+                elements.statusText.style.display = 'none';
+                elements.waitingTimer.style.display = 'none';
+                elements.graphPath.classList.remove('crashed');
+                
+                // Анимация самолета
+                const progress = Math.min((gameState.multiplier - 1) * 50, 85);
+                elements.plane.style.left = progress + '%';
+                elements.plane.style.bottom = progress + '%';
+                
+                // График
+                updateGraph();
+                
+                // Обновить потенциальный выигрыш
+                if (gameState.hasBet) {
+                    const potential = Math.floor(gameState.betAmount * gameState.multiplier);
+                    elements.potentialWin.textContent = potential + ' ₽';
+                }
+                
+            } else if (data.status === 'crashed') {
+                elements.multiplier.textContent = 'CRASHED';
+                elements.multiplier.classList.add('crashed');
+                elements.statusText.textContent = `Краш на ${data.crash_point}x`;
+                elements.statusText.style.display = 'block';
+                elements.graphPath.classList.add('crashed');
+                
+                elements.lastCrash.textContent = data.crash_point + 'x';
+                
+                if (gameState.hasBet) {
+                    gameState.hasBet = false;
+                    gameState.betAmount = 0;
+                    elements.myBet.textContent = '0';
+                    elements.cashoutBtn.style.display = 'none';
+                    elements.betBtn.style.display = 'block';
+                    elements.activeSection.style.display = 'none';
+                }
+                
+            } else if (data.status === 'waiting') {
+                elements.multiplier.textContent = '1.00x';
+                elements.multiplier.classList.remove('crashed');
+                elements.statusText.textContent = 'Принимаются ставки';
+                elements.statusText.style.display = 'block';
+                elements.waitingTimer.textContent = '';
+                elements.betBtn.disabled = false;
+                elements.graphPath.classList.remove('crashed');
+                
+                elements.plane.style.left = '10%';
+                elements.plane.style.bottom = '10%';
+                
+                graphPoints = [];
+                elements.graphPath.setAttribute('d', '');
+            }
+            
+            if (data.bets_count !== undefined) {
+                elements.playersCount.textContent = data.bets_count;
+            }
+        }
+
+        // Сделать ставку
+        async function placeBet() {
+            const amount = parseInt(elements.betAmount.value);
+            const autoCashout = parseFloat(elements.autoCashout.value) || null;
+            
+            if (amount < 10) {
+                showAlert('Минимальная ставка 10 ₽', 'error');
+                return;
+            }
+            
+            if (tg.HapticFeedback) {
+                tg.HapticFeedback.impactOccurred('medium');
+            }
+            
+            try {
+                const response = await fetch(`${API_URL}/api/game/aviator/bet`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ userId, amount, autoCashout })
+                });
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    gameState.hasBet = true;
+                    gameState.betAmount = amount;
+                    elements.myBet.textContent = amount;
+                    elements.activeBet.textContent = amount + ' ₽';
+                    elements.betBtn.style.display = 'none';
+                    elements.cashoutBtn.style.display = 'block';
+                    elements.activeSection.style.display = 'block';
+                    showAlert(`Ставка ${amount} ₽ принята`, 'success');
+                    await updateBalance();
+                } else {
+                    showAlert('Ошибка ставки', 'error');
+                }
+            } catch (error) {
+                showAlert('Ошибка: ' + error.message, 'error');
+            }
+        }
+
+        // Забрать выигрыш
+        async function cashout() {
+            if (tg.HapticFeedback) {
+                tg.HapticFeedback.impactOccurred('heavy');
+            }
+            
+            try {
+                const response = await fetch(`${API_URL}/api/game/aviator/cashout`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ userId })
+                });
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    showAlert(`Выигрыш ${data.win_amount} ₽ на ${data.multiplier.toFixed(2)}x`, 'success');
+                    gameState.hasBet = false;
+                    elements.cashoutBtn.style.display = 'none';
+                    elements.betBtn.style.display = 'block';
+                    elements.activeSection.style.display = 'none';
+                    await updateBalance();
+                } else {
+                    showAlert('Ошибка вывода', 'error');
+                }
+            } catch (error) {
+                showAlert('Ошибка: ' + error.message, 'error');
+            }
+        }
+
+        // События
+        elements.betBtn.addEventListener('click', placeBet);
+        elements.cashoutBtn.addEventListener('click', cashout);
+
+        // Инициализация
+        updateBalance();
+        setInterval(getGameState, UPDATE_INTERVAL);
+        getGameState();
+    </script>
+</body>
+</html>
