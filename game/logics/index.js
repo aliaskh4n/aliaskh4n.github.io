@@ -1,9 +1,9 @@
 import { DOM } from './DOM.js';
 import { Requester } from './Requester.js';
-
-import { wins_reload_interval, reload_interval, games_path } from './constants.js';
+import { Cache } from './Cache.js';
+import { wins_reload_interval, reload_interval, games_path, routes } from './constants.js';
 // import { initData } from '../test/tgdata.js';
-// 
+
 // ========== STATE AND DOM ==========
 const app = {
     state: {
@@ -16,52 +16,59 @@ const app = {
         balance:    DOM.document_get_id('balance'),
         userMenu:   DOM.document_get_id('user-menu'),
         userAvatar: DOM.document_get_id('user-avatar'),
-        winsScroll: DOM.document_get_id('wins-scroll'),
+        leaderboard: DOM.document_get_id('wins-scroll'),
     }
 };
 
 const requester = new Requester(app);
 
 const set_avatar_text = () => {
-    app.dom.userAvatar.innerHTML = `<div class="user-avatar-placeholder">${app.state.user.name?.charAt(0).toUpperCase() || '👤'}</div>`;
+    DOM.render(
+        app.dom.userAvatar,
+        `<div class="user-avatar-placeholder">${app.state.user.name?.charAt(0).toUpperCase() || '👤'}</div>`
+    );
 }
 
 const load_leaderboard = async () => {
     try {
-        const res = await requester.send_request('/stats/leaderboard');
+        let leaderboard = {};
+        const version = await requester.get_version_leaderboard();
+        const cache_version = Cache.get_version(routes.leaderboard);
 
-        if (!res.leaderboard || res.leaderboard.length === 0) {
-            app.dom.winsScroll.innerHTML = '<div class="win-empty">Нет игроков</div>';
-            return;
+        if(cache_version < version) {
+            leaderboard = await requester.get_leaderboard(10);
+            Cache.set(routes.leaderboard, version, leaderboard);
+        } else {
+            leaderboard = Cache.get(routes.leaderboard);            
         }
 
-        const richestPlayers = res.leaderboard.slice(0, 10);
-
-        if (richestPlayers.length === 0) {
-            app.dom.winsScroll.innerHTML = '<div class="win-empty">Нет данных</div>';
-            return;
+        if(!leaderboard) {
+            DOM.render(app.dom.leaderboard, '<div class="win-empty">Нет данных</div>');
         }
-        
-        app.dom.winsScroll.innerHTML = richestPlayers.map((player, i) => {
-            let avatar = `<span>${ player.name?.charAt(0).toUpperCase() || '👤' }</span>`;
 
-            if(player.photo_url) {
-                avatar = `<img src="${ player.photo_url }" alt="${ player.name }" onerror="this.style.display='none'">`;
-            }
+        DOM.render(
+            app.dom.leaderboard,
+            Object.values(leaderboard).map((player, i) => {
+                let avatar = `<span>${ player.name?.charAt(0).toUpperCase() || '👤' }</span>`;
 
-            return `
-                <div class="win-card">
-                    <div class="win-medal">${ i+1 }</div>
-                    <div class="win-avatar">${avatar}</div>
-                    <div class="win-player">${player.name}</div>
-                    <div class="win-amount">${format_number_advanced(player.balance).toLocaleString()}</div>
-                </div>
-            `;
-            }).join('');
+                if(player.photo_url) {
+                    avatar = `<img src="${ player.photo_url }" alt="${ player.name }" onerror="this.style.display='none'">`;
+                }
+
+                return `
+                    <div class="win-card">
+                        <div class="win-medal">${ i+1 }</div>
+                        <div class="win-avatar">${avatar}</div>
+                        <div class="win-player">${player.name}</div>
+                        <div class="win-amount">${format_number_advanced(player.balance).toLocaleString()}</div>
+                    </div>
+                `;
+            }).join('')
+        );
 
     } catch (e) {
-        console.error('Wins load error:', e);
-        app.dom.winsScroll.innerHTML = '<div class="win-empty">Ошибка загрузки</div>';
+        console.error('leadeboard error: ', e);
+        DOM.render(app.dom.leaderboard, '<div class="win-empty">Ошибка загрузки</div>');
     }
 }
 
@@ -156,7 +163,7 @@ const load_games = async () => {
                 const container = document.getElementById(`lottie-${g.id}`);
                 
                 if (container) {
-                    lottie.setSpeed(g.animation_speed);
+                    lottie.setSpeed(0.6);
                     lottie.setQuality('low');
 
                     lottie.loadAnimation({
