@@ -16,5 +16,15 @@
     "desc": "Найди алмазы и избегай бомб",
     "gradient": ["#9333ea", "#c084fc"],
     "ready": true
+  },
+  {
+    "id": "aviator",
+    "title": "Aviator",
+    "animation": "./animations/aviator.json",
+    "animation_speed": 1,
+    "desc": "Лови коэффициент и успей вывести до падения",
+    "gradient": ["#0ea5e9", "#38bdf8"],
+    "ready": true
   }
 ]
+
