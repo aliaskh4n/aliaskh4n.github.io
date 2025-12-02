@@ -2,21 +2,21 @@ import { DOM } from './DOM.js';
 import { Requester } from './Requester.js';
 import { Cache } from './Cache.js';
 import { wins_reload_interval, reload_interval, games_path, routes } from './constants.js';
-// import { initData } from '../test/tgdata.js';
+import { initData } from '../test/tgdata.js';
 
 // ========== STATE AND DOM ==========
 const app = {
     state: {
         user: null,
         token: null,
-        tg: window.Telegram.WebApp
+        tg: { initData, ready: () => {}, expand: () => {} } //window.Telegram.WebApp
     },
     dom: {
-        container:  DOM.document_get_id('games-container'),
-        balance:    DOM.document_get_id('balance'),
-        userMenu:   DOM.document_get_id('user-menu'),
-        userAvatar: DOM.document_get_id('user-avatar'),
-        leaderboard: DOM.document_get_id('wins-scroll'),
+        container:      DOM.document_get_id('games-container'),
+        balance:        DOM.document_get_id('balance'),
+        userMenu:       DOM.document_get_id('user-menu'),
+        userAvatar:     DOM.document_get_id('user-avatar'),
+        leaderboard:    DOM.document_get_id('wins-scroll'),
     }
 };
 
@@ -33,7 +33,7 @@ const load_leaderboard = async () => {
     try {
         let leaderboard = {};
         const version = await requester.get_version_leaderboard();
-        const cache_version = Cache.get_version(routes.leaderboard);
+        const cache_version = Cache.get_version(routes.leaderboard);        
 
         if(cache_version < version) {
             leaderboard = await requester.get_leaderboard(10);
@@ -96,21 +96,28 @@ const update_ui = () => {
 
 const auth = async () => {
     try {
-        app.dom.container.innerHTML = '<div class="message"><div class="loading-spinner"></div></div>';
+        DOM.render(app.dom.container, '<div class="message"><div class="loading-spinner"></div></div>');
+        
+        const res = await requester.init(app.state.tg.initData);
 
-        const res = await requester.send_request('/auth/init', 'POST', { initData: app.state.tg.initData });
+        if(res !== null) {
+            app.state.user = res.user;
+            app.state.token = res.token;
 
-        app.state.user = res.user;
-        app.state.token = res.token;
+            Cache.set_raw('user', res.user);
+            Cache.set_raw('token', res.token);
+        } else {
+            const user = Cache.get_raw('user') ?? {};
+            const token = Cache.get_raw('token') ?? {};
 
-        localStorage.setItem('token',           app.state.token);
-        localStorage.setItem('user_id',         app.state.user.id);
-        localStorage.setItem('user_balance',    app.state.user.balance);
+            app.state.user = user;
+            app.state.token = token;
+        }
 
         update_ui();
         load_games();
         load_leaderboard();
-
+        
         setInterval(load_games, reload_interval);
         setInterval(load_leaderboard, wins_reload_interval);
     } catch (e) {

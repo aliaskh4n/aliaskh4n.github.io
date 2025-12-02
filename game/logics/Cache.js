@@ -27,4 +27,13 @@ export class Cache {
 
         return data ?? {};
     }
+
+    static set_raw(id, data) {
+        localStorage.setItem(id, JSON.stringify(data));
+    }
+
+    static get_raw(id) {
+        const data = localStorage.getItem(id);
+        return data ? JSON.parse(data) : null;
+    }
 }
