@@ -2,14 +2,14 @@ import { DOM } from './DOM.js';
 import { Requester } from './Requester.js';
 import { Cache } from './Cache.js';
 import { wins_reload_interval, reload_interval, games_path, routes } from './constants.js';
-import { initData } from '../test/tgdata.js';
+// import { initData } from '../test/tgdata.js';
 
 // ========== STATE AND DOM ==========
 const app = {
     state: {
         user: null,
         token: null,
-        tg: { initData, ready: () => {}, expand: () => {} } //window.Telegram.WebApp
+        tg: {}
     },
     dom: {
         container:      DOM.document_get_id('games-container'),
@@ -19,6 +19,14 @@ const app = {
         leaderboard:    DOM.document_get_id('wins-scroll'),
     }
 };
+
+if(typeof initData !== 'undefined') {
+    app.state.tg.initData = initData;
+    app.state.tg.ready = () => {};
+    app.state.tg.expand = () => {};
+} else {
+    app.state.tg = window.Telegram.WebApp;
+}
 
 const requester = new Requester(app);
 
