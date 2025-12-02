@@ -50,6 +50,20 @@ export class Requester {
         throw lastError;
     }
 
+    async init(initData) {
+        try {
+            const res = await this.send_request(
+                routes.init_auth,
+                'POST', 
+                { initData }
+            );
+
+            return res;
+        } catch {            
+            return null;
+        }
+    }
+
     async get_leaderboard(limit) {
         const res = await this.send_request(routes.leaderboard);
 
@@ -67,7 +81,11 @@ export class Requester {
     }
 
     async get_version_leaderboard() {
-        const res = await this.send_request(routes.version_leaderboard);
-        return res.version ?? 0;
+        try {
+            const res = await this.send_request(routes.version_leaderboard);
+            return res.version ?? 0;
+        } catch {
+            return 0;
+        }
     }
 }
