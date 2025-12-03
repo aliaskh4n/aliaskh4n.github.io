@@ -96,12 +96,9 @@ const update_ui = () => {
         avatar.appendChild(img);
     } else set_avatar_text();
 
-    app.dom.userMenu.onclick = () => app.state.tg.showAlert(
-        `👤 ${app.state.user.name}\n` + 
-        `💰 ${app.state.user.balance}\n` +
-        `🎮 ${app.state.user.gamesPlayed}\n` +
-        `🏆 ${app.state.user.gamesWon}`
-    );
+    app.dom.userMenu.onclick = () => {
+        location.href = '/profile.html';
+    };
 }
 
 const auth = async () => {
