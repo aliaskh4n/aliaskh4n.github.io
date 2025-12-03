@@ -40,7 +40,7 @@ const set_avatar_text = () => {
 const load_leaderboard = async () => {
     try {
         let leaderboard = {};
-        const version = await requester.get_version_leaderboard();
+        const version = await requester.get_version_leaderboard(app.state.user.id);
         const cache_version = Cache.get_version(routes.leaderboard);        
 
         if(cache_version < version) {
