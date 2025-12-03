@@ -5,6 +5,6 @@ export const wins_reload_interval = 5000;
 
 export const routes = {
     leaderboard: '/stats/leaderboard',
-    version_leaderboard: '/checker/leaderboard',
+    versions_checker: '/checker/all/',
     init_auth: '/auth/init'
 };

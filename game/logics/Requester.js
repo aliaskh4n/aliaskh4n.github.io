@@ -52,7 +52,7 @@ export class Requester {
 
     async init(initData) {
         try {
-            const res = await this.send_request(
+            let res = await this.send_request(
                 routes.init_auth,
                 'POST', 
                 { initData }
@@ -65,7 +65,7 @@ export class Requester {
     }
 
     async get_leaderboard(limit) {
-        const res = await this.send_request(routes.leaderboard);
+        let res = await this.send_request(routes.leaderboard);
 
         if (!res.leaderboard || res.leaderboard.length === 0) {
             return {};
@@ -80,10 +80,10 @@ export class Requester {
         return richestPlayers;
     }
 
-    async get_version_leaderboard() {
+    async get_version_leaderboard(userid) {
         try {
-            const res = await this.send_request(routes.version_leaderboard);
-            return res.version ?? 0;
+            let res = await this.send_request(routes.versions_checker + userid);
+            return res.leaderboard ?? 0;
         } catch {
             return 0;
         }
