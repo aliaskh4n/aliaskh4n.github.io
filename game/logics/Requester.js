@@ -80,9 +80,9 @@ export class Requester {
         return richestPlayers;
     }
 
-    async get_version_leaderboard() {
+    async get_version_leaderboard(id) {
         try {
-            const res = await this.send_request(routes.version_leaderboard);
+            const res = await this.send_request(`${routes.version_leaderboard}/${id}`);
             return res.leaderboard ?? 0;
         } catch {
             return 0;
