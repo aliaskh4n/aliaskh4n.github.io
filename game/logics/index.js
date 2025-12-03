@@ -97,7 +97,7 @@ const update_ui = () => {
     } else set_avatar_text();
 
     app.dom.userMenu.onclick = () => {
-        location.href = location.origin + '/profile/';
+        location.href = location.origin + '/game/profile/';
     };
 }
 
