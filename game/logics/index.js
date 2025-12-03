@@ -40,9 +40,11 @@ const set_avatar_text = () => {
 const load_leaderboard = async () => {
     try {
         let leaderboard = {};
+        
         const version = await requester.get_version_leaderboard(app.state.user.id);
-        const cache_version = Cache.get_version(routes.leaderboard);        
-
+        const cache_version = Cache.get_version(routes.leaderboard);
+        
+        
         if(cache_version < version) {
             leaderboard = await requester.get_leaderboard(10);
             Cache.set(routes.leaderboard, version, leaderboard);
@@ -73,7 +75,6 @@ const load_leaderboard = async () => {
                 `;
             }).join('')
         );
-
     } catch (e) {
         console.error('leadeboard error: ', e);
         DOM.render(app.dom.leaderboard, '<div class="win-empty">Ошибка загрузки</div>');
@@ -127,7 +128,7 @@ const auth = async () => {
         load_leaderboard();
         
         setInterval(load_games, reload_interval);
-        setInterval(load_leaderboard, wins_reload_interval);
+        const leadeboard_interval = setInterval(() => load_leaderboard(leadeboard_interval), wins_reload_interval);
     } catch (e) {
         app.dom.container.innerHTML = `<div class="message">⌛ ${e.message}</div>`;
     }
