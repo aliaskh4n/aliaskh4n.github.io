@@ -22,7 +22,7 @@ const app = {
 };
 
 app.dom.userMenu.onclick = () => {
-    location.href = location.origin + '/profile/';
+    location.href = location.origin + '/game/profile/';
 };
 
 if(typeof initData !== 'undefined') {
