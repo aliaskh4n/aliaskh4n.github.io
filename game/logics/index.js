@@ -21,6 +21,10 @@ const app = {
     }
 };
 
+app.dom.userMenu.onclick = () => {
+    location.href = location.origin + '/profile/';
+};
+
 if(typeof initData !== 'undefined') {
     app.state.tg.initData = initData;
     app.state.tg.ready = () => {};
