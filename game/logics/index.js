@@ -2,7 +2,7 @@ import { DOM } from './DOM.js';
 import { Requester } from './Requester.js';
 import { Cache } from './Cache.js';
 import { wins_reload_interval, reload_interval, games_path, routes } from './constants.js';
-import { initData } from '../test/tgdata.js';
+// import { initData } from '../test/tgdata.js';
 
 // ========== STATE AND DOM ==========
 const app = {
@@ -43,8 +43,6 @@ const load_leaderboard = async () => {
         
         const version = await requester.get_version_leaderboard(app.state.user.id);
         const cache_version = Cache.get_version(routes.leaderboard);
-
-        console.log(cache_version, version);
         
         
         if(cache_version < version) {
