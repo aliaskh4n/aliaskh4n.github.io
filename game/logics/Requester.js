@@ -83,7 +83,7 @@ export class Requester {
     async get_version_leaderboard() {
         try {
             const res = await this.send_request(routes.version_leaderboard);
-            return res.version ?? 0;
+            return res.leaderboard ?? 0;
         } catch {
             return 0;
         }
