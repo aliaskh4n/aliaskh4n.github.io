@@ -9,6 +9,7 @@ const app = {
     state: {
         user: null,
         token: null,
+        lottie_load: false,
         tg: {}
     },
     dom: {
@@ -127,8 +128,8 @@ const auth = async () => {
         load_games();
         load_leaderboard();
         
-        setInterval(load_games, reload_interval);
-        const leadeboard_interval = setInterval(() => load_leaderboard(leadeboard_interval), wins_reload_interval);
+        // setInterval(load_games, reload_interval);
+        // const leadeboard_interval = setInterval(() => load_leaderboard(leadeboard_interval), wins_reload_interval);
     } catch (e) {
         app.dom.container.innerHTML = `<div class="message">⌛ ${e.message}</div>`;
     }
@@ -163,35 +164,40 @@ const create_card = (g) => {
 // ========== LOAD GAMES + LOTTIE ==========
 const load_games = async () => {
     try {
-        const res = await fetch(`${games_path}?t=${Date.now()}`);
-        const games = await res.json();
+        const games = await requester.get_games();
 
         if (!games?.length) {
-            app.dom.container.innerHTML = '<div class="message">Нет игр</div>';
-            return;
+            return DOM.render(app.dom.container, '<div class="message">Нет игр</div>');
         }
 
-        app.dom.container.innerHTML = games.map(create_card).join('');
+        DOM.render(
+            app.dom.container,
+            games.map(create_card).join('')
+        );
 
-        // Подключение Lottie-анимаций
-        games.forEach(g => {
-            if (g.animation) {
-                const container = document.getElementById(`lottie-${g.id}`);
-                
-                if (container) {
-                    lottie.setSpeed(0.6);
-                    lottie.setQuality('low');
+        if(!app.state.lottie_load) {
+            lottie.setSpeed(0.3);
+            lottie.setQuality(4);
+            lottie.inBrowser(true);
 
-                    lottie.loadAnimation({
-                        container,
-                        renderer: "svg",
-                        loop: true,
-                        autoplay: true,
-                        path: g.animation
-                    });
+            games.forEach(g => {
+                if (g.animation) {
+                    let container = document.getElementById(`lottie-${g.id}`);
+                    
+                    if (container) {
+                        lottie.loadAnimation({
+                            container,
+                            renderer: "canvas",
+                            loop: true,
+                            autoplay: true,
+                            path: g.animation
+                        });
+                    }
                 }
-            }
-        });
+            });
+
+            app.state.lottie_load = true;
+        }
 
     } catch (e) {        
         app.dom.container.innerHTML = `<div class="message">⌛ ${e.message}</div>`;

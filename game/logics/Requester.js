@@ -1,5 +1,5 @@
 import { api_url } from './constants.js';
-import { routes } from './constants.js';
+import { routes, games_path } from './constants.js';
 
 export class Requester {
     constructor(App) {
@@ -87,5 +87,16 @@ export class Requester {
         } catch {
             return 0;
         }
+    }
+
+    async get_games() {
+        let res = await fetch(`${games_path}?t=${Date.now()}`);
+        let games = await res.json();        
+
+        if (!games?.length) {
+            return {};
+        }
+
+        return games;
     }
 }
