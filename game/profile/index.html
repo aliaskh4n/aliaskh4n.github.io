@@ -6,10 +6,24 @@
   <title>Профиль</title>
   <script src="/game/dependencies/telegram/telegram-web-app.js"></script>
   <link href="/game/dependencies/googlefonts/Inter.css" rel="stylesheet">
+  <link rel="stylesheet" href="/game/styles/profile.css">
 </head>
 <body>
-    <script>
-        localStorage.clear();
-    </script>
+  <profile-main>
+    <avatar>
+      <empty-img></empty-img>
+    </avatar>
+
+    <info>
+      <username>Username</username>
+      <balance>-</balance>
+    </info>
+  </profile-main>
+
+  <packs-main>
+    <packs-name>Пополнение</packs-name>
+    <packs></packs>
+  </packs-main>
 </body>
+<script src="./../logics/profile.js" type="module"></script>
 </html>

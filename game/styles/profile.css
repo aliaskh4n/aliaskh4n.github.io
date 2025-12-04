@@ -1,0 +1,160 @@
+body {
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+    background: var(--tg-theme-bg-color, #ffffff);
+    color: var(--tg-theme-text-color, #000000);
+    overflow-x: hidden;
+    -webkit-tap-highlight-color: transparent;
+
+    padding: 20px 10px;
+}
+
+body, html {
+    margin: 0;
+    height: 100%;
+    box-sizing: border-box;
+}
+
+* {
+    color: var(--tg-theme-hint-color, #999999);
+}
+
+:root {
+    --primary-color: var(--tg-theme-accent-text-color, #db4e23);
+}
+
+.loading-spinner {
+    display: inline-block;
+    width: 20px;
+    height: 20px;
+    border: 3px solid rgba(0,0,0,0);
+    border-top-color: var(--tg-theme-button-color, #3390ec);
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+}
+
+hr {
+    border: 1px solid var(--tg-theme-secondary-bg-color, #cecece);
+}
+
+profile-main {
+    padding: 10px 0;
+    display: flex;
+    gap: 8px;
+    align-items: center;
+    flex-direction: column;
+}
+
+profile-main avatar, profile-main avatar img, profile-main avatar empty-img {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100px;
+    height: 100px;
+    background: var(--primary-color);
+    color: var(--tg-theme-text-color, #000000);
+    border-radius: 50px;
+    font-size: 32px;
+}
+
+profile-main info {
+    display: block;
+}
+
+profile-main info username {
+    display: block;
+    font-size: 16px;
+    text-align: center;
+}
+
+profile-main info balance {
+    display: block;
+    font-size: 32px;
+    font-weight: 700;
+    text-align: center;
+    color: var(--tg-theme-text-color, #000000);
+}
+
+packs-main {
+    display: block;
+    max-width: 450px;
+    margin: auto;
+}
+
+packs-main packs-name {
+    display: block;
+    margin: 5px 0;
+    font-size: 24px;
+    font-weight: 600;
+    color: var(--tg-theme-text-color, #000000);
+}
+
+packs-main packs {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 8px;
+}
+
+packs-main pack {
+    background-color: var(--tg-theme-secondary-bg-color, #f4f4f5);
+    display: flex;
+    flex-direction: column;
+    align-content: center;
+    padding: 10px;
+    border-radius: 8px;
+}
+
+packs-main pack:active {
+    transform: scale(0.98);
+}
+
+packs-main pack img {
+    max-width: 50%;
+    margin: 0 auto;
+    max-height: 100%;
+    transform: translateY(15px);
+}
+
+packs-main pack count {
+    font-weight: 700;
+    font-size: 24px;
+    color: var(--tg-theme-text-color, #000000);
+    background: var(--tg-theme-secondary-bg-color, #f4f4f5);
+    padding: 2px 5px;
+    border-radius: 5px;
+}
+
+packs-main pack cost {
+    display: flex;
+    gap: 5px;
+    font-weight: 700;
+    justify-content: center;
+    align-items: center;
+    color: #c4971b;
+    margin-top: 5px;
+}
+
+packs-main pack cost star {
+    width: 16px;
+}
+
+packs-main pack-title {
+    display: block;
+    font-size: 16px;
+    text-align: center;
+    z-index: 1;
+}
+
+star {
+    display: block;
+    width: 100%;
+    height: 100%;
+    background-image: url(./../icons/star.svg);
+    background-position: center;
+    background-size: contain;
+    aspect-ratio: 1;
+    background-repeat: no-repeat;
+}
+
+@keyframes spin {
+    to { transform: rotate(360deg); }
+}

@@ -21,10 +21,6 @@ const app = {
     }
 };
 
-app.dom.userMenu.onclick = () => {
-    location.href = location.origin + '/game/profile/';
-};
-
 if(typeof initData !== 'undefined') {
     app.state.tg.initData = initData;
     app.state.tg.ready = () => {};
@@ -100,7 +96,7 @@ const update_ui = () => {
         avatar.appendChild(img);
     } else set_avatar_text();
 
-    app.dom.userMenu.onclick = () => {
+    app.dom.userMenu.onclick = () => {        
         location.href = location.origin + '/game/profile/';
     };
 }
@@ -129,8 +125,8 @@ const auth = async () => {
         load_games();
         load_leaderboard();
         
-        // setInterval(load_games, reload_interval);
-        // const leadeboard_interval = setInterval(() => load_leaderboard(leadeboard_interval), wins_reload_interval);
+        setInterval(load_games, reload_interval);
+        const leadeboard_interval = setInterval(() => load_leaderboard(leadeboard_interval), wins_reload_interval);
     } catch (e) {
         app.dom.container.innerHTML = `<div class="message">⌛ ${e.message}</div>`;
     }
