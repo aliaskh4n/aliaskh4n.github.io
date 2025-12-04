@@ -34,7 +34,10 @@ app.state.tg.ready();
 app.state.tg.expand();
 
 app.state.tg.BackButton.show();
-app.state.tg.BackButton.onClick(() => app.tg.BackButton.hide());
+app.state.tg.BackButton.onClick(() => {
+    app.state.tg.BackButton.hide();
+    window.history.back();
+});
 
 const set_avatar_text = () => {
     DOM.render(
