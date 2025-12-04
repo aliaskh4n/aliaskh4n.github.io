@@ -99,4 +99,13 @@ export class Requester {
 
         return games;
     }
+
+    async get_packs() {
+        try {
+            let res = await this.send_request(routes.packs);
+            return res.packs ?? {};
+        } catch {
+            return {};
+        }
+    }
 }

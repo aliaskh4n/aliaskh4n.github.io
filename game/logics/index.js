@@ -2,7 +2,7 @@ import { DOM } from './DOM.js';
 import { Requester } from './Requester.js';
 import { Cache } from './Cache.js';
 import { wins_reload_interval, reload_interval, games_path, routes } from './constants.js';
-// import { initData } from '../test/tgdata.js';
+import { initData } from '../test/tgdata.js';
 
 // ========== STATE AND DOM ==========
 const app = {
@@ -19,10 +19,6 @@ const app = {
         userAvatar:     DOM.document_get_id('user-avatar'),
         leaderboard:    DOM.document_get_id('wins-scroll'),
     }
-};
-
-app.dom.userMenu.onclick = () => {
-    location.href = location.origin + '/game/profile/';
 };
 
 if(typeof initData !== 'undefined') {
@@ -100,7 +96,7 @@ const update_ui = () => {
         avatar.appendChild(img);
     } else set_avatar_text();
 
-    app.dom.userMenu.onclick = () => {
+    app.dom.userMenu.onclick = () => {        
         location.href = location.origin + '/game/profile/';
     };
 }
@@ -129,8 +125,8 @@ const auth = async () => {
         load_games();
         load_leaderboard();
         
-        // setInterval(load_games, reload_interval);
-        // const leadeboard_interval = setInterval(() => load_leaderboard(leadeboard_interval), wins_reload_interval);
+        setInterval(load_games, reload_interval);
+        const leadeboard_interval = setInterval(() => load_leaderboard(leadeboard_interval), wins_reload_interval);
     } catch (e) {
         app.dom.container.innerHTML = `<div class="message">⌛ ${e.message}</div>`;
     }
