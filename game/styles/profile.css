@@ -62,14 +62,13 @@ profile-main info {
     text-align: center;
 }
 
-profile-main info br {
-    margin: 3px 0;
-    margin-top: 0;
+profile-main info gap {
+    display: block;
+    height: 5px;
 }
 
 profile-main info username {
     font-size: 16px;
-    margin-bottom: 5px;
 }
 
 profile-main info balance {
