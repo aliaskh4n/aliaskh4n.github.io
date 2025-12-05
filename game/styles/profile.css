@@ -20,7 +20,7 @@ body, html {
 
 :root {
     --primary-color: var(--tg-theme-accent-text-color, #db4e23);
-    --shimmer-color: var(--tg-theme-header-bg-color, #bebebe);
+    --shimmer-color: var(--tg-theme-secondary-bg-color, #bebebe);
 }
 
 .loading-spinner {
@@ -59,21 +59,23 @@ profile-main avatar, profile-main avatar img, profile-main avatar empty-img {
 
 profile-main info {
     display: block;
+    text-align: center;
+}
+
+profile-main info br {
+    margin: 5px 0;
+    margin-top: 0;
 }
 
 profile-main info username {
-    display: block;
     font-size: 16px;
-    text-align: center;
+    margin-bottom: 5px;
 }
 
 profile-main info balance {
-    display: block;
     font-size: 32px;
     font-weight: 700;
-    text-align: center;
     color: var(--tg-theme-text-color, #000000);
-    margin-top: 5px;
 }
 
 packs-main {
@@ -97,7 +99,7 @@ packs-main packs {
 }
 
 packs-main pack {
-    background-color: var(--tg-theme-header-bg-color, #f4f4f5);
+    background-color: var(--tg-theme-secondary-bg-color, #f4f4f5);
     display: flex;
     flex-direction: column;
     align-content: center;
@@ -126,7 +128,7 @@ packs-main pack count {
     font-weight: 700;
     font-size: 14px;
     color: var(--tg-theme-text-color, #000000);
-    background: var(--tg-theme-header-bg-color, #f4f4f5);
+    background: var(--tg-theme-secondary-bg-color, #f4f4f5);
     padding: 2px 5px;
     border-radius: 5px;
 }
@@ -175,7 +177,6 @@ packs-main packs:has(> :first-child:not(:only-child)) {
     background: var(--shimmer-color);
     border-radius: 5px;
 
-    text-indent: 100%;
-    white-space: nowrap;
-    overflow: hidden;
+    color: transparent;
+    user-select: none;
 }
