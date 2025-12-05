@@ -63,13 +63,12 @@ profile-main info {
 }
 
 profile-main info br {
-    margin: 5px 0;
+    margin: 3px 0;
     margin-top: 0;
 }
 
 profile-main info username {
     font-size: 16px;
-    margin-bottom: 5px;
 }
 
 profile-main info balance {
