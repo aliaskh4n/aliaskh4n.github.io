@@ -23,20 +23,6 @@ body, html {
     --shimmer-color: var(--tg-theme-secondary-bg-color, #bebebe);
 }
 
-.loading-spinner {
-    display: inline-block;
-    width: 20px;
-    height: 20px;
-    border: 3px solid rgba(0,0,0,0);
-    border-top-color: var(--tg-theme-button-color, #3390ec);
-    border-radius: 50%;
-    animation: spin 0.8s linear infinite;
-}
-
-hr {
-    border: 1px solid var(--tg-theme-secondary-bg-color, #cecece);
-}
-
 profile-main {
     padding: 10px 0;
     display: flex;
@@ -162,10 +148,6 @@ star {
     background-size: contain;
     aspect-ratio: 1;
     background-repeat: no-repeat;
-}
-
-@keyframes spin {
-    to { transform: rotate(360deg); }
 }
 
 packs-main packs:has(> :first-child:not(:only-child)) {

@@ -108,4 +108,20 @@ export class Requester {
             return {};
         }
     }
+
+    async create_invoice(userid, pack_id) {
+        try {
+            let res = await this.send_request(
+                routes.create_invoice, 
+                "POST", 
+                {
+                    userId: userid,
+                    packId: pack_id
+                }
+            );
+            return res ?? {};
+        } catch {
+            return {};
+        }
+    }
 }

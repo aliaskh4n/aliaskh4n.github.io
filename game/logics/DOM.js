@@ -6,6 +6,10 @@ export class DOM {
     static get_element(element_query) {
         return document.querySelector(element_query);
     }
+    
+    static get_elements(element_query) {
+        return document.querySelectorAll(element_query);
+    }
 
     static render(element, html) {
         element.innerHTML = html;

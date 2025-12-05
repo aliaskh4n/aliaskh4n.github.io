@@ -7,5 +7,6 @@ export const routes = {
     leaderboard: '/stats/leaderboard',
     versions_checker: '/checker/all/',
     packs: "/shop/packs",
+    create_invoice: "/shop/create_invoice",
     init_auth: '/auth/init'
 };
