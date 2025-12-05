@@ -73,7 +73,7 @@ const set_packs = async () => {
 
     packs.forEach(pack => {
         DOM.add(app.dom.packs, 
-            `<pack id="${pack.id}">
+            `<pack id="${pack.id}" label="${pack.label}">
                 <img src="${pack.photo_url}">
                 <pack-title>
                     <count>${pack.coins}</count>
@@ -82,6 +82,32 @@ const set_packs = async () => {
             </pack>`
         );
     });
+
+    DOM.get_elements('pack').forEach((element) => {
+        element.onclick = async () => {
+            const pack_id = element.getAttribute('id');
+            const label = element.getAttribute('label');
+            const invoice = await requester.create_invoice(app.state.user.id, pack_id);            
+            const invoice_query = query_serialize({ label, ...invoice });
+
+            location.href = location.origin + '/game/invoice/?' + invoice_query;
+        }
+    });
+}
+
+const query_serialize = (obj, prefix) => {
+    var str = [],
+        p;
+    for (p in obj) {
+        if (obj.hasOwnProperty(p)) {
+            var k = prefix ? prefix + "[" + p + "]" : p,
+                v = obj[p];
+            str.push((v !== null && typeof v === "object") ?
+                query_serialize(v, k) :
+                encodeURIComponent(k) + "=" + encodeURIComponent(v));
+        }
+    }
+    return str.join("&");
 }
 
 (async () => {
