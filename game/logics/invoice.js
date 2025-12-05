@@ -1,7 +1,7 @@
 import { DOM } from './DOM.js';
 import { Requester } from './Requester.js';
 import { Cache } from './Cache.js';
-import { initData } from '../test/tgdata.js';
+// import { initData } from '../test/tgdata.js';
 
 const app = {
     state: {
@@ -41,7 +41,7 @@ const update_ui = () => {
     app.state.params = params;
 
     DOM.render(app.dom.mainContent, JSON.stringify(Object.fromEntries(params)));
-    
+
     app.dom.packName.textContent = params.get('label') ?? "Null";
     app.dom.packName.removeAttribute('shimmer');
 }

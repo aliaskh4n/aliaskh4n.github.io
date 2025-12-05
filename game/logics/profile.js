@@ -1,7 +1,7 @@
 import { DOM } from './DOM.js';
 import { Requester } from './Requester.js';
 import { Cache } from './Cache.js';
-import { initData } from '../test/tgdata.js';
+// import { initData } from '../test/tgdata.js';
 
 const app = {
     state: {
@@ -89,7 +89,7 @@ const set_packs = async () => {
             const label = element.getAttribute('label');
             const invoice = await requester.create_invoice(app.state.user.id, pack_id);            
             const invoice_query = query_serialize({ label, ...invoice });
-            
+
             location.href = location.origin + '/game/invoice/?' + invoice_query;
         }
     });
