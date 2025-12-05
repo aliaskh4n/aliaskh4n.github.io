@@ -14,6 +14,7 @@ const app = {
         avatar:         DOM.get_element('profile-main avatar'),
         username:       DOM.get_element('profile-main username'),
         balance:        DOM.get_element('profile-main balance'),
+        packTitle:      DOM.get_element('packs-main packs-name'),
         packs:          DOM.get_element('packs-main packs'),
     }
 };
@@ -50,6 +51,9 @@ const update_ui = () => {
     app.dom.balance.textContent = app.state.user.balance.toLocaleString();
     app.dom.username.textContent = app.state.user.name.toLocaleString();
 
+    app.dom.balance.removeAttribute('shimmer');
+    app.dom.username.removeAttribute('shimmer');
+
     const avatar = app.dom.avatar;
 
     if (app.state.user.photoUrl) {
@@ -63,9 +67,8 @@ const update_ui = () => {
 }
 
 const set_packs = async () => {
-    DOM.render(app.dom.packs, '<div class="loading-spinner"></div>');
-
     const packs = await requester.get_packs();
+    app.dom.packTitle.removeAttribute('shimmer');
     DOM.render(app.dom.packs, '');
 
     packs.forEach(pack => {
