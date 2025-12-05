@@ -69,6 +69,7 @@ profile-main info br {
 
 profile-main info username {
     font-size: 16px;
+    margin-bottom: 5px;
 }
 
 profile-main info balance {
