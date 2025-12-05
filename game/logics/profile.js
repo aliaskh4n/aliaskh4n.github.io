@@ -87,10 +87,11 @@ const set_packs = async () => {
         element.onclick = async () => {
             const pack_id = element.getAttribute('id');
             const label = element.getAttribute('label');
-            const invoice = await requester.create_invoice(app.state.user.id, pack_id);            
-            const invoice_query = query_serialize({ label, ...invoice });
-
-            location.href = location.origin + '/game/invoice/?' + invoice_query;
+            const invoice = await requester.create_invoice(app.state.user.id, pack_id);
+            
+            if(invoice?.invoice_link) {
+                location.href = invoice?.invoice_link;
+            }
         }
     });
 }
