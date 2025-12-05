@@ -20,6 +20,7 @@ body, html {
 
 :root {
     --primary-color: var(--tg-theme-accent-text-color, #db4e23);
+    --shimmer-color: var(--tg-theme-header-bg-color, #bebebe);
 }
 
 .loading-spinner {
@@ -50,7 +51,7 @@ profile-main avatar, profile-main avatar img, profile-main avatar empty-img {
     align-items: center;
     width: 100px;
     height: 100px;
-    background: var(--primary-color);
+    background: var(--shimmer-color);
     color: var(--tg-theme-text-color, #000000);
     border-radius: 50px;
     font-size: 32px;
@@ -72,6 +73,7 @@ profile-main info balance {
     font-weight: 700;
     text-align: center;
     color: var(--tg-theme-text-color, #000000);
+    margin-top: 5px;
 }
 
 packs-main {
@@ -90,6 +92,7 @@ packs-main packs-name {
 
 packs-main packs {
     display: grid;
+    justify-content: center;
     gap: 8px;
 }
 
@@ -101,6 +104,11 @@ packs-main pack {
     padding: 5px;
     border-radius: 8px;
     overflow: hidden;
+}
+
+packs-main pack[shimmer] {
+    aspect-ratio: 1;
+    border-radius: 8px;
 }
 
 packs-main pack:active {
@@ -118,7 +126,7 @@ packs-main pack count {
     font-weight: 700;
     font-size: 14px;
     color: var(--tg-theme-text-color, #000000);
-    background: var(--tg-theme-secondary-bg-color, #f4f4f5);
+    background: var(--tg-theme-header-bg-color, #f4f4f5);
     padding: 2px 5px;
     border-radius: 5px;
 }
@@ -130,7 +138,6 @@ packs-main pack cost {
     justify-content: center;
     align-items: center;
     color: #c4971b;
-    margin-top: 5px;
 }
 
 packs-main pack cost star {
@@ -162,4 +169,13 @@ star {
 
 packs-main packs:has(> :first-child:not(:only-child)) {
     grid-template-columns: repeat(4, 1fr);
+}
+
+[shimmer] {
+    background: var(--shimmer-color);
+    border-radius: 5px;
+
+    text-indent: 100%;
+    white-space: nowrap;
+    overflow: hidden;
 }
