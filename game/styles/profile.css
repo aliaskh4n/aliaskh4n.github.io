@@ -82,7 +82,7 @@ packs-main {
 
 packs-main packs-name {
     display: block;
-    margin: 5px 0;
+    margin: 10px 0;
     font-size: 24px;
     font-weight: 600;
     color: var(--tg-theme-text-color, #000000);
@@ -90,17 +90,17 @@ packs-main packs-name {
 
 packs-main packs {
     display: grid;
-    grid-template-columns: repeat(2, 1fr);
     gap: 8px;
 }
 
 packs-main pack {
-    background-color: var(--tg-theme-secondary-bg-color, #f4f4f5);
+    background-color: var(--tg-theme-header-bg-color, #f4f4f5);
     display: flex;
     flex-direction: column;
     align-content: center;
-    padding: 10px;
+    padding: 5px;
     border-radius: 8px;
+    overflow: hidden;
 }
 
 packs-main pack:active {
@@ -111,12 +111,12 @@ packs-main pack img {
     max-width: 50%;
     margin: 0 auto;
     max-height: 100%;
-    transform: translateY(15px);
+    transform: scale(3) translateY(5px);
 }
 
 packs-main pack count {
     font-weight: 700;
-    font-size: 24px;
+    font-size: 14px;
     color: var(--tg-theme-text-color, #000000);
     background: var(--tg-theme-secondary-bg-color, #f4f4f5);
     padding: 2px 5px;
@@ -134,14 +134,15 @@ packs-main pack cost {
 }
 
 packs-main pack cost star {
-    width: 16px;
+    width: 10px;
 }
 
 packs-main pack-title {
     display: block;
-    font-size: 16px;
+    font-size: 10px;
     text-align: center;
     z-index: 1;
+    margin-top: auto;
 }
 
 star {
@@ -157,4 +158,8 @@ star {
 
 @keyframes spin {
     to { transform: rotate(360deg); }
+}
+
+packs-main packs:has(> :first-child:not(:only-child)) {
+    grid-template-columns: repeat(4, 1fr);
 }
