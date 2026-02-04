@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Быстрое бронирование</title>
+
+<style>
+* { box-sizing: border-box; }
+
+body {
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+  background: #121212;
+  color: #eee;
+  padding: 20px;
+}
+
+.container {
+  max-width: 1000px;
+  margin: auto;
+  background: #1e1e1e;
+  padding: 25px;
+  border-radius: 12px;
+  box-shadow: 0 10px 25px rgba(0,0,0,0.7);
+}
+
+h2 { 
+  margin-bottom: 20px; 
+  color: #fff;
+}
+
+.form-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 15px;
+  margin-bottom: 15px;
+}
+
+.form-grid-row2 {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 15px;
+  margin-bottom: 15px;
+}
+
+input, select {
+  padding: 12px;
+  border-radius: 8px;
+  border: 1px solid #444;
+  font-size: 14px;
+  background: #2c2c2c;
+  color: #eee;
+}
+
+input::placeholder {
+  color: #888;
+}
+
+input:focus, select:focus {
+  outline: none;
+  border-color: #4CAF50;
+  box-shadow: 0 0 0 2px rgba(76,175,80,0.3);
+}
+
+button {
+  margin-top: 10px;
+  padding: 14px;
+  font-size: 16px;
+  background: #4CAF50;
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: 0.2s;
+}
+
+button:hover { background: #43a047; }
+
+table {
+  width: 100%;
+  margin-top: 25px;
+  border-collapse: collapse;
+  font-size: 15px;
+  color: #eee;
+}
+
+th, td {
+  padding: 10px;
+  border: 1px solid #333;
+  text-align: center;
+}
+
+th {
+  background: #2c2c2c;
+  font-weight: 600;
+}
+
+tbody tr:hover {
+  background: #333;
+}
+</style>
+</head>
+
+<body>
+
+<div class="container">
+  <h2>Быстрое бронирование</h2>
+
+  <!-- Первый ряд -->
+  <div class="form-grid">
+    <input id="name" placeholder="Имя">
+    <select id="place">
+      <option value="">Место</option>
+      <option>Общ-1</option>
+      <option>Общ-2</option>
+      <option>Общ-3</option>
+      <option>Общ-4</option>
+      <option>VIP-1</option>
+      <option>VIP-2</option>
+      <option>VIP-3</option>
+      <option>VIP-4</option>
+    </select>
+    <input id="date" type="date">
+  </div>
+
+  <!-- Второй ряд -->
+  <div class="form-grid-row2">
+    <input id="time" placeholder="Время">
+    <input id="phone" placeholder="Номер">
+    <input id="service" placeholder="Услуга">
+    <select id="channel">
+      <option value="">Канал брони</option>
+      <option>Телефон</option>
+      <option>WhatsApp</option>
+      <option>Instagram</option>
+      <option>Сайт</option>
+      <option>Другое</option>
+    </select>
+  </div>
+
+  <button onclick="addBooking()">Сохранить (Enter)</button>
+  <button onclick="downloadReport()">Скачать отчет</button>
+
+  <table>
+    <thead>
+      <tr>
+        <th>Имя</th>
+        <th>Место</th>
+        <th>Дата</th>
+        <th>Время</th>
+        <th>Номер</th>
+        <th>Услуга</th>
+        <th>Канал</th>
+        <th>Дата добавления</th>
+      </tr>
+    </thead>
+    <tbody id="list"></tbody>
+  </table>
+</div>
+
+<script>
+const fields = Array.from(document.querySelectorAll("input, select"));
+let bookings = JSON.parse(localStorage.getItem("bookings")) || [];
+
+// установка сегодняшней даты в инпут даты
+const dateInput = document.getElementById("date");
+const today = new Date().toISOString().split('T')[0];
+dateInput.value = today;
+
+function render() {
+  const list = document.getElementById("list");
+  list.innerHTML = "";
+  bookings.forEach(b => {
+    list.innerHTML += `
+      <tr>
+        <td>${b.name}</td>
+        <td>${b.place}</td>
+        <td>${b.date}</td>
+        <td>${b.time}</td>
+        <td>${b.phone}</td>
+        <td>${b.service}</td>
+        <td>${b.channel}</td>
+        <td>${new Date(b.createdAt).toLocaleString()}</td>
+      </tr>
+    `;
+  });
+}
+
+function addBooking() {
+  const booking = {
+    name: document.getElementById("name").value,
+    place: document.getElementById("place").value,
+    date: document.getElementById("date").value,
+    time: document.getElementById("time").value,
+    phone: document.getElementById("phone").value,
+    service: document.getElementById("service").value,
+    channel: document.getElementById("channel").value,
+    createdAt: new Date().toISOString() // сохраняем дату и время добавления
+  };
+
+  bookings.push(booking);
+  localStorage.setItem("bookings", JSON.stringify(bookings));
+  render();
+
+  fields.forEach(f => f.value = "");
+  dateInput.value = today;
+  fields[0].focus();
+}
+
+// навигация Enter/Shift+Enter
+fields.forEach((field, index) => {
+  field.addEventListener("keydown", e => {
+    if (e.key === "Enter" && !e.shiftKey) {
+      e.preventDefault();
+      if (index === fields.length - 1) addBooking();
+      else fields[index + 1].focus();
+    }
+
+    if (e.key === "Enter" && e.shiftKey && index > 0) {
+      e.preventDefault();
+      fields[index - 1].focus();
+    }
+  });
+});
+
+// автодвоеточие для времени
+const timeInput = document.getElementById("time");
+timeInput.addEventListener("input", () => {
+  let val = timeInput.value.replace(/[^0-9]/g, "");
+  if (val.length > 2) {
+    val = val.slice(0,2) + ":" + val.slice(2,4);
+  }
+  timeInput.value = val;
+});
+
+// автотире после двух цифр для номера
+const phoneInput = document.getElementById("phone");
+phoneInput.addEventListener("input", () => {
+  let val = phoneInput.value.replace(/\D/g, "");
+  if (val.length > 2) {
+    val = val.slice(0,2) + "-" + val.slice(2,10);
+  }
+  phoneInput.value = val;
+});
+
+// функция для скачивания полного отчета
+function downloadReport() {
+  if (bookings.length === 0) {
+    alert("Броней нет для отчета!");
+    return;
+  }
+
+  let report = "Полный отчет по бронированиям\n";
+  report += "Создано: " + new Date().toLocaleString() + "\n\n";
+
+  bookings.forEach((b, index) => {
+    report += `Бронь №${index + 1}\n`;
+    report += `Дата добавления: ${new Date(b.createdAt).toLocaleString()}\n`;
+    report += `Имя: ${b.name}\n`;
+    report += `Место: ${b.place}\n`;
+    report += `Дата брони: ${b.date}\n`;
+    report += `Время: ${b.time}\n`;
+    report += `Номер: ${b.phone}\n`;
+    report += `Услуга: ${b.service}\n`;
+    report += `Канал: ${b.channel}\n`;
+    report += "-----------------------\n";
+  });
+
+  const blob = new Blob([report], { type: "text/plain;charset=utf-8" });
+  const link = document.createElement("a");
+  link.href = URL.createObjectURL(blob);
+  link.download = `report_${new Date().toISOString().slice(0,10)}.txt`;
+  link.click();
+  URL.revokeObjectURL(link.href);
+}
+
+render();
+fields[0].focus();
+</script>
+
+</body>
+</html>
