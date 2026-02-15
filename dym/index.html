@@ -1,0 +1,1248 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>ДЫМ НА ДОМ — Премиальная аренда кальяна в Астане</title>
+<meta name="description" content="Премиальная аренда и доставка кальяна в Астане 24/7. Пакеты Standard, Gold, Premium. Выезд на мероприятия.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,700;1,400;1,700&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+/* ════════════════════════════════════
+   ROOT TOKENS
+════════════════════════════════════ */
+:root{
+  --ruby:    #8B1A2F;
+  --ruby-l:  #B82040;
+  --ruby-gl: rgba(139,26,47,.15);
+  --ink:     #080810;
+  --ink-1:   #0D0D18;
+  --ink-2:   #121220;
+  --ink-3:   #1A1A2E;
+  --line:    rgba(255,255,255,.08);
+  --line-s:  rgba(255,255,255,.04);
+  --w1: #F5F0EA;
+  --w2: #9090A0;
+  --w3: #454555;
+  --r: 4px;
+  --R: 12px;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth;-webkit-tap-highlight-color:transparent;font-size:16px}
+body{background:var(--ink);color:var(--w1);font-family:'DM Sans',sans-serif;font-weight:400;line-height:1.65;overflow-x:hidden}
+a{color:inherit;text-decoration:none}
+ul{list-style:none}
+button{font-family:'DM Sans',sans-serif;cursor:pointer;border:none;background:none;outline:none}
+input,textarea,select{font-family:'DM Sans',sans-serif}
+
+/* ════════════════════════════════════
+   PAGES
+════════════════════════════════════ */
+.pg{display:none;min-height:100dvh;padding-top:64px;padding-bottom:80px}
+.pg.on{display:block}
+
+/* ════════════════════════════════════
+   HEADER
+════════════════════════════════════ */
+#H{
+  position:fixed;top:0;left:0;right:0;z-index:300;
+  height:64px;display:flex;align-items:center;justify-content:space-between;
+  padding:0 20px;
+  border-bottom:1px solid var(--line);
+  background:rgba(8,8,16,.7);
+  backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);
+  transition:background .4s;
+}
+#H.solid{background:rgba(8,8,16,.98)}
+
+.brand{
+  display:flex;flex-direction:column;
+  font-family:'DM Sans',sans-serif;
+}
+.brand-name{
+  font-weight:600;font-size:14px;letter-spacing:4px;
+  text-transform:uppercase;color:var(--w1);line-height:1;
+}
+.brand-tag{
+  font-size:9px;letter-spacing:3px;text-transform:uppercase;
+  color:var(--w3);font-weight:400;margin-top:3px;
+}
+
+.h-right{display:flex;align-items:center;gap:12px}
+.h-call{
+  font-size:12px;font-weight:500;color:var(--w2);letter-spacing:.5px;
+  display:flex;align-items:center;gap:6px;
+}
+.h-dot{width:6px;height:6px;border-radius:50%;background:#4ade80;box-shadow:0 0 8px #4ade80;animation:blink 2s infinite;flex-shrink:0}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:.25}}
+
+.h-menu-btn{
+  width:40px;height:40px;display:flex;flex-direction:column;justify-content:center;gap:6px;
+  padding:8px;cursor:pointer;
+}
+.h-menu-btn span{display:block;height:1px;background:var(--w1);transition:.3s;transform-origin:center}
+.h-menu-btn.x span:nth-child(1){transform:translateY(7px) rotate(45deg)}
+.h-menu-btn.x span:nth-child(2){opacity:0}
+.h-menu-btn.x span:nth-child(3){transform:translateY(-7px) rotate(-45deg)}
+
+/* ════════════════════════════════════
+   MENU OVERLAY
+════════════════════════════════════ */
+#M{
+  position:fixed;inset:0;z-index:290;
+  background:rgba(8,8,16,.99);backdrop-filter:blur(40px);
+  display:flex;flex-direction:column;justify-content:center;
+  padding:80px 32px 40px;
+  opacity:0;pointer-events:none;transition:opacity .35s;
+}
+#M.on{opacity:1;pointer-events:all}
+
+.mn-items{display:flex;flex-direction:column}
+.mn-item{
+  font-family:'Playfair Display',serif;font-size:28px;font-style:italic;
+  color:var(--w3);padding:14px 0;border-bottom:1px solid var(--line-s);
+  cursor:pointer;transition:.2s;display:flex;align-items:center;justify-content:space-between;
+  letter-spacing:.5px;
+}
+.mn-item:hover,.mn-item.cur{color:var(--w1)}
+.mn-item:hover .mn-arr,.mn-item.cur .mn-arr{color:var(--ruby-l)}
+.mn-num{font-family:'DM Sans',sans-serif;font-size:11px;color:var(--w3);letter-spacing:2px;font-style:normal;margin-right:auto;padding-right:16px}
+.mn-arr{font-size:14px;font-style:normal;color:var(--w3);transition:.2s}
+
+.mn-bottom{margin-top:36px;display:flex;flex-direction:column;gap:12px}
+.mn-phone{font-size:22px;font-weight:600;color:var(--w1);letter-spacing:1px}
+.mn-sub{font-size:12px;color:var(--w3);letter-spacing:2px;text-transform:uppercase}
+.mn-wa{
+  display:inline-flex;align-items:center;gap:8px;
+  background:var(--ruby);color:var(--w1);font-size:13px;font-weight:600;
+  padding:14px 24px;border-radius:var(--r);letter-spacing:.5px;cursor:pointer;
+  margin-top:8px;width:fit-content;
+}
+
+/* ════════════════════════════════════
+   BOTTOM TAB BAR
+════════════════════════════════════ */
+#T{
+  position:fixed;bottom:0;left:0;right:0;z-index:280;
+  background:rgba(8,8,16,.97);border-top:1px solid var(--line);
+  display:grid;grid-template-columns:repeat(5,1fr);
+  padding-bottom:max(env(safe-area-inset-bottom),6px);
+}
+.t-btn{
+  display:flex;flex-direction:column;align-items:center;gap:3px;padding:8px 4px;
+  font-size:9px;letter-spacing:1px;text-transform:uppercase;color:var(--w3);cursor:pointer;transition:.2s;
+}
+.t-btn.cur{color:var(--ruby-l)}
+.t-icon{font-size:18px;line-height:1}
+
+/* ════════════════════════════════════
+   COMMON
+════════════════════════════════════ */
+.s{padding:52px 22px 0}
+.s-last{padding-bottom:52px}
+
+.eyebrow{
+  font-size:10px;letter-spacing:4px;text-transform:uppercase;font-weight:500;
+  color:var(--ruby-l);margin-bottom:12px;display:block;
+}
+.h1{
+  font-family:'Playfair Display',serif;
+  font-size:clamp(32px,9vw,52px);line-height:1.05;font-weight:700;
+  color:var(--w1);margin-bottom:8px;
+}
+.h1 em{font-style:italic;color:var(--ruby-l)}
+.h2{
+  font-family:'Playfair Display',serif;
+  font-size:clamp(24px,6vw,36px);line-height:1.1;font-weight:700;
+  color:var(--w1);margin-bottom:16px;
+}
+.h2 em{font-style:italic;color:var(--ruby-l)}
+.body-t{font-size:14px;color:var(--w2);line-height:1.75}
+.rule{width:1px;height:40px;background:var(--ruby);display:block;margin-bottom:24px}
+
+/* ════════════════════════════════════
+   HERO
+════════════════════════════════════ */
+.hero{
+  min-height:100dvh;display:flex;flex-direction:column;justify-content:flex-end;
+  padding:80px 22px 100px;
+  background:
+    linear-gradient(to top,rgba(8,8,16,1) 0%,rgba(8,8,16,.8) 50%,rgba(8,8,16,.2) 100%),
+    url('https://kz.dymnadom.kz/wp-content/uploads/2026/02/%D0%BA%D0%B0%D0%BB%D1%8C%D1%8F.jpg') 60% center/cover no-repeat;
+  position:relative;
+}
+.hero::after{
+  content:'';position:absolute;left:22px;top:0;bottom:0;width:1px;
+  background:linear-gradient(to bottom,transparent,var(--line) 30%,var(--line) 70%,transparent);
+}
+
+.hero-status{
+  display:inline-flex;align-items:center;gap:8px;margin-bottom:28px;
+}
+.hero-status-line{width:32px;height:1px;background:var(--ruby)}
+.hero-status-text{font-size:11px;letter-spacing:3px;text-transform:uppercase;color:var(--ruby-l);font-weight:500}
+
+.hero-title{
+  font-family:'Playfair Display',serif;
+  font-size:clamp(36px,10vw,64px);font-weight:700;line-height:1.0;
+  color:var(--w1);margin-bottom:20px;
+}
+.hero-title em{font-style:italic;color:var(--ruby-l);display:block}
+.hero-desc{font-size:15px;color:var(--w2);max-width:340px;line-height:1.7;margin-bottom:36px}
+
+.hero-cta{display:flex;flex-direction:column;gap:10px;max-width:320px}
+.btn-r{
+  display:flex;align-items:center;justify-content:center;gap:10px;
+  padding:17px 28px;border-radius:var(--r);font-weight:600;font-size:14px;
+  letter-spacing:.5px;transition:.25s;cursor:pointer;width:100%;
+}
+.btn-r:active{transform:scale(.97)}
+.btn-fill{background:var(--ruby);color:#fff}
+.btn-fill:hover{background:var(--ruby-l)}
+.btn-out{background:transparent;color:var(--w1);border:1px solid var(--line)}
+.btn-out:hover{border-color:rgba(255,255,255,.25);background:rgba(255,255,255,.04)}
+.btn-wa{background:#25D366;color:#fff}
+
+.hero-metrics{
+  display:flex;gap:0;margin-top:48px;padding-top:28px;border-top:1px solid var(--line);
+}
+.metric{flex:1;padding:0 0 0 20px;border-left:1px solid var(--line)}
+.metric:first-child{padding-left:0;border-left:none}
+.metric-n{font-family:'Playfair Display',serif;font-size:28px;font-weight:700;color:var(--w1);line-height:1;display:block}
+.metric-l{font-size:10px;letter-spacing:2px;text-transform:uppercase;color:var(--w3);margin-top:4px;display:block}
+
+/* ════════════════════════════════════
+   SERVICE CARDS
+════════════════════════════════════ */
+.svc-list{display:flex;flex-direction:column;gap:1px}
+.svc-card{
+  display:flex;align-items:center;justify-content:space-between;gap:16px;
+  padding:22px 20px;background:var(--ink-2);border:1px solid var(--line-s);
+  cursor:pointer;transition:.25s;
+}
+.svc-card:hover{background:var(--ink-3);border-color:var(--line)}
+.svc-card:first-child{border-radius:var(--R) var(--R) 0 0}
+.svc-card:last-child{border-radius:0 0 var(--R) var(--R)}
+.svc-left{display:flex;align-items:center;gap:16px}
+.svc-num{font-family:'DM Sans',sans-serif;font-size:11px;letter-spacing:2px;color:var(--w3);font-weight:500;width:20px;flex-shrink:0}
+.svc-name{font-family:'Playfair Display',serif;font-size:18px;font-weight:500;color:var(--w1)}
+.svc-desc{font-size:12px;color:var(--w3);margin-top:2px}
+.svc-arr{color:var(--ruby-l);font-size:20px;flex-shrink:0;transition:.25s}
+.svc-card:hover .svc-arr{transform:translateX(4px)}
+
+/* ════════════════════════════════════
+   FEATURE GRID
+════════════════════════════════════ */
+.feat-grid{display:grid;grid-template-columns:1fr 1fr;gap:1px;background:var(--line-s);border:1px solid var(--line-s);border-radius:var(--R);overflow:hidden}
+.feat{background:var(--ink-2);padding:24px 18px}
+.feat-icon{font-size:22px;margin-bottom:12px;display:block}
+.feat-t{font-size:13px;font-weight:600;color:var(--w1);margin-bottom:4px}
+.feat-d{font-size:12px;color:var(--w3);line-height:1.5}
+
+/* ════════════════════════════════════
+   PACKAGES
+════════════════════════════════════ */
+.pkg-list{display:flex;flex-direction:column;gap:10px}
+.pkg{
+  background:var(--ink-2);border:1px solid var(--line-s);border-radius:var(--R);
+  padding:24px 20px;transition:.25s;position:relative;overflow:hidden;
+}
+.pkg.star{border-color:var(--ruby)}
+.pkg.star::after{
+  content:'ПОПУЛЯРНЫЙ';position:absolute;top:18px;right:16px;
+  font-size:9px;letter-spacing:2px;font-weight:600;color:var(--ruby-l);
+  border:1px solid var(--ruby);border-radius:2px;padding:3px 8px;
+}
+.pkg-tier{font-size:10px;letter-spacing:4px;text-transform:uppercase;color:var(--w3);margin-bottom:10px}
+.pkg-name{font-family:'Playfair Display',serif;font-size:22px;font-weight:700;color:var(--w1);margin-bottom:4px}
+.pkg-price{font-size:28px;font-weight:600;color:var(--w1);line-height:1}
+.pkg-price span{font-size:14px;font-weight:400;color:var(--w3);margin-left:3px}
+.pkg-info{font-size:12px;color:var(--w3);margin-top:6px;margin-bottom:18px}
+.pkg-feats{display:flex;flex-direction:column;gap:8px}
+.pf{display:flex;align-items:flex-start;gap:10px;font-size:13px;color:var(--w2)}
+.pf::before{content:'';width:4px;height:4px;border-radius:50%;background:var(--ruby);flex-shrink:0;margin-top:7px}
+.pf.off{color:var(--w3)}
+.pf.off::before{background:var(--w3)}
+
+/* ════════════════════════════════════
+   CALCULATOR
+════════════════════════════════════ */
+.calc{background:var(--ink-2);border:1px solid var(--line);border-radius:var(--R);overflow:hidden}
+.calc-head{padding:20px;border-bottom:1px solid var(--line);display:flex;justify-content:space-between;align-items:center}
+.calc-head-t{font-family:'Playfair Display',serif;font-size:16px;font-weight:500;color:var(--w1)}
+.calc-head-s{font-size:12px;color:var(--w3)}
+.calc-body{padding:20px;display:flex;flex-direction:column;gap:16px}
+.c-row{}
+.c-lbl{font-size:11px;letter-spacing:2px;text-transform:uppercase;color:var(--w3);font-weight:500;margin-bottom:8px;display:flex;justify-content:space-between}
+.c-lbl b{color:var(--ruby-l);font-family:'Playfair Display',serif;font-size:13px;letter-spacing:0}
+
+.c-sel,.c-in{
+  width:100%;background:var(--ink);border:1px solid var(--line-s);border-radius:var(--r);
+  padding:13px 16px;font-size:14px;color:var(--w1);outline:none;transition:border-color .2s;
+  appearance:none;-webkit-appearance:none;
+}
+.c-sel:focus,.c-in:focus{border-color:var(--ruby)}
+.c-sel option{background:var(--ink)}
+
+.c-counter{display:flex;border:1px solid var(--line-s);border-radius:var(--r);overflow:hidden}
+.c-cnt-btn{width:50px;height:48px;background:var(--ink);color:var(--w2);font-size:22px;font-weight:300;border:none;cursor:pointer;transition:.2s;flex-shrink:0}
+.c-cnt-btn:active{background:var(--ink-3)}
+.c-cnt-v{flex:1;text-align:center;background:var(--ink);color:var(--w1);font-size:18px;font-weight:600;padding:12px 0;font-family:'Playfair Display',serif}
+
+.toggles{display:flex;flex-direction:column;gap:2px}
+.tog-row{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:13px 14px;background:var(--ink);border:1px solid var(--line-s);
+  border-radius:var(--r);transition:.2s;
+}
+.tog-row:has(input:checked){border-color:var(--ruby);background:rgba(139,26,47,.06)}
+.tog-info{flex:1}
+.tog-name{font-size:13px;font-weight:500;color:var(--w1)}
+.tog-price{font-size:11px;color:var(--w3);margin-top:1px}
+
+/* Custom toggle switch */
+.sw{position:relative;width:42px;height:22px;flex-shrink:0}
+.sw input{display:none}
+.sw label{position:absolute;inset:0;background:var(--ink-3);border:1px solid var(--line-s);border-radius:50px;cursor:pointer;transition:.3s}
+.sw label::after{content:'';position:absolute;left:2px;top:2px;width:16px;height:16px;background:var(--w3);border-radius:50%;transition:.3s}
+.sw input:checked+label{background:var(--ruby);border-color:var(--ruby)}
+.sw input:checked+label::after{left:22px;background:#fff}
+
+.promo-row{display:flex;gap:8px}
+.promo-row .c-in{flex:1}
+.promo-btn{padding:0 18px;background:var(--ink-3);border:1px solid var(--line-s);border-radius:var(--r);color:var(--w2);font-size:12px;font-weight:600;cursor:pointer;white-space:nowrap;flex-shrink:0;transition:.2s}
+.promo-btn:hover{border-color:var(--ruby);color:var(--ruby-l)}
+
+.calc-result{
+  background:var(--ruby);padding:22px 20px;display:flex;align-items:center;justify-content:space-between;
+}
+.cr-label{font-size:11px;letter-spacing:2px;text-transform:uppercase;color:rgba(255,255,255,.6);font-weight:500}
+.cr-price{font-family:'Playfair Display',serif;font-size:36px;font-weight:700;color:#fff;line-height:1}
+.cr-info{font-size:11px;color:rgba(255,255,255,.6);margin-top:3px}
+
+/* ════════════════════════════════════
+   FAQ
+════════════════════════════════════ */
+.faq{display:flex;flex-direction:column;gap:1px}
+.fi{background:var(--ink-2);border:1px solid var(--line-s)}
+.fi:first-child{border-radius:var(--R) var(--R) 0 0}
+.fi:last-child{border-radius:0 0 var(--R) var(--R)}
+.fi-q{
+  padding:18px 20px;font-size:14px;font-weight:500;color:var(--w1);
+  cursor:pointer;display:flex;justify-content:space-between;align-items:center;gap:12px;
+  user-select:none;transition:color .2s;
+}
+.fi-q.o{color:var(--ruby-l)}
+.fi-ico{width:20px;height:20px;border:1px solid var(--line);border-radius:50%;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:10px;color:var(--w3);transition:.3s}
+.fi-q.o .fi-ico{border-color:var(--ruby);color:var(--ruby-l);transform:rotate(180deg)}
+.fi-a{max-height:0;overflow:hidden;transition:max-height .35s ease,padding .25s;font-size:13px;color:var(--w3);line-height:1.7;padding:0 20px}
+.fi-a.o{max-height:300px;padding:0 20px 18px}
+
+/* ════════════════════════════════════
+   STEPS
+════════════════════════════════════ */
+.steps{display:flex;flex-direction:column;gap:0;position:relative}
+.steps::before{content:'';position:absolute;left:19px;top:38px;bottom:38px;width:1px;background:var(--line)}
+.step{display:flex;gap:20px;padding:20px 0;border-bottom:1px solid var(--line-s)}
+.step:last-child{border-bottom:none}
+.step-n{
+  width:38px;height:38px;border-radius:50%;border:1px solid var(--line);
+  display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:600;color:var(--ruby-l);
+  flex-shrink:0;position:relative;z-index:1;background:var(--ink);letter-spacing:.5px;
+}
+.step-t{font-weight:600;font-size:14px;color:var(--w1);margin-bottom:3px}
+.step-d{font-size:12px;color:var(--w3);line-height:1.6}
+
+/* ════════════════════════════════════
+   AREAS
+════════════════════════════════════ */
+.areas-grid{display:grid;grid-template-columns:1fr 1fr;gap:1px;background:var(--line-s);border:1px solid var(--line-s);border-radius:var(--R);overflow:hidden}
+.area{background:var(--ink-2);padding:16px 14px;display:flex;align-items:center;gap:10px}
+.area-dot{width:4px;height:4px;border-radius:50%;background:var(--ruby);flex-shrink:0}
+.area-n{font-size:13px;font-weight:500;color:var(--w1)}
+
+/* ════════════════════════════════════
+   REVIEWS
+════════════════════════════════════ */
+.rev-list{display:flex;flex-direction:column;gap:10px}
+.rev{background:var(--ink-2);border:1px solid var(--line-s);border-radius:var(--R);padding:20px}
+.rev-top{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:10px}
+.rev-name{font-weight:600;font-size:14px;color:var(--w1)}
+.rev-date{font-size:11px;color:var(--w3)}
+.rev-stars{color:var(--ruby-l);font-size:13px;letter-spacing:2px;margin-bottom:8px}
+.rev-t{font-size:13px;color:var(--w2);line-height:1.6}
+
+.rating-row{
+  display:flex;align-items:center;gap:16px;
+  background:var(--ink-2);border:1px solid var(--line);border-radius:var(--R);padding:20px;margin-bottom:20px;
+}
+.rr-n{font-family:'Playfair Display',serif;font-size:52px;font-weight:700;color:var(--w1);line-height:1}
+.rr-stars{color:var(--ruby-l);font-size:18px;letter-spacing:3px;margin-bottom:3px}
+.rr-sub{font-size:12px;color:var(--w3);letter-spacing:1px}
+
+/* ════════════════════════════════════
+   CONTACTS
+════════════════════════════════════ */
+.ct-list{display:flex;flex-direction:column;gap:1px}
+.ct{
+  display:flex;align-items:center;gap:16px;padding:20px;
+  background:var(--ink-2);border:1px solid var(--line-s);transition:.2s;
+}
+.ct:hover{background:var(--ink-3)}
+.ct:first-child{border-radius:var(--R) var(--R) 0 0}
+.ct:last-child{border-radius:0 0 var(--R) var(--R)}
+.ct-icon{width:44px;height:44px;border:1px solid var(--line);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0}
+.ct-t{font-size:11px;letter-spacing:2px;text-transform:uppercase;color:var(--w3);margin-bottom:3px}
+.ct-v{font-size:15px;font-weight:600;color:var(--w1)}
+.ct-v a{color:var(--ruby-l);transition:.2s}
+
+/* ════════════════════════════════════
+   FORM
+════════════════════════════════════ */
+.form-wrap{background:var(--ink-2);border:1px solid var(--line);border-radius:var(--R);overflow:hidden}
+.form-head{padding:20px;border-bottom:1px solid var(--line)}
+.form-head-t{font-family:'Playfair Display',serif;font-size:18px;font-weight:500;color:var(--w1)}
+.form-head-s{font-size:12px;color:var(--w3);margin-top:3px}
+.form-body{padding:20px;display:flex;flex-direction:column;gap:12px}
+.f-lbl{font-size:10px;letter-spacing:2px;text-transform:uppercase;color:var(--w3);margin-bottom:6px;display:block}
+.f-inp{
+  width:100%;background:var(--ink);border:1px solid var(--line-s);border-radius:var(--r);
+  padding:14px 16px;font-size:14px;color:var(--w1);outline:none;transition:border-color .2s;
+}
+.f-inp:focus{border-color:var(--ruby)}
+.f-inp::placeholder{color:var(--w3)}
+textarea.f-inp{resize:none;height:88px;line-height:1.5}
+.f-note{font-size:11px;color:var(--w3);text-align:center;margin-top:4px;line-height:1.5}
+
+/* ════════════════════════════════════
+   SITEMAP
+════════════════════════════════════ */
+.sm-group{margin-bottom:24px}
+.sm-gt{
+  font-size:10px;letter-spacing:3px;text-transform:uppercase;font-weight:600;
+  color:var(--ruby-l);padding:14px 0 10px;border-bottom:1px solid var(--line-s);margin-bottom:4px;
+}
+.sm-links{display:flex;flex-direction:column;gap:1px}
+.sm-link{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:15px 16px;background:var(--ink-2);border:1px solid var(--line-s);font-size:14px;color:var(--w2);cursor:pointer;transition:.2s;
+}
+.sm-link:hover{color:var(--w1);background:var(--ink-3);border-color:var(--line)}
+.sm-link:first-child{border-radius:var(--r) var(--r) 0 0}
+.sm-link:last-child{border-radius:0 0 var(--r) var(--r)}
+.sm-arr{color:var(--w3);font-size:14px}
+
+/* ════════════════════════════════════
+   DIVIDER & INLINE ELEMENTS
+════════════════════════════════════ */
+.sep{height:1px;background:var(--line-s);margin:0}
+.tag{
+  display:inline-block;font-size:10px;letter-spacing:2px;text-transform:uppercase;
+  border:1px solid var(--line);border-radius:2px;padding:4px 10px;color:var(--w3);
+}
+.tag.hi{border-color:var(--ruby);color:var(--ruby-l)}
+
+/* ════════════════════════════════════
+   FLOAT BUTTONS
+════════════════════════════════════ */
+.fl-wa{
+  position:fixed;bottom:76px;right:16px;z-index:260;
+  width:52px;height:52px;border-radius:50%;background:#25D366;
+  display:flex;align-items:center;justify-content:center;font-size:24px;
+  box-shadow:0 4px 24px rgba(37,211,102,.35);transition:.2s;
+}
+.fl-wa:active{transform:scale(.92)}
+
+/* ════════════════════════════════════
+   TOAST
+════════════════════════════════════ */
+.toast{
+  position:fixed;bottom:90px;left:50%;transform:translateX(-50%) translateY(12px);
+  background:var(--ink-3);border:1px solid var(--ruby);border-radius:var(--r);
+  padding:12px 20px;font-size:13px;font-weight:500;color:var(--ruby-l);
+  white-space:nowrap;z-index:400;opacity:0;transition:.3s;pointer-events:none;
+}
+.toast.on{opacity:1;transform:translateX(-50%) translateY(0)}
+
+/* ════════════════════════════════════
+   PRELOADER
+════════════════════════════════════ */
+#PL{position:fixed;inset:0;z-index:999;background:var(--ink);display:flex;align-items:center;justify-content:center;flex-direction:column;gap:20px;transition:opacity .5s}
+#PL.out{opacity:0;pointer-events:none}
+.pl-logo{font-family:'Playfair Display',serif;font-size:11px;letter-spacing:8px;text-transform:uppercase;color:var(--w3);font-weight:400;animation:pl-fade 1.5s infinite}
+@keyframes pl-fade{0%,100%{opacity:.3}50%{opacity:1}}
+.pl-line{width:80px;height:1px;background:var(--line);position:relative;overflow:hidden}
+.pl-line::after{content:'';position:absolute;left:-100%;top:0;height:100%;width:100%;background:var(--ruby);animation:pl-run 1.2s ease forwards}
+@keyframes pl-run{to{left:100%}}
+
+/* ════════════════════════════════════
+   REVEAL
+════════════════════════════════════ */
+.rv{opacity:0;transform:translateY(20px);transition:opacity .55s,transform .55s}
+.rv.v{opacity:1;transform:translateY(0)}
+</style>
+</head>
+<body>
+
+<div id="PL"><div class="pl-logo">Дым на дом</div><div class="pl-line"></div></div>
+
+<!-- ═══ HEADER ═══ -->
+<header id="H">
+  <div class="brand">
+    <div class="brand-name">Дым на дом</div>
+    <div class="brand-tag">Астана · 24/7</div>
+  </div>
+  <div class="h-right">
+    <a href="tel:+77054215018" class="h-call"><span class="h-dot"></span>705 421-50-18</a>
+    <div class="h-menu-btn" id="MB"><span></span><span></span><span></span></div>
+  </div>
+</header>
+
+<!-- ═══ MENU ═══ -->
+<div id="M">
+  <div class="mn-items">
+    <div class="mn-item cur" data-pg="home"><span class="mn-num">01</span>Главная<span class="mn-arr">→</span></div>
+    <div class="mn-item" data-pg="arenda"><span class="mn-num">02</span>Аренда кальяна<span class="mn-arr">→</span></div>
+    <div class="mn-item" data-pg="delivery"><span class="mn-num">03</span>Доставка кальяна<span class="mn-arr">→</span></div>
+    <div class="mn-item" data-pg="vyezd"><span class="mn-num">04</span>Кальян на выезд<span class="mn-arr">→</span></div>
+    <div class="mn-item" data-pg="dom"><span class="mn-num">05</span>Кальян на дом<span class="mn-arr">→</span></div>
+    <div class="mn-item" data-pg="prices"><span class="mn-num">06</span>Цены<span class="mn-arr">→</span></div>
+    <div class="mn-item" data-pg="contacts"><span class="mn-num">07</span>Контакты<span class="mn-arr">→</span></div>
+    <div class="mn-item" data-pg="sitemap"><span class="mn-num">08</span>Карта сайта<span class="mn-arr">→</span></div>
+  </div>
+  <div class="mn-bottom">
+    <div class="mn-phone">+7 705 421 50 18</div>
+    <div class="mn-sub">Работаем 24/7 без выходных</div>
+    <a href="https://wa.me/77054215018" target="_blank" class="mn-wa">WhatsApp →</a>
+  </div>
+</div>
+
+<!-- ═══ BOTTOM TABS ═══ -->
+<nav id="T">
+  <div class="t-btn cur" data-pg="home"><span class="t-icon">○</span>Главная</div>
+  <div class="t-btn" data-pg="arenda"><span class="t-icon">◇</span>Аренда</div>
+  <div class="t-btn" data-pg="prices"><span class="t-icon">◈</span>Цены</div>
+  <div class="t-btn" data-pg="contacts"><span class="t-icon">◻</span>Контакты</div>
+  <div class="t-btn" data-pg="sitemap"><span class="t-icon">≡</span>Ещё</div>
+</nav>
+
+<!-- ══════════════════════════════════
+ PAGE: HOME
+══════════════════════════════════ -->
+<div class="pg on" id="pg-home">
+
+  <div class="hero">
+    <div class="hero-status"><div class="hero-status-line"></div><div class="hero-status-text">Премиальный сервис · Астана</div></div>
+    <div class="hero-title">Аренда<br>кальяна<em>без компромиссов</em></div>
+    <p class="hero-desc">Доставляем готовый кальян за 60 минут. Darkside, MustHave, Tangiers. Работаем круглосуточно во все районы Астаны.</p>
+    <div class="hero-cta">
+      <button class="btn-r btn-fill" data-pg="prices">Выбрать пакет</button>
+      <a href="https://wa.me/77054215018" target="_blank" class="btn-r btn-wa">WhatsApp</a>
+    </div>
+    <div class="hero-metrics">
+      <div class="metric"><span class="metric-n">60'</span><span class="metric-l">Доставка</span></div>
+      <div class="metric"><span class="metric-n">24/7</span><span class="metric-l">Работаем</span></div>
+      <div class="metric"><span class="metric-n">4.9</span><span class="metric-l">Рейтинг</span></div>
+      <div class="metric"><span class="metric-n">127</span><span class="metric-l">Отзывов</span></div>
+    </div>
+  </div>
+
+  <div class="s rv">
+    <span class="eyebrow">Наши услуги</span>
+    <h2 class="h2">Всё, что вам<br><em>нужно</em></h2>
+    <div class="svc-list">
+      <div class="svc-card" data-pg="arenda">
+        <div class="svc-left"><div class="svc-num">01</div><div><div class="svc-name">Аренда кальяна</div><div class="svc-desc">Профессиональное оборудование напрокат</div></div></div>
+        <div class="svc-arr">→</div>
+      </div>
+      <div class="svc-card" data-pg="delivery">
+        <div class="svc-left"><div class="svc-num">02</div><div><div class="svc-name">Доставка кальяна</div><div class="svc-desc">60 минут — в любой район Астаны</div></div></div>
+        <div class="svc-arr">→</div>
+      </div>
+      <div class="svc-card" data-pg="vyezd">
+        <div class="svc-left"><div class="svc-num">03</div><div><div class="svc-name">Кальян на выезд</div><div class="svc-desc">Мероприятия, свадьбы, корпоративы</div></div></div>
+        <div class="svc-arr">→</div>
+      </div>
+      <div class="svc-card" data-pg="dom">
+        <div class="svc-left"><div class="svc-num">04</div><div><div class="svc-name">Кальян на дом</div><div class="svc-desc">Уютный вечер без лишних хлопот</div></div></div>
+        <div class="svc-arr">→</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="s rv">
+    <span class="eyebrow">Преимущества</span>
+    <h2 class="h2">Чистота.<br>Вкус. <em>Тяга.</em></h2>
+    <div class="feat-grid">
+      <div class="feat"><span class="feat-icon">◈</span><div class="feat-t">Топ-табаки</div><div class="feat-d">Darkside, MustHave, Tangiers, Sebero, Jam</div></div>
+      <div class="feat"><span class="feat-icon">◷</span><div class="feat-t">60 минут</div><div class="feat-d">Среднее время доставки по городу</div></div>
+      <div class="feat"><span class="feat-icon">◑</span><div class="feat-t">24 / 7</div><div class="feat-d">Праздники, выходные — без разницы</div></div>
+      <div class="feat"><span class="feat-icon">◇</span><div class="feat-t">Мастер</div><div class="feat-d">Настройка, контроль, перезабивки</div></div>
+      <div class="feat"><span class="feat-icon">○</span><div class="feat-t">Всё включено</div><div class="feat-d">Угли, мундштуки, фольга, калауд</div></div>
+      <div class="feat"><span class="feat-icon">◎</span><div class="feat-t">Приватность</div><div class="feat-d">Дома — без наценок заведений</div></div>
+    </div>
+  </div>
+
+  <div class="s s-last rv">
+    <span class="eyebrow">Отзывы</span>
+    <h2 class="h2"><em>127</em> довольных<br>клиентов</h2>
+    <div class="rating-row">
+      <div class="rr-n">4.9</div>
+      <div>
+        <div class="rr-stars">★★★★★</div>
+        <div class="rr-sub">127 отзывов · Google</div>
+      </div>
+    </div>
+    <div class="rev-list">
+      <div class="rev">
+        <div class="rev-top"><div class="rev-name">Арман К.</div><div class="rev-date">3 дня назад</div></div>
+        <div class="rev-stars">★★★★★</div>
+        <div class="rev-t">Заказывали на день рождения — мастер приехал вовремя, настроил два кальяна. Атмосфера была отличная, всем понравилось.</div>
+      </div>
+      <div class="rev">
+        <div class="rev-top"><div class="rev-name">Айгерим Б.</div><div class="rev-date">1 нед. назад</div></div>
+        <div class="rev-stars">★★★★★</div>
+        <div class="rev-t">Уже третий раз заказываю. Быстро, качественно, вкусы всегда свежие. Однозначно рекомендую!</div>
+      </div>
+      <div class="rev">
+        <div class="rev-top"><div class="rev-name">Дмитрий Л.</div><div class="rev-date">2 нед. назад</div></div>
+        <div class="rev-stars">★★★★☆</div>
+        <div class="rev-t">Привезли за 45 минут, хотя обещали 60. Табак Darkside — огонь. Цена адекватная для такого уровня.</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════
+ PAGE: АРЕНДА
+══════════════════════════════════ -->
+<div class="pg" id="pg-arenda">
+  <div class="s rv">
+    <span class="eyebrow">Аренда кальяна</span>
+    <h2 class="h2">Премиальная аренда<br>в <em>Астане</em></h2>
+    <p class="body-t" style="margin-bottom:24px">Аренда кальяна в Астане — это не просто доставка оборудования, а создание атмосферы. ДЫМ НА ДОМ привозит полностью подготовленный кальян за 60 минут. Чистота, вкус, тяга — как в лучших lounge-заведениях, но у вас дома.</p>
+    <div class="feat-grid" style="margin-bottom:20px">
+      <div class="feat"><span class="feat-icon">◈</span><div class="feat-t">Доставка 60 мин</div><div class="feat-d">По всей Астане</div></div>
+      <div class="feat"><span class="feat-icon">◑</span><div class="feat-t">Работаем 24/7</div><div class="feat-d">Без выходных</div></div>
+      <div class="feat"><span class="feat-icon">◇</span><div class="feat-t">Премиум табаки</div><div class="feat-d">Топ-бренды</div></div>
+      <div class="feat"><span class="feat-icon">○</span><div class="feat-t">Чистота и сервис</div><div class="feat-d">Гарантия качества</div></div>
+    </div>
+    <button class="btn-r btn-fill" data-pg="prices">Выбрать пакет →</button>
+  </div>
+
+  <div class="s rv">
+    <span class="eyebrow">Комплектация</span>
+    <h2 class="h2">Что входит<br>в <em>аренду</em></h2>
+    <div class="steps">
+      <div class="step"><div class="step-n">○</div><div><div class="step-t">Кальян премиум-класса</div><div class="step-d">Khalil Mamoon, Amy, Shishabucks — профессиональное оборудование</div></div></div>
+      <div class="step"><div class="step-n">○</div><div><div class="step-t">Табаки на выбор</div><div class="step-d">Darkside, MustHave, Sebero, Jam, Blackburn — более 50 вкусов</div></div></div>
+      <div class="step"><div class="step-n">○</div><div><div class="step-t">Уголь кокосовый</div><div class="step-d">Naturalcoal, Coco Nara — без химии и постороннего запаха</div></div></div>
+      <div class="step"><div class="step-n">○</div><div><div class="step-t">Мундштуки гигиенические</div><div class="step-d">Индивидуальные одноразовые для каждого гостя</div></div></div>
+      <div class="step"><div class="step-n">○</div><div><div class="step-t">Мастер на весь срок аренды</div><div class="step-d">Настройка, контроль, замена угля, перезабивки</div></div></div>
+    </div>
+  </div>
+
+  <div class="s rv">
+    <span class="eyebrow">Подходит для</span>
+    <h2 class="h2">Любой<br><em>формат</em></h2>
+    <div class="areas-grid">
+      <div class="area"><div class="area-dot"></div><div class="area-n">Квартиры и апартаменты</div></div>
+      <div class="area"><div class="area-dot"></div><div class="area-n">Частные дома</div></div>
+      <div class="area"><div class="area-dot"></div><div class="area-n">Офисные встречи</div></div>
+      <div class="area"><div class="area-dot"></div><div class="area-n">Дни рождения</div></div>
+      <div class="area"><div class="area-dot"></div><div class="area-n">Свадьбы</div></div>
+      <div class="area"><div class="area-dot"></div><div class="area-n">Корпоративы</div></div>
+    </div>
+  </div>
+
+  <div class="s s-last rv">
+    <span class="eyebrow">Вопросы</span>
+    <h2 class="h2"><em>FAQ</em></h2>
+    <div class="faq">
+      <div class="fi"><div class="fi-q">Сколько времени действует аренда?<span class="fi-ico">▼</span></div><div class="fi-a">Стандартная аренда — 24 часа. Также возможны форматы на сессию (2–4 часа) с мастером на месте.</div></div>
+      <div class="fi"><div class="fi-q">Можно ли заказать ночью?<span class="fi-ico">▼</span></div><div class="fi-a">Да, доставка кальяна доступна круглосуточно 24/7 без дополнительных условий.</div></div>
+      <div class="fi"><div class="fi-q">Что входит в стоимость?<span class="fi-ico">▼</span></div><div class="fi-a">Кальян, табак, уголь, мундштуки, подготовка и работа мастера. Никаких скрытых доплат.</div></div>
+      <div class="fi"><div class="fi-q">Работаете ли вы на выезд?<span class="fi-ico">▼</span></div><div class="fi-a">Да, кальян на выезд в Астане доступен для мероприятий любого формата. Подробнее — в разделе «Кальян на выезд».</div></div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════
+ PAGE: ДОСТАВКА
+══════════════════════════════════ -->
+<div class="pg" id="pg-delivery">
+  <div class="s rv">
+    <span class="eyebrow">Доставка кальяна</span>
+    <h2 class="h2">Кальян дома<br>за <em>60 минут</em></h2>
+    <p class="body-t" style="margin-bottom:24px">Доставка кальяна в Астане 24/7. Привезём готовый комплект в любой район города. Кальян, табак, угли, мундштуки — всё включено. Вам ничего не нужно покупать.</p>
+    <div class="feat-grid" style="margin-bottom:20px">
+      <div class="feat"><span class="feat-icon">◷</span><div class="feat-t">60 минут</div><div class="feat-d">Среднее время по городу</div></div>
+      <div class="feat"><span class="feat-icon">◑</span><div class="feat-t">24/7</div><div class="feat-d">Включая ночь и праздники</div></div>
+      <div class="feat"><span class="feat-icon">◈</span><div class="feat-t">Всё включено</div><div class="feat-d">Ничего не нужно покупать</div></div>
+      <div class="feat"><span class="feat-icon">○</span><div class="feat-t">Весь город</div><div class="feat-d">Все районы Астаны</div></div>
+    </div>
+    <button class="btn-r btn-fill" data-pg="prices">Рассчитать стоимость →</button>
+  </div>
+
+  <div class="s rv">
+    <span class="eyebrow">Зона покрытия</span>
+    <h2 class="h2">Все районы<br><em>Астаны</em></h2>
+    <div class="areas-grid">
+      <div class="area"><div class="area-dot"></div><div class="area-n">Левый берег</div></div>
+      <div class="area"><div class="area-dot"></div><div class="area-n">Правый берег</div></div>
+      <div class="area"><div class="area-dot"></div><div class="area-n">Район Есиль</div></div>
+      <div class="area"><div class="area-dot"></div><div class="area-n">Сарыарка</div></div>
+      <div class="area"><div class="area-dot"></div><div class="area-n">Байконыр</div></div>
+      <div class="area"><div class="area-dot"></div><div class="area-n">Район Алматы</div></div>
+      <div class="area"><div class="area-dot"></div><div class="area-n">Жилые комплексы</div></div>
+      <div class="area"><div class="area-dot"></div><div class="area-n">Коттеджи</div></div>
+    </div>
+  </div>
+
+  <div class="s s-last rv">
+    <span class="eyebrow">Вопросы</span>
+    <h2 class="h2"><em>FAQ</em></h2>
+    <div class="faq">
+      <div class="fi"><div class="fi-q">Сколько стоит доставка?<span class="fi-ico">▼</span></div><div class="fi-a">Доставка по городу включена в стоимость пакета. Выезд за пределы Астаны — по договорённости.</div></div>
+      <div class="fi"><div class="fi-q">Доставляете за МКАД?<span class="fi-ico">▼</span></div><div class="fi-a">Да, выезжаем за пределы города. Уточняйте стоимость у менеджера — зависит от расстояния.</div></div>
+      <div class="fi"><div class="fi-q">Что если опоздаете?<span class="fi-ico">▼</span></div><div class="fi-a">Если опоздаем более чем на 20 минут от обещанного времени — скидка 10% на заказ.</div></div>
+    </div>
+    <div style="margin-top:20px">
+      <a href="https://wa.me/77054215018" target="_blank" class="btn-r btn-wa" style="max-width:300px">Заказать в WhatsApp</a>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════
+ PAGE: ВЫЕЗД
+══════════════════════════════════ -->
+<div class="pg" id="pg-vyezd">
+  <div class="s rv">
+    <span class="eyebrow">Кальян на выезд</span>
+    <h2 class="h2">Мероприятия<br><em>премиум-класса</em></h2>
+    <p class="body-t" style="margin-bottom:24px">Кальян на выезд в Астане — полноценный premium-сервис для мероприятий любого формата. ДЫМ НА ДОМ организует кальянную зону под ключ: свадьбы, корпоративы, дни рождения, закрытые вечеринки и VIP-события.</p>
+    <button class="btn-r btn-fill" data-pg="contacts">Обсудить мероприятие →</button>
+  </div>
+
+  <div class="s rv">
+    <span class="eyebrow">Форматы</span>
+    <h2 class="h2">Подходит<br>для <em>любого события</em></h2>
+    <div class="feat-grid">
+      <div class="feat"><span class="feat-icon">◇</span><div class="feat-t">Свадьбы</div><div class="feat-d">VIP-зона для гостей любого масштаба</div></div>
+      <div class="feat"><span class="feat-icon">◈</span><div class="feat-t">Корпоративы</div><div class="feat-d">Расслабленная деловая атмосфера</div></div>
+      <div class="feat"><span class="feat-icon">○</span><div class="feat-t">Дни рождения</div><div class="feat-d">Центр притяжения для гостей</div></div>
+      <div class="feat"><span class="feat-icon">◑</span><div class="feat-t">VIP-события</div><div class="feat-d">Закрытые мероприятия и вечеринки</div></div>
+    </div>
+  </div>
+
+  <div class="s rv">
+    <span class="eyebrow">Кальянщик</span>
+    <h2 class="h2">Профессионал<br>на вашем <em>событии</em></h2>
+    <p class="body-t" style="margin-bottom:20px">Наши мастера — опытные кальянщики с большим стажем работы на мероприятиях. Они не просто готовят кальяны, а создают атмосферу сервиса luxury-уровня. Постоянная замена угля, контроль вкуса и дыма, безупречная чистота — всё под наблюдением.</p>
+    <div class="svc-list" style="gap:1px">
+      <div class="svc-card" style="cursor:default">
+        <div class="svc-left"><div class="svc-num">—</div><div><div class="svc-name">1 кальян на 4–6 гостей</div><div class="svc-desc">Рекомендуемое соотношение</div></div></div>
+      </div>
+      <div class="svc-card" style="cursor:default">
+        <div class="svc-left"><div class="svc-num">—</div><div><div class="svc-name">Индивидуальный подбор вкусов</div><div class="svc-desc">Согласуем список заранее</div></div></div>
+      </div>
+      <div class="svc-card" style="cursor:default">
+        <div class="svc-left"><div class="svc-num">—</div><div><div class="svc-name">Оформление лаунж-зоны</div><div class="svc-desc">Адаптируем под стиль мероприятия</div></div></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="s rv">
+    <span class="eyebrow">Стоимость</span>
+    <h2 class="h2">Цены<br>на <em>выезд</em></h2>
+    <div class="pkg" style="margin-bottom:12px">
+      <div class="pkg-tier">Выездной пакет</div>
+      <div class="pkg-name">VIP Мероприятие</div>
+      <div class="pkg-price">от 66 000<span>₸</span></div>
+      <div class="pkg-info">Стоимость зависит от числа кальянов и длительности</div>
+      <div class="pkg-feats">
+        <div class="pf">2+ кальяна премиум-класса</div>
+        <div class="pf">Профессиональный кальянщик на выезд</div>
+        <div class="pf">Постоянная замена угля</div>
+        <div class="pf">Топ-табаки на выбор (Darkside, MustHave, Blackburn)</div>
+        <div class="pf">Оформление кальянной зоны</div>
+        <div class="pf">Индивидуальный расчёт под формат</div>
+      </div>
+    </div>
+    <button class="btn-r btn-fill" data-pg="contacts">Получить расчёт →</button>
+  </div>
+
+  <div class="s s-last rv">
+    <span class="eyebrow">Вопросы</span>
+    <h2 class="h2"><em>FAQ</em></h2>
+    <div class="faq">
+      <div class="fi"><div class="fi-q">Сколько кальянов нужно на мероприятие?<span class="fi-ico">▼</span></div><div class="fi-a">Рекомендуется 1 кальян на 4–6 гостей. Точное количество обсуждаем при бронировании.</div></div>
+      <div class="fi"><div class="fi-q">За сколько нужно бронировать?<span class="fi-ico">▼</span></div><div class="fi-a">Для мероприятий рекомендуем бронировать за 24–48 часов. Срочный выезд возможен при наличии свободного мастера.</div></div>
+      <div class="fi"><div class="fi-q">Работаете ли вы ночью?<span class="fi-ico">▼</span></div><div class="fi-a">Да, возможен круглосуточный выезд по Астане и за её пределы.</div></div>
+      <div class="fi"><div class="fi-q">Можно ли выбрать вкусы табака?<span class="fi-ico">▼</span></div><div class="fi-a">Да, перед мероприятием мы согласовываем список вкусов. Доступны все топ-бренды.</div></div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════
+ PAGE: НА ДОМ
+══════════════════════════════════ -->
+<div class="pg" id="pg-dom">
+  <div class="s rv">
+    <span class="eyebrow">Кальян на дом</span>
+    <h2 class="h2">Кальян на дом<br><em>Астана 24/7</em></h2>
+    <p class="body-t" style="margin-bottom:24px">Заказать кальян на дом с доставкой за 60 минут. Премиальные табаки, аренда кальяна и сервис под ключ. Работаем круглосуточно и доставляем в любой район Астаны.</p>
+    <div class="feat-grid" style="margin-bottom:20px">
+      <div class="feat"><span class="feat-icon">◈</span><div class="feat-t">Премиальные табаки</div><div class="feat-d">Darkside, MustHave, Tangiers и другие топ-бренды</div></div>
+      <div class="feat"><span class="feat-icon">◷</span><div class="feat-t">60 мин доставка</div><div class="feat-d">Среднее время по Астане</div></div>
+      <div class="feat"><span class="feat-icon">◇</span><div class="feat-t">Проф. оборудование</div><div class="feat-d">Полный комплект аксессуаров</div></div>
+      <div class="feat"><span class="feat-icon">◑</span><div class="feat-t">Доставка 24/7</div><div class="feat-d">Круглосуточно, любой день</div></div>
+    </div>
+  </div>
+
+  <div class="s rv">
+    <span class="eyebrow">Зона доставки</span>
+    <h2 class="h2">Все районы<br><em>Астаны</em></h2>
+    <div class="areas-grid">
+      <div class="area"><div class="area-dot"></div><div class="area-n">Левый берег</div></div>
+      <div class="area"><div class="area-dot"></div><div class="area-n">Правый берег</div></div>
+      <div class="area"><div class="area-dot"></div><div class="area-n">Район Есиль</div></div>
+      <div class="area"><div class="area-dot"></div><div class="area-n">Сарыарка</div></div>
+      <div class="area"><div class="area-dot"></div><div class="area-n">Район Алматы</div></div>
+      <div class="area"><div class="area-dot"></div><div class="area-n">ЖК и коттеджи</div></div>
+    </div>
+  </div>
+
+  <div class="s rv">
+    <span class="eyebrow">Как заказать</span>
+    <h2 class="h2">Три шага<br>до <em>кайфа</em></h2>
+    <div class="steps">
+      <div class="step"><div class="step-n">01</div><div><div class="step-t">Оставьте заявку</div><div class="step-d">Форма ниже, WhatsApp или звонок — менеджер ответит за 2 минуты.</div></div></div>
+      <div class="step"><div class="step-n">02</div><div><div class="step-t">Выберите вкус и время</div><div class="step-d">Подберём табак под ваши предпочтения. Укажите адрес и желаемое время.</div></div></div>
+      <div class="step"><div class="step-n">03</div><div><div class="step-t">Мастер приедет к вам</div><div class="step-d">Соберёт, настроит кальян. После — заберёт оборудование. Вам — только наслаждаться.</div></div></div>
+    </div>
+  </div>
+
+  <div class="s s-last rv">
+    <div class="form-wrap">
+      <div class="form-head">
+        <div class="form-head-t">Заказать кальян на дом</div>
+        <div class="form-head-s">Ответим и перезвоним за 5 минут</div>
+      </div>
+      <div class="form-body">
+        <form id="form-dom">
+          <div style="margin-bottom:12px"><label class="f-lbl">Ваше имя</label><input class="f-inp" type="text" placeholder="Алихан" required></div>
+          <div style="margin-bottom:12px"><label class="f-lbl">Телефон</label><input class="f-inp f-phone" type="tel" placeholder="+7 (700) 000-00-00" required></div>
+          <div style="margin-bottom:12px"><label class="f-lbl">Адрес доставки</label><input class="f-inp" type="text" placeholder="ул. Туран, д. 40, кв. 1"></div>
+          <div style="margin-bottom:16px"><label class="f-lbl">Пожелания</label><textarea class="f-inp" placeholder="Вкус табака, количество гостей, время..."></textarea></div>
+          <button type="submit" class="btn-r btn-fill" style="border:none">Оформить заказ</button>
+          <p class="f-note" style="margin-top:10px">Нажимая кнопку, вы соглашаетесь на обработку персональных данных</p>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════
+ PAGE: ЦЕНЫ + КАЛЬКУЛЯТОР
+══════════════════════════════════ -->
+<div class="pg" id="pg-prices">
+  <div class="s rv">
+    <span class="eyebrow">Тарифы</span>
+    <h2 class="h2">Честные цены<br><em>без скрытых</em> доплат</h2>
+    <div class="pkg-list">
+      <div class="pkg">
+        <div class="pkg-tier">Пакет 01</div>
+        <div class="pkg-name">Standard</div>
+        <div class="pkg-price">от 13 990<span>₸</span></div>
+        <div class="pkg-info">1–2 человека · 2 часа</div>
+        <div class="pkg-feats">
+          <div class="pf">Кальян + табак + угли</div>
+          <div class="pf">1 перезабивка</div>
+          <div class="pf">Мастер 2 часа</div>
+          <div class="pf">Доставка по городу</div>
+          <div class="pf off">Приоритетная доставка</div>
+          <div class="pf off">Топ-табаки VIP</div>
+        </div>
+      </div>
+      <div class="pkg star">
+        <div class="pkg-tier">Пакет 02</div>
+        <div class="pkg-name">Gold</div>
+        <div class="pkg-price">от 16 990<span>₸</span></div>
+        <div class="pkg-info">2–4 человека · 3 часа</div>
+        <div class="pkg-feats">
+          <div class="pf">Кальян Gold + премиум-табак</div>
+          <div class="pf">2 перезабивки</div>
+          <div class="pf">Мастер весь вечер</div>
+          <div class="pf">Приоритетная доставка</div>
+          <div class="pf">Скидка 15% на доп. кальян</div>
+          <div class="pf off">Топ-табаки VIP</div>
+        </div>
+      </div>
+      <div class="pkg">
+        <div class="pkg-tier">Пакет 03</div>
+        <div class="pkg-name">Premium</div>
+        <div class="pkg-price">от 18 990<span>₸</span></div>
+        <div class="pkg-info">Любая компания · весь вечер</div>
+        <div class="pkg-feats">
+          <div class="pf">Кальян Premium-класса</div>
+          <div class="pf">Неограниченные перезабивки</div>
+          <div class="pf">Мастер под ключ</div>
+          <div class="pf">Топ-табаки VIP (Tangiers, Satyr)</div>
+          <div class="pf">Приоритетная доставка</div>
+          <div class="pf">Персональный сервис</div>
+        </div>
+      </div>
+      <div class="pkg">
+        <div class="pkg-tier">Выездной пакет</div>
+        <div class="pkg-name">Мероприятия</div>
+        <div class="pkg-price">от 66 000<span>₸</span></div>
+        <div class="pkg-info">Свадьбы, корпоративы, VIP-события</div>
+        <div class="pkg-feats">
+          <div class="pf">Индивидуальный расчёт</div>
+          <div class="pf">2+ кальяна премиум-класса</div>
+          <div class="pf">Кальянщик на выезд</div>
+          <div class="pf">Оформление лаунж-зоны</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- КАЛЬКУЛЯТОР -->
+  <div class="s s-last rv">
+    <span class="eyebrow">Онлайн-расчёт</span>
+    <h2 class="h2">Калькулятор<br><em>аренды</em></h2>
+    <div class="calc">
+      <div class="calc-head">
+        <div class="calc-head-t">Рассчитать стоимость</div>
+        <div class="calc-head-s">Без звонка</div>
+      </div>
+      <div class="calc-body">
+
+        <div class="c-row">
+          <div class="c-lbl">Тип услуги</div>
+          <select class="c-sel" id="cc-type">
+            <option value="0">Кальян на дом / аренда</option>
+            <option value="5000">Кальян на выезд (мероприятие)</option>
+            <option value="2000">Ночная доставка (23:00–06:00)</option>
+          </select>
+        </div>
+
+        <div class="c-row">
+          <div class="c-lbl">Количество кальянов <b id="v-qty">1</b></div>
+          <div class="c-counter">
+            <button class="c-cnt-btn" id="qty-m">−</button>
+            <div class="c-cnt-v" id="qty-d">1</div>
+            <button class="c-cnt-btn" id="qty-p">+</button>
+          </div>
+        </div>
+
+        <div class="c-row">
+          <div class="c-lbl">Пакет</div>
+          <select class="c-sel" id="cc-pkg">
+            <option value="13990">Standard — от 13 990 ₸</option>
+            <option value="16990">Gold — от 16 990 ₸</option>
+            <option value="18990">Premium — от 18 990 ₸</option>
+          </select>
+        </div>
+
+        <div class="c-row">
+          <div class="c-lbl">Длительность (ч) <b id="v-h">2</b></div>
+          <div class="c-counter">
+            <button class="c-cnt-btn" id="h-m">−</button>
+            <div class="c-cnt-v" id="h-d">2</div>
+            <button class="c-cnt-btn" id="h-p">+</button>
+          </div>
+        </div>
+
+        <div class="c-row">
+          <div class="c-lbl" style="margin-bottom:10px">Дополнительно</div>
+          <div class="toggles">
+            <div class="tog-row">
+              <div class="tog-info"><div class="tog-name">Перезабивка (extra)</div><div class="tog-price">+2 000 ₸</div></div>
+              <div class="sw"><input type="checkbox" id="t1" onchange="calc()"><label for="t1"></label></div>
+            </div>
+            <div class="tog-row">
+              <div class="tog-info"><div class="tog-name">Второй мастер</div><div class="tog-price">+5 000 ₸</div></div>
+              <div class="sw"><input type="checkbox" id="t2" onchange="calc()"><label for="t2"></label></div>
+            </div>
+            <div class="tog-row">
+              <div class="tog-info"><div class="tog-name">Оформление зоны</div><div class="tog-price">+3 000 ₸</div></div>
+              <div class="sw"><input type="checkbox" id="t3" onchange="calc()"><label for="t3"></label></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="c-row">
+          <div class="c-lbl" style="margin-bottom:8px">Промо-код</div>
+          <div class="promo-row">
+            <input class="c-in" id="promo" type="text" placeholder="Введите код">
+            <button class="promo-btn" onclick="applyPromo()">Применить</button>
+          </div>
+          <div id="promo-msg" style="font-size:11px;margin-top:6px;color:var(--w3)"></div>
+        </div>
+
+      </div>
+      <div class="calc-result">
+        <div>
+          <div class="cr-label">Итого к оплате</div>
+          <div class="cr-info" id="c-breakdown">Standard · 1 кальян · 2 ч</div>
+        </div>
+        <div class="cr-price" id="c-total">13 990 ₸</div>
+      </div>
+    </div>
+    <div style="margin-top:12px;display:flex;flex-direction:column;gap:10px">
+      <button class="btn-r btn-fill" data-pg="dom">Оформить заказ</button>
+      <a href="https://wa.me/77054215018" target="_blank" class="btn-r btn-wa">WhatsApp</a>
+    </div>
+
+    <div style="margin-top:40px">
+      <span class="eyebrow">Акции</span>
+      <h2 class="h2">Скидки<br>и <em>бонусы</em></h2>
+      <div class="svc-list">
+        <div class="svc-card" style="cursor:default"><div class="svc-left"><div class="svc-num">%</div><div><div class="svc-name">Повторный заказ</div><div class="svc-desc">−10% на каждый следующий заказ</div></div></div></div>
+        <div class="svc-card" style="cursor:default"><div class="svc-left"><div class="svc-num">%</div><div><div class="svc-name">2+ кальяна</div><div class="svc-desc">−15% на каждый дополнительный</div></div></div></div>
+        <div class="svc-card" style="cursor:default"><div class="svc-left"><div class="svc-num">◇</div><div><div class="svc-name">Промо-код САЙТ</div><div class="svc-desc">Скидка 500 ₸ на первый заказ</div></div></div><div class="tag hi">САЙТ</div></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════
+ PAGE: КОНТАКТЫ
+══════════════════════════════════ -->
+<div class="pg" id="pg-contacts">
+  <div class="s rv">
+    <span class="eyebrow">Связь</span>
+    <h2 class="h2">Контакты</h2>
+    <div class="ct-list">
+      <a href="tel:+77054215018" class="ct">
+        <div class="ct-icon">◻</div>
+        <div><div class="ct-t">Телефон</div><div class="ct-v"><a href="tel:+77054215018">+7 (705) 421-50-18</a></div></div>
+      </a>
+      <a href="https://wa.me/77054215018" target="_blank" class="ct">
+        <div class="ct-icon">◇</div>
+        <div><div class="ct-t">WhatsApp</div><div class="ct-v"><span style="color:var(--ruby-l)">Написать сейчас →</span></div></div>
+      </a>
+      <div class="ct">
+        <div class="ct-icon">◑</div>
+        <div><div class="ct-t">Режим работы</div><div class="ct-v">24 / 7 · без выходных</div></div>
+      </div>
+      <a href="https://maps.app.goo.gl/eRPy7j3DCzyoh7Wa9" target="_blank" class="ct">
+        <div class="ct-icon">○</div>
+        <div><div class="ct-t">Адрес склада</div><div class="ct-v" style="font-size:13px">просп. Туран 40/2, Астана</div></div>
+      </a>
+    </div>
+  </div>
+
+  <div class="s s-last rv">
+    <div class="form-wrap">
+      <div class="form-head">
+        <div class="form-head-t">Обратная связь</div>
+        <div class="form-head-s">Ответим в течение 10 минут</div>
+      </div>
+      <div class="form-body">
+        <form id="form-ct">
+          <div style="margin-bottom:12px"><label class="f-lbl">Имя</label><input class="f-inp" type="text" placeholder="Ваше имя" required></div>
+          <div style="margin-bottom:12px"><label class="f-lbl">Телефон</label><input class="f-inp f-phone" type="tel" placeholder="+7 (700) 000-00-00" required></div>
+          <div style="margin-bottom:16px"><label class="f-lbl">Сообщение</label><textarea class="f-inp" placeholder="Ваш вопрос или заявка..."></textarea></div>
+          <button type="submit" class="btn-r btn-fill" style="border:none">Отправить</button>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════
+ PAGE: КАРТА САЙТА
+══════════════════════════════════ -->
+<div class="pg" id="pg-sitemap">
+  <div class="s s-last rv">
+    <span class="eyebrow">Навигация</span>
+    <h2 class="h2">Карта сайта</h2>
+
+    <div class="sm-group">
+      <div class="sm-gt">Основные страницы</div>
+      <div class="sm-links">
+        <div class="sm-link" data-pg="home"><span>Главная — аренда кальяна в Астане</span><span class="sm-arr">→</span></div>
+        <div class="sm-link" data-pg="arenda"><span>Аренда кальяна</span><span class="sm-arr">→</span></div>
+        <div class="sm-link" data-pg="delivery"><span>Доставка кальяна</span><span class="sm-arr">→</span></div>
+        <div class="sm-link" data-pg="vyezd"><span>Кальян на выезд (мероприятия)</span><span class="sm-arr">→</span></div>
+        <div class="sm-link" data-pg="dom"><span>Кальян на дом</span><span class="sm-arr">→</span></div>
+      </div>
+    </div>
+
+    <div class="sm-group">
+      <div class="sm-gt">Цены и заказ</div>
+      <div class="sm-links">
+        <div class="sm-link" data-pg="prices"><span>Цены и тарифы</span><span class="sm-arr">→</span></div>
+        <div class="sm-link" data-pg="prices"><span>Калькулятор аренды</span><span class="sm-arr">→</span></div>
+        <div class="sm-link" data-pg="dom"><span>Форма заказа</span><span class="sm-arr">→</span></div>
+      </div>
+    </div>
+
+    <div class="sm-group">
+      <div class="sm-gt">Контакты и информация</div>
+      <div class="sm-links">
+        <div class="sm-link" data-pg="contacts"><span>Контакты</span><span class="sm-arr">→</span></div>
+        <div class="sm-link" href="#" onclick="window.open('https://maps.app.goo.gl/eRPy7j3DCzyoh7Wa9','_blank')"><span>Туран 40/2, Астана (Карта)</span><span class="sm-arr">↗</span></div>
+      </div>
+    </div>
+
+    <div style="margin-top:28px;display:flex;flex-direction:column;gap:10px">
+      <a href="tel:+77054215018" class="btn-r btn-fill">Позвонить сейчас</a>
+      <a href="https://wa.me/77054215018" target="_blank" class="btn-r btn-wa">WhatsApp</a>
+    </div>
+  </div>
+</div>
+
+<!-- Float WA -->
+<a href="https://wa.me/77054215018" target="_blank" class="fl-wa">💬</a>
+<div class="toast" id="toast">Заявка принята. Перезвоним за 5 минут.</div>
+
+<!-- ═══ SCRIPTS ═══ -->
+<script>
+/* PRELOADER */
+window.addEventListener('load', () => {
+  setTimeout(() => { document.getElementById('PL').classList.add('out'); setTimeout(()=>document.getElementById('PL').remove(),600); }, 1200);
+});
+
+/* HEADER */
+const HDR = document.getElementById('H');
+window.addEventListener('scroll', () => HDR.classList.toggle('solid', scrollY > 40));
+
+/* MENU BURGER */
+const MB = document.getElementById('MB'), MO = document.getElementById('M');
+MB.addEventListener('click', () => {
+  MB.classList.toggle('x'); MO.classList.toggle('on');
+  document.body.style.overflow = MO.classList.contains('on') ? 'hidden' : '';
+});
+function closeMenu() { MB.classList.remove('x'); MO.classList.remove('on'); document.body.style.overflow = ''; }
+
+/* SPA ROUTER */
+function goTo(name) {
+  document.querySelectorAll('.pg').forEach(p => p.classList.remove('on'));
+  const pg = document.getElementById('pg-' + name);
+  if (!pg) return;
+  pg.classList.add('on');
+  window.scrollTo({top:0,behavior:'instant'});
+  // tabs
+  document.querySelectorAll('#T .t-btn').forEach(b => b.classList.toggle('cur', b.dataset.pg === name));
+  // menu items
+  document.querySelectorAll('#M .mn-item').forEach(i => i.classList.toggle('cur', i.dataset.pg === name));
+  closeMenu();
+  setTimeout(initReveal, 60);
+}
+
+document.addEventListener('click', e => {
+  const el = e.target.closest('[data-pg]');
+  if (el && el.dataset.pg) { e.preventDefault(); goTo(el.dataset.pg); }
+});
+
+/* REVEAL */
+function initReveal() {
+  const io = new IntersectionObserver(entries => {
+    entries.forEach(e => { if (e.isIntersecting) { e.target.classList.add('v'); io.unobserve(e.target); } });
+  }, {threshold: .08});
+  document.querySelectorAll('.rv:not(.v)').forEach(el => io.observe(el));
+}
+initReveal();
+
+/* FAQ */
+document.addEventListener('click', e => {
+  const q = e.target.closest('.fi-q');
+  if (!q) return;
+  const a = q.nextElementSibling, open = q.classList.contains('o');
+  q.closest('.faq').querySelectorAll('.fi-q.o').forEach(oq => { oq.classList.remove('o'); oq.nextElementSibling.classList.remove('o'); });
+  if (!open) { q.classList.add('o'); a.classList.add('o'); }
+});
+
+/* PHONE FORMAT */
+document.addEventListener('input', e => {
+  if (!e.target.classList.contains('f-phone')) return;
+  let v = e.target.value.replace(/\D/g,'');
+  if (v.startsWith('8')) v = '7'+v.slice(1);
+  if (v.length && !v.startsWith('7')) v = '7'+v;
+  v = v.slice(0,11);
+  let f = '';
+  if(v.length>0) f='+7';
+  if(v.length>1) f+=' ('+v.slice(1,4);
+  if(v.length>=4) f+=') '+v.slice(4,7);
+  if(v.length>=7) f+='-'+v.slice(7,9);
+  if(v.length>=9) f+='-'+v.slice(9,11);
+  e.target.value = f;
+});
+
+/* TOAST */
+function toast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg; t.classList.add('on');
+  setTimeout(()=>t.classList.remove('on'), 3200);
+}
+
+/* FORMS */
+document.addEventListener('submit', e => {
+  e.preventDefault();
+  const btn = e.target.querySelector('button[type=submit]');
+  const orig = btn.textContent;
+  btn.textContent = 'Отправляем…'; btn.disabled = true;
+  setTimeout(() => {
+    e.target.reset(); btn.textContent = orig; btn.disabled = false;
+    toast('Заявка принята. Перезвоним за 5 минут.');
+  }, 1100);
+});
+
+/* CALCULATOR */
+let qty=1, hrs=2, promoDisc=0;
+const EXTRA_KAL=0.85, EXTRA_HR=2500;
+
+document.getElementById('qty-m').onclick = () => { if(qty>1) qty--; document.getElementById('qty-d').textContent=qty; document.getElementById('v-qty').textContent=qty; calc(); };
+document.getElementById('qty-p').onclick = () => { if(qty<5) qty++; document.getElementById('qty-d').textContent=qty; document.getElementById('v-qty').textContent=qty; calc(); };
+document.getElementById('h-m').onclick   = () => { if(hrs>2) hrs--; document.getElementById('h-d').textContent=hrs; document.getElementById('v-h').textContent=hrs; calc(); };
+document.getElementById('h-p').onclick   = () => { if(hrs<12) hrs++; document.getElementById('h-d').textContent=hrs; document.getElementById('v-h').textContent=hrs; calc(); };
+['cc-type','cc-pkg'].forEach(id => document.getElementById(id).addEventListener('change', calc));
+
+const PROMOS = {'САЙТ':500,'ДРУГ':1000,'DYM10':'10%'};
+function applyPromo() {
+  const code = document.getElementById('promo').value.trim().toUpperCase();
+  const msg = document.getElementById('promo-msg');
+  if (PROMOS[code] !== undefined) {
+    const d = PROMOS[code];
+    promoDisc = typeof d === 'string' ? d : d;
+    msg.style.color = '#4ade80';
+    msg.textContent = typeof d === 'string' ? `✓ Скидка ${d}` : `✓ Скидка ${d.toLocaleString('ru')} ₸`;
+  } else {
+    promoDisc = 0;
+    msg.style.color = 'var(--w3)';
+    msg.textContent = code ? 'Промо-код не найден' : '';
+  }
+  calc();
+}
+
+function calc() {
+  const base = parseInt(document.getElementById('cc-pkg').value);
+  const type = parseInt(document.getElementById('cc-type').value);
+  const r1 = document.getElementById('t1').checked ? 2000 : 0;
+  const r2 = document.getElementById('t2').checked ? 5000 : 0;
+  const r3 = document.getElementById('t3').checked ? 3000 : 0;
+
+  let total = base;
+  if (qty > 1) total += Math.round(base * EXTRA_KAL * (qty-1));
+  if (hrs > 2) total += EXTRA_HR * (hrs-2) * qty;
+  total += type + r1 + r2 + r3;
+
+  if (typeof promoDisc === 'string' && promoDisc.endsWith('%')) {
+    total = Math.round(total * (1 - parseInt(promoDisc)/100));
+  } else if (promoDisc > 0) {
+    total -= promoDisc;
+  }
+
+  const pkgs = ['Standard','Gold','Premium'];
+  const pkgI = document.getElementById('cc-pkg').selectedIndex;
+  document.getElementById('c-total').textContent = total.toLocaleString('ru') + ' ₸';
+  document.getElementById('c-breakdown').textContent = `${pkgs[pkgI]} · ${qty} кальян · ${hrs} ч`;
+}
+calc();
+</script>
+</body>
+</html>
