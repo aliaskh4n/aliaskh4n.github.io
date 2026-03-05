@@ -1,0 +1,614 @@
+<!DOCTYPE html>
+
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Nurasyl Aliaskhan — Full-Stack Python Developer</title>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Mono:wght@300;400;500&family=Manrope:wght@300;400;500;600;700&display=swap" rel="stylesheet"/>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+```
+:root {
+  --bg: #0b0d11;
+  --surface: #12151c;
+  --border: #1e2330;
+  --accent: #4ade80;
+  --accent2: #22d3ee;
+  --accent3: #a78bfa;
+  --text: #e8eaf0;
+  --muted: #6b7280;
+  --card: #161a24;
+}
+
+html { scroll-behavior: smooth; }
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: 'Manrope', sans-serif;
+  font-weight: 400;
+  line-height: 1.7;
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+
+/* Background grid */
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background-image:
+    linear-gradient(rgba(74,222,128,0.03) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(74,222,128,0.03) 1px, transparent 1px);
+  background-size: 40px 40px;
+  pointer-events: none;
+  z-index: 0;
+}
+
+.glow {
+  position: fixed;
+  width: 600px; height: 600px;
+  border-radius: 50%;
+  filter: blur(120px);
+  pointer-events: none;
+  z-index: 0;
+  opacity: 0.12;
+}
+.glow-1 { background: var(--accent); top: -200px; left: -100px; }
+.glow-2 { background: var(--accent2); bottom: -200px; right: -100px; }
+.glow-3 { background: var(--accent3); top: 40%; left: 40%; opacity: 0.07; }
+
+.container {
+  max-width: 860px;
+  margin: 0 auto;
+  padding: 60px 24px 80px;
+  position: relative;
+  z-index: 1;
+}
+
+/* ── HEADER ── */
+header {
+  padding-bottom: 48px;
+  border-bottom: 1px solid var(--border);
+  margin-bottom: 52px;
+  animation: fadeUp 0.7s ease both;
+}
+
+.tag {
+  display: inline-block;
+  font-family: 'DM Mono', monospace;
+  font-size: 11px;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  color: var(--accent);
+  background: rgba(74,222,128,0.08);
+  border: 1px solid rgba(74,222,128,0.2);
+  padding: 4px 12px;
+  border-radius: 20px;
+  margin-bottom: 20px;
+}
+
+h1 {
+  font-family: 'DM Serif Display', serif;
+  font-size: clamp(36px, 6vw, 58px);
+  font-weight: 400;
+  line-height: 1.1;
+  letter-spacing: -0.02em;
+  color: var(--text);
+  margin-bottom: 6px;
+}
+
+h1 span { color: var(--accent); font-style: italic; }
+
+.subtitle {
+  font-family: 'DM Mono', monospace;
+  font-size: 14px;
+  color: var(--accent2);
+  letter-spacing: 0.05em;
+  margin-bottom: 28px;
+}
+
+.bio {
+  font-size: 15px;
+  color: #9ca3af;
+  max-width: 600px;
+  line-height: 1.8;
+  margin-bottom: 32px;
+}
+
+.contacts {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.contact-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-family: 'DM Mono', monospace;
+  font-size: 12px;
+  color: var(--muted);
+  background: var(--surface);
+  border: 1px solid var(--border);
+  padding: 8px 16px;
+  border-radius: 8px;
+  text-decoration: none;
+  transition: all 0.2s;
+}
+
+.contact-item:hover {
+  border-color: var(--accent);
+  color: var(--accent);
+  background: rgba(74,222,128,0.05);
+}
+
+.contact-item .icon { font-size: 14px; }
+
+/* ── SECTIONS ── */
+section {
+  margin-bottom: 52px;
+  animation: fadeUp 0.7s ease both;
+}
+
+section:nth-child(2) { animation-delay: 0.1s; }
+section:nth-child(3) { animation-delay: 0.15s; }
+section:nth-child(4) { animation-delay: 0.2s; }
+section:nth-child(5) { animation-delay: 0.25s; }
+section:nth-child(6) { animation-delay: 0.3s; }
+
+.section-label {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 28px;
+}
+
+.section-label h2 {
+  font-family: 'DM Mono', monospace;
+  font-size: 11px;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+.section-label::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: var(--border);
+}
+
+/* ── SKILLS ── */
+.skills-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+  gap: 16px;
+}
+
+.skill-group {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 20px;
+  transition: border-color 0.2s;
+}
+
+.skill-group:hover { border-color: rgba(74,222,128,0.3); }
+
+.skill-group-title {
+  font-family: 'DM Mono', monospace;
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.15em;
+  margin-bottom: 14px;
+  padding-bottom: 10px;
+  border-bottom: 1px solid var(--border);
+}
+
+.skill-group:nth-child(1) .skill-group-title { color: var(--accent); }
+.skill-group:nth-child(2) .skill-group-title { color: var(--accent2); }
+.skill-group:nth-child(3) .skill-group-title { color: var(--accent3); }
+.skill-group:nth-child(4) .skill-group-title { color: #fb923c; }
+.skill-group:nth-child(5) .skill-group-title { color: #f472b6; }
+
+.skill-list {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.skill-list li {
+  font-family: 'DM Mono', monospace;
+  font-size: 12px;
+  color: #9ca3af;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.skill-list li::before {
+  content: '';
+  width: 4px; height: 4px;
+  border-radius: 50%;
+  background: currentColor;
+  opacity: 0.5;
+  flex-shrink: 0;
+}
+
+/* ── PROJECTS ── */
+.projects-list {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.project-card {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  padding: 28px 32px;
+  position: relative;
+  overflow: hidden;
+  transition: border-color 0.25s, transform 0.25s;
+}
+
+.project-card::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0;
+  width: 3px; height: 100%;
+}
+
+.project-card:nth-child(1)::before { background: var(--accent); }
+.project-card:nth-child(2)::before { background: var(--accent2); }
+.project-card:nth-child(3)::before { background: var(--accent3); }
+
+.project-card:hover {
+  border-color: rgba(74,222,128,0.25);
+  transform: translateX(4px);
+}
+
+.project-card:nth-child(2):hover { border-color: rgba(34,211,238,0.25); }
+.project-card:nth-child(3):hover { border-color: rgba(167,139,250,0.25); }
+
+.project-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 12px;
+}
+
+.project-name {
+  font-family: 'DM Serif Display', serif;
+  font-size: 20px;
+  color: var(--text);
+}
+
+.project-desc {
+  font-size: 14px;
+  color: #6b7280;
+  margin-bottom: 16px;
+}
+
+.project-features {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 16px;
+}
+
+.feature-tag {
+  font-family: 'DM Mono', monospace;
+  font-size: 11px;
+  color: #9ca3af;
+  background: rgba(255,255,255,0.04);
+  border: 1px solid var(--border);
+  padding: 3px 10px;
+  border-radius: 6px;
+}
+
+.tech-stack {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.tech-tag {
+  font-family: 'DM Mono', monospace;
+  font-size: 11px;
+  padding: 4px 12px;
+  border-radius: 20px;
+  font-weight: 500;
+}
+
+.project-card:nth-child(1) .tech-tag { color: var(--accent); background: rgba(74,222,128,0.08); border: 1px solid rgba(74,222,128,0.2); }
+.project-card:nth-child(2) .tech-tag { color: var(--accent2); background: rgba(34,211,238,0.08); border: 1px solid rgba(34,211,238,0.2); }
+.project-card:nth-child(3) .tech-tag { color: var(--accent3); background: rgba(167,139,250,0.08); border: 1px solid rgba(167,139,250,0.2); }
+
+/* ── BOTTOM ROW ── */
+.bottom-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+}
+
+@media (max-width: 560px) {
+  .bottom-row { grid-template-columns: 1fr; }
+}
+
+.info-card {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  padding: 24px;
+}
+
+.info-card-title {
+  font-family: 'DM Mono', monospace;
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.15em;
+  color: var(--muted);
+  margin-bottom: 16px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid var(--border);
+}
+
+.lang-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px 0;
+  border-bottom: 1px solid rgba(255,255,255,0.04);
+  font-size: 14px;
+  color: #9ca3af;
+}
+
+.lang-item:last-child { border: none; }
+
+.lang-level {
+  font-family: 'DM Mono', monospace;
+  font-size: 11px;
+  color: var(--accent);
+}
+
+.edu-text {
+  font-size: 14px;
+  color: #9ca3af;
+  line-height: 1.8;
+}
+
+.edu-badge {
+  display: inline-block;
+  margin-top: 10px;
+  font-family: 'DM Mono', monospace;
+  font-size: 11px;
+  color: var(--accent3);
+  background: rgba(167,139,250,0.08);
+  border: 1px solid rgba(167,139,250,0.2);
+  padding: 4px 12px;
+  border-radius: 20px;
+}
+
+/* ── FOOTER ── */
+footer {
+  text-align: center;
+  padding-top: 40px;
+  border-top: 1px solid var(--border);
+  font-family: 'DM Mono', monospace;
+  font-size: 11px;
+  color: var(--muted);
+  letter-spacing: 0.05em;
+}
+
+/* ── ANIMATIONS ── */
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(20px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* ── SCROLLBAR ── */
+::-webkit-scrollbar { width: 6px; }
+::-webkit-scrollbar-track { background: var(--bg); }
+::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+```
+
+  </style>
+</head>
+<body>
+
+<div class="glow glow-1"></div>
+<div class="glow glow-2"></div>
+<div class="glow glow-3"></div>
+
+<div class="container">
+
+  <!-- HEADER -->
+
+  <header>
+    <div class="tag">Available for hire</div>
+    <h1>Nurasyl <span>Aliaskhan</span></h1>
+    <div class="subtitle">// Full-Stack Python Developer</div>
+    <p class="bio">
+      Python Full-Stack разработчик с опытом создания веб-приложений, API-сервисов и систем автоматизации. Работаю с Flask и FastAPI, строю backend-архитектуры, REST API, Telegram-ботов и интегрирую AI-сервисы.
+    </p>
+    <div class="contacts">
+      <a class="contact-item" href="mailto:yourmail@gmail.com">
+        <span class="icon">✉</span> n.aliaskhan@yandex.kz
+      </a>
+      <a class="contact-item" href="tel:+7XXXXXXXXXX">
+        <span class="icon">📱</span> +7 708 948 7621
+      </a>
+      <a class="contact-item" href="https://github.com/username" target="_blank">
+        <span class="icon">⌥</span> github.com/aliaskh4n
+      </a>
+      <a class="contact-item" href="#">
+        <span class="icon">📍</span> Казахстан
+      </a>
+    </div>
+  </header>
+
+  <!-- SKILLS -->
+
+  <section>
+    <div class="section-label"><h2>Навыки</h2></div>
+    <div class="skills-grid">
+      <div class="skill-group">
+        <div class="skill-group-title">Backend</div>
+        <ul class="skill-list">
+          <li>Python</li>
+          <li>Flask</li>
+          <li>FastAPI</li>
+          <li>REST API</li>
+          <li>JWT</li>
+          <li>Webhooks</li>
+        </ul>
+      </div>
+      <div class="skill-group">
+        <div class="skill-group-title">Frontend</div>
+        <ul class="skill-list">
+          <li>HTML5</li>
+          <li>CSS3</li>
+          <li>JavaScript</li>
+          <li>Bootstrap</li>
+        </ul>
+      </div>
+      <div class="skill-group">
+        <div class="skill-group-title">Базы данных</div>
+        <ul class="skill-list">
+          <li>PostgreSQL</li>
+          <li>SQLite</li>
+          <li>MySQL</li>
+          <li>SQLAlchemy</li>
+        </ul>
+      </div>
+      <div class="skill-group">
+        <div class="skill-group-title">Инструменты</div>
+        <ul class="skill-list">
+          <li>Git</li>
+          <li>Docker</li>
+          <li>Linux</li>
+          <li>Nginx</li>
+        </ul>
+      </div>
+      <div class="skill-group">
+        <div class="skill-group-title">Дополнительно</div>
+        <ul class="skill-list">
+          <li>Telegram Bot API</li>
+          <li>AI API интеграция</li>
+          <li>JSON / Webhooks</li>
+          <li>Автоматизация</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- PROJECTS -->
+
+  <section>
+    <div class="section-label"><h2>Проекты</h2></div>
+    <div class="projects-list">
+
+```
+  <div class="project-card">
+    <div class="project-header">
+      <div class="project-name">Web API Сервис</div>
+    </div>
+    <p class="project-desc">Backend-сервис на FastAPI для обработки API-запросов с авторизацией и базой данных.</p>
+    <div class="project-features">
+      <span class="feature-tag">Авторизация пользователей</span>
+      <span class="feature-tag">REST API</span>
+      <span class="feature-tag">База данных</span>
+      <span class="feature-tag">Обработка JSON</span>
+    </div>
+    <div class="tech-stack">
+      <span class="tech-tag">Python</span>
+      <span class="tech-tag">FastAPI</span>
+      <span class="tech-tag">PostgreSQL</span>
+    </div>
+  </div>
+
+  <div class="project-card">
+    <div class="project-header">
+      <div class="project-name">Telegram Bot</div>
+    </div>
+    <p class="project-desc">Telegram-бот для автоматизации задач с интеграцией внешних сервисов.</p>
+    <div class="project-features">
+      <span class="feature-tag">Обработка команд</span>
+      <span class="feature-tag">Работа с API</span>
+      <span class="feature-tag">Внешние интеграции</span>
+    </div>
+    <div class="tech-stack">
+      <span class="tech-tag">Python</span>
+      <span class="tech-tag">Telegram Bot API</span>
+    </div>
+  </div>
+
+  <div class="project-card">
+    <div class="project-header">
+      <div class="project-name">Веб-приложение</div>
+    </div>
+    <p class="project-desc">Полноценный веб-сайт с backend-логикой, системой регистрации и административной панелью.</p>
+    <div class="project-features">
+      <span class="feature-tag">Регистрация пользователей</span>
+      <span class="feature-tag">База данных</span>
+      <span class="feature-tag">REST API</span>
+      <span class="feature-tag">Админ панель</span>
+    </div>
+    <div class="tech-stack">
+      <span class="tech-tag">Flask</span>
+      <span class="tech-tag">HTML / CSS / JS</span>
+      <span class="tech-tag">SQLite</span>
+    </div>
+  </div>
+
+</div>
+```
+
+  </section>
+
+  <!-- EDUCATION + LANGUAGES -->
+
+  <section>
+    <div class="section-label"><h2>О себе</h2></div>
+    <div class="bottom-row">
+
+```
+  <div class="info-card">
+    <div class="info-card-title">Образование</div>
+    <p class="edu-text">Неоконченное высшее образование. Постоянно развиваюсь через практику, open-source проекты и самообразование.</p>
+    <span class="edu-badge">Self-taught developer</span>
+  </div>
+
+  <div class="info-card">
+    <div class="info-card-title">Языки</div>
+    <div class="lang-item">
+      <span>Казахский</span>
+      <span class="lang-level">Родной</span>
+    </div>
+    <div class="lang-item">
+      <span>Русский</span>
+      <span class="lang-level">Свободно</span>
+    </div>
+    <div class="lang-item">
+      <span>Английский</span>
+      <span class="lang-level">Технический</span>
+    </div>
+  </div>
+
+</div>
+```
+
+  </section>
+
+  <footer>
+    <p>© 2025 Nurasyl Aliaskhan &nbsp;·&nbsp; Full-Stack Python Developer &nbsp;·&nbsp; Kazakhstan</p>
+  </footer>
+
+</div>
+</body>
