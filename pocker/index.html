@@ -3,423 +3,226 @@
 <style>
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;touch-action:manipulation}
 :root{
-  --tg-bg:#ffffff;--tg-secondary-bg:#f0f0f0;--tg-text:#000000;--tg-hint:#999999;
-  --tg-link:#2481cc;--tg-btn:#2481cc;--tg-btn-text:#ffffff;--tg-accent:#2481cc;
-  --radius:14px;--radius-sm:10px;
+  --bg:#ffffff;--bg2:#f2f2f7;--text:#000000;--hint:#8e8e93;
+  --accent:#2481cc;--g:#34c759;--o:#ff9500;--r:#ff3b30;
+  --rad:16px;--rad-sm:12px;
 }
-html,body{background:var(--tg-bg);color:var(--tg-text);font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;font-size:16px;min-height:100vh}
+html,body{background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSystemFont,sans-serif;height:100%;overflow:hidden}
+body{display:flex;flex-direction:column;height:100svh}
 
-.screen{display:none;flex-direction:column;min-height:100vh;background:var(--tg-bg)}
-.screen.active{display:flex}
+/* ── TOP BAR ── */
+.bar{display:flex;align-items:center;justify-content:space-between;padding:14px 16px 0}
+.stage-dots{display:flex;gap:6px}
+.dot{width:8px;height:8px;border-radius:50%;background:var(--bg2);transition:background .2s}
+.dot.on{background:var(--accent)}
+.dot.done{background:var(--hint)}
+.reset-btn{width:36px;height:36px;border-radius:50%;background:var(--bg2);border:none;font-size:18px;display:flex;align-items:center;justify-content:center;cursor:pointer;color:var(--hint)}
 
-.topbar{padding:16px 16px 8px;display:flex;align-items:center;justify-content:space-between}
-.topbar-title{font-size:18px;font-weight:600;color:var(--tg-text)}
-.topbar-sub{font-size:13px;color:var(--tg-hint);margin-top:2px}
-.new-btn{padding:8px 14px;border-radius:20px;background:var(--tg-secondary-bg);color:var(--tg-text);font-size:13px;font-weight:500;border:none;cursor:pointer}
+/* ── CARDS AREA ── */
+.cards-area{padding:12px 16px 8px;display:flex;flex-direction:column;gap:10px}
 
-.stage-tabs{display:flex;gap:0;margin:0 16px 16px;background:var(--tg-secondary-bg);border-radius:var(--radius-sm);padding:3px}
-.tab{flex:1;padding:8px 4px;font-size:12px;font-weight:500;border-radius:8px;text-align:center;color:var(--tg-hint);background:transparent;border:none;cursor:pointer;transition:all .2s}
-.tab.active{background:var(--tg-bg);color:var(--tg-text);font-weight:600}
-.tab.done{color:var(--tg-accent)}
+.row-label{font-size:11px;font-weight:600;color:var(--hint);letter-spacing:.05em;text-transform:uppercase;margin-bottom:6px}
 
-.section{padding:0 16px 14px}
-.sec-label{font-size:12px;font-weight:600;color:var(--tg-hint);letter-spacing:.04em;text-transform:uppercase;margin-bottom:10px}
+.cards-row{display:flex;gap:8px;align-items:center}
 
-.hole-cards{display:flex;gap:10px;margin-bottom:0}
-.card-big{width:80px;height:112px;border-radius:var(--radius);border:2px dashed var(--tg-secondary-bg);background:var(--tg-secondary-bg);display:flex;flex-direction:column;align-items:center;justify-content:center;cursor:pointer;position:relative;transition:all .15s;flex-shrink:0}
-.card-big.filled{border-style:solid;border-color:var(--tg-accent);background:var(--tg-bg)}
-.card-big .plus{font-size:28px;color:var(--tg-hint)}
-.card-big .add-lbl{font-size:12px;color:var(--tg-hint);margin-top:4px}
-.card-big .rank{font-size:32px;font-weight:700;line-height:1}
-.card-big .suit{font-size:24px;line-height:1;margin-top:2px}
-.card-big.red .rank,.card-big.red .suit{color:#E53935}
-.card-big.blk .rank,.card-big.blk .suit{color:var(--tg-text)}
-.card-big .cx{position:absolute;top:4px;right:6px;font-size:16px;color:var(--tg-hint);font-weight:300;cursor:pointer;padding:4px}
+/* Swipe card — big (hole) */
+.sc{flex-shrink:0;border-radius:var(--rad);background:var(--bg2);display:flex;flex-direction:column;align-items:center;justify-content:center;position:relative;user-select:none;-webkit-user-select:none;cursor:pointer;overflow:visible;border:2px solid transparent;transition:border-color .15s,box-shadow .15s,background .15s}
+.sc.big{width:76px;height:106px}
+.sc.sm{width:52px;height:74px}
+.sc.active{border-color:var(--accent);box-shadow:0 0 0 3px rgba(36,129,204,.2);background:var(--bg)}
+.sc.filled{border-color:var(--accent);background:var(--bg)}
+.sc .plus{font-size:24px;color:var(--hint);line-height:1}
+.sc .r{font-weight:800;line-height:1;color:var(--text)}
+.sc.big .r{font-size:30px}
+.sc.sm .r{font-size:22px}
+.sc .s{line-height:1;margin-top:2px;color:var(--text)}
+.sc.big .s{font-size:22px}
+.sc.sm .s{font-size:16px}
+.sc.red .r,.sc.red .s{color:#ff3b30}
 
-.board-cards{display:flex;gap:7px;flex-wrap:nowrap;overflow-x:auto;padding-bottom:2px}
-.card-sm{width:58px;height:82px;border-radius:10px;border:2px dashed var(--tg-secondary-bg);background:var(--tg-secondary-bg);display:flex;flex-direction:column;align-items:center;justify-content:center;cursor:pointer;position:relative;flex-shrink:0;transition:all .15s}
-.card-sm.filled{border-style:solid;border-color:var(--tg-accent);background:var(--tg-bg)}
-.card-sm .plus{font-size:20px;color:var(--tg-hint)}
-.card-sm .rank{font-size:22px;font-weight:700;line-height:1}
-.card-sm .suit{font-size:17px;line-height:1;margin-top:1px}
-.card-sm.red .rank,.card-sm.red .suit{color:#E53935}
-.card-sm.blk .rank,.card-sm.blk .suit{color:var(--tg-text)}
-.card-sm .cx{position:absolute;top:2px;right:4px;font-size:14px;color:var(--tg-hint);cursor:pointer;padding:3px}
+/* directional arrows */
+.arr{position:absolute;font-weight:800;color:var(--accent);opacity:0;transition:opacity .15s;pointer-events:none;font-size:15px;line-height:1}
+.sc.active .arr{opacity:.8}
+.arr.l{left:-16px;top:50%;transform:translateY(-50%)}
+.arr.r{right:-16px;top:50%;transform:translateY(-50%)}
+.arr.u{top:-16px;left:50%;transform:translateX(-50%);font-size:12px}
+.arr.d{bottom:-16px;left:50%;transform:translateX(-50%);font-size:12px}
 
-.divider{height:0.5px;background:var(--tg-secondary-bg);margin:0 16px 14px}
+/* ── RESULT AREA ── */
+.result{flex:1;display:flex;flex-direction:column;justify-content:center;padding:0 16px;gap:10px}
+.result.hidden{visibility:hidden}
 
-.stats-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
-.stat-card{background:var(--tg-secondary-bg);border-radius:var(--radius-sm);padding:12px 14px}
-.stat-label{font-size:11px;color:var(--tg-hint);font-weight:500;margin-bottom:4px}
-.stat-val{font-size:24px;font-weight:700;color:var(--tg-text)}
-.stat-val.g{color:#43A047}
-.stat-val.o{color:#FF8F00}
-.stat-val.r{color:#E53935}
-.stat-val.sm{font-size:14px;padding-top:4px;line-height:1.3;font-weight:600}
+.win-row{display:flex;align-items:baseline;gap:8px}
+.win-pct{font-size:56px;font-weight:800;line-height:1;transition:color .3s}
+.win-pct.g{color:var(--g)}
+.win-pct.o{color:var(--o)}
+.win-pct.r{color:var(--r)}
+.win-label{font-size:14px;color:var(--hint);font-weight:500}
 
-.bar{height:5px;background:var(--tg-secondary-bg);border-radius:3px;margin-top:6px;overflow:hidden}
-.bar-fill{height:100%;border-radius:3px}
+.hand-name{font-size:17px;font-weight:600;color:var(--text)}
 
-.advice-card{background:var(--tg-secondary-bg);border-radius:var(--radius);padding:14px;margin:0 16px 14px}
-.advice-top{font-size:13px;color:var(--tg-hint);font-weight:500;margin-bottom:6px}
-.advice-body{font-size:15px;color:var(--tg-text);line-height:1.5}
-.advice-actions{display:flex;gap:7px;margin-top:10px;flex-wrap:wrap}
-.act-pill{padding:8px 16px;border-radius:99px;font-size:13px;font-weight:600;border:none;cursor:pointer}
-.ap-fold{background:#FFEBEE;color:#C62828}
-.ap-check{background:#E8F5E9;color:#2E7D32}
-.ap-call{background:#E3F2FD;color:#1565C0}
-.ap-raise{background:#FFF3E0;color:#E65100}
+.action-pill{display:inline-flex;align-items:center;height:36px;padding:0 18px;border-radius:99px;font-size:15px;font-weight:700;margin-top:2px}
+.fold{background:#ff3b3022;color:#ff3b30}
+.check{background:#34c75922;color:#34c759}
+.call{background:#2481cc22;color:#2481cc}
+.raise{background:#ff950022;color:#ff9500}
 
-.meta-row{display:flex;gap:8px;margin:0 16px 14px}
-.meta-inp{flex:1;background:var(--tg-secondary-bg);border-radius:var(--radius-sm);padding:10px 12px;display:flex;flex-direction:column;gap:3px}
-.meta-inp label{font-size:11px;color:var(--tg-hint);font-weight:500}
-.meta-inp input{background:transparent;border:none;outline:none;font-size:17px;font-weight:600;color:var(--tg-text);width:100%}
+/* ── BOTTOM NAV ── */
+.bottom{padding:10px 16px 28px;display:flex;gap:10px;align-items:center}
+.meta-pill{flex:1;height:50px;background:var(--bg2);border-radius:var(--rad-sm);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1px;cursor:pointer;position:relative}
+.meta-pill label{font-size:10px;color:var(--hint);font-weight:500;pointer-events:none}
+.meta-pill input{background:transparent;border:none;outline:none;font-size:16px;font-weight:700;color:var(--text);width:100%;text-align:center;padding:0}
 
-.bottom-action{padding:12px 16px 24px;margin-top:auto}
-.main-btn{width:100%;padding:16px;border-radius:var(--radius);background:var(--tg-btn);color:var(--tg-btn-text);font-size:17px;font-weight:600;border:none;cursor:pointer;letter-spacing:-.2px}
-.main-btn:disabled{opacity:.35;cursor:not-allowed}
-.main-btn.secondary{background:var(--tg-secondary-bg);color:var(--tg-text);margin-top:8px}
+.next-btn{width:54px;height:54px;border-radius:50%;background:var(--accent);border:none;font-size:26px;color:#fff;display:flex;align-items:center;justify-content:center;cursor:pointer;flex-shrink:0;transition:opacity .2s,transform .1s}
+.next-btn:disabled{opacity:.3}
+.next-btn:active{transform:scale(.93)}
+.next-btn.end{background:var(--hint)}
 
-.picker-backdrop{display:none;min-height:100vh;align-items:flex-end;background:rgba(0,0,0,.5);position:fixed;inset:0;z-index:100}
-.picker-backdrop.open{display:flex}
-.picker-sheet{background:var(--tg-bg);border-radius:20px 20px 0 0;padding:0 0 32px;width:100%}
-.picker-handle{width:36px;height:4px;background:var(--tg-secondary-bg);border-radius:2px;margin:10px auto 16px}
-.picker-ttl{font-size:16px;font-weight:600;color:var(--tg-text);text-align:center;margin-bottom:10px}
-
-/* Swipe picker */
-.swipe-hint-row{display:flex;justify-content:center;gap:24px;margin-bottom:10px}
-.swipe-hint{font-size:12px;color:var(--tg-hint);font-weight:500}
-.swipe-arena{display:flex;align-items:center;justify-content:center;gap:16px;margin-bottom:16px}
-.swipe-arrow{width:48px;height:48px;border-radius:50%;background:var(--tg-secondary-bg);font-size:32px;display:flex;align-items:center;justify-content:center;cursor:pointer;color:var(--tg-text);user-select:none;-webkit-user-select:none;transition:background .15s;flex-shrink:0}
-.swipe-arrow:active{background:var(--tg-accent);color:#fff}
-.swipe-card-wrap{display:flex;flex-direction:column;align-items:center;gap:8px}
-.swipe-suit-above,.swipe-suit-below{width:48px;height:36px;border-radius:10px;background:var(--tg-secondary-bg);font-size:20px;display:flex;align-items:center;justify-content:center;cursor:pointer;transition:background .15s;user-select:none;-webkit-user-select:none}
-.swipe-suit-above:active,.swipe-suit-below:active{background:var(--tg-accent);color:#fff}
-.swipe-card-preview{width:110px;height:154px;border-radius:16px;border:3px solid var(--tg-accent);background:var(--tg-bg);display:flex;flex-direction:column;align-items:center;justify-content:center;box-shadow:0 4px 20px rgba(0,0,0,.12);transition:all .2s}
-.swipe-card-preview.used-card{border-color:#E53935;background:#FFEBEE}
-.swipe-rank-disp{font-size:52px;font-weight:800;line-height:1;color:var(--tg-text)}
-.swipe-suit-disp{font-size:38px;line-height:1;margin-top:4px;color:var(--tg-text)}
-.swipe-card-preview.red .swipe-rank-disp,.swipe-card-preview.red .swipe-suit-disp{color:#E53935}
-.swipe-card-preview.empty .swipe-rank-disp,.swipe-card-preview.empty .swipe-suit-disp{color:var(--tg-hint)}
-
-/* indicator strips */
-.swipe-indicators{padding:0 16px;display:flex;flex-direction:column;gap:8px;margin-bottom:4px}
-.swipe-rank-strip,.swipe-suit-strip{display:flex;gap:4px;justify-content:center;flex-wrap:wrap}
-.si-dot{width:24px;height:24px;border-radius:6px;background:var(--tg-secondary-bg);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:var(--tg-hint);cursor:pointer;transition:all .15s;flex-shrink:0}
-.si-dot.active{background:var(--tg-accent);color:#fff}
-.si-dot.used{opacity:.3;cursor:not-allowed}
-.suit-dot{width:36px;height:36px;border-radius:10px;font-size:20px}
-
-.picker-acts{display:flex;gap:8px;padding:0 14px;margin-top:12px}
-.picker-acts button{flex:1;height:50px;border-radius:var(--radius-sm);font-size:16px;font-weight:600;border:none;cursor:pointer}
-.picker-acts .cancel{background:var(--tg-secondary-bg);color:var(--tg-text)}
-.picker-acts .confirm{background:var(--tg-btn);color:var(--tg-btn-text)}
-.picker-acts .confirm:disabled{opacity:.35;cursor:not-allowed}
+.dismiss{display:none;position:fixed;inset:0;z-index:1}
+.dismiss.on{display:block}
 </style>
 
-<div class="screen active" id="screen-main">
-  <div class="topbar">
-    <div><div class="topbar-title">Покер-бот</div><div class="topbar-sub" id="stage-sub">Выберите карты</div></div>
-    <button class="new-btn" onclick="resetGame()">Новая рука</button>
-  </div>
+<div class="dismiss" id="dz" onclick="deactivate()"></div>
 
-  <div class="stage-tabs">
-    <button class="tab active" id="t0">Пре-флоп</button>
-    <button class="tab" id="t1">Флоп</button>
-    <button class="tab" id="t2">Тёрн</button>
-    <button class="tab" id="t3">Ривер</button>
+<div class="bar">
+  <div class="stage-dots">
+    <div class="dot on" id="d0"></div>
+    <div class="dot" id="d1"></div>
+    <div class="dot" id="d2"></div>
+    <div class="dot" id="d3"></div>
   </div>
+  <button class="reset-btn" onclick="resetGame()">↺</button>
+</div>
 
-  <div class="section">
-    <div class="sec-label">Мои карты</div>
-    <div class="hole-cards">
-      <div class="card-big" id="h0" onclick="openP('h',0)"><span class="plus">+</span><span class="add-lbl">карта 1</span></div>
-      <div class="card-big" id="h1" onclick="openP('h',1)"><span class="plus">+</span><span class="add-lbl">карта 2</span></div>
+<div class="cards-area">
+  <!-- Hole cards -->
+  <div>
+    <div class="row-label">Мои карты</div>
+    <div class="cards-row">
+      <div class="sc big" id="h0" style="z-index:2"></div>
+      <div class="sc big" id="h1" style="z-index:2"></div>
     </div>
   </div>
-
+  <!-- Board -->
   <div id="board-wrap" style="display:none">
-    <div class="divider"></div>
-    <div class="section">
-      <div class="sec-label" id="board-lbl">Борд</div>
-      <div class="board-cards" id="board-row"></div>
-    </div>
-  </div>
-
-  <div id="stats-wrap" style="display:none">
-    <div class="divider"></div>
-    <div class="section">
-      <div class="stats-grid">
-        <div class="stat-card">
-          <div class="stat-label">Шанс выиграть</div>
-          <div class="stat-val" id="sv-win">—</div>
-          <div class="bar"><div class="bar-fill" id="bar-fill" style="width:0%;background:#43A047"></div></div>
-        </div>
-        <div class="stat-card">
-          <div class="stat-label">Текущая рука</div>
-          <div class="stat-val sm" id="sv-hand">—</div>
-        </div>
-        <div class="stat-card">
-          <div class="stat-label">Пот-оддсы</div>
-          <div class="stat-val" id="sv-odds">—</div>
-        </div>
-        <div class="stat-card">
-          <div class="stat-label">EV ставки</div>
-          <div class="stat-val" id="sv-ev">—</div>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <div id="advice-wrap" style="display:none">
-    <div class="advice-card">
-      <div class="advice-top">Рекомендация</div>
-      <div class="advice-body" id="adv-body">...</div>
-      <div class="advice-actions" id="adv-pills"></div>
-    </div>
-  </div>
-
-  <div class="divider"></div>
-  <div class="meta-row">
-    <div class="meta-inp"><label>Банк</label><input type="number" id="pot" value="100" step="10" oninput="onMetaChange()"></div>
-    <div class="meta-inp"><label>Ставка</label><input type="number" id="bet" value="20" step="5" oninput="onMetaChange()"></div>
-    <div class="meta-inp"><label>Игроков</label><input type="number" id="plr" value="4" min="2" max="9" oninput="onMetaChange()"></div>
-  </div>
-
-  <div class="bottom-action">
-    <button class="main-btn" id="main-btn" disabled onclick="nextStage()">Открыть флоп</button>
+    <div class="row-label" id="board-lbl">Борд</div>
+    <div class="cards-row" id="board-row"></div>
   </div>
 </div>
 
-<div class="picker-backdrop" id="picker-bd" onclick="maybeCls(event)">
-  <div class="picker-sheet" onclick="event.stopPropagation()">
-    <div class="picker-handle"></div>
-    <div class="picker-ttl">Выберите карту</div>
-
-    <!-- Swipe card picker -->
-    <div class="swipe-picker" id="swipe-picker">
-      <div class="swipe-hint-row">
-        <span class="swipe-hint">← → значение</span>
-        <span class="swipe-hint">↑ ↓ масть</span>
-      </div>
-      <div class="swipe-arena" id="swipe-arena">
-        <div class="swipe-arrow swipe-left" id="swipe-btn-left" onclick="swipeRank(-1)">‹</div>
-        <div class="swipe-card-wrap">
-          <div class="swipe-suit-above" id="swipe-suit-up" onclick="swipeSuit(-1)">▲</div>
-          <div class="swipe-card-preview" id="swipe-preview">
-            <div class="swipe-rank-disp" id="swipe-rank-disp">?</div>
-            <div class="swipe-suit-disp" id="swipe-suit-disp">?</div>
-          </div>
-          <div class="swipe-suit-below" id="swipe-suit-down" onclick="swipeSuit(1)">▼</div>
-        </div>
-        <div class="swipe-arrow swipe-right" id="swipe-btn-right" onclick="swipeRank(1)">›</div>
-      </div>
-      <div class="swipe-indicators">
-        <div class="swipe-rank-strip" id="swipe-rank-strip"></div>
-        <div class="swipe-suit-strip" id="swipe-suit-strip"></div>
-      </div>
-    </div>
-
-    <div class="picker-acts">
-      <button class="cancel" onclick="closeP()">Отмена</button>
-      <button class="confirm" id="p-ok" onclick="confirmCard()" disabled>Добавить</button>
-    </div>
+<div class="result hidden" id="result">
+  <div class="win-row">
+    <div class="win-pct" id="win-pct">—</div>
+    <div class="win-label">шанс выиграть</div>
   </div>
+  <div class="hand-name" id="hand-name"></div>
+  <div id="action-pill"></div>
+</div>
+
+<div class="bottom">
+  <div class="meta-pill"><label>Банк</label><input type="number" id="pot" value="100" step="10" inputmode="numeric" oninput="onMeta()"></div>
+  <div class="meta-pill"><label>Ставка</label><input type="number" id="bet" value="0" step="5" inputmode="numeric" oninput="onMeta()"></div>
+  <div class="meta-pill"><label>Игроки</label><input type="number" id="plr" value="4" min="2" max="9" inputmode="numeric" oninput="onMeta()"></div>
+  <button class="next-btn" id="next-btn" disabled onclick="nextStage()">›</button>
 </div>
 
 <script>
 (function(){
   const tg=window.Telegram&&window.Telegram.WebApp;
-  if(tg){
-    tg.ready();tg.expand();
-    const c=tg.themeParams||{};
-    const set=(v,val)=>val&&document.documentElement.style.setProperty(v,val);
-    set('--tg-bg',c.bg_color);
-    set('--tg-secondary-bg',c.secondary_bg_color);
-    set('--tg-text',c.text_color);
-    set('--tg-hint',c.hint_color);
-    set('--tg-link',c.link_color);
-    set('--tg-btn',c.button_color);
-    set('--tg-btn-text',c.button_text_color);
-    set('--tg-accent',c.button_color||c.link_color);
-  }
+  if(tg){tg.ready();tg.expand();const c=tg.themeParams||{};const s=(v,val)=>val&&document.documentElement.style.setProperty(v,val);s('--bg',c.bg_color);s('--bg2',c.secondary_bg_color);s('--text',c.text_color);s('--hint',c.hint_color);s('--accent',c.button_color||c.link_color);}
 })();
 
 const RANKS=['2','3','4','5','6','7','8','9','10','J','Q','K','A'];
 const SUITS=['♠','♥','♦','♣'];
 const RV={'2':2,'3':3,'4':4,'5':5,'6':6,'7':7,'8':8,'9':9,'10':10,'J':11,'Q':12,'K':13,'A':14};
 const RED=['♥','♦'];
-
 let G={stage:0,hole:[null,null],board:[],used:new Set()};
-let P={t:null,i:null,s:null,r:null};
-let lastKey='';
+let AC=null,lastKey='';
 
 function ck(r,s){return r+s}
+function haptic(t='light'){const tg=window.Telegram&&window.Telegram.WebApp;if(tg&&tg.HapticFeedback)tg.HapticFeedback.impactOccurred(t);}
 
-function haptic(t='light'){
-  const tg=window.Telegram&&window.Telegram.WebApp;
-  if(tg&&tg.HapticFeedback)tg.HapticFeedback.impactOccurred(t);
+/* ── Render ────────────────────────────────────────── */
+function rCard(el,card,big,isActive){
+  const sz=big?'big':'sm';
+  const isRed=card&&RED.includes(card.s);
+  el.className='sc '+sz+(card?' filled':'')+(isRed?' red':'')+(isActive?' active':'');
+  if(!card){el.innerHTML='<span class="plus">+</span>'+(isActive?arrows():'');return;}
+  el.innerHTML='<span class="r">'+card.r+'</span><span class="s">'+card.s+'</span>'+arrows();
 }
+function arrows(){return '<span class="arr l">‹</span><span class="arr r">›</span><span class="arr u">▲</span><span class="arr d">▼</span>';}
 
-function drawHoleCard(el,card,idx){
-  if(!card){
-    el.className='card-big';
-    el.innerHTML=`<span class="plus">+</span><span class="add-lbl">карта ${idx+1}</span>`;
-    el.onclick=()=>{haptic();openP('h',idx)};return;
-  }
-  const r=RED.includes(card.s);
-  el.className='card-big filled '+(r?'red':'blk');
-  el.onclick=null;
-  el.innerHTML=`<span class="cx" onclick="rem('h',${idx});haptic()">×</span><span class="rank">${card.r}</span><span class="suit">${card.s}</span>`;
-}
-
-function drawSmCard(el,card,type,idx){
-  if(!card){
-    el.className='card-sm';
-    el.innerHTML='<span class="plus">+</span>';
-    el.onclick=()=>{haptic();openP(type,idx)};return;
-  }
-  const r=RED.includes(card.s);
-  el.className='card-sm filled '+(r?'red':'blk');
-  el.onclick=null;
-  el.innerHTML=`<span class="cx" onclick="rem('${type}',${idx});haptic()">×</span><span class="rank">${card.r}</span><span class="suit">${card.s}</span>`;
-}
-
-function drawHole(){for(let i=0;i<2;i++)drawHoleCard(document.getElementById('h'+i),G.hole[i],i);}
-
+function drawHole(){for(let i=0;i<2;i++){const el=document.getElementById('h'+i);rCard(el,G.hole[i],true,AC&&AC.type==='h'&&AC.idx===i);attachT(el,'h',i,true);}}
 function drawBoard(){
-  const n=[0,3,4,5][G.stage];
-  const row=document.getElementById('board-row');
-  row.innerHTML='';
-  for(let i=0;i<n;i++){
-    const el=document.createElement('div');el.id='b'+i;row.appendChild(el);
-    drawSmCard(el,G.board[i]||null,'b',i);
-  }
+  const n=[0,3,4,5][G.stage];const row=document.getElementById('board-row');row.innerHTML='';
+  for(let i=0;i<n;i++){const el=document.createElement('div');el.id='b'+i;el.style.zIndex=2;row.appendChild(el);rCard(el,G.board[i]||null,false,AC&&AC.type==='b'&&AC.idx===i);attachT(el,'b',i,false);}
 }
 
-function rem(t,i){
-  haptic();
-  if(t==='h'){if(G.hole[i])G.used.delete(ck(G.hole[i].r,G.hole[i].s));G.hole[i]=null;drawHole();}
-  else{if(G.board[i])G.used.delete(ck(G.board[i].r,G.board[i].s));G.board[i]=null;drawBoard();}
-  lastKey='';update();
-}
-
-function openP(type,idx){
-  P={t:type,i:idx,s:null,r:null};
-  // default to first available rank & suit
-  P.rIdx=0; P.sIdx=0;
-  // find first non-used rank for current suit
-  updateSwipePicker();
-  document.getElementById('p-ok').disabled=true;
-  document.getElementById('picker-bd').classList.add('open');
-  // Touch swipe support
-  initSwipeGestures();
-}
-
-let _swipeStartX=0,_swipeStartY=0;
-function initSwipeGestures(){
-  const arena=document.getElementById('swipe-arena');
-  arena.ontouchstart=e=>{_swipeStartX=e.touches[0].clientX;_swipeStartY=e.touches[0].clientY;};
-  arena.ontouchend=e=>{
-    const dx=e.changedTouches[0].clientX-_swipeStartX;
-    const dy=e.changedTouches[0].clientY-_swipeStartY;
-    if(Math.abs(dx)>Math.abs(dy)){
-      if(dx>30)swipeRank(-1); else if(dx<-30)swipeRank(1);
-    } else {
-      if(dy>30)swipeSuit(-1); else if(dy<-30)swipeSuit(1);
+/* ── Touch ─────────────────────────────────────────── */
+function attachT(el,type,idx,big){
+  let sx=0,sy=0;
+  el.ontouchstart=e=>{sx=e.touches[0].clientX;sy=e.touches[0].clientY;};
+  el.ontouchmove=e=>{if(AC&&AC.type===type&&AC.idx===idx)e.preventDefault();};
+  el.ontouchend=e=>{
+    const dx=e.changedTouches[0].clientX-sx,dy=e.changedTouches[0].clientY-sy;
+    const adx=Math.abs(dx),ady=Math.abs(dy),T=18;
+    if(adx<T&&ady<T){
+      if(AC&&AC.type===type&&AC.idx===idx){deactivate();return;}
+      activate(el,type,idx,big);return;
     }
+    if(!AC||AC.type!==type||AC.idx!==idx){activate(el,type,idx,big);return;}
+    if(adx>=ady&&adx>T)nudgeR(dx>0?-1:1);
+    else if(ady>adx&&ady>T)nudgeS(dy>0?-1:1);
   };
 }
 
-function swipeRank(dir){
+function activate(el,type,idx,big){
+  if(AC){blur(AC);}
+  const card=type==='h'?G.hole[idx]:(G.board[idx]||null);
+  AC={type,idx,big,el,rIdx:card?RANKS.indexOf(card.r):0,sIdx:card?SUITS.indexOf(card.s):0};
+  document.getElementById('dz').className='dismiss on';
   haptic('light');
-  const n=RANKS.length;
-  // find next non-used in direction
-  let idx=P.rIdx;
-  for(let i=1;i<n;i++){
-    idx=((P.rIdx===null?0:P.rIdx)+dir*i+n)%n;
-    const k=P.s?ck(RANKS[idx],P.s):null;
-    if(!k||!G.used.has(k)){P.rIdx=idx;break;}
-  }
-  P.r=RANKS[P.rIdx];
-  updateSwipePicker();
+  if(!card)commit();else{rCard(el,card,big,true);attachT(el,type,idx,big);}
+}
+function blur(ac){
+  const card=ac.type==='h'?G.hole[ac.idx]:(G.board[ac.idx]||null);
+  rCard(ac.el,card,ac.big,false);attachT(ac.el,ac.type,ac.idx,ac.big);
+}
+function deactivate(){
+  if(!AC)return;
+  blur(AC);AC=null;
+  document.getElementById('dz').className='dismiss';
 }
 
-function swipeSuit(dir){
-  haptic('light');
-  const n=SUITS.length;
-  let idx=P.sIdx;
-  for(let i=1;i<n;i++){
-    idx=((P.sIdx===null?0:P.sIdx)+dir*i+n)%n;
-    P.sIdx=idx;break;
-  }
-  P.s=SUITS[P.sIdx];
-  // if current rank+suit is used, try to find free rank
-  if(P.r&&G.used.has(ck(P.r,P.s))){P.r=null;P.rIdx=null;}
-  updateSwipePicker();
+function commit(){
+  if(!AC)return;
+  const r=RANKS[AC.rIdx],s=SUITS[AC.sIdx],key=ck(r,s);
+  const old=AC.type==='h'?G.hole[AC.idx]:G.board[AC.idx];
+  if(old)G.used.delete(ck(old.r,old.s));
+  if(!G.used.has(key)){G.used.add(key);const c={r,s};if(AC.type==='h')G.hole[AC.idx]=c;else G.board[AC.idx]=c;}
+  rCard(AC.el,AC.type==='h'?G.hole[AC.idx]:G.board[AC.idx],AC.big,true);
+  attachT(AC.el,AC.type,AC.idx,AC.big);
+  lastKey='';update();
 }
 
-function updateSwipePicker(){
-  const rankEl=document.getElementById('swipe-rank-disp');
-  const suitEl=document.getElementById('swipe-suit-disp');
-  const preview=document.getElementById('swipe-preview');
-  const strip=document.getElementById('swipe-rank-strip');
-  const sstrip=document.getElementById('swipe-suit-strip');
-
-  // current values
-  const r=P.rIdx!==null?RANKS[P.rIdx]:null;
-  const s=P.sIdx!==null?SUITS[P.sIdx]:null;
-  P.r=r; P.s=s;
-
-  const isRed=s==='♥'||s==='♦';
-  const isUsed=r&&s&&G.used.has(ck(r,s));
-
-  preview.className='swipe-card-preview'+(r&&s?' ':' empty')+(isRed?' red':'')+(isUsed?' used-card':'');
-  rankEl.textContent=r||'?';
-  suitEl.textContent=s||'?';
-
-  // rank indicator strip
-  strip.innerHTML='';
-  RANKS.forEach((rk,i)=>{
-    const d=document.createElement('div');
-    d.className='si-dot'+(i===P.rIdx?' active':'');
-    const k=s?ck(rk,s):null;
-    if(k&&G.used.has(k))d.classList.add('used');
-    d.textContent=rk;
-    d.onclick=()=>{if(!d.classList.contains('used')){haptic('light');P.rIdx=i;P.r=RANKS[i];updateSwipePicker();}};
-    strip.appendChild(d);
-  });
-
-  // suit indicator strip
-  sstrip.innerHTML='';
-  SUITS.forEach((su,i)=>{
-    const d=document.createElement('div');
-    d.className='si-dot suit-dot'+(i===P.sIdx?' active':'');
-    d.style.color=(su==='♥'||su==='♦')?'#E53935':'';
-    d.textContent=su;
-    d.onclick=()=>{haptic('light');P.sIdx=i;P.s=SUITS[i];if(P.r&&G.used.has(ck(P.r,P.s))){P.r=null;P.rIdx=null;}updateSwipePicker();};
-    sstrip.appendChild(d);
-  });
-
-  const ok=r&&s&&!isUsed;
-  document.getElementById('p-ok').disabled=!ok;
+function nudgeR(dir){
+  if(!AC)return;haptic('light');
+  const n=RANKS.length,s=SUITS[AC.sIdx];
+  const old=AC.type==='h'?G.hole[AC.idx]:G.board[AC.idx];
+  const oldKey=old?ck(old.r,old.s):null;
+  for(let i=1;i<n;i++){const ni=((AC.rIdx+dir*i)+n*99)%n;const k=ck(RANKS[ni],s);if(!G.used.has(k)||k===oldKey){AC.rIdx=ni;break;}}
+  commit();
+}
+function nudgeS(dir){
+  if(!AC)return;haptic('light');
+  const n=SUITS.length,r=RANKS[AC.rIdx];
+  const old=AC.type==='h'?G.hole[AC.idx]:G.board[AC.idx];
+  const oldKey=old?ck(old.r,old.s):null;
+  for(let i=1;i<n;i++){const ni=((AC.sIdx+dir*i)+n*99)%n;const k=ck(r,SUITS[ni]);if(!G.used.has(k)||k===oldKey){AC.sIdx=ni;break;}}
+  commit();
 }
 
-function buildRanks(){} // kept for compat, no-op now
-
-function confirmCard(){
-  haptic('medium');
-  const c={r:P.r,s:P.s};const k=ck(c.r,c.s);
-  if(G.used.has(k))return;
-  G.used.add(k);
-  if(P.t==='h'){G.hole[P.i]=c;drawHole();}
-  else{G.board[P.i]=c;drawBoard();}
-  closeP();lastKey='';update();
-}
-
-function closeP(){document.getElementById('picker-bd').classList.remove('open');}
-function maybeCls(e){if(e.target===document.getElementById('picker-bd'))closeP();}
-
+/* ── Poker logic ───────────────────────────────────── */
 function holeOk(){return G.hole[0]&&G.hole[1];}
 function boardOk(){const n=[0,3,4,5][G.stage];for(let i=0;i<n;i++)if(!G.board[i])return false;return true;}
 
@@ -448,157 +251,111 @@ function monteCarlo(){
   const hole=G.hole.filter(Boolean),board=G.board.filter(Boolean);
   const n=parseInt(document.getElementById('plr').value)||4;
   if(hole.length<2)return 0;
-  const deck=[];
-  RANKS.forEach(r=>SUITS.forEach(s=>{if(!G.used.has(ck(r,s)))deck.push({r,s});}));
+  const deck=[];RANKS.forEach(r=>SUITS.forEach(s=>{if(!G.used.has(ck(r,s)))deck.push({r,s});}));
   function sh(a){for(let i=a.length-1;i>0;i--){const j=0|Math.random()*(i+1);[a[i],a[j]]=[a[j],a[i]];}return a;}
-  const need=5-board.length;let wins=0;const T=600;
-  for(let t=0;t<T;t++){
-    const d=sh([...deck]);const comm=d.slice(0,need);
-    const my=evalHand([...hole,...board,...comm]).s;
-    let best=my;
-    for(let p=1;p<n;p++){const oc=d.slice(need+(p-1)*2,need+p*2);if(oc.length<2)continue;const os=evalHand([...hole,...board,...comm,...oc]).s;if(os>best)best=os;}
-    if(my>=best)wins++;
-  }
+  const need=5-board.length;let wins=0;const T=500;
+  for(let t=0;t<T;t++){const d=sh([...deck]);const comm=d.slice(0,need);const my=evalHand([...hole,...board,...comm]).s;let best=my;for(let p=1;p<n;p++){const oc=d.slice(need+(p-1)*2,need+p*2);if(oc.length<2)continue;const os=evalHand([...hole,...board,...comm,...oc]).s;if(os>best)best=os;}if(my>=best)wins++;}
   return Math.round(wins/T*100);
 }
 
 function preflopAdvice(){
   const h=G.hole;if(!h[0]||!h[1])return null;
-  const r1=RV[h[0].r],r2=RV[h[1].r];
-  const suited=h[0].s===h[1].s,pair=r1===r2;
+  const r1=RV[h[0].r],r2=RV[h[1].r];const suited=h[0].s===h[1].s,pair=r1===r2;
   const hi=Math.max(r1,r2),lo=Math.min(r1,r2),gap=hi-lo;
-  if(pair){if(r1>=10)return{txt:`Пара ${h[0].r} — отличный старт! Рейз.`,act:'raise',pct:72}; if(r1>=7)return{txt:`Пара ${h[0].r} — хорошо. Рейз.`,act:'raise',pct:58};return{txt:`Мелкая пара. Колл если дёшево.`,act:'call',pct:42};}
-  if(hi===14&&lo>=11)return{txt:`${h[0].r}+${h[1].r} — топовая рука! Рейз!`,act:'raise_big',pct:82};
-  if(hi===14&&lo>=10)return{txt:`Туз с хорошим кикером. Рейз.`,act:'raise',pct:65};
-  if(hi===14)return{txt:`Туз, слабый кикер. Колл${suited?' (мастевые)':''}.`,act:'call',pct:50};
-  if(hi>=12&&gap<=2)return{txt:`Высокие коннекторы${suited?' мастевые':''} — рейз.`,act:'raise',pct:60};
-  if(suited&&gap<=3&&hi>=9)return{txt:`Мастевые коннекторы — колл.`,act:'call',pct:48};
-  if(hi>=10&&lo>=8)return{txt:`Хорошие карты — колл.`,act:'call',pct:44};
-  return{txt:`Слабая рука — лучше пас.`,act:'fold',pct:26};
+  if(pair){if(r1>=10)return{act:'raise',pct:72,txt:'Пара '+h[0].r};if(r1>=7)return{act:'raise',pct:58,txt:'Пара '+h[0].r};return{act:'call',pct:42,txt:'Мелкая пара'};}
+  if(hi===14&&lo>=11)return{act:'raise',pct:82,txt:h[0].r+h[1].r+' топ'};
+  if(hi===14&&lo>=10)return{act:'raise',pct:65,txt:'Туз+кикер'};
+  if(hi===14)return{act:'call',pct:50,txt:'Туз'+(suited?' мастевой':'')};
+  if(hi>=12&&gap<=2)return{act:'raise',pct:60,txt:'Коннекторы'+(suited?' мастевые':'')};
+  if(suited&&gap<=3&&hi>=9)return{act:'call',pct:48,txt:'Мастевые коннекторы'};
+  if(hi>=10&&lo>=8)return{act:'call',pct:44,txt:'Хорошие карты'};
+  return{act:'fold',pct:26,txt:'Слабая рука'};
 }
 
-function getAdvice(win,hand,potOdds){
-  const s=hand.s;let act,txt;
-  if(s>=8){act='raise_big';txt=`${hand.n} — монстр! Жми максимально.`;}
-  else if(s>=6){act='raise';txt=`${hand.n} — очень сильно. Рейз!`;}
-  else if(s>=5){act='raise';txt=`${hand.n} — хорошая рука. Ставь.`;}
-  else if(s===4){act='call';txt=`${hand.n} — средне. Колл.`;}
-  else if(s===3){act=win>=45?'call':'check';txt=`${hand.n} — осторожно.`;}
-  else if(s===2){act=win>=40?'call':'check';txt=`${hand.n} — слабовато.`;}
-  else{act=win>=35?'check':'fold';txt=`Старшая карта — мало шансов.`;}
-  if(potOdds!==null&&win<potOdds){act='fold';txt+=` Пот-оддсы невыгодны (нужно ${potOdds}%).`;}
-  else if(potOdds!==null&&win>potOdds+15&&(act==='check'||act==='call')){act='raise';txt+=` Шансы хорошие — поднимай!`;}
-  return{txt,act};
+function getAct(win,potOdds){
+  let act;
+  if(win>=65)act='raise';
+  else if(win>=50)act='call';
+  else if(win>=35)act='check';
+  else act='fold';
+  if(potOdds!==null&&win<potOdds)act='fold';
+  else if(potOdds!==null&&win>potOdds+15&&act==='check')act='raise';
+  return act;
 }
 
-function renderPills(act,pot){
-  const r=Math.round(pot*.75/5)*5;
-  const rb=Math.round(pot*1.5/5)*5;
-  const map={
-    fold:'<button class="act-pill ap-fold">Пас</button>',
-    check:'<button class="act-pill ap-check">Чек</button><button class="act-pill ap-call">Колл</button>',
-    call:`<button class="act-pill ap-call">Колл</button><button class="act-pill ap-check">Чек</button>`,
-    raise:`<button class="act-pill ap-raise">Рейз ~${r}</button><button class="act-pill ap-call">Колл</button>`,
-    raise_big:`<button class="act-pill ap-raise">Рейз ~${rb}</button><button class="act-pill ap-call">Колл</button>`
-  };
-  return map[act]||map.check;
-}
+const ACT_MAP={fold:{cls:'fold',txt:'Пас'},check:{cls:'check',txt:'Чек'},call:{cls:'call',txt:'Колл'},raise:{cls:'raise',txt:'Рейз'}};
 
 function update(){
-  const nb=document.getElementById('main-btn');
+  const nb=document.getElementById('next-btn');
   const ok=holeOk()&&boardOk();
-  nb.disabled=!ok||G.stage>=3;
+  nb.disabled=!ok;
+  nb.className='next-btn'+(G.stage>=3?' end':'');
+  nb.textContent=G.stage>=3?'↺':'›';
+  nb.onclick=G.stage>=3?resetGame:nextStage;
 
-  if(!holeOk()){
-    document.getElementById('stats-wrap').style.display='none';
-    document.getElementById('advice-wrap').style.display='none';
-    return;
-  }
+  const res=document.getElementById('result');
+  if(!holeOk()){res.className='result hidden';return;}
 
-  const key=JSON.stringify({h:G.hole,b:G.board.filter(Boolean),s:G.stage,
-    pot:document.getElementById('pot').value,
-    bet:document.getElementById('bet').value,
-    plr:document.getElementById('plr').value});
+  const key=JSON.stringify({h:G.hole,b:G.board.filter(Boolean),s:G.stage,pot:document.getElementById('pot').value,bet:document.getElementById('bet').value,plr:document.getElementById('plr').value});
   if(key===lastKey)return;lastKey=key;
 
-  const cards=[...G.hole.filter(Boolean),...G.board.filter(Boolean)];
-  const hand=evalHand(cards);
+  let win,act,handTxt;
   const pot=parseFloat(document.getElementById('pot').value)||100;
   const bet=parseFloat(document.getElementById('bet').value)||0;
   const potOdds=bet>0?Math.round(bet/(pot+bet)*100):null;
 
-  let win,advice;
-  if(G.stage===0){const pa=preflopAdvice();if(!pa)return;win=pa.pct;advice={txt:pa.txt,act:pa.act};}
-  else{win=monteCarlo();advice=getAdvice(win,hand,potOdds);}
+  if(G.stage===0){
+    const pa=preflopAdvice();if(!pa)return;
+    win=pa.pct;act=pa.act;handTxt=pa.txt;
+  } else {
+    const cards=[...G.hole.filter(Boolean),...G.board.filter(Boolean)];
+    const hand=evalHand(cards);
+    win=monteCarlo();act=getAct(win,potOdds);handTxt=hand.n;
+  }
 
-  const color=win>=55?'#43A047':win>=35?'#FF8F00':'#E53935';
-  const wEl=document.getElementById('sv-win');
+  const wEl=document.getElementById('win-pct');
   wEl.textContent=win+'%';
-  wEl.className='stat-val '+(win>=55?'g':win>=35?'o':'r');
-  document.getElementById('bar-fill').style.width=win+'%';
-  document.getElementById('bar-fill').style.background=color;
-  document.getElementById('sv-hand').textContent=hand.n;
-
-  if(potOdds!==null){
-    document.getElementById('sv-odds').textContent=potOdds+'%';
-    document.getElementById('sv-odds').className='stat-val '+(win>potOdds?'g':'r');
-  } else {
-    document.getElementById('sv-odds').textContent='—';
-    document.getElementById('sv-odds').className='stat-val';
-  }
-
-  if(bet>0){
-    const ev=Math.round((win/100)*pot-(1-win/100)*bet);
-    document.getElementById('sv-ev').textContent=(ev>=0?'+':'')+ev;
-    document.getElementById('sv-ev').className='stat-val '+(ev>=0?'g':'r');
-  } else {
-    document.getElementById('sv-ev').textContent='—';
-    document.getElementById('sv-ev').className='stat-val';
-  }
-
-  document.getElementById('stats-wrap').style.display='';
-  document.getElementById('adv-body').textContent=advice.txt;
-  document.getElementById('adv-pills').innerHTML=renderPills(advice.act,pot);
-  document.getElementById('advice-wrap').style.display='';
+  wEl.className='win-pct '+(win>=55?'g':win>=35?'o':'r');
+  document.getElementById('hand-name').textContent=handTxt;
+  const a=ACT_MAP[act]||ACT_MAP.check;
+  document.getElementById('action-pill').innerHTML='<span class="action-pill '+a.cls+'">'+a.txt+'</span>';
+  res.className='result';
 }
 
 function nextStage(){
-  haptic('medium');
+  if(G.stage>=3){resetGame();return;}
+  haptic('medium');deactivate();
   G.stage++;G.board=G.board.filter(Boolean);
-  updateStageUI();lastKey='';update();
+  updateUI();lastKey='';update();
 }
 
-function updateStageUI(){
-  const subs=['Выберите карты','Введите флоп','Введите тёрн','Введите ривер'];
-  const btnLbls=['Открыть флоп','Открыть тёрн','Открыть ривер','Конец раздачи'];
-  const brdLbls=['','Флоп (3 карты)','Тёрн (4-я карта)','Ривер (5-я карта)'];
-  for(let i=0;i<4;i++){const t=document.getElementById('t'+i);t.className='tab'+(i===G.stage?' active':i<G.stage?' done':'');}
-  document.getElementById('stage-sub').textContent=subs[G.stage];
-  const nb=document.getElementById('main-btn');
-  nb.textContent=btnLbls[G.stage];
-  if(G.stage>=3)nb.disabled=true;
+function updateUI(){
+  // dots
+  for(let i=0;i<4;i++){const d=document.getElementById('d'+i);d.className='dot'+(i===G.stage?' on':i<G.stage?' done':'');}
+  // board
   if(G.stage>=1){
+    const lbl=['','Флоп','Тёрн','Ривер'];
     document.getElementById('board-wrap').style.display='';
-    document.getElementById('board-lbl').textContent=brdLbls[G.stage];
+    document.getElementById('board-lbl').textContent=lbl[G.stage];
     drawBoard();
   } else {
     document.getElementById('board-wrap').style.display='none';
   }
 }
 
-function onMetaChange(){lastKey='';update();}
+function onMeta(){lastKey='';update();}
 
 function resetGame(){
-  haptic('medium');
+  haptic('medium');deactivate();
   G={stage:0,hole:[null,null],board:[],used:new Set()};lastKey='';
-  drawHole();
   document.getElementById('board-wrap').style.display='none';
-  document.getElementById('stats-wrap').style.display='none';
-  document.getElementById('advice-wrap').style.display='none';
-  updateStageUI();
-  document.getElementById('main-btn').disabled=true;
-  document.getElementById('main-btn').onclick=nextStage;
+  document.getElementById('result').className='result hidden';
+  updateUI();drawHole();
+  document.getElementById('next-btn').disabled=true;
+  document.getElementById('next-btn').textContent='›';
+  document.getElementById('next-btn').onclick=nextStage;
+  document.getElementById('next-btn').className='next-btn';
 }
 
-drawHole();updateStageUI();
+drawHole();updateUI();
 </script>
