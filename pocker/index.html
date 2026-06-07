@@ -1,4 +1,4 @@
-
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <script src="https://telegram.org/js/telegram-web-app.js"></script>
 <style>
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;touch-action:manipulation}
@@ -80,19 +80,37 @@ html,body{background:var(--tg-bg);color:var(--tg-text);font-family:-apple-system
 .main-btn:disabled{opacity:.35;cursor:not-allowed}
 .main-btn.secondary{background:var(--tg-secondary-bg);color:var(--tg-text);margin-top:8px}
 
-.picker-backdrop{display:none;min-height:600px;align-items:flex-end;background:rgba(0,0,0,.5)}
+.picker-backdrop{display:none;min-height:100vh;align-items:flex-end;background:rgba(0,0,0,.5);position:fixed;inset:0;z-index:100}
 .picker-backdrop.open{display:flex}
 .picker-sheet{background:var(--tg-bg);border-radius:20px 20px 0 0;padding:0 0 32px;width:100%}
 .picker-handle{width:36px;height:4px;background:var(--tg-secondary-bg);border-radius:2px;margin:10px auto 16px}
-.picker-ttl{font-size:16px;font-weight:600;color:var(--tg-text);text-align:center;margin-bottom:14px}
-.suits-row{display:flex;gap:8px;padding:0 14px;margin-bottom:14px}
-.suit-btn{flex:1;height:56px;border-radius:var(--radius-sm);background:var(--tg-secondary-bg);font-size:26px;display:flex;align-items:center;justify-content:center;border:2px solid transparent;cursor:pointer;transition:all .15s}
-.suit-btn.sel{border-color:var(--tg-accent);background:var(--tg-bg)}
-.ranks-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:6px;padding:0 14px;margin-bottom:16px}
-.rank-btn{height:48px;border-radius:var(--radius-sm);background:var(--tg-secondary-bg);font-size:14px;font-weight:600;color:var(--tg-text);display:flex;align-items:center;justify-content:center;border:2px solid transparent;cursor:pointer;transition:all .15s}
-.rank-btn.sel{border-color:var(--tg-accent);background:var(--tg-bg);color:var(--tg-accent)}
-.rank-btn.used{opacity:.25;cursor:not-allowed}
-.picker-acts{display:flex;gap:8px;padding:0 14px}
+.picker-ttl{font-size:16px;font-weight:600;color:var(--tg-text);text-align:center;margin-bottom:10px}
+
+/* Swipe picker */
+.swipe-hint-row{display:flex;justify-content:center;gap:24px;margin-bottom:10px}
+.swipe-hint{font-size:12px;color:var(--tg-hint);font-weight:500}
+.swipe-arena{display:flex;align-items:center;justify-content:center;gap:16px;margin-bottom:16px}
+.swipe-arrow{width:48px;height:48px;border-radius:50%;background:var(--tg-secondary-bg);font-size:32px;display:flex;align-items:center;justify-content:center;cursor:pointer;color:var(--tg-text);user-select:none;-webkit-user-select:none;transition:background .15s;flex-shrink:0}
+.swipe-arrow:active{background:var(--tg-accent);color:#fff}
+.swipe-card-wrap{display:flex;flex-direction:column;align-items:center;gap:8px}
+.swipe-suit-above,.swipe-suit-below{width:48px;height:36px;border-radius:10px;background:var(--tg-secondary-bg);font-size:20px;display:flex;align-items:center;justify-content:center;cursor:pointer;transition:background .15s;user-select:none;-webkit-user-select:none}
+.swipe-suit-above:active,.swipe-suit-below:active{background:var(--tg-accent);color:#fff}
+.swipe-card-preview{width:110px;height:154px;border-radius:16px;border:3px solid var(--tg-accent);background:var(--tg-bg);display:flex;flex-direction:column;align-items:center;justify-content:center;box-shadow:0 4px 20px rgba(0,0,0,.12);transition:all .2s}
+.swipe-card-preview.used-card{border-color:#E53935;background:#FFEBEE}
+.swipe-rank-disp{font-size:52px;font-weight:800;line-height:1;color:var(--tg-text)}
+.swipe-suit-disp{font-size:38px;line-height:1;margin-top:4px;color:var(--tg-text)}
+.swipe-card-preview.red .swipe-rank-disp,.swipe-card-preview.red .swipe-suit-disp{color:#E53935}
+.swipe-card-preview.empty .swipe-rank-disp,.swipe-card-preview.empty .swipe-suit-disp{color:var(--tg-hint)}
+
+/* indicator strips */
+.swipe-indicators{padding:0 16px;display:flex;flex-direction:column;gap:8px;margin-bottom:4px}
+.swipe-rank-strip,.swipe-suit-strip{display:flex;gap:4px;justify-content:center;flex-wrap:wrap}
+.si-dot{width:24px;height:24px;border-radius:6px;background:var(--tg-secondary-bg);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:var(--tg-hint);cursor:pointer;transition:all .15s;flex-shrink:0}
+.si-dot.active{background:var(--tg-accent);color:#fff}
+.si-dot.used{opacity:.3;cursor:not-allowed}
+.suit-dot{width:36px;height:36px;border-radius:10px;font-size:20px}
+
+.picker-acts{display:flex;gap:8px;padding:0 14px;margin-top:12px}
 .picker-acts button{flex:1;height:50px;border-radius:var(--radius-sm);font-size:16px;font-weight:600;border:none;cursor:pointer}
 .picker-acts .cancel{background:var(--tg-secondary-bg);color:var(--tg-text)}
 .picker-acts .confirm{background:var(--tg-btn);color:var(--tg-btn-text)}
@@ -177,13 +195,31 @@ html,body{background:var(--tg-bg);color:var(--tg-text);font-family:-apple-system
   <div class="picker-sheet" onclick="event.stopPropagation()">
     <div class="picker-handle"></div>
     <div class="picker-ttl">Выберите карту</div>
-    <div class="suits-row">
-      <div class="suit-btn" id="ps♠" onclick="pickSuit('♠')">♠</div>
-      <div class="suit-btn" id="ps♥" onclick="pickSuit('♥')" style="color:#E53935">♥</div>
-      <div class="suit-btn" id="ps♦" onclick="pickSuit('♦')" style="color:#E53935">♦</div>
-      <div class="suit-btn" id="ps♣" onclick="pickSuit('♣')">♣</div>
+
+    <!-- Swipe card picker -->
+    <div class="swipe-picker" id="swipe-picker">
+      <div class="swipe-hint-row">
+        <span class="swipe-hint">← → значение</span>
+        <span class="swipe-hint">↑ ↓ масть</span>
+      </div>
+      <div class="swipe-arena" id="swipe-arena">
+        <div class="swipe-arrow swipe-left" id="swipe-btn-left" onclick="swipeRank(-1)">‹</div>
+        <div class="swipe-card-wrap">
+          <div class="swipe-suit-above" id="swipe-suit-up" onclick="swipeSuit(-1)">▲</div>
+          <div class="swipe-card-preview" id="swipe-preview">
+            <div class="swipe-rank-disp" id="swipe-rank-disp">?</div>
+            <div class="swipe-suit-disp" id="swipe-suit-disp">?</div>
+          </div>
+          <div class="swipe-suit-below" id="swipe-suit-down" onclick="swipeSuit(1)">▼</div>
+        </div>
+        <div class="swipe-arrow swipe-right" id="swipe-btn-right" onclick="swipeRank(1)">›</div>
+      </div>
+      <div class="swipe-indicators">
+        <div class="swipe-rank-strip" id="swipe-rank-strip"></div>
+        <div class="swipe-suit-strip" id="swipe-suit-strip"></div>
+      </div>
     </div>
-    <div class="ranks-grid" id="ranks-g"></div>
+
     <div class="picker-acts">
       <button class="cancel" onclick="closeP()">Отмена</button>
       <button class="confirm" id="p-ok" onclick="confirmCard()" disabled>Добавить</button>
@@ -270,36 +306,106 @@ function rem(t,i){
 
 function openP(type,idx){
   P={t:type,i:idx,s:null,r:null};
-  document.querySelectorAll('.suit-btn').forEach(b=>b.classList.remove('sel'));
-  buildRanks();
+  // default to first available rank & suit
+  P.rIdx=0; P.sIdx=0;
+  // find first non-used rank for current suit
+  updateSwipePicker();
   document.getElementById('p-ok').disabled=true;
   document.getElementById('picker-bd').classList.add('open');
+  // Touch swipe support
+  initSwipeGestures();
 }
 
-function buildRanks(){
-  const g=document.getElementById('ranks-g');g.innerHTML='';
-  RANKS.forEach(r=>{
-    const b=document.createElement('div');b.className='rank-btn';b.textContent=r;
-    const k=P.s?ck(r,P.s):null;
-    if(k&&G.used.has(k))b.classList.add('used');
-    if(r===P.r)b.classList.add('sel');
-    b.onclick=()=>{
-      if(b.classList.contains('used'))return;
-      haptic('light');P.r=r;buildRanks();
-      document.getElementById('p-ok').disabled=!(P.s&&P.r);
-    };
-    g.appendChild(b);
+let _swipeStartX=0,_swipeStartY=0;
+function initSwipeGestures(){
+  const arena=document.getElementById('swipe-arena');
+  arena.ontouchstart=e=>{_swipeStartX=e.touches[0].clientX;_swipeStartY=e.touches[0].clientY;};
+  arena.ontouchend=e=>{
+    const dx=e.changedTouches[0].clientX-_swipeStartX;
+    const dy=e.changedTouches[0].clientY-_swipeStartY;
+    if(Math.abs(dx)>Math.abs(dy)){
+      if(dx>30)swipeRank(-1); else if(dx<-30)swipeRank(1);
+    } else {
+      if(dy>30)swipeSuit(-1); else if(dy<-30)swipeSuit(1);
+    }
+  };
+}
+
+function swipeRank(dir){
+  haptic('light');
+  const n=RANKS.length;
+  // find next non-used in direction
+  let idx=P.rIdx;
+  for(let i=1;i<n;i++){
+    idx=((P.rIdx===null?0:P.rIdx)+dir*i+n)%n;
+    const k=P.s?ck(RANKS[idx],P.s):null;
+    if(!k||!G.used.has(k)){P.rIdx=idx;break;}
+  }
+  P.r=RANKS[P.rIdx];
+  updateSwipePicker();
+}
+
+function swipeSuit(dir){
+  haptic('light');
+  const n=SUITS.length;
+  let idx=P.sIdx;
+  for(let i=1;i<n;i++){
+    idx=((P.sIdx===null?0:P.sIdx)+dir*i+n)%n;
+    P.sIdx=idx;break;
+  }
+  P.s=SUITS[P.sIdx];
+  // if current rank+suit is used, try to find free rank
+  if(P.r&&G.used.has(ck(P.r,P.s))){P.r=null;P.rIdx=null;}
+  updateSwipePicker();
+}
+
+function updateSwipePicker(){
+  const rankEl=document.getElementById('swipe-rank-disp');
+  const suitEl=document.getElementById('swipe-suit-disp');
+  const preview=document.getElementById('swipe-preview');
+  const strip=document.getElementById('swipe-rank-strip');
+  const sstrip=document.getElementById('swipe-suit-strip');
+
+  // current values
+  const r=P.rIdx!==null?RANKS[P.rIdx]:null;
+  const s=P.sIdx!==null?SUITS[P.sIdx]:null;
+  P.r=r; P.s=s;
+
+  const isRed=s==='♥'||s==='♦';
+  const isUsed=r&&s&&G.used.has(ck(r,s));
+
+  preview.className='swipe-card-preview'+(r&&s?' ':' empty')+(isRed?' red':'')+(isUsed?' used-card':'');
+  rankEl.textContent=r||'?';
+  suitEl.textContent=s||'?';
+
+  // rank indicator strip
+  strip.innerHTML='';
+  RANKS.forEach((rk,i)=>{
+    const d=document.createElement('div');
+    d.className='si-dot'+(i===P.rIdx?' active':'');
+    const k=s?ck(rk,s):null;
+    if(k&&G.used.has(k))d.classList.add('used');
+    d.textContent=rk;
+    d.onclick=()=>{if(!d.classList.contains('used')){haptic('light');P.rIdx=i;P.r=RANKS[i];updateSwipePicker();}};
+    strip.appendChild(d);
   });
+
+  // suit indicator strip
+  sstrip.innerHTML='';
+  SUITS.forEach((su,i)=>{
+    const d=document.createElement('div');
+    d.className='si-dot suit-dot'+(i===P.sIdx?' active':'');
+    d.style.color=(su==='♥'||su==='♦')?'#E53935':'';
+    d.textContent=su;
+    d.onclick=()=>{haptic('light');P.sIdx=i;P.s=SUITS[i];if(P.r&&G.used.has(ck(P.r,P.s))){P.r=null;P.rIdx=null;}updateSwipePicker();};
+    sstrip.appendChild(d);
+  });
+
+  const ok=r&&s&&!isUsed;
+  document.getElementById('p-ok').disabled=!ok;
 }
 
-function pickSuit(s){
-  haptic('light');P.s=s;
-  document.querySelectorAll('.suit-btn').forEach(b=>b.classList.remove('sel'));
-  document.getElementById('ps'+s).classList.add('sel');
-  if(P.r&&G.used.has(ck(P.r,P.s)))P.r=null;
-  buildRanks();
-  document.getElementById('p-ok').disabled=!(P.s&&P.r);
-}
+function buildRanks(){} // kept for compat, no-op now
 
 function confirmCard(){
   haptic('medium');
