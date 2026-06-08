@@ -1,0 +1,277 @@
+
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --tg-bg:#efeff4;
+  --tg-surface:#ffffff;
+  --tg-blue:#2AABEE;
+  --tg-blue-dark:#1a8ec9;
+  --tg-text:#000000;
+  --tg-sub:#8e8e93;
+  --tg-sep:#c8c7cc;
+  --tg-pill-bg:#e8f4fd;
+  --tg-pill-txt:#1a8ec9;
+}
+@media(prefers-color-scheme:dark){
+:root{
+  --tg-bg:#1c1c1e;
+  --tg-surface:#2c2c2e;
+  --tg-blue:#2AABEE;
+  --tg-blue-dark:#50baf0;
+  --tg-text:#ffffff;
+  --tg-sub:#8e8e93;
+  --tg-sep:#38383a;
+  --tg-pill-bg:#1a3a4e;
+  --tg-pill-txt:#50baf0;
+}
+}
+body{font-family:-apple-system,BlinkMacSystemFont,'SF Pro Text',sans-serif;background:var(--tg-bg);color:var(--tg-text)}
+.phone{max-width:380px;margin:0 auto;background:var(--tg-bg);min-height:100vh;padding-bottom:20px}
+.topbar{background:var(--tg-surface);padding:12px 16px 0;border-bottom:0.5px solid var(--tg-sep);position:sticky;top:0;z-index:10}
+.topbar-title{display:flex;align-items:center;gap:10px;padding-bottom:10px}
+.avatar{width:36px;height:36px;border-radius:50%;background:var(--tg-blue);display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.avatar i{color:#fff;font-size:18px}
+.title-col{flex:1}
+.title-col h1{font-size:16px;font-weight:500;color:var(--tg-text);line-height:1}
+.title-col p{font-size:12px;color:var(--tg-sub);margin-top:2px}
+.count-badge{background:var(--tg-blue);color:#fff;font-size:11px;font-weight:500;padding:2px 8px;border-radius:10px}
+.search-wrap{padding:8px 0 10px}
+.search-inner{display:flex;align-items:center;gap:8px;background:var(--tg-bg);border-radius:10px;padding:7px 10px}
+.search-inner i{font-size:16px;color:var(--tg-sub)}
+.search-inner input{border:none;background:transparent;outline:none;font-size:15px;color:var(--tg-text);flex:1;font-family:inherit}
+.search-inner input::placeholder{color:var(--tg-sub)}
+.cats{display:flex;gap:6px;overflow-x:auto;padding:10px 16px;scrollbar-width:none}
+.cats::-webkit-scrollbar{display:none}
+.cat{flex-shrink:0;font-size:13px;padding:5px 13px;border-radius:16px;border:1px solid var(--tg-sep);background:var(--tg-surface);color:var(--tg-sub);cursor:pointer;transition:all .15s;white-space:nowrap}
+.cat.on{background:var(--tg-blue);border-color:var(--tg-blue);color:#fff;font-weight:500}
+.section-header{font-size:13px;font-weight:500;color:var(--tg-sub);padding:14px 16px 6px;text-transform:uppercase;letter-spacing:.5px}
+.list{background:var(--tg-surface);border-radius:0;overflow:hidden;margin:0}
+.item{padding:12px 16px;border-bottom:0.5px solid var(--tg-sep);cursor:pointer;transition:background .1s;display:flex;align-items:flex-start;gap:12px}
+.item:last-child{border-bottom:none}
+.item:active{background:var(--tg-bg)}
+.item-icon{width:40px;height:40px;border-radius:12px;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:18px}
+.item-body{flex:1;min-width:0}
+.item-top{display:flex;align-items:baseline;justify-content:space-between;gap:6px;margin-bottom:2px}
+.item-name{font-size:15px;font-weight:500;color:var(--tg-text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.item-abv{font-size:12px;color:var(--tg-blue);flex-shrink:0;font-weight:500}
+.item-meta{display:flex;align-items:center;gap:6px;margin-bottom:4px}
+.item-method{font-size:12px;color:var(--tg-sub)}
+.item-dot{width:3px;height:3px;border-radius:50%;background:var(--tg-sep);flex-shrink:0}
+.item-base-pill{font-size:11px;color:var(--tg-pill-txt);background:var(--tg-pill-bg);padding:1px 7px;border-radius:8px;font-weight:500}
+.item-ing{font-size:13px;color:var(--tg-sub);line-height:1.4;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.item.expanded .item-ing{white-space:normal;overflow:visible}
+.empty{text-align:center;padding:40px 20px;color:var(--tg-sub);font-size:15px}
+.empty i{font-size:40px;display:block;margin-bottom:10px;opacity:.4}
+.group{margin-top:2px}
+
+.ic-v{background:#e8f4fd;color:#1a8ec9}
+.ic-r{background:#fdecea;color:#c0392b}
+.ic-w{background:#fef3e2;color:#b7770d}
+.ic-g{background:#e8f8ef;color:#1a7a45}
+.ic-t{background:#f0ebfe;color:#6c3fbf}
+.ic-c{background:#fde8f0;color:#b5267a}
+.ic-l{background:#e2f5f1;color:#0e7a5f}
+.ic-a{background:#fef0e6;color:#c96a1a}
+.ic-m{background:#eef0fe;color:#3a4abf}
+@media(prefers-color-scheme:dark){
+.ic-v{background:#1a3a4e;color:#50baf0}
+.ic-r{background:#3e1a18;color:#e87e7a}
+.ic-w{background:#3a2a0a;color:#e8b84b}
+.ic-g{background:#0f2e1a;color:#4ec97a}
+.ic-t{background:#25183e;color:#a57bea}
+.ic-c{background:#350d22;color:#e06baa}
+.ic-l{background:#052920;color:#3dd9a8}
+.ic-a{background:#3a2010;color:#e89a55}
+.ic-m{background:#12153e;color:#818dea}
+}
+</style>
+
+<div class="phone">
+<h2 style="position:absolute;width:1px;height:1px;overflow:hidden">Барная карта: 80 коктейлей</h2>
+
+<div class="topbar">
+  <div class="topbar-title">
+    <div class="avatar"><i class="ti ti-bottle" aria-hidden="true"></i></div>
+    <div class="title-col">
+      <h1>Барная карта</h1>
+      <p>80 коктейлей со спиртом</p>
+    </div>
+    <span class="count-badge" id="badge">80</span>
+  </div>
+  <div class="search-wrap">
+    <div class="search-inner">
+      <i class="ti ti-search" aria-hidden="true"></i>
+      <input type="search" id="s" placeholder="Коктейль или ингредиент..." oninput="render()">
+    </div>
+  </div>
+</div>
+
+<div class="cats" id="cats"></div>
+<div id="out"></div>
+</div>
+
+<script>
+const D=[
+{n:"Водка-тоник",b:"Водка",c:"v",abv:"8–10%",m:"Билд",i:"Водка 50 мл, тоник 150 мл, лайм, лёд"},
+{n:"Cosmopolitan",b:"Водка",c:"v",abv:"16%",m:"Шейкер",i:"Водка цитрон 40 мл, трипл сек 15 мл, клюквенный сок 30 мл, сок лайма 15 мл"},
+{n:"Screwdriver",b:"Водка",c:"v",abv:"10%",m:"Билд",i:"Водка 50 мл, апельсиновый сок 150 мл, лёд"},
+{n:"Sex on the Beach",b:"Водка",c:"v",abv:"12%",m:"Билд",i:"Водка 40 мл, персиковый шнапс 20 мл, апельс. сок 80 мл, клюкв. сок 40 мл"},
+{n:"Moscow Mule",b:"Водка",c:"v",abv:"10%",m:"Билд",i:"Водка 50 мл, имбирное пиво 150 мл, лайм 15 мл, мята, лёд"},
+{n:"Bloody Mary",b:"Водка",c:"v",abv:"12%",m:"Билд",i:"Водка 50 мл, томатный сок 120 мл, лимон, вустер 3 дэша, табаско, сельдерей"},
+{n:"White Russian",b:"Водка",c:"v",abv:"20%",m:"Шейкер",i:"Водка 50 мл, кофейный ликёр 25 мл, сливки 25 мл, лёд"},
+{n:"Black Russian",b:"Водка",c:"v",abv:"24%",m:"Билд",i:"Водка 50 мл, Kahlúa 25 мл, лёд"},
+{n:"Espresso Martini",b:"Водка",c:"v",abv:"18%",m:"Шейкер",i:"Водка 40 мл, кофейный ликёр 20 мл, эспрессо 30 мл, сахарный сироп 10 мл"},
+{n:"Harvey Wallbanger",b:"Водка",c:"v",abv:"12%",m:"Билд",i:"Водка 45 мл, апельс. сок 90 мл, Galliano 15 мл float"},
+{n:"Lemon Drop",b:"Водка",c:"v",abv:"18%",m:"Шейкер",i:"Водка лимонная 50 мл, трипл сек 20 мл, лимон 25 мл, сироп 10 мл"},
+{n:"Vodka Gimlet",b:"Водка",c:"v",abv:"20%",m:"Шейкер",i:"Водка 60 мл, сок лайма 30 мл, сахарный сироп 15 мл"},
+{n:"Kamikaze",b:"Водка",c:"v",abv:"22%",m:"Шейкер",i:"Водка 30 мл, трипл сек 30 мл, лайм 30 мл"},
+{n:"Bloody Caesar",b:"Водка",c:"v",abv:"12%",m:"Билд",i:"Водка 50 мл, Clamato 150 мл, вустер, табаско, соль сельдерея"},
+{n:"Porn Star Martini",b:"Водка",c:"v",abv:"16%",m:"Шейкер",i:"Водка ваниль 40 мл, маракуйевый ликёр 20 мл, маракуйя пюре 30 мл + шот просекко"},
+{n:"Mojito",b:"Ром",c:"r",abv:"11%",m:"Мадл+Билд",i:"Белый ром 50 мл, лайм 25 мл, сахарный сироп 15 мл, мята 10 листьев, содовая 100 мл"},
+{n:"Daiquiri",b:"Ром",c:"r",abv:"18%",m:"Шейкер",i:"Белый ром 60 мл, лайм 30 мл, сахарный сироп 15 мл"},
+{n:"Piña Colada",b:"Ром",c:"r",abv:"13%",m:"Блендер",i:"Белый ром 50 мл, кокосовые сливки 30 мл, ананасовый сок 120 мл, лёд"},
+{n:"Cuba Libre",b:"Ром",c:"r",abv:"10%",m:"Билд",i:"Тёмный ром 50 мл, Coca-Cola 150 мл, лайм, лёд"},
+{n:"Dark 'n' Stormy",b:"Ром",c:"r",abv:"10%",m:"Билд",i:"Тёмный ром Gosling's 50 мл, имбирное пиво 150 мл, лайм, лёд"},
+{n:"Mai Tai",b:"Ром",c:"r",abv:"17%",m:"Шейкер",i:"Светлый ром 30 мл, тёмный ром 30 мл, трипл сек 15 мл, оргеат 15 мл, лайм 30 мл"},
+{n:"Zombie",b:"Ром",c:"r",abv:"22%",m:"Шейкер",i:"Белый ром 30 мл, золотой ром 30 мл, тёмный ром 30 мл, Falernum 15 мл, грейпфрут 30 мл, лайм 15 мл"},
+{n:"Rum Punch",b:"Ром",c:"r",abv:"12%",m:"Билд",i:"Тёмный ром 50 мл, ананасовый сок 60 мл, апельс. сок 60 мл, гренадин 15 мл, лайм 15 мл"},
+{n:"Strawberry Daiquiri",b:"Ром",c:"r",abv:"14%",m:"Блендер",i:"Белый ром 50 мл, клубника 80 г, лайм 25 мл, сироп 15 мл, лёд"},
+{n:"Hurricane",b:"Ром",c:"r",abv:"14%",m:"Шейкер",i:"Тёмный ром 30 мл, белый ром 30 мл, маракуйевый сок 60 мл, апельс. сок 60 мл, гренадин 15 мл"},
+{n:"Jungle Bird",b:"Ром",c:"r",abv:"16%",m:"Шейкер",i:"Тёмный ром 45 мл, Кампари 30 мл, ананасовый сок 45 мл, лайм 15 мл, сироп 15 мл"},
+{n:"Whisky Sour",b:"Виски",c:"w",abv:"16%",m:"Шейкер",i:"Бурбон 60 мл, лимон 30 мл, сахарный сироп 15 мл, белок 1 шт"},
+{n:"Old Fashioned",b:"Виски",c:"w",abv:"28%",m:"Стир",i:"Бурбон 60 мл, Ангостура 2 дэша, сахар 1 кубик, вода, лёд, апельс. цедра"},
+{n:"Manhattan",b:"Виски",c:"w",abv:"28%",m:"Стир",i:"Ржаной виски 60 мл, сладкий вермут 30 мл, Ангостура 2 дэша, вишня"},
+{n:"Rob Roy",b:"Виски",c:"w",abv:"26%",m:"Стир",i:"Скотч 60 мл, сладкий вермут 30 мл, Ангостура 2 дэша, вишня"},
+{n:"Rusty Nail",b:"Виски",c:"w",abv:"30%",m:"Билд",i:"Скотч 50 мл, Drambuie 25 мл, лёд"},
+{n:"New York Sour",b:"Виски",c:"w",abv:"16%",m:"Шейкер",i:"Бурбон 60 мл, лимон 25 мл, сироп 15 мл, красное вино float 15 мл, белок"},
+{n:"Irish Coffee",b:"Виски",c:"w",abv:"12%",m:"Билд",i:"Ирландский виски 45 мл, горячий кофе 90 мл, коричневый сахар 1 ч.л., взбитые сливки"},
+{n:"Blood and Sand",b:"Виски",c:"w",abv:"18%",m:"Шейкер",i:"Скотч 22 мл, вишнёвый ликёр 22 мл, сладкий вермут 22 мл, апельс. сок 22 мл"},
+{n:"Penicillin",b:"Виски",c:"w",abv:"18%",m:"Шейкер",i:"Купажный скотч 50 мл, айлей скотч 10 мл float, лимон 25 мл, мёд-имбир. сироп 20 мл"},
+{n:"Paper Plane",b:"Виски",c:"w",abv:"20%",m:"Шейкер",i:"Бурбон 22 мл, Апероль 22 мл, Амаретто 22 мл, лимон 22 мл"},
+{n:"Mint Julep",b:"Виски",c:"w",abv:"20%",m:"Мадл",i:"Бурбон 60 мл, мята 8–10 листьев, сахарный сироп 15 мл, колотый лёд"},
+{n:"Gin & Tonic",b:"Джин",c:"g",abv:"10%",m:"Билд",i:"Джин 50 мл, тоник 150 мл, огурец или лайм, лёд"},
+{n:"Dry Martini",b:"Джин",c:"g",abv:"30%",m:"Стир",i:"Джин 60 мл, сухой вермут 10–15 мл, оливка или лимонная цедра"},
+{n:"Negroni",b:"Джин",c:"g",abv:"24%",m:"Стир",i:"Джин 30 мл, Кампари 30 мл, сладкий вермут 30 мл, апельс. цедра"},
+{n:"Tom Collins",b:"Джин",c:"g",abv:"11%",m:"Шейкер",i:"Джин 50 мл, лимон 30 мл, сироп 15 мл, содовая 100 мл, лёд"},
+{n:"Gimlet",b:"Джин",c:"g",abv:"20%",m:"Шейкер",i:"Джин 60 мл, сок лайма 30 мл, сахарный сироп 15 мл, лёд"},
+{n:"Clover Club",b:"Джин",c:"g",abv:"15%",m:"Шейкер",i:"Джин 50 мл, малиновый сироп 20 мл, лимон 20 мл, белок 1 шт"},
+{n:"Bee's Knees",b:"Джин",c:"g",abv:"18%",m:"Шейкер",i:"Джин 60 мл, лимон 25 мл, мёдовый сироп 20 мл"},
+{n:"Aviation",b:"Джин",c:"g",abv:"20%",m:"Шейкер",i:"Джин 50 мл, Maraschino 15 мл, крем де виолетт 10 мл, лимон 20 мл"},
+{n:"Southside",b:"Джин",c:"g",abv:"18%",m:"Шейкер",i:"Джин 60 мл, лимон 25 мл, сироп 15 мл, мята 8 листьев"},
+{n:"Corpse Reviver #2",b:"Джин",c:"g",abv:"20%",m:"Шейкер",i:"Джин 22 мл, трипл сек 22 мл, вермут Лилле 22 мл, лимон 22 мл, абсент rinse"},
+{n:"Singapore Sling",b:"Джин",c:"g",abv:"13%",m:"Шейкер",i:"Джин 30 мл, вишнёвый бренди 15 мл, Cointreau 7 мл, Bénédictine 7 мл, ананас. сок 120 мл, гренадин 10 мл"},
+{n:"French 75",b:"Джин",c:"g",abv:"14%",m:"Шейкер",i:"Джин 45 мл, лимон 15 мл, сироп 15 мл, шампанское 90 мл"},
+{n:"Margarita",b:"Текила",c:"t",abv:"17%",m:"Шейкер",i:"Текила 50 мл, трипл сек 25 мл, лайм 25 мл, соль на ободке"},
+{n:"Tequila Sunrise",b:"Текила",c:"t",abv:"12%",m:"Билд",i:"Текила 50 мл, апельс. сок 150 мл, гренадин 15 мл float"},
+{n:"Paloma",b:"Текила",c:"t",abv:"10%",m:"Билд",i:"Текила 50 мл, грейпфрутовый газ. напиток 150 мл, лайм, соль"},
+{n:"Tommy's Margarita",b:"Текила",c:"t",abv:"17%",m:"Шейкер",i:"Текила бланко 60 мл, лайм 30 мл, агавовый сироп 15 мл"},
+{n:"Spicy Margarita",b:"Текила",c:"t",abv:"17%",m:"Шейкер",i:"Текила 50 мл, трипл сек 25 мл, лайм 25 мл, халапеньо 3–4 колечка, соль"},
+{n:"Oaxacan Old Fashioned",b:"Текила",c:"t",abv:"30%",m:"Стир",i:"Текила репосадо 30 мл, мескаль 30 мл, агавовый сироп 5 мл, Ангостура 2 дэша"},
+{n:"Mexican Mule",b:"Текила",c:"t",abv:"10%",m:"Билд",i:"Текила 50 мл, имбирное пиво 150 мл, лайм 15 мл, лёд"},
+{n:"Batanga",b:"Текила",c:"t",abv:"10%",m:"Билд",i:"Текила бланко 50 мл, Coca-Cola 150 мл, лайм, соль"},
+{n:"El Diablo",b:"Текила",c:"t",abv:"11%",m:"Билд",i:"Текила 50 мл, крем де касис 15 мл, лайм 15 мл, имбирное пиво 90 мл"},
+{n:"Siesta",b:"Текила",c:"t",abv:"16%",m:"Шейкер",i:"Текила 40 мл, Кампари 20 мл, грейпфрут 30 мл, лайм 15 мл, сироп 10 мл"},
+{n:"Sidecar",b:"Коньяк",c:"c",abv:"22%",m:"Шейкер",i:"Коньяк 50 мл, Cointreau 25 мл, лимон 25 мл, сахар на ободке"},
+{n:"Brandy Alexander",b:"Коньяк",c:"c",abv:"18%",m:"Шейкер",i:"Коньяк 30 мл, тёмное какао 30 мл, сливки 30 мл, мускатный орех"},
+{n:"Vieux Carré",b:"Коньяк",c:"c",abv:"26%",m:"Стир",i:"Коньяк 22 мл, ржаной виски 22 мл, сладкий вермут 22 мл, Bénédictine 7 мл, биттерс"},
+{n:"French Connection",b:"Коньяк",c:"c",abv:"28%",m:"Билд",i:"Коньяк 40 мл, Амаретто 20 мл, лёд"},
+{n:"Stinger",b:"Коньяк",c:"c",abv:"26%",m:"Стир",i:"Коньяк 50 мл, белый мятный ликёр 25 мл, лёд"},
+{n:"Horse's Neck",b:"Коньяк",c:"c",abv:"12%",m:"Билд",i:"Коньяк 50 мл, имбирное пиво 150 мл, Ангостура 3 дэша, лимонная спираль"},
+{n:"Aperol Spritz",b:"Аперитив",c:"l",abv:"8%",m:"Билд",i:"Апероль 60 мл, просекко 90 мл, содовая 30 мл, апельсин, лёд"},
+{n:"Campari Spritz",b:"Аперитив",c:"l",abv:"9%",m:"Билд",i:"Кампари 60 мл, просекко 90 мл, содовая 30 мл, апельсин, лёд"},
+{n:"Amaretto Sour",b:"Ликёр",c:"l",abv:"12%",m:"Шейкер",i:"Амаретто 50 мл, лимон 30 мл, сироп 10 мл, белок, Ангостура 2 дэша"},
+{n:"B-52",b:"Ликёр",c:"l",abv:"25%",m:"Флоат",i:"Кофейный ликёр 20 мл, Baileys 20 мл, Grand Marnier 20 мл — слоями"},
+{n:"Grasshopper",b:"Ликёр",c:"l",abv:"18%",m:"Шейкер",i:"Белый шоколадный ликёр 30 мл, зелёный мятный ликёр 30 мл, сливки 30 мл"},
+{n:"Kir Royale",b:"Аперитив",c:"l",abv:"10%",m:"Билд",i:"Шампанское 120 мл, крем де касис 20 мл"},
+{n:"Slippery Nipple",b:"Ликёр",c:"l",abv:"22%",m:"Флоат",i:"Самбука 30 мл, Baileys 30 мл — слоями в шоте"},
+{n:"Bellini",b:"Шампанское",c:"a",abv:"8%",m:"Билд",i:"Просекко 100 мл, персиковое пюре 50 мл"},
+{n:"Mimosa",b:"Шампанское",c:"a",abv:"7%",m:"Билд",i:"Шампанское 90 мл, апельс. сок 90 мл"},
+{n:"Kir",b:"Шампанское",c:"a",abv:"10%",m:"Билд",i:"Белое сухое вино 120 мл, крем де касис 20 мл"},
+{n:"Rossini",b:"Шампанское",c:"a",abv:"8%",m:"Билд",i:"Просекко 100 мл, клубничное пюре 50 мл"},
+{n:"Champagne Cocktail",b:"Шампанское",c:"a",abv:"11%",m:"Билд",i:"Шампанское 120 мл, коньяк 10 мл, Ангостура 2 дэша, сахарный кубик"},
+{n:"Death in the Afternoon",b:"Шампанское",c:"a",abv:"14%",m:"Билд",i:"Абсент 30 мл, шампанское 120 мл"},
+{n:"Sbagliato",b:"Аперитив",c:"a",abv:"10%",m:"Стир",i:"Кампари 30 мл, сладкий вермут 30 мл, просекко 60 мл, апельс. цедра"},
+{n:"Long Island Iced Tea",b:"Микс",c:"m",abv:"22%",m:"Шейкер",i:"Водка 15 мл, ром 15 мл, джин 15 мл, текила 15 мл, трипл сек 15 мл, лимон 25 мл, сироп 10 мл, кола dash"},
+{n:"Adios MF",b:"Микс",c:"m",abv:"22%",m:"Шейкер",i:"Водка 15 мл, ром 15 мл, джин 15 мл, текила 15 мл, голубой кюрасао 15 мл, лимон 25 мл, 7-Up"},
+{n:"Jungle Juice",b:"Микс",c:"m",abv:"12%",m:"Батч",i:"Водка 50 мл, ром 30 мл, ананас. сок 90 мл, апельс. сок 90 мл, клюкв. сок 60 мл, лимонад"},
+{n:"Tuxedo",b:"Аперитив",c:"m",abv:"25%",m:"Стир",i:"Джин 45 мл, сухой вермут 45 мл, Maraschino 5 мл, абсент 3 дэша, апельс. биттерс"},
+];
+
+const ICONS={v:"ti-droplet",r:"ti-sail",w:"ti-flame",g:"ti-leaf",t:"ti-sun",c:"ti-grapes",l:"ti-candy",a:"ti-glass-champagne",m:"ti-circles"};
+const CATS=[
+  {k:"all",l:"Все"},
+  {k:"v",l:"Водка"},
+  {k:"r",l:"Ром"},
+  {k:"w",l:"Виски"},
+  {k:"g",l:"Джин"},
+  {k:"t",l:"Текила"},
+  {k:"c",l:"Коньяк"},
+  {k:"l",l:"Ликёры"},
+  {k:"a",l:"Игристые"},
+  {k:"m",l:"Микс"},
+];
+
+const GROUPS={v:"Водка",r:"Ром",w:"Виски",g:"Джин",t:"Текила",c:"Коньяк",l:"Ликёры / аперитивы",a:"Шампанское / игристые",m:"Микс"};
+let active="all";
+const expanded=new Set();
+
+const catsEl=document.getElementById("cats");
+CATS.forEach(({k,l})=>{
+  const b=document.createElement("button");
+  b.className="cat"+(k==="all"?" on":"");
+  b.textContent=l;
+  b.onclick=()=>{active=k;document.querySelectorAll(".cat").forEach(x=>x.classList.remove("on"));b.classList.add("on");render()};
+  catsEl.appendChild(b);
+});
+
+function render(){
+  const q=document.getElementById("s").value.toLowerCase();
+  const list=D.filter(c=>{
+    const mc=active==="all"||c.c===active;
+    const mq=!q||c.n.toLowerCase().includes(q)||c.i.toLowerCase().includes(q)||c.b.toLowerCase().includes(q);
+    return mc&&mq;
+  });
+  document.getElementById("badge").textContent=list.length;
+  const out=document.getElementById("out");
+  if(!list.length){out.innerHTML='<div class="empty"><i class="ti ti-glass-off" aria-hidden="true"></i>Ничего не найдено</div>';return;}
+
+  const grouped={};
+  list.forEach(c=>{(grouped[c.c]=grouped[c.c]||[]).push(c)});
+
+  let html="";
+  Object.entries(grouped).forEach(([cat,items])=>{
+    const showHeader=active==="all"&&!q;
+    if(showHeader) html+=`<div class="section-header">${GROUPS[cat]||cat}</div>`;
+    html+=`<div class="list">`;
+    items.forEach((c,idx)=>{
+      const isExp=expanded.has(c.n);
+      html+=`<div class="item${isExp?" expanded":""}" onclick="toggle('${c.n.replace(/'/g,"\\'")}')">
+        <div class="item-icon ic-${c.c}"><i class="ti ${ICONS[c.c]||'ti-bottle'}" aria-hidden="true"></i></div>
+        <div class="item-body">
+          <div class="item-top">
+            <span class="item-name">${c.n}</span>
+            <span class="item-abv">${c.abv}</span>
+          </div>
+          <div class="item-meta">
+            <span class="item-base-pill">${c.b}</span>
+            <span class="item-dot"></span>
+            <span class="item-method">${c.m}</span>
+          </div>
+          <div class="item-ing">${c.i}</div>
+        </div>
+      </div>`;
+    });
+    html+=`</div>`;
+    if(showHeader) html+=`<div style="height:8px"></div>`;
+  });
+  out.innerHTML=html;
+}
+
+function toggle(name){
+  if(expanded.has(name)) expanded.delete(name);
+  else expanded.add(name);
+  render();
+}
+
+render();
+</script>
