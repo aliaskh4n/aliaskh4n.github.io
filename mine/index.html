@@ -1,3 +1,4 @@
+voxel_game.html
 <!DOCTYPE html>
 <html lang="ru">
 <head>
@@ -39,6 +40,21 @@
     line-height:1.55;z-index:10;max-width:290px;
   }
   #info b{color:#ffd54f;}
+  #stats{margin-top:6px;opacity:0.75;font-size:11px;}
+
+  #minimap{
+    position:fixed;top:12px;right:12px;z-index:10;border-radius:8px;
+    border:2px solid rgba(255,255,255,0.4);background:rgba(0,0,0,0.3);
+  }
+  #netBadge{
+    position:fixed;top:166px;right:12px;z-index:10;background:rgba(0,0,0,0.35);
+    color:#fff;font-size:12px;padding:6px 10px;border-radius:8px;max-width:160px;text-align:right;
+  }
+  #soundToggle{
+    position:fixed;bottom:14px;right:14px;z-index:10;background:rgba(0,0,0,0.35);
+    color:#fff;font-size:20px;padding:8px 10px;border-radius:8px;cursor:pointer;user-select:none;
+  }
+  #soundToggle:hover{background:rgba(0,0,0,0.55);}
 
   #startScreen{
     position:fixed;inset:0;background:linear-gradient(#7ec8ff,#bfe6ff);
@@ -47,7 +63,7 @@
   }
   #startScreen h1{font-size:52px;margin:0 0 6px;letter-spacing:2px;
     text-shadow:3px 3px 0 rgba(255,255,255,0.6);color:#2e5b2e;}
-  #startScreen p{font-size:15px;max-width:420px;margin:4px 0 20px;color:#33475a;}
+  #startScreen p{font-size:15px;max-width:460px;margin:4px 0 20px;color:#33475a;}
   #startBtn{
     padding:14px 38px;font-size:18px;font-weight:bold;color:#fff;background:#4CAF50;
     border:3px solid #2e7d32;border-radius:8px;cursor:pointer;letter-spacing:1px;
@@ -55,23 +71,29 @@
   #startBtn:hover{background:#5cc85f;}
 
   #editorPanel{
-    position:fixed;top:0;right:0;width:360px;height:100%;background:rgba(20,24,20,0.95);
+    position:fixed;top:0;right:0;width:380px;height:100%;background:rgba(20,24,20,0.95);
     color:#e8f5e9;z-index:50;padding:16px;box-sizing:border-box;display:none;
     font-size:13px;overflow-y:auto;border-left:2px solid #4CAF50;
   }
-  #editorPanel h2{margin-top:0;font-size:16px;color:#a5d6a7;}
+  #editorPanel h2{margin-top:18px;font-size:16px;color:#a5d6a7;}
+  #editorPanel h2:first-of-type{margin-top:0;}
   #editorPanel textarea{
     width:100%;height:200px;background:#0e150e;color:#c8e6c9;border:1px solid #4CAF50;
     border-radius:4px;padding:8px;font-family:monospace;font-size:12px;box-sizing:border-box;
   }
   #editorPanel button{
-    margin-top:8px;padding:8px 14px;background:#4CAF50;border:none;border-radius:5px;
+    margin-top:8px;margin-right:6px;padding:8px 14px;background:#4CAF50;border:none;border-radius:5px;
     color:#fff;cursor:pointer;font-size:13px;
   }
   #editorPanel button:hover{background:#66bb6a;}
-  #editorPanel .row{display:flex;align-items:center;justify-content:space-between;margin:6px 0;}
+  #editorPanel .row{display:flex;align-items:center;justify-content:space-between;margin:6px 0;gap:8px;}
   #editorPanel input[type=color]{width:44px;height:26px;border:none;background:none;cursor:pointer;}
-  #editorMsg{margin-top:6px;color:#ffd54f;font-size:12px;min-height:16px;}
+  #editorPanel input[type=text]{
+    background:#0e150e;color:#c8e6c9;border:1px solid #4CAF50;border-radius:4px;
+    padding:6px 8px;font-size:12px;box-sizing:border-box;
+  }
+  #editorMsg,#animMsg,#worldMsg{margin-top:6px;color:#ffd54f;font-size:12px;min-height:16px;}
+  #netStatus{margin-top:6px;color:#a5d6a7;font-size:12px;}
   #closeEditor{position:absolute;top:10px;right:12px;cursor:pointer;font-size:18px;color:#e8f5e9;}
   .texRow{border:1px solid #2f4a2f;border-radius:6px;padding:8px;margin-bottom:10px;}
   .texRow .texHead{display:flex;align-items:center;gap:8px;margin-bottom:4px;}
@@ -79,6 +101,8 @@
   .texRow textarea{height:170px;font-size:10.5px;}
   .texRow button{font-size:12px;padding:5px 10px;}
   .texMsg{font-size:11px;color:#ef9a9a;min-height:14px;}
+  #editorPanel p{line-height:1.5;}
+  #editorPanel code{background:#0e150e;padding:1px 4px;border-radius:3px;}
 </style>
 </head>
 <body>
@@ -86,7 +110,8 @@
 <div id="startScreen">
   <h1>⛏ VOXEL CRAFT</h1>
   <p>Воксельный мир на Three.js: физика, разрушение/установка блоков, свой текстовый формат
-  текстур 32×32 с анимацией и редактор моделей. Клик — начать игру.</p>
+  текстур 32×32 с анимацией, редактор моделей и анимаций персонажа, и онлайн-игра с друзьями.
+  Клик — начать игру.</p>
   <button id="startBtn">Играть</button>
 </div>
 
@@ -95,11 +120,16 @@
 <div id="info">
   <b>WASD</b> — движение &nbsp; <b>Space</b> — прыжок<br>
   <b>ЛКМ</b> — сломать блок &nbsp; <b>ПКМ</b> — поставить<br>
-  <b>1-6</b> — выбор слота &nbsp; <b>E</b> — редактор моделей/текстур<br>
-  <b>Esc</b> — отпустить мышь
+  <b>1-6</b> — выбор слота &nbsp; <b>E</b> — редактор<br>
+  <b>F</b> — своя анимация &nbsp; <b>Esc</b> — отпустить мышь
+  <div id="stats">FPS: -- &nbsp;|&nbsp; блоков: --</div>
 </div>
 
+<canvas id="minimap" width="140" height="140"></canvas>
+<div id="netBadge">⚪ Оффлайн</div>
+
 <div id="hud"></div>
+<div id="soundToggle" title="Звук">🔊</div>
 
 <div id="editorPanel">
   <span id="closeEditor">✕</span>
@@ -133,30 +163,100 @@
   <br>
   <button id="applyModel">Сохранить модель в слот 6</button>
   <div id="editorMsg"></div>
+
+  <h2>🎬 Анимация персонажа (свой клип)</h2>
+  <p style="opacity:0.8">JSON-клип: длительность в секундах и повороты частей тела
+  (<code>armL armR legL legR head torso</code>) в радианах по времени <code>t</code>.
+  Клавиша <b>F</b> проигрывает клип у тебя и показывает его другим игрокам онлайн.</p>
+  <textarea id="animInput" style="height:170px;">{
+  "name": "wave",
+  "duration": 1.0,
+  "loop": false,
+  "tracks": {
+    "armR": [
+      {"t":0,    "rot":[0,0,0]},
+      {"t":0.25, "rot":[-2.2,0,0.4]},
+      {"t":0.5,  "rot":[-1.8,0,-0.4]},
+      {"t":0.75, "rot":[-2.2,0,0.4]},
+      {"t":1.0,  "rot":[0,0,0]}
+    ]
+  }
+}</textarea>
+  <br>
+  <button id="applyAnim">Сохранить на клавишу F</button>
+  <div id="animMsg"></div>
+
+  <h2>🌐 Онлайн-игра</h2>
+  <p style="opacity:0.8">По умолчанию — канал браузера (BroadcastChannel): открой эту страницу
+  в нескольких вкладках с одинаковым кодом комнаты, и игроки увидят друг друга. Для игры через
+  интернет с других устройств впиши адрес своего WebSocket-сервера (<code>wss://...</code>)
+  вместо кода комнаты.</p>
+  <div class="row"><span>Имя</span><input id="netName" type="text" value="Игрок"></div>
+  <div class="row"><span>Комната / wss://</span><input id="netRoom" type="text" value="default"></div>
+  <button id="netConnect">Подключиться</button>
+  <button id="netDisconnect">Отключиться</button>
+  <div id="netStatus">Не подключено</div>
+
+  <h2>💾 Мир</h2>
+  <button id="worldSave">Сохранить мир</button>
+  <button id="worldLoad">Загрузить мир</button>
+  <div id="worldMsg"></div>
 </div>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 <script>
 'use strict';
 /* =========================================================================
-   VOXEL CRAFT — воксельная игра на Three.js, ООП-архитектура
-   Классы: VoxelTexture, VoxelWorld, CloudSystem, Player, InputManager,
-           UIManager, Game
+   VOXEL CRAFT — воксельная игра на Three.js
+   Слоистая ООП-архитектура (как в реальном игровом проекте, где каждый
+   класс лежал бы в своём файле):
+
+     core/        EventBus, утилиты
+     assets/      VoxelTexture (парсер .vtx + анимация кадров)
+     world/       BlockType, VoxelWorld
+     animation/   AnimationClip, AnimationController, buildHumanoid
+     entities/    Player (локальный), RemotePlayer (сетевой)
+     fx/          SoundManager, BreakEffect
+     network/     NetworkTransport, BroadcastChannelTransport,
+                  WebSocketTransport, NetworkManager
+     persistence/ SaveManager
+     systems/     InputManager, CloudSystem
+     ui/          UIManager
+     Game.js      точка сборки
+
+   Модули общаются не напрямую, а через единую шину событий EventBus —
+   так World не знает о существовании сети или звука, а Network и Sound
+   просто подписываются на события 'block:changed' и т.д.
    ========================================================================= */
 
-// ---------------------------------------------------------------------------
-// Утилиты
-// ---------------------------------------------------------------------------
+// =====================================================================
+// core/EventBus.js
+// =====================================================================
+class EventBus {
+  constructor() { this._listeners = {}; }
+  on(event, fn) {
+    (this._listeners[event] = this._listeners[event] || []).push(fn);
+    return () => this.off(event, fn);
+  }
+  off(event, fn) {
+    if (!this._listeners[event]) return;
+    this._listeners[event] = this._listeners[event].filter(f => f !== fn);
+  }
+  emit(event, payload) {
+    (this._listeners[event] || []).slice().forEach(fn => {
+      try { fn(payload); } catch (err) { console.error('EventBus listener error:', err); }
+    });
+  }
+}
+
+// =====================================================================
+// core/utils.js
+// =====================================================================
 function hashRandom(x, z) {
   const s = Math.sin(x * 127.1 + z * 311.7) * 43758.5453;
   return s - Math.floor(s);
 }
 
-/**
- * Строит текст в формате .vtx по параметрам процедурного шума (для дефолтных
- * текстур блоков). Можно использовать несколько кадров (frames>1) + fps,
- * чтобы сразу получить анимированную текстуру.
- */
 function buildSpeckleVtx({ size, palette, weights, frames = 1, fps = 0, seed = 1, stripe = null }) {
   const keys = Object.keys(palette);
   let out = `${size} ${size}\nPALETTE\n` + keys.map(k => `${k}=${palette[k]}`).join(' ') + '\n';
@@ -186,7 +286,6 @@ function buildSpeckleVtx({ size, palette, weights, frames = 1, fps = 0, seed = 1
   return out.trim();
 }
 
-/** Парсер собственного текстового формата текстур .vtx (поддерживает анимацию) */
 function parseVoxelTexture(text) {
   const lines = text.replace(/\r/g, '').split('\n');
   let i = 0;
@@ -248,7 +347,7 @@ function parseVoxelTexture(text) {
     if (idx === -1) break;
     const upper = lines[idx].trim().toUpperCase();
     if (upper === 'FRAME' || upper === 'PIXELS') {
-      next(); // съедаем маркер кадра
+      next();
       const rows = [];
       for (let r = 0; r < h; r++) rows.push(lines[i++] || '');
       frames.push(rows);
@@ -259,9 +358,9 @@ function parseVoxelTexture(text) {
   return { w, h, palette, frames, fps };
 }
 
-// ---------------------------------------------------------------------------
-// VoxelTexture — текстура блока, распарсенная из .vtx, с поддержкой анимации
-// ---------------------------------------------------------------------------
+// =====================================================================
+// assets/VoxelTexture.js
+// =====================================================================
 class VoxelTexture {
   constructor(text) {
     const def = parseVoxelTexture(text);
@@ -284,7 +383,7 @@ class VoxelTexture {
       const row = rows[y] || '';
       for (let x = 0; x < this.w; x++) {
         const ch = row[x] || '.';
-        const hex = palette[ch] || 'FF00FF'; // неизвестный символ -> заметный розовый
+        const hex = palette[ch] || 'FF00FF';
         if (hex === 'TRANSPARENT') {
           this.hasTransparent = true;
           ctx.clearRect(x, y, 1, 1);
@@ -310,7 +409,6 @@ class VoxelTexture {
   get previewCanvas() { return this.canvases[this.frameIndex]; }
   get isAnimated() { return this.textures.length > 1 && this.fps > 0; }
 
-  /** Продвигает анимацию на dt секунд. Возвращает true, если кадр сменился. */
   update(dt) {
     if (!this.isAnimated) return false;
     this.timer += dt;
@@ -324,33 +422,35 @@ class VoxelTexture {
   }
 }
 
-// ---------------------------------------------------------------------------
-// BlockType — описание одного типа блока
-// ---------------------------------------------------------------------------
+// =====================================================================
+// world/BlockType.js
+// =====================================================================
 class BlockType {
   constructor(id, name, color) {
     this.id = id;
     this.name = name;
     this.color = color;
-    this.texture = null; // VoxelTexture | null
+    this.texture = null;
   }
 }
 
-// ---------------------------------------------------------------------------
-// VoxelWorld — хранилище вокселей + оптимизированный рендер через InstancedMesh
-// ---------------------------------------------------------------------------
+// =====================================================================
+// world/VoxelWorld.js
+// =====================================================================
 class VoxelWorld {
-  constructor(scene, sizeX, sizeY, sizeZ, maxInstancesPerType = 26000) {
+  constructor(scene, sizeX, sizeY, sizeZ, bus, maxInstancesPerType = 26000) {
     this.scene = scene;
+    this.bus = bus;
     this.sx = sizeX; this.sy = sizeY; this.sz = sizeZ;
     this.maxInstances = maxInstancesPerType;
 
     this.blocks = new Uint8Array(sizeX * sizeY * sizeZ);
-    this.blockTypes = {};   // id -> BlockType
-    this.meshes = {};       // id -> InstancedMesh
-    this.counts = {};       // id -> текущее число инстансов
-    this.slotToPos = {};    // id -> [key,...] индекс инстанса -> позиция
-    this.posToSlot = new Map(); // "x,y,z" -> {type, slot}
+    this.heightMap = new Int16Array(sizeX * sizeZ).fill(-1);
+    this.blockTypes = {};
+    this.meshes = {};
+    this.counts = {};
+    this.slotToPos = {};
+    this.posToSlot = new Map();
 
     this._boxGeom = new THREE.BoxGeometry(1, 1, 1);
     this._dummy = new THREE.Object3D();
@@ -380,7 +480,7 @@ class VoxelWorld {
     this.blockTypes[id].texture = voxelTexture;
     const mat = this.meshes[id].material;
     mat.map = voxelTexture.current;
-    mat.color.set(0xffffff); // цвет-пикер дальше работает как тонировка поверх текстуры
+    mat.color.set(0xffffff);
     mat.alphaTest = voxelTexture.hasTransparent ? 0.5 : 0;
     mat.needsUpdate = true;
   }
@@ -389,7 +489,6 @@ class VoxelWorld {
     this.meshes[id].material.color.set(hex);
   }
 
-  /** Прогоняет анимацию текстур всех блоков; вызывать раз в кадр. */
   updateTextureAnimations(dt) {
     for (const id in this.blockTypes) {
       const bt = this.blockTypes[id];
@@ -407,8 +506,14 @@ class VoxelWorld {
 
   isSolid(x, y, z) {
     const bx = Math.floor(x), by = Math.floor(y), bz = Math.floor(z);
-    if (by < 0) return true; // не проваливаться под мир
+    if (by < 0) return true;
     return this.getBlock(bx, by, bz) !== 0;
+  }
+
+  get blockCount() {
+    let n = 0;
+    for (const id in this.counts) n += this.counts[id];
+    return n;
   }
 
   _placeInstance(type, x, y, z) {
@@ -447,16 +552,31 @@ class VoxelWorld {
     mesh.instanceMatrix.needsUpdate = true;
   }
 
-  setBlock(x, y, z, type) {
+  _updateHeightOnChange(x, z, y, newType, prevType) {
+    const hi = z * this.sx + x;
+    if (newType !== 0) {
+      if (y > this.heightMap[hi]) this.heightMap[hi] = y;
+    } else if (prevType !== 0 && y === this.heightMap[hi]) {
+      let ny = y - 1;
+      while (ny >= 0 && this.getBlock(x, ny, z) === 0) ny--;
+      this.heightMap[hi] = ny;
+    }
+  }
+
+  setBlock(x, y, z, type, opts) {
+    opts = opts || {};
+    const local = opts.local !== false;
+    const silent = !!opts.silent;
     if (!this.inBounds(x, y, z)) return;
     const cur = this.getBlock(x, y, z);
     if (cur === type) return;
     if (cur !== 0) this._removeInstance(x, y, z);
     this.blocks[this.idx(x, y, z)] = type;
     if (type !== 0) this._placeInstance(type, x, y, z);
+    this._updateHeightOnChange(x, z, y, type, cur);
+    if (!silent && this.bus) this.bus.emit('block:changed', { x, y, z, type, prevType: cur, local });
   }
 
-  /** Простая процедурная генерация ландшафта + редкие деревья */
   generateTerrain() {
     const heightAt = (x, z) => {
       const n = Math.sin(x * 0.10) + Math.sin(z * 0.13) + Math.sin((x + z) * 0.045) + Math.sin(x * 0.07 - z * 0.09) * 0.6;
@@ -469,25 +589,198 @@ class VoxelWorld {
           let t = 3;
           if (y === h) t = 1;
           else if (y >= h - 3) t = 2;
-          this.setBlock(x, y, z, t);
+          this.setBlock(x, y, z, t, { silent: true });
         }
         if (hashRandom(x, z) > 0.985 && h < this.sy - 6) {
           const trunkH = 3 + Math.floor(hashRandom(x + 1, z + 1) * 2);
-          for (let ty = 1; ty <= trunkH; ty++) this.setBlock(x, h + ty, z, 4);
+          for (let ty = 1; ty <= trunkH; ty++) this.setBlock(x, h + ty, z, 4, { silent: true });
           for (let lx = -1; lx <= 1; lx++)
             for (let lz = -1; lz <= 1; lz++)
               for (let ly = 0; ly <= 1; ly++)
-                this.setBlock(x + lx, h + trunkH + ly, z + lz, 5);
-          this.setBlock(x, h + trunkH + 2, z, 5);
+                this.setBlock(x + lx, h + trunkH + ly, z + lz, 5, { silent: true });
+          this.setBlock(x, h + trunkH + 2, z, 5, { silent: true });
         }
       }
     }
   }
+
+  serialize() {
+    const out = [];
+    let cur = this.blocks[0], count = 0;
+    for (let i = 0; i < this.blocks.length; i++) {
+      const v = this.blocks[i];
+      if (v === cur) { count++; }
+      else { out.push(cur + ':' + count); cur = v; count = 1; }
+    }
+    out.push(cur + ':' + count);
+    return { sx: this.sx, sy: this.sy, sz: this.sz, rle: out.join(',') };
+  }
+
+  deserialize(data) {
+    if (data.sx !== this.sx || data.sy !== this.sy || data.sz !== this.sz) {
+      throw new Error('Размер сохранённого мира не совпадает с текущим');
+    }
+    for (const id in this.meshes) {
+      this.meshes[id].count = 0;
+      this.counts[id] = 0;
+      this.slotToPos[id] = [];
+    }
+    this.posToSlot.clear();
+    this.blocks.fill(0);
+    this.heightMap.fill(-1);
+
+    const parts = data.rle.split(',');
+    let i = 0;
+    const area = this.sx * this.sz;
+    parts.forEach(p => {
+      const [vStr, cStr] = p.split(':');
+      const v = parseInt(vStr), c = parseInt(cStr);
+      for (let k = 0; k < c; k++) {
+        if (v !== 0) {
+          const y = Math.floor(i / area);
+          const rem = i % area;
+          const z = Math.floor(rem / this.sx);
+          const x = rem % this.sx;
+          this.blocks[i] = v;
+          this._placeInstance(v, x, y, z);
+          this._updateHeightOnChange(x, z, y, v, 0);
+        }
+        i++;
+      }
+    });
+  }
 }
 
-// ---------------------------------------------------------------------------
-// CloudSystem — лёгкие полупрозрачные воксельные облака с медленным дрейфом
-// ---------------------------------------------------------------------------
+// =====================================================================
+// animation/AnimationClip.js
+// =====================================================================
+class AnimationClip {
+  constructor(name, duration, tracks, loop = true) {
+    this.name = name;
+    this.duration = duration;
+    this.tracks = tracks;
+    this.loop = loop;
+  }
+
+  sample(t) {
+    const tt = this.loop ? (t % this.duration) : Math.min(t, this.duration);
+    const pose = {};
+    for (const part in this.tracks) pose[part] = AnimationClip._sampleTrack(this.tracks[part], tt);
+    return pose;
+  }
+
+  static _sampleTrack(kfs, t) {
+    if (!kfs.length) return [0, 0, 0];
+    if (kfs.length === 1) return kfs[0].rot.slice();
+    let i = 0;
+    while (i < kfs.length - 1 && kfs[i + 1].t < t) i++;
+    const a = kfs[i], b = kfs[Math.min(i + 1, kfs.length - 1)];
+    const span = (b.t - a.t) || 1;
+    const f = Math.max(0, Math.min(1, (t - a.t) / span));
+    return [
+      a.rot[0] + (b.rot[0] - a.rot[0]) * f,
+      a.rot[1] + (b.rot[1] - a.rot[1]) * f,
+      a.rot[2] + (b.rot[2] - a.rot[2]) * f,
+    ];
+  }
+
+  toJSON() { return { name: this.name, duration: this.duration, loop: this.loop, tracks: this.tracks }; }
+
+  static fromJSON(data) {
+    if (!data || typeof data !== 'object') throw new Error('Некорректные данные анимации');
+    if (!data.tracks || typeof data.tracks !== 'object' || !Object.keys(data.tracks).length) {
+      throw new Error('Нужно непустое поле tracks');
+    }
+    const validParts = ['armL', 'armR', 'legL', 'legR', 'head', 'torso'];
+    for (const part in data.tracks) {
+      if (!validParts.includes(part)) throw new Error('Неизвестная часть тела: ' + part);
+    }
+    return new AnimationClip(data.name || 'custom', Number(data.duration) || 1, data.tracks, !!data.loop);
+  }
+}
+
+// =====================================================================
+// animation/AnimationController.js
+// =====================================================================
+class AnimationController {
+  constructor(parts) { this.parts = parts; this.clip = null; this.t = 0; this.speed = 1; }
+
+  play(clip, { reset = true, speed = 1 } = {}) {
+    if (this.clip === clip && !reset) return;
+    this.clip = clip; this.t = 0; this.speed = speed;
+  }
+
+  update(dt) {
+    if (!this.clip) return;
+    this.t += dt * this.speed;
+    const pose = this.clip.sample(this.t);
+    for (const partName in pose) {
+      const obj = this.parts[partName];
+      if (!obj) continue;
+      const [rx, ry, rz] = pose[partName];
+      obj.rotation.set(rx, ry, rz);
+    }
+  }
+
+  get finished() { return !!this.clip && !this.clip.loop && this.t >= this.clip.duration; }
+}
+
+function buildHumanoid(visible) {
+  const group = new THREE.Group();
+  const parts = {};
+  function mk(name, w, h, d, color, pivotY, x) {
+    const geo = new THREE.BoxGeometry(w, h, d);
+    geo.translate(0, -h / 2, 0);
+    const mat = new THREE.MeshLambertMaterial({ color });
+    if (!visible) { mat.colorWrite = false; mat.depthWrite = false; }
+    const mesh = new THREE.Mesh(geo, mat);
+    mesh.castShadow = true;
+    mesh.receiveShadow = false;
+    const pivot = new THREE.Group();
+    pivot.position.set(x, pivotY, 0);
+    pivot.add(mesh);
+    group.add(pivot);
+    parts[name] = pivot;
+  }
+  mk('legL', 0.16, 0.5, 0.16, 0x37474F, 0.5, -0.1);
+  mk('legR', 0.16, 0.5, 0.16, 0x37474F, 0.5, 0.1);
+  mk('torso', 0.4, 0.55, 0.22, 0x3F51B5, 1.05, 0);
+  mk('armL', 0.15, 0.5, 0.15, 0x3F51B5, 1.0, -0.32);
+  mk('armR', 0.15, 0.5, 0.15, 0x3F51B5, 1.0, 0.32);
+  mk('head', 0.35, 0.35, 0.35, 0xE0AC69, 1.4, 0);
+  return { group, parts };
+}
+
+function createDefaultClips() {
+  const idle = new AnimationClip('idle', 2, {
+    armL: [{ t: 0, rot: [0, 0, 0.05] }, { t: 1, rot: [0, 0, -0.05] }, { t: 2, rot: [0, 0, 0.05] }],
+    armR: [{ t: 0, rot: [0, 0, -0.05] }, { t: 1, rot: [0, 0, 0.05] }, { t: 2, rot: [0, 0, -0.05] }],
+  }, true);
+
+  const walk = new AnimationClip('walk', 0.6, {
+    legL: [{ t: 0, rot: [0.6, 0, 0] }, { t: 0.3, rot: [-0.6, 0, 0] }, { t: 0.6, rot: [0.6, 0, 0] }],
+    legR: [{ t: 0, rot: [-0.6, 0, 0] }, { t: 0.3, rot: [0.6, 0, 0] }, { t: 0.6, rot: [-0.6, 0, 0] }],
+    armL: [{ t: 0, rot: [-0.5, 0, 0] }, { t: 0.3, rot: [0.5, 0, 0] }, { t: 0.6, rot: [-0.5, 0, 0] }],
+    armR: [{ t: 0, rot: [0.5, 0, 0] }, { t: 0.3, rot: [-0.5, 0, 0] }, { t: 0.6, rot: [0.5, 0, 0] }],
+  }, true);
+
+  const jump = new AnimationClip('jump', 0.35, {
+    legL: [{ t: 0, rot: [-0.3, 0, 0] }, { t: 0.35, rot: [0.2, 0, 0] }],
+    legR: [{ t: 0, rot: [-0.3, 0, 0] }, { t: 0.35, rot: [0.2, 0, 0] }],
+    armL: [{ t: 0, rot: [-1.4, 0, 0] }, { t: 0.35, rot: [-0.6, 0, 0] }],
+    armR: [{ t: 0, rot: [-1.4, 0, 0] }, { t: 0.35, rot: [-0.6, 0, 0] }],
+  }, false);
+
+  const mine = new AnimationClip('mine', 0.35, {
+    armR: [{ t: 0, rot: [-1.2, 0, 0] }, { t: 0.18, rot: [0.3, 0, 0] }, { t: 0.35, rot: [-1.2, 0, 0] }],
+  }, true);
+
+  return { idle, walk, jump, mine };
+}
+
+// =====================================================================
+// systems/CloudSystem.js
+// =====================================================================
 class CloudSystem {
   constructor(scene, worldX, worldZ) {
     this.scene = scene;
@@ -529,9 +822,9 @@ class CloudSystem {
   }
 }
 
-// ---------------------------------------------------------------------------
-// InputManager — клавиатура, мышь, pointer lock
-// ---------------------------------------------------------------------------
+// =====================================================================
+// systems/InputManager.js
+// =====================================================================
 class InputManager {
   constructor(canvas) {
     this.canvas = canvas;
@@ -561,7 +854,6 @@ class InputManager {
   requestLock() { this.canvas.requestPointerLock(); }
   exitLock() { document.exitPointerLock(); }
 
-  /** Забирает накопленные дельты мыши за кадр (и обнуляет их) */
   consumeMouseDelta() {
     const d = { yaw: this.yawDelta, pitch: this.pitchDelta };
     this.yawDelta = 0; this.pitchDelta = 0;
@@ -569,13 +861,14 @@ class InputManager {
   }
 }
 
-// ---------------------------------------------------------------------------
-// Player — физика, коллизии, камера, невидимая (но с тенью) воксельная модель
-// ---------------------------------------------------------------------------
+// =====================================================================
+// entities/Player.js — локальный игрок: физика, коллизии, камера, анимация
+// =====================================================================
 class Player {
-  constructor(world, scene, camera) {
+  constructor(world, scene, camera, bus) {
     this.world = world;
     this.camera = camera;
+    this.bus = bus;
 
     this.pos = new THREE.Vector3(world.sx / 2, world.sy, world.sz / 2);
     this.vel = new THREE.Vector3(0, 0, 0);
@@ -591,9 +884,21 @@ class Player {
     this.MOVE_SPEED = 5.2;
 
     this._bobTimer = 0;
+    this._footstepTimer = 0;
+    this._mineTimer = 0;
+    this._customTimer = 0;
 
     this._spawnOnGround();
-    this._buildInvisibleShadowModel(scene);
+
+    const built = buildHumanoid(false);
+    this.model = built.group;
+    this.parts = built.parts;
+    scene.add(this.model);
+
+    this.clips = createDefaultClips();
+    this.animController = new AnimationController(this.parts);
+    this.animController.play(this.clips.idle);
+    this.currentAnimName = 'idle';
   }
 
   _spawnOnGround() {
@@ -603,32 +908,12 @@ class Player {
     }
   }
 
-  /**
-   * Простая воксельная фигурка игрока. Она НЕ видна самому игроку (colorWrite
-   * выключен, поэтому меш ничего не пишет в цветовой буфер основного кадра),
-   * но тени в three.js — отдельный depth-проход со своим материалом, который
-   * colorWrite не учитывает, так что тень от фигурки всё равно отрисовывается.
-   */
-  _buildInvisibleShadowModel(scene) {
-    this.model = new THREE.Group();
-    const addPart = (w, h, d, y, color, xOff = 0) => {
-      const geo = new THREE.BoxGeometry(w, h, d);
-      const mat = new THREE.MeshLambertMaterial({ color });
-      mat.colorWrite = false;
-      mat.depthWrite = false;
-      const m = new THREE.Mesh(geo, mat);
-      m.position.set(xOff, y + h / 2, 0);
-      m.castShadow = true;
-      m.receiveShadow = false;
-      this.model.add(m);
-    };
-    addPart(0.16, 0.5, 0.16, 0.0, 0x37474F, -0.1);  // левая нога
-    addPart(0.16, 0.5, 0.16, 0.0, 0x37474F, 0.1);   // правая нога
-    addPart(0.4, 0.55, 0.22, 0.5, 0x3F51B5);        // торс
-    addPart(0.15, 0.5, 0.15, 0.5, 0x3F51B5, -0.32); // левая рука
-    addPart(0.15, 0.5, 0.15, 0.5, 0x3F51B5, 0.32);  // правая рука
-    addPart(0.35, 0.35, 0.35, 1.05, 0xE0AC69);      // голова
-    scene.add(this.model);
+  triggerMine() { this._mineTimer = 0.35; }
+
+  triggerCustom(clip) {
+    this._customTimer = clip.duration;
+    this.animController.play(clip, { reset: true });
+    this.currentAnimName = 'custom';
   }
 
   _collidesBox(pos) {
@@ -642,7 +927,6 @@ class Player {
     return false;
   }
 
-  /** input: {keys, mouseDelta:{yaw,pitch}} */
   update(dt, input) {
     this.yaw += input.mouseDelta.yaw;
     this.pitch += input.mouseDelta.pitch;
@@ -651,7 +935,6 @@ class Player {
     this.vel.y += this.GRAVITY * dt;
     if (this.vel.y < -40) this.vel.y = -40;
 
-    // камера смотрит вдоль -Z, поэтому forward = R_y(yaw)*(0,0,-1)
     const forward = new THREE.Vector3(-Math.sin(this.yaw), 0, -Math.cos(this.yaw));
     const right = new THREE.Vector3(Math.cos(this.yaw), 0, -Math.sin(this.yaw));
     const mv = new THREE.Vector3();
@@ -665,6 +948,7 @@ class Player {
     if (input.keys['Space'] && this.onGround) {
       this.vel.y = this.JUMP_SPEED;
       this.onGround = false;
+      if (this.bus) this.bus.emit('player:jump', {});
     }
 
     const dx = mv.x * dt, dz = mv.z * dt, dy = this.vel.y * dt;
@@ -684,13 +968,18 @@ class Player {
     p.x = Math.max(0.5, Math.min(this.world.sx - 0.5, p.x));
     p.z = Math.max(0.5, Math.min(this.world.sz - 0.5, p.z));
 
-    // лёгкое покачивание камеры при ходьбе по земле — простая процедурная анимация
     let bobOffset = 0;
     if (moving && this.onGround) {
       this._bobTimer += dt * 9;
       bobOffset = Math.abs(Math.sin(this._bobTimer)) * 0.06;
+      this._footstepTimer -= dt;
+      if (this._footstepTimer <= 0) {
+        this._footstepTimer = 0.28;
+        if (this.bus) this.bus.emit('player:footstep', {});
+      }
     } else {
       this._bobTimer = 0;
+      this._footstepTimer = 0;
     }
 
     this.camera.position.set(p.x, p.y + this.eye + bobOffset, p.z);
@@ -700,12 +989,391 @@ class Player {
 
     this.model.position.set(p.x, p.y, p.z);
     this.model.rotation.y = this.yaw;
+
+    if (this._customTimer > 0) {
+      this._customTimer -= dt;
+    } else if (this._mineTimer > 0) {
+      this._mineTimer -= dt;
+      if (this.currentAnimName !== 'mine') { this.animController.play(this.clips.mine); this.currentAnimName = 'mine'; }
+    } else if (!this.onGround) {
+      if (this.currentAnimName !== 'jump') { this.animController.play(this.clips.jump); this.currentAnimName = 'jump'; }
+    } else if (moving) {
+      if (this.currentAnimName !== 'walk') { this.animController.play(this.clips.walk); this.currentAnimName = 'walk'; }
+    } else {
+      if (this.currentAnimName !== 'idle') { this.animController.play(this.clips.idle); this.currentAnimName = 'idle'; }
+    }
+    this.animController.update(dt);
+  }
+
+  getNetState() {
+    const anim = (this.currentAnimName === 'custom') ? 'idle' : this.currentAnimName;
+    return { x: this.pos.x, y: this.pos.y, z: this.pos.z, yaw: this.yaw, anim };
   }
 }
 
-// ---------------------------------------------------------------------------
-// UIManager — хотбар и панель редактора (цвета, текстуры, модели)
-// ---------------------------------------------------------------------------
+// =====================================================================
+// entities/RemotePlayer.js — видимая модель другого игрока по сети
+// =====================================================================
+class RemotePlayer {
+  constructor(scene, id, name, defaultClips) {
+    this.id = id;
+    this.name = name;
+    this.scene = scene;
+
+    const built = buildHumanoid(true);
+    this.group = built.group;
+    this.parts = built.parts;
+    scene.add(this.group);
+
+    this.defaultClips = defaultClips;
+    this.animController = new AnimationController(this.parts);
+    this.animController.play(defaultClips.idle);
+
+    this.targetPos = new THREE.Vector3();
+    this.yaw = 0; this.targetYaw = 0;
+    this._customUntil = null;
+    this._addLabel(name);
+  }
+
+  _addLabel(name) {
+    const canvas = document.createElement('canvas');
+    canvas.width = 256; canvas.height = 64;
+    const ctx = canvas.getContext('2d');
+    ctx.fillStyle = 'rgba(0,0,0,0.45)'; ctx.fillRect(0, 0, 256, 64);
+    ctx.fillStyle = '#fff'; ctx.font = 'bold 28px sans-serif'; ctx.textAlign = 'center';
+    ctx.fillText(name, 128, 40);
+    const tex = new THREE.CanvasTexture(canvas);
+    const mat = new THREE.SpriteMaterial({ map: tex, depthTest: false });
+    const sprite = new THREE.Sprite(mat);
+    sprite.scale.set(1.4, 0.35, 1);
+    sprite.position.set(0, 2.0, 0);
+    this.group.add(sprite);
+  }
+
+  applyState(s) {
+    this.targetPos.set(s.x, s.y, s.z);
+    this.targetYaw = s.yaw;
+    if (!this._customUntil) {
+      const clip = this.defaultClips[s.anim];
+      if (clip && this.animController.clip !== clip) this.animController.play(clip);
+    }
+  }
+
+  playCustomClip(clip) {
+    this.animController.play(clip, { reset: true });
+    this._customUntil = performance.now() + clip.duration * 1000;
+  }
+
+  update(dt) {
+    this.group.position.lerp(this.targetPos, Math.min(1, dt * 10));
+    let dy = this.targetYaw - this.yaw;
+    while (dy > Math.PI) dy -= Math.PI * 2;
+    while (dy < -Math.PI) dy += Math.PI * 2;
+    this.yaw += dy * Math.min(1, dt * 10);
+    this.group.rotation.y = this.yaw;
+    this.animController.update(dt);
+    if (this._customUntil && performance.now() > this._customUntil) {
+      this._customUntil = null;
+      this.animController.play(this.defaultClips.idle);
+    }
+  }
+
+  dispose() { this.scene.remove(this.group); }
+}
+
+// =====================================================================
+// fx/SoundManager.js — процедурный звук на WebAudio, без внешних файлов
+// =====================================================================
+class SoundManager {
+  constructor() { this.ctx = null; this.muted = false; }
+  _ensure() {
+    if (!this.ctx) this.ctx = new (window.AudioContext || window.webkitAudioContext)();
+    return this.ctx;
+  }
+  _blip(freq, dur, type, gainMax) {
+    if (this.muted) return;
+    try {
+      const ctx = this._ensure();
+      const osc = ctx.createOscillator();
+      const gain = ctx.createGain();
+      osc.type = type; osc.frequency.value = freq;
+      gain.gain.setValueAtTime(0, ctx.currentTime);
+      gain.gain.linearRampToValueAtTime(gainMax, ctx.currentTime + 0.01);
+      gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + dur);
+      osc.connect(gain); gain.connect(ctx.destination);
+      osc.start(); osc.stop(ctx.currentTime + dur + 0.02);
+    } catch (e) { /* аудио недоступно (например, до жеста пользователя) */ }
+  }
+  breakSound() { this._blip(180, 0.12, 'square', 0.12); }
+  place() { this._blip(320, 0.09, 'triangle', 0.12); }
+  jump() { this._blip(500, 0.08, 'sine', 0.10); }
+  footstep() { this._blip(110, 0.05, 'square', 0.05); }
+  toggleMute() { this.muted = !this.muted; return this.muted; }
+}
+
+// =====================================================================
+// fx/BreakEffect.js — частицы разрушения блока
+// =====================================================================
+class BreakEffect {
+  constructor(scene, x, y, z, color) {
+    this.scene = scene;
+    this.group = new THREE.Group();
+    this.parts = [];
+    const geo = new THREE.BoxGeometry(0.18, 0.18, 0.18);
+    for (let i = 0; i < 6; i++) {
+      const mat = new THREE.MeshLambertMaterial({ color });
+      const m = new THREE.Mesh(geo, mat);
+      m.position.set(
+        x + 0.5 + (Math.random() - 0.5) * 0.6,
+        y + 0.5 + (Math.random() - 0.5) * 0.6,
+        z + 0.5 + (Math.random() - 0.5) * 0.6
+      );
+      m.userData.vel = new THREE.Vector3((Math.random() - 0.5) * 2, Math.random() * 2.5, (Math.random() - 0.5) * 2);
+      this.group.add(m);
+      this.parts.push(m);
+    }
+    scene.add(this.group);
+    this.life = 0; this.maxLife = 0.5;
+    this.dead = false;
+  }
+
+  update(dt) {
+    this.life += dt;
+    const s = Math.max(0, 1 - this.life / this.maxLife);
+    this.parts.forEach(m => {
+      m.userData.vel.y -= 9 * dt;
+      m.position.addScaledVector(m.userData.vel, dt);
+      m.scale.setScalar(s);
+    });
+    if (this.life >= this.maxLife) {
+      this.dead = true;
+      this.scene.remove(this.group);
+      this.parts.forEach(m => m.material.dispose());
+    }
+  }
+}
+
+// =====================================================================
+// network/NetworkTransport.js — общий интерфейс канала связи
+// =====================================================================
+class NetworkTransport {
+  connect() {}
+  send(_obj) {}
+  disconnect() {}
+  onMessage(_cb) {}
+  onOpen(_cb) {}
+  onClose(_cb) {}
+}
+
+class BroadcastChannelTransport extends NetworkTransport {
+  constructor(room) {
+    super();
+    this.room = room;
+    this.channel = null;
+    this._msgCb = null; this._openCb = null; this._closeCb = null;
+  }
+  connect() {
+    this.channel = new BroadcastChannel('voxelcraft:' + this.room);
+    this.channel.onmessage = (e) => { this._msgCb && this._msgCb(e.data); };
+    if (this._openCb) this._openCb();
+  }
+  send(obj) { if (this.channel) this.channel.postMessage(obj); }
+  disconnect() {
+    if (this.channel) { this.channel.close(); this.channel = null; }
+    if (this._closeCb) this._closeCb();
+  }
+  onMessage(cb) { this._msgCb = cb; }
+  onOpen(cb) { this._openCb = cb; }
+  onClose(cb) { this._closeCb = cb; }
+}
+
+class WebSocketTransport extends NetworkTransport {
+  constructor(url) {
+    super();
+    this.url = url;
+    this.ws = null;
+    this._msgCb = null; this._openCb = null; this._closeCb = null;
+  }
+  connect() {
+    this.ws = new WebSocket(this.url);
+    this.ws.onmessage = (e) => { try { this._msgCb && this._msgCb(JSON.parse(e.data)); } catch (err) {} };
+    this.ws.onopen = () => { this._openCb && this._openCb(); };
+    this.ws.onclose = () => { this._closeCb && this._closeCb(); };
+    this.ws.onerror = () => { this._closeCb && this._closeCb(); };
+  }
+  send(obj) { if (this.ws && this.ws.readyState === WebSocket.OPEN) this.ws.send(JSON.stringify(obj)); }
+  disconnect() { if (this.ws) { this.ws.close(); this.ws = null; } }
+  onMessage(cb) { this._msgCb = cb; }
+  onOpen(cb) { this._openCb = cb; }
+  onClose(cb) { this._closeCb = cb; }
+}
+
+// =====================================================================
+// network/NetworkManager.js
+// =====================================================================
+class NetworkManager {
+  constructor(bus, scene, world, defaultClips, getLocalState) {
+    this.bus = bus; this.scene = scene; this.world = world;
+    this.defaultClips = defaultClips;
+    this.getLocalState = getLocalState;
+
+    this.transport = null;
+    this.id = 'p-' + Math.random().toString(36).slice(2, 9);
+    this.name = 'Игрок';
+    this.peers = new Map();
+    this.connected = false;
+    this._sendTimer = 0;
+
+    bus.on('block:changed', (e) => {
+      if (!e.local || !this.connected) return;
+      this.transport.send({ type: 'block', id: this.id, x: e.x, y: e.y, z: e.z, blockType: e.type });
+    });
+  }
+
+  connect(transport, name) {
+    if (this.transport) this.disconnect();
+    if (name) this.name = name;
+    this.transport = transport;
+    transport.onMessage((msg) => this._onMessage(msg));
+    transport.onOpen(() => {
+      this.connected = true;
+      this.transport.send({ type: 'hello', id: this.id, name: this.name });
+      this.bus.emit('net:status', { connected: true, count: this.peers.size });
+    });
+    transport.onClose(() => {
+      this.connected = false;
+      this.bus.emit('net:status', { connected: false, count: 0 });
+    });
+    transport.connect();
+  }
+
+  disconnect() {
+    if (this.transport) {
+      try { this.transport.send({ type: 'bye', id: this.id }); } catch (e) {}
+      this.transport.disconnect();
+    }
+    this.transport = null;
+    this.connected = false;
+    this.peers.forEach(p => p.dispose());
+    this.peers.clear();
+    this.bus.emit('net:status', { connected: false, count: 0 });
+  }
+
+  _ensurePeer(id, name) {
+    let p = this.peers.get(id);
+    if (!p) {
+      p = new RemotePlayer(this.scene, id, name || 'Игрок', this.defaultClips);
+      this.peers.set(id, p);
+      this.bus.emit('net:status', { connected: this.connected, count: this.peers.size });
+    }
+    return p;
+  }
+
+  _onMessage(msg) {
+    if (!msg || msg.id === this.id) return;
+    if (msg.type === 'hello') {
+      this._ensurePeer(msg.id, msg.name);
+      const s = this.getLocalState();
+      this.transport.send(Object.assign({ type: 'state', id: this.id, name: this.name }, s));
+    } else if (msg.type === 'state') {
+      this._ensurePeer(msg.id, msg.name).applyState(msg);
+    } else if (msg.type === 'block') {
+      this.world.setBlock(msg.x, msg.y, msg.z, msg.blockType, { local: false });
+    } else if (msg.type === 'customAnim') {
+      try {
+        const clip = AnimationClip.fromJSON(msg.clip);
+        this._ensurePeer(msg.id, msg.name).playCustomClip(clip);
+      } catch (e) {}
+    } else if (msg.type === 'bye') {
+      const p = this.peers.get(msg.id);
+      if (p) { p.dispose(); this.peers.delete(msg.id); }
+      this.bus.emit('net:status', { connected: this.connected, count: this.peers.size });
+    }
+  }
+
+  broadcastCustomAnim(clip) {
+    if (!this.connected) return;
+    this.transport.send({ type: 'customAnim', id: this.id, name: this.name, clip: clip.toJSON() });
+  }
+
+  update(dt) {
+    this.peers.forEach(p => p.update(dt));
+    if (!this.connected) return;
+    this._sendTimer += dt;
+    if (this._sendTimer >= 0.1) {
+      this._sendTimer = 0;
+      const s = this.getLocalState();
+      this.transport.send(Object.assign({ type: 'state', id: this.id, name: this.name }, s));
+    }
+  }
+}
+
+// =====================================================================
+// persistence/SaveManager.js
+// =====================================================================
+class SaveManager {
+  constructor(game) {
+    this.game = game;
+    this._hasStorage = (typeof window.storage !== 'undefined');
+  }
+
+  async save() {
+    const data = {
+      world: this.game.world.serialize(),
+      player: { x: this.game.player.pos.x, y: this.game.player.pos.y, z: this.game.player.pos.z, yaw: this.game.player.yaw },
+      savedAt: Date.now(),
+    };
+    const json = JSON.stringify(data);
+    if (this._hasStorage) {
+      const res = await window.storage.set('voxelcraft:save', json, false);
+      if (!res) throw new Error('Не удалось сохранить (хранилище недоступно)');
+      return;
+    }
+    const blob = new Blob([json], { type: 'application/json' });
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = 'voxelcraft-world.json';
+    a.click();
+    URL.revokeObjectURL(a.href);
+  }
+
+  async load() {
+    if (this._hasStorage) {
+      let res;
+      try { res = await window.storage.get('voxelcraft:save', false); }
+      catch (e) { throw new Error('Сохранение не найдено'); }
+      if (!res) throw new Error('Сохранение не найдено');
+      this._apply(JSON.parse(res.value));
+      return;
+    }
+    return new Promise((resolve, reject) => {
+      const input = document.createElement('input');
+      input.type = 'file'; input.accept = '.json';
+      input.onchange = () => {
+        const file = input.files[0];
+        if (!file) { reject(new Error('Файл не выбран')); return; }
+        const reader = new FileReader();
+        reader.onload = () => {
+          try { this._apply(JSON.parse(reader.result)); resolve(); }
+          catch (err) { reject(err); }
+        };
+        reader.onerror = () => reject(new Error('Не удалось прочитать файл'));
+        reader.readAsText(file);
+      };
+      input.click();
+    });
+  }
+
+  _apply(data) {
+    this.game.world.deserialize(data.world);
+    this.game.player.pos.set(data.player.x, data.player.y, data.player.z);
+    this.game.player.yaw = data.player.yaw;
+  }
+}
+
+// =====================================================================
+// ui/UIManager.js — хотбар и панель редактора (цвета, текстуры, модели)
+// =====================================================================
 class UIManager {
   constructor(game) {
     this.game = game;
@@ -842,7 +1510,6 @@ class UIManager {
       row.appendChild(head); row.appendChild(ta); row.appendChild(msg);
       wrap.appendChild(row);
 
-      // применяем дефолтную текстуру блока сразу
       try {
         const tex = new VoxelTexture(this.game.defaultTextures[type]);
         world.setBlockTexture(type, tex);
@@ -867,17 +1534,19 @@ class UIManager {
   }
 }
 
-// ---------------------------------------------------------------------------
-// Game — точка сборки: сцена, свет, мир, игрок, ввод, UI, главный цикл
-// ---------------------------------------------------------------------------
+// =====================================================================
+// Game.js — точка сборки: сцена, свет, мир, игрок, сеть, ui, главный цикл
+// =====================================================================
 class Game {
   constructor() {
     this.WORLD_X = 48; this.WORLD_Y = 28; this.WORLD_Z = 48;
 
+    this.bus = new EventBus();
+
     this._initRenderer();
     this._initLights();
 
-    this.world = new VoxelWorld(this.scene, this.WORLD_X, this.WORLD_Y, this.WORLD_Z);
+    this.world = new VoxelWorld(this.scene, this.WORLD_X, this.WORLD_Y, this.WORLD_Z, this.bus);
     this.world.registerBlockType(1, 'Трава', 0x5DBB4F);
     this.world.registerBlockType(2, 'Земля', 0x8B5A2B);
     this.world.registerBlockType(3, 'Камень', 0x8A8A8A);
@@ -888,12 +1557,22 @@ class Game {
     this.defaultTextures = this._buildDefaultTextures();
 
     this.clouds = new CloudSystem(this.scene, this.WORLD_X, this.WORLD_Z);
-    this.player = new Player(this.world, this.scene, this.camera);
+    this.player = new Player(this.world, this.scene, this.camera, this.bus);
     this.input = new InputManager(this.renderer.domElement);
-    this.ui = new UIManager(this); // применит дефолтные текстуры блокам
+    this.sound = new SoundManager();
+    this.effects = [];
+    this.customClip = null;
+
+    const defaultClips = createDefaultClips();
+    this.network = new NetworkManager(this.bus, this.scene, this.world, defaultClips, () => this.player.getNetState());
+    this.save = new SaveManager(this);
+
+    this.ui = new UIManager(this);
 
     this._bindKeys();
     this._bindMouseActions();
+    this._bindExtraUI();
+    this._bindBusEvents();
 
     document.getElementById('startBtn').addEventListener('click', () => {
       document.getElementById('startScreen').style.display = 'none';
@@ -903,6 +1582,7 @@ class Game {
     window.addEventListener('resize', () => this._onResize());
 
     this._lastTime = performance.now();
+    this._fps = 0; this._fpsTimer = 0; this._fpsFrames = 0;
     this._loop = this._loop.bind(this);
     requestAnimationFrame(this._loop);
   }
@@ -942,14 +1622,12 @@ class Game {
     this.scene.add(sun.target);
   }
 
-  /** Дефолтные текстуры блоков 32x32 в собственном текстовом формате (генерируются кодом) */
   _buildDefaultTextures() {
     return {
       1: buildSpeckleVtx({ size: 32, palette: { g: '6CC24A', k: '57A63D' }, weights: [0.82, 0.18], seed: 1 }),
       2: buildSpeckleVtx({ size: 32, palette: { d: '8B5A2B', k: '6E4620', l: 'A16B3B' }, weights: [0.72, 0.14, 0.14], seed: 2 }),
       3: buildSpeckleVtx({ size: 32, palette: { s: '8A8A8A', k: '6E6E6E', l: 'A3A3A3' }, weights: [0.7, 0.15, 0.15], seed: 3 }),
       4: buildSpeckleVtx({ size: 32, palette: { w: '6B4423', k: '52341A' }, stripe: 4, seed: 4 }),
-      // листва анимирована — 3 кадра, 3 fps, лёгкое "мерцание на ветру"
       5: buildSpeckleVtx({ size: 32, palette: { l: '2E7D32', k: '1B5E20' }, weights: [0.78, 0.22], frames: 3, fps: 3, seed: 5 }),
     };
   }
@@ -961,7 +1639,76 @@ class Game {
         if (n >= 1 && n <= 6) this.ui.selectSlot(n);
       }
       if (e.code === 'KeyE') this.ui.toggleEditor();
+      if (e.code === 'KeyF' && this.customClip) {
+        this.player.triggerCustom(this.customClip);
+        this.network.broadcastCustomAnim(this.customClip);
+      }
     };
+  }
+
+  _bindBusEvents() {
+    this.bus.on('block:changed', (e) => {
+      if (e.type === 0 && e.prevType !== 0) {
+        const bt = this.world.blockTypes[e.prevType];
+        this.effects.push(new BreakEffect(this.scene, e.x, e.y, e.z, bt ? bt.color : 0x888888));
+        this.sound.breakSound();
+      } else if (e.type !== 0) {
+        this.sound.place();
+      }
+    });
+    this.bus.on('player:jump', () => this.sound.jump());
+    this.bus.on('player:footstep', () => this.sound.footstep());
+
+    this.bus.on('net:status', (s) => {
+      const badge = document.getElementById('netBadge');
+      const status = document.getElementById('netStatus');
+      const text = s.connected ? `рядом: ${s.count} игрок(ов)` : '';
+      badge.textContent = s.connected ? ('🟢 Онлайн — ' + text) : '⚪ Оффлайн';
+      status.textContent = s.connected ? ('Подключено, ' + text) : 'Не подключено';
+    });
+  }
+
+  _bindExtraUI() {
+    const $ = id => document.getElementById(id);
+
+    $('applyAnim').addEventListener('click', () => {
+      const msg = $('animMsg');
+      try {
+        const data = JSON.parse($('animInput').value);
+        this.customClip = AnimationClip.fromJSON(data);
+        msg.style.color = '#a5d6a7';
+        msg.textContent = 'Анимация сохранена! Нажми F, чтобы проиграть.';
+      } catch (err) {
+        msg.style.color = '#ef9a9a';
+        msg.textContent = 'Ошибка: ' + err.message;
+      }
+    });
+
+    $('netConnect').addEventListener('click', () => {
+      const room = $('netRoom').value.trim() || 'default';
+      const name = $('netName').value.trim() || 'Игрок';
+      const transport = /^wss?:\/\//i.test(room) ? new WebSocketTransport(room) : new BroadcastChannelTransport(room);
+      this.network.connect(transport, name);
+    });
+    $('netDisconnect').addEventListener('click', () => this.network.disconnect());
+
+    $('worldSave').addEventListener('click', async () => {
+      const msg = $('worldMsg');
+      msg.style.color = '#a5d6a7'; msg.textContent = 'Сохранение...';
+      try { await this.save.save(); msg.textContent = 'Мир сохранён ✓'; }
+      catch (err) { msg.style.color = '#ef9a9a'; msg.textContent = 'Ошибка: ' + err.message; }
+    });
+    $('worldLoad').addEventListener('click', async () => {
+      const msg = $('worldMsg');
+      msg.style.color = '#a5d6a7'; msg.textContent = 'Загрузка...';
+      try { await this.save.load(); msg.textContent = 'Мир загружен ✓'; this.ui.buildHud(); }
+      catch (err) { msg.style.color = '#ef9a9a'; msg.textContent = 'Ошибка: ' + err.message; }
+    });
+
+    $('soundToggle').addEventListener('click', () => {
+      const muted = this.sound.toggleMute();
+      $('soundToggle').textContent = muted ? '🔇' : '🔊';
+    });
   }
 
   _raymarchTarget() {
@@ -994,9 +1741,12 @@ class Game {
       const target = this._raymarchTarget();
       if (!target) return;
 
-      if (e.button === 0) { // ЛКМ — сломать
-        this.world.setBlock(target.hit.x, target.hit.y, target.hit.z, 0);
-      } else if (e.button === 2) { // ПКМ — поставить
+      if (e.button === 0) {
+        if (target.hit) {
+          this.world.setBlock(target.hit.x, target.hit.y, target.hit.z, 0);
+          this.player.triggerMine();
+        }
+      } else if (e.button === 2) {
         if (!target.place) return;
         const slot = this.ui.activeSlot;
         if (slot === 6) {
@@ -1009,6 +1759,7 @@ class Game {
             p.y + 1 > feet.y && p.y < feet.y + this.player.height;
           if (!overlapsPlayer) this.world.setBlock(p.x, p.y, p.z, slot);
         }
+        this.player.triggerMine();
       }
     });
   }
@@ -1017,6 +1768,55 @@ class Game {
     this.camera.aspect = window.innerWidth / window.innerHeight;
     this.camera.updateProjectionMatrix();
     this.renderer.setSize(window.innerWidth, window.innerHeight);
+  }
+
+  _drawMinimap() {
+    const canvas = document.getElementById('minimap');
+    const ctx = canvas.getContext('2d');
+    const w = canvas.width, h = canvas.height;
+    ctx.clearRect(0, 0, w, h);
+    const world = this.world, p = this.player.pos;
+    const radius = 24, cell = w / (radius * 2);
+
+    for (let dz = -radius; dz < radius; dz++) {
+      const z = Math.floor(p.z) + dz;
+      if (z < 0 || z >= world.sz) continue;
+      for (let dx = -radius; dx < radius; dx++) {
+        const x = Math.floor(p.x) + dx;
+        if (x < 0 || x >= world.sx) continue;
+        const y = world.heightMap[z * world.sx + x];
+        if (y < 0) continue;
+        const type = world.getBlock(x, y, z);
+        const bt = world.blockTypes[type];
+        ctx.fillStyle = bt ? '#' + bt.color.toString(16).padStart(6, '0') : '#333';
+        ctx.fillRect((dx + radius) * cell, (dz + radius) * cell, cell + 1, cell + 1);
+      }
+    }
+
+    ctx.fillStyle = '#ffd54f';
+    this.network.peers.forEach(rp => {
+      const dx = rp.group.position.x - p.x, dz = rp.group.position.z - p.z;
+      if (Math.abs(dx) < radius && Math.abs(dz) < radius) {
+        ctx.beginPath(); ctx.arc((dx + radius) * cell, (dz + radius) * cell, 3, 0, Math.PI * 2); ctx.fill();
+      }
+    });
+
+    ctx.fillStyle = '#fff';
+    ctx.beginPath(); ctx.arc(w / 2, h / 2, 4, 0, Math.PI * 2); ctx.fill();
+    const dirX = -Math.sin(this.player.yaw), dirZ = -Math.cos(this.player.yaw);
+    ctx.strokeStyle = '#fff'; ctx.lineWidth = 2;
+    ctx.beginPath(); ctx.moveTo(w / 2, h / 2); ctx.lineTo(w / 2 + dirX * 10, h / 2 + dirZ * 10); ctx.stroke();
+  }
+
+  _updateStats(dt) {
+    this._fpsFrames++;
+    this._fpsTimer += dt;
+    if (this._fpsTimer >= 0.5) {
+      this._fps = Math.round(this._fpsFrames / this._fpsTimer);
+      this._fpsFrames = 0; this._fpsTimer = 0;
+      const el = document.getElementById('stats');
+      if (el) el.textContent = `FPS: ${this._fps} | блоков: ${this.world.blockCount}`;
+    }
   }
 
   _loop(now) {
@@ -1029,6 +1829,15 @@ class Game {
     this.player.update(dt, frameInput);
     this.clouds.update(dt);
     this.world.updateTextureAnimations(dt);
+    this.network.update(dt);
+
+    for (let i = this.effects.length - 1; i >= 0; i--) {
+      this.effects[i].update(dt);
+      if (this.effects[i].dead) this.effects.splice(i, 1);
+    }
+
+    this._drawMinimap();
+    this._updateStats(dt);
 
     this.renderer.render(this.scene, this.camera);
   }
@@ -1038,3 +1847,5 @@ new Game();
 </script>
 </body>
 </html>
+HTMLEOF
+echo "OK, lines: $(wc -l < /home/claude/voxel_game.html)"
