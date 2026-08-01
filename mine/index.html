@@ -1,0 +1,1040 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<title>Voxel Craft</title>
+<style>
+  html,body{margin:0;padding:0;overflow:hidden;background:#87ceeb;font-family:'Segoe UI',Arial,sans-serif;}
+  canvas{display:block;}
+
+  #crosshair{
+    position:fixed;top:50%;left:50%;width:18px;height:18px;
+    transform:translate(-50%,-50%);pointer-events:none;z-index:10;
+  }
+  #crosshair:before,#crosshair:after{
+    content:'';position:absolute;background:rgba(255,255,255,0.85);
+    box-shadow:0 0 2px rgba(0,0,0,0.6);
+  }
+  #crosshair:before{left:8px;top:0;width:2px;height:18px;}
+  #crosshair:after{top:8px;left:0;height:2px;width:18px;}
+
+  #hud{
+    position:fixed;bottom:14px;left:50%;transform:translateX(-50%);
+    display:flex;gap:6px;z-index:10;background:rgba(0,0,0,0.25);
+    padding:8px;border-radius:10px;
+  }
+  .slot{
+    width:52px;height:52px;border-radius:6px;border:2px solid rgba(255,255,255,0.35);
+    display:flex;align-items:center;justify-content:center;position:relative;
+    box-shadow:inset 0 0 6px rgba(0,0,0,0.4);cursor:pointer;
+  }
+  .slot.active{border-color:#fff;box-shadow:0 0 8px 2px rgba(255,255,255,0.7) inset;}
+  .slot .swatch{width:34px;height:34px;border-radius:3px;image-rendering:pixelated;background-size:cover;}
+  .slot .num{position:absolute;top:2px;left:4px;font-size:10px;color:#fff;text-shadow:0 0 3px #000;}
+  .slot .lbl{position:absolute;bottom:2px;font-size:9px;color:#fff;text-shadow:0 0 3px #000;width:100%;text-align:center;}
+
+  #info{
+    position:fixed;top:12px;left:12px;color:#fff;font-size:13px;
+    background:rgba(0,0,0,0.35);padding:10px 14px;border-radius:8px;
+    line-height:1.55;z-index:10;max-width:290px;
+  }
+  #info b{color:#ffd54f;}
+
+  #startScreen{
+    position:fixed;inset:0;background:linear-gradient(#7ec8ff,#bfe6ff);
+    display:flex;flex-direction:column;align-items:center;justify-content:center;
+    z-index:100;color:#22303c;text-align:center;
+  }
+  #startScreen h1{font-size:52px;margin:0 0 6px;letter-spacing:2px;
+    text-shadow:3px 3px 0 rgba(255,255,255,0.6);color:#2e5b2e;}
+  #startScreen p{font-size:15px;max-width:420px;margin:4px 0 20px;color:#33475a;}
+  #startBtn{
+    padding:14px 38px;font-size:18px;font-weight:bold;color:#fff;background:#4CAF50;
+    border:3px solid #2e7d32;border-radius:8px;cursor:pointer;letter-spacing:1px;
+  }
+  #startBtn:hover{background:#5cc85f;}
+
+  #editorPanel{
+    position:fixed;top:0;right:0;width:360px;height:100%;background:rgba(20,24,20,0.95);
+    color:#e8f5e9;z-index:50;padding:16px;box-sizing:border-box;display:none;
+    font-size:13px;overflow-y:auto;border-left:2px solid #4CAF50;
+  }
+  #editorPanel h2{margin-top:0;font-size:16px;color:#a5d6a7;}
+  #editorPanel textarea{
+    width:100%;height:200px;background:#0e150e;color:#c8e6c9;border:1px solid #4CAF50;
+    border-radius:4px;padding:8px;font-family:monospace;font-size:12px;box-sizing:border-box;
+  }
+  #editorPanel button{
+    margin-top:8px;padding:8px 14px;background:#4CAF50;border:none;border-radius:5px;
+    color:#fff;cursor:pointer;font-size:13px;
+  }
+  #editorPanel button:hover{background:#66bb6a;}
+  #editorPanel .row{display:flex;align-items:center;justify-content:space-between;margin:6px 0;}
+  #editorPanel input[type=color]{width:44px;height:26px;border:none;background:none;cursor:pointer;}
+  #editorMsg{margin-top:6px;color:#ffd54f;font-size:12px;min-height:16px;}
+  #closeEditor{position:absolute;top:10px;right:12px;cursor:pointer;font-size:18px;color:#e8f5e9;}
+  .texRow{border:1px solid #2f4a2f;border-radius:6px;padding:8px;margin-bottom:10px;}
+  .texRow .texHead{display:flex;align-items:center;gap:8px;margin-bottom:4px;}
+  .texRow .texHead .prev{width:28px;height:28px;border:1px solid #555;image-rendering:pixelated;}
+  .texRow textarea{height:170px;font-size:10.5px;}
+  .texRow button{font-size:12px;padding:5px 10px;}
+  .texMsg{font-size:11px;color:#ef9a9a;min-height:14px;}
+</style>
+</head>
+<body>
+
+<div id="startScreen">
+  <h1>⛏ VOXEL CRAFT</h1>
+  <p>Воксельный мир на Three.js: физика, разрушение/установка блоков, свой текстовый формат
+  текстур 32×32 с анимацией и редактор моделей. Клик — начать игру.</p>
+  <button id="startBtn">Играть</button>
+</div>
+
+<div id="crosshair"></div>
+
+<div id="info">
+  <b>WASD</b> — движение &nbsp; <b>Space</b> — прыжок<br>
+  <b>ЛКМ</b> — сломать блок &nbsp; <b>ПКМ</b> — поставить<br>
+  <b>1-6</b> — выбор слота &nbsp; <b>E</b> — редактор моделей/текстур<br>
+  <b>Esc</b> — отпустить мышь
+</div>
+
+<div id="hud"></div>
+
+<div id="editorPanel">
+  <span id="closeEditor">✕</span>
+  <h2>🎨 Быстрый цвет блоков</h2>
+  <div id="colorRows"></div>
+
+  <h2>🧵 Свой текстовый формат текстур (.vtx)</h2>
+  <p style="opacity:0.85">
+  Текстура — это текст, а не картинка:<br>
+  1) <b>W H</b> — размер сетки (сейчас блоки 32×32)<br>
+  2) <b>PALETTE</b>, затем <code>символ=HEXцвет</code> (можно несколько через пробел, "." можно сделать <code>.=TRANSPARENT</code>)<br>
+  3) необязательная строка <b>FPS n</b> — если кадров больше одного, они сменяются n раз в секунду (анимация!)<br>
+  4) один или несколько блоков <b>FRAME</b>, каждый — ровно H строк по W символов.<br>
+  Один кадр 32×32 весит около 1 КБ текста — в сотни раз легче PNG.
+  </p>
+  <div id="textureRows"></div>
+
+  <h2>🧩 Свои модели (воксельные)</h2>
+  <p style="opacity:0.8">Опиши модель JSON-массивом кубиков относительно точки установки.
+  Поле <b>t</b> — тип блока (1 трава, 2 земля, 3 камень, 4 дерево, 5 листва).</p>
+  <textarea id="modelInput">[
+  {"x":0,"y":0,"z":0,"t":4},
+  {"x":0,"y":1,"z":0,"t":4},
+  {"x":0,"y":2,"z":0,"t":5},
+  {"x":1,"y":2,"z":0,"t":5},
+  {"x":-1,"y":2,"z":0,"t":5},
+  {"x":0,"y":2,"z":1,"t":5},
+  {"x":0,"y":2,"z":-1,"t":5},
+  {"x":0,"y":3,"z":0,"t":5}
+]</textarea>
+  <br>
+  <button id="applyModel">Сохранить модель в слот 6</button>
+  <div id="editorMsg"></div>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script>
+'use strict';
+/* =========================================================================
+   VOXEL CRAFT — воксельная игра на Three.js, ООП-архитектура
+   Классы: VoxelTexture, VoxelWorld, CloudSystem, Player, InputManager,
+           UIManager, Game
+   ========================================================================= */
+
+// ---------------------------------------------------------------------------
+// Утилиты
+// ---------------------------------------------------------------------------
+function hashRandom(x, z) {
+  const s = Math.sin(x * 127.1 + z * 311.7) * 43758.5453;
+  return s - Math.floor(s);
+}
+
+/**
+ * Строит текст в формате .vtx по параметрам процедурного шума (для дефолтных
+ * текстур блоков). Можно использовать несколько кадров (frames>1) + fps,
+ * чтобы сразу получить анимированную текстуру.
+ */
+function buildSpeckleVtx({ size, palette, weights, frames = 1, fps = 0, seed = 1, stripe = null }) {
+  const keys = Object.keys(palette);
+  let out = `${size} ${size}\nPALETTE\n` + keys.map(k => `${k}=${palette[k]}`).join(' ') + '\n';
+  if (fps) out += `FPS ${fps}\n`;
+  for (let f = 0; f < frames; f++) {
+    out += 'FRAME\n';
+    for (let y = 0; y < size; y++) {
+      let row = '';
+      for (let x = 0; x < size; x++) {
+        let ch;
+        if (stripe) {
+          ch = (x % stripe === 0) ? keys[1] : keys[0];
+        } else {
+          const r = hashRandom(x * 7 + seed * 13 + f * 101, y * 11 + seed * 17 + f * 53);
+          let acc = 0;
+          ch = keys[keys.length - 1];
+          for (let i = 0; i < keys.length; i++) {
+            acc += weights[i];
+            if (r <= acc) { ch = keys[i]; break; }
+          }
+        }
+        row += ch;
+      }
+      out += row + '\n';
+    }
+  }
+  return out.trim();
+}
+
+/** Парсер собственного текстового формата текстур .vtx (поддерживает анимацию) */
+function parseVoxelTexture(text) {
+  const lines = text.replace(/\r/g, '').split('\n');
+  let i = 0;
+  function peekIdx() {
+    let j = i;
+    while (j < lines.length) {
+      const l = lines[j].trim();
+      if (l === '' || l.startsWith('#')) { j++; continue; }
+      return j;
+    }
+    return -1;
+  }
+  function next() {
+    while (i < lines.length) {
+      const l = lines[i].trim();
+      i++;
+      if (l === '' || l.startsWith('#')) continue;
+      return l;
+    }
+    return null;
+  }
+
+  const sizeLine = next();
+  if (!sizeLine) throw new Error('Пустой файл текстуры');
+  const [wStr, hStr] = sizeLine.split(/\s+/);
+  const w = parseInt(wStr), h = parseInt(hStr);
+  if (!w || !h || w > 128 || h > 128) throw new Error('Некорректный размер (1-128)');
+
+  const paletteHeader = next();
+  if (!paletteHeader || paletteHeader.toUpperCase() !== 'PALETTE') {
+    throw new Error('Ожидалась строка PALETTE');
+  }
+
+  const palette = {};
+  while (true) {
+    const idx = peekIdx();
+    if (idx === -1) throw new Error('Не найден блок FRAME/PIXELS');
+    const upper = lines[idx].trim().toUpperCase();
+    if (upper === 'PIXELS' || upper === 'FRAME' || upper.startsWith('FPS')) break;
+    const line = next();
+    line.split(/\s+/).forEach(tok => {
+      const m = tok.match(/^(.)=(TRANSPARENT|[0-9a-fA-F]{6})$/i);
+      if (m) palette[m[1]] = m[2].toUpperCase() === 'TRANSPARENT' ? 'TRANSPARENT' : m[2];
+    });
+  }
+
+  let fps = 0;
+  {
+    const idx = peekIdx();
+    if (idx !== -1 && lines[idx].trim().toUpperCase().startsWith('FPS')) {
+      const fl = next();
+      fps = parseFloat(fl.split(/\s+/)[1]) || 0;
+    }
+  }
+
+  const frames = [];
+  while (true) {
+    const idx = peekIdx();
+    if (idx === -1) break;
+    const upper = lines[idx].trim().toUpperCase();
+    if (upper === 'FRAME' || upper === 'PIXELS') {
+      next(); // съедаем маркер кадра
+      const rows = [];
+      for (let r = 0; r < h; r++) rows.push(lines[i++] || '');
+      frames.push(rows);
+    } else break;
+  }
+  if (frames.length === 0) throw new Error('Нет ни одного кадра (FRAME/PIXELS)');
+
+  return { w, h, palette, frames, fps };
+}
+
+// ---------------------------------------------------------------------------
+// VoxelTexture — текстура блока, распарсенная из .vtx, с поддержкой анимации
+// ---------------------------------------------------------------------------
+class VoxelTexture {
+  constructor(text) {
+    const def = parseVoxelTexture(text);
+    this.w = def.w;
+    this.h = def.h;
+    this.fps = def.fps || 0;
+    this.hasTransparent = false;
+    this.canvases = def.frames.map(rows => this._buildCanvas(rows, def.palette));
+    this.textures = this.canvases.map(c => this._makeGpuTexture(c));
+    this.frameIndex = 0;
+    this.timer = 0;
+  }
+
+  _buildCanvas(rows, palette) {
+    const canvas = document.createElement('canvas');
+    canvas.width = this.w;
+    canvas.height = this.h;
+    const ctx = canvas.getContext('2d');
+    for (let y = 0; y < this.h; y++) {
+      const row = rows[y] || '';
+      for (let x = 0; x < this.w; x++) {
+        const ch = row[x] || '.';
+        const hex = palette[ch] || 'FF00FF'; // неизвестный символ -> заметный розовый
+        if (hex === 'TRANSPARENT') {
+          this.hasTransparent = true;
+          ctx.clearRect(x, y, 1, 1);
+        } else {
+          ctx.fillStyle = '#' + hex;
+          ctx.fillRect(x, y, 1, 1);
+        }
+      }
+    }
+    return canvas;
+  }
+
+  _makeGpuTexture(canvas) {
+    const t = new THREE.CanvasTexture(canvas);
+    t.magFilter = THREE.NearestFilter;
+    t.minFilter = THREE.NearestFilter;
+    t.generateMipmaps = false;
+    t.needsUpdate = true;
+    return t;
+  }
+
+  get current() { return this.textures[this.frameIndex]; }
+  get previewCanvas() { return this.canvases[this.frameIndex]; }
+  get isAnimated() { return this.textures.length > 1 && this.fps > 0; }
+
+  /** Продвигает анимацию на dt секунд. Возвращает true, если кадр сменился. */
+  update(dt) {
+    if (!this.isAnimated) return false;
+    this.timer += dt;
+    const frameDur = 1 / this.fps;
+    if (this.timer >= frameDur) {
+      this.timer -= frameDur;
+      this.frameIndex = (this.frameIndex + 1) % this.textures.length;
+      return true;
+    }
+    return false;
+  }
+}
+
+// ---------------------------------------------------------------------------
+// BlockType — описание одного типа блока
+// ---------------------------------------------------------------------------
+class BlockType {
+  constructor(id, name, color) {
+    this.id = id;
+    this.name = name;
+    this.color = color;
+    this.texture = null; // VoxelTexture | null
+  }
+}
+
+// ---------------------------------------------------------------------------
+// VoxelWorld — хранилище вокселей + оптимизированный рендер через InstancedMesh
+// ---------------------------------------------------------------------------
+class VoxelWorld {
+  constructor(scene, sizeX, sizeY, sizeZ, maxInstancesPerType = 26000) {
+    this.scene = scene;
+    this.sx = sizeX; this.sy = sizeY; this.sz = sizeZ;
+    this.maxInstances = maxInstancesPerType;
+
+    this.blocks = new Uint8Array(sizeX * sizeY * sizeZ);
+    this.blockTypes = {};   // id -> BlockType
+    this.meshes = {};       // id -> InstancedMesh
+    this.counts = {};       // id -> текущее число инстансов
+    this.slotToPos = {};    // id -> [key,...] индекс инстанса -> позиция
+    this.posToSlot = new Map(); // "x,y,z" -> {type, slot}
+
+    this._boxGeom = new THREE.BoxGeometry(1, 1, 1);
+    this._dummy = new THREE.Object3D();
+  }
+
+  static key(x, y, z) { return x + ',' + y + ',' + z; }
+
+  registerBlockType(id, name, color) {
+    const bt = new BlockType(id, name, color);
+    this.blockTypes[id] = bt;
+
+    const mat = new THREE.MeshLambertMaterial({ color });
+    const mesh = new THREE.InstancedMesh(this._boxGeom, mat, this.maxInstances);
+    mesh.count = 0;
+    mesh.castShadow = true;
+    mesh.receiveShadow = true;
+    mesh.instanceMatrix.setUsage(THREE.DynamicDrawUsage);
+    this.scene.add(mesh);
+
+    this.meshes[id] = mesh;
+    this.counts[id] = 0;
+    this.slotToPos[id] = [];
+    return bt;
+  }
+
+  setBlockTexture(id, voxelTexture) {
+    this.blockTypes[id].texture = voxelTexture;
+    const mat = this.meshes[id].material;
+    mat.map = voxelTexture.current;
+    mat.color.set(0xffffff); // цвет-пикер дальше работает как тонировка поверх текстуры
+    mat.alphaTest = voxelTexture.hasTransparent ? 0.5 : 0;
+    mat.needsUpdate = true;
+  }
+
+  setBlockColor(id, hex) {
+    this.meshes[id].material.color.set(hex);
+  }
+
+  /** Прогоняет анимацию текстур всех блоков; вызывать раз в кадр. */
+  updateTextureAnimations(dt) {
+    for (const id in this.blockTypes) {
+      const bt = this.blockTypes[id];
+      if (bt.texture && bt.texture.update(dt)) {
+        const mat = this.meshes[id].material;
+        mat.map = bt.texture.current;
+        mat.needsUpdate = true;
+      }
+    }
+  }
+
+  idx(x, y, z) { return x + z * this.sx + y * this.sx * this.sz; }
+  inBounds(x, y, z) { return x >= 0 && x < this.sx && y >= 0 && y < this.sy && z >= 0 && z < this.sz; }
+  getBlock(x, y, z) { return this.inBounds(x, y, z) ? this.blocks[this.idx(x, y, z)] : 0; }
+
+  isSolid(x, y, z) {
+    const bx = Math.floor(x), by = Math.floor(y), bz = Math.floor(z);
+    if (by < 0) return true; // не проваливаться под мир
+    return this.getBlock(bx, by, bz) !== 0;
+  }
+
+  _placeInstance(type, x, y, z) {
+    const mesh = this.meshes[type];
+    const slot = this.counts[type];
+    this._dummy.position.set(x + 0.5, y + 0.5, z + 0.5);
+    this._dummy.updateMatrix();
+    mesh.setMatrixAt(slot, this._dummy.matrix);
+    mesh.count = this.counts[type] + 1;
+    this.counts[type]++;
+    const k = VoxelWorld.key(x, y, z);
+    this.slotToPos[type][slot] = k;
+    this.posToSlot.set(k, { type, slot });
+    mesh.instanceMatrix.needsUpdate = true;
+  }
+
+  _removeInstance(x, y, z) {
+    const k = VoxelWorld.key(x, y, z);
+    const rec = this.posToSlot.get(k);
+    if (!rec) return;
+    const { type, slot } = rec;
+    const mesh = this.meshes[type];
+    const lastSlot = this.counts[type] - 1;
+    if (slot !== lastSlot) {
+      const m = new THREE.Matrix4();
+      mesh.getMatrixAt(lastSlot, m);
+      mesh.setMatrixAt(slot, m);
+      const lastKey = this.slotToPos[type][lastSlot];
+      this.slotToPos[type][slot] = lastKey;
+      this.posToSlot.set(lastKey, { type, slot });
+    }
+    this.counts[type]--;
+    mesh.count = this.counts[type];
+    this.slotToPos[type].pop();
+    this.posToSlot.delete(k);
+    mesh.instanceMatrix.needsUpdate = true;
+  }
+
+  setBlock(x, y, z, type) {
+    if (!this.inBounds(x, y, z)) return;
+    const cur = this.getBlock(x, y, z);
+    if (cur === type) return;
+    if (cur !== 0) this._removeInstance(x, y, z);
+    this.blocks[this.idx(x, y, z)] = type;
+    if (type !== 0) this._placeInstance(type, x, y, z);
+  }
+
+  /** Простая процедурная генерация ландшафта + редкие деревья */
+  generateTerrain() {
+    const heightAt = (x, z) => {
+      const n = Math.sin(x * 0.10) + Math.sin(z * 0.13) + Math.sin((x + z) * 0.045) + Math.sin(x * 0.07 - z * 0.09) * 0.6;
+      return Math.floor(10 + n * 2.2);
+    };
+    for (let x = 0; x < this.sx; x++) {
+      for (let z = 0; z < this.sz; z++) {
+        const h = heightAt(x, z);
+        for (let y = 0; y <= h; y++) {
+          let t = 3;
+          if (y === h) t = 1;
+          else if (y >= h - 3) t = 2;
+          this.setBlock(x, y, z, t);
+        }
+        if (hashRandom(x, z) > 0.985 && h < this.sy - 6) {
+          const trunkH = 3 + Math.floor(hashRandom(x + 1, z + 1) * 2);
+          for (let ty = 1; ty <= trunkH; ty++) this.setBlock(x, h + ty, z, 4);
+          for (let lx = -1; lx <= 1; lx++)
+            for (let lz = -1; lz <= 1; lz++)
+              for (let ly = 0; ly <= 1; ly++)
+                this.setBlock(x + lx, h + trunkH + ly, z + lz, 5);
+          this.setBlock(x, h + trunkH + 2, z, 5);
+        }
+      }
+    }
+  }
+}
+
+// ---------------------------------------------------------------------------
+// CloudSystem — лёгкие полупрозрачные воксельные облака с медленным дрейфом
+// ---------------------------------------------------------------------------
+class CloudSystem {
+  constructor(scene, worldX, worldZ) {
+    this.scene = scene;
+    this.worldX = worldX;
+    this.group = new THREE.Group();
+    this.clusters = [];
+    const cloudGeo = new THREE.BoxGeometry(1, 1, 1);
+
+    for (let i = 0; i < 16; i++) {
+      const cluster = new THREE.Group();
+      const cx = -20 + Math.random() * (worldX + 40);
+      const cz = -20 + Math.random() * (worldZ + 40);
+      const cy = 42 + Math.random() * 14;
+      const puffs = 4 + Math.floor(Math.random() * 5);
+      for (let p = 0; p < puffs; p++) {
+        const mat = new THREE.MeshLambertMaterial({
+          color: 0xffffff, transparent: true, opacity: 0.78, depthWrite: false,
+        });
+        const puff = new THREE.Mesh(cloudGeo, mat);
+        puff.scale.set(3 + Math.random() * 4, 1 + Math.random() * 1.2, 2.5 + Math.random() * 3.5);
+        puff.position.set((Math.random() - 0.5) * 6, (Math.random() - 0.5) * 1.2, (Math.random() - 0.5) * 4);
+        puff.castShadow = false;
+        puff.receiveShadow = false;
+        cluster.add(puff);
+      }
+      cluster.position.set(cx, cy, cz);
+      cluster.userData.speed = 0.4 + Math.random() * 0.6;
+      this.group.add(cluster);
+      this.clusters.push(cluster);
+    }
+    scene.add(this.group);
+  }
+
+  update(dt) {
+    this.clusters.forEach(c => {
+      c.position.x += c.userData.speed * dt;
+      if (c.position.x > this.worldX + 25) c.position.x = -25;
+    });
+  }
+}
+
+// ---------------------------------------------------------------------------
+// InputManager — клавиатура, мышь, pointer lock
+// ---------------------------------------------------------------------------
+class InputManager {
+  constructor(canvas) {
+    this.canvas = canvas;
+    this.keys = {};
+    this.pointerLocked = false;
+    this.yawDelta = 0;
+    this.pitchDelta = 0;
+    this.mouseSensitivity = 0.0022;
+
+    window.addEventListener('keydown', e => { this.keys[e.code] = true; this.onKeyDown && this.onKeyDown(e); });
+    window.addEventListener('keyup', e => { this.keys[e.code] = false; });
+
+    document.addEventListener('pointerlockchange', () => {
+      this.pointerLocked = document.pointerLockElement === canvas;
+    });
+    document.addEventListener('mousemove', e => {
+      if (!this.pointerLocked) return;
+      this.yawDelta -= e.movementX * this.mouseSensitivity;
+      this.pitchDelta -= e.movementY * this.mouseSensitivity;
+    });
+    canvas.addEventListener('click', () => {
+      if (!this.pointerLocked && this.canLock !== false) canvas.requestPointerLock();
+    });
+    canvas.addEventListener('contextmenu', e => e.preventDefault());
+  }
+
+  requestLock() { this.canvas.requestPointerLock(); }
+  exitLock() { document.exitPointerLock(); }
+
+  /** Забирает накопленные дельты мыши за кадр (и обнуляет их) */
+  consumeMouseDelta() {
+    const d = { yaw: this.yawDelta, pitch: this.pitchDelta };
+    this.yawDelta = 0; this.pitchDelta = 0;
+    return d;
+  }
+}
+
+// ---------------------------------------------------------------------------
+// Player — физика, коллизии, камера, невидимая (но с тенью) воксельная модель
+// ---------------------------------------------------------------------------
+class Player {
+  constructor(world, scene, camera) {
+    this.world = world;
+    this.camera = camera;
+
+    this.pos = new THREE.Vector3(world.sx / 2, world.sy, world.sz / 2);
+    this.vel = new THREE.Vector3(0, 0, 0);
+    this.halfW = 0.3;
+    this.height = 1.7;
+    this.eye = 1.55;
+    this.onGround = false;
+    this.yaw = 0;
+    this.pitch = 0;
+
+    this.GRAVITY = -22;
+    this.JUMP_SPEED = 8.2;
+    this.MOVE_SPEED = 5.2;
+
+    this._bobTimer = 0;
+
+    this._spawnOnGround();
+    this._buildInvisibleShadowModel(scene);
+  }
+
+  _spawnOnGround() {
+    const sx = Math.floor(this.pos.x), sz = Math.floor(this.pos.z);
+    for (let y = this.world.sy - 1; y > 0; y--) {
+      if (this.world.getBlock(sx, y, sz) !== 0) { this.pos.y = y + 1; break; }
+    }
+  }
+
+  /**
+   * Простая воксельная фигурка игрока. Она НЕ видна самому игроку (colorWrite
+   * выключен, поэтому меш ничего не пишет в цветовой буфер основного кадра),
+   * но тени в three.js — отдельный depth-проход со своим материалом, который
+   * colorWrite не учитывает, так что тень от фигурки всё равно отрисовывается.
+   */
+  _buildInvisibleShadowModel(scene) {
+    this.model = new THREE.Group();
+    const addPart = (w, h, d, y, color, xOff = 0) => {
+      const geo = new THREE.BoxGeometry(w, h, d);
+      const mat = new THREE.MeshLambertMaterial({ color });
+      mat.colorWrite = false;
+      mat.depthWrite = false;
+      const m = new THREE.Mesh(geo, mat);
+      m.position.set(xOff, y + h / 2, 0);
+      m.castShadow = true;
+      m.receiveShadow = false;
+      this.model.add(m);
+    };
+    addPart(0.16, 0.5, 0.16, 0.0, 0x37474F, -0.1);  // левая нога
+    addPart(0.16, 0.5, 0.16, 0.0, 0x37474F, 0.1);   // правая нога
+    addPart(0.4, 0.55, 0.22, 0.5, 0x3F51B5);        // торс
+    addPart(0.15, 0.5, 0.15, 0.5, 0x3F51B5, -0.32); // левая рука
+    addPart(0.15, 0.5, 0.15, 0.5, 0x3F51B5, 0.32);  // правая рука
+    addPart(0.35, 0.35, 0.35, 1.05, 0xE0AC69);      // голова
+    scene.add(this.model);
+  }
+
+  _collidesBox(pos) {
+    const minX = pos.x - this.halfW, maxX = pos.x + this.halfW;
+    const minY = pos.y, maxY = pos.y + this.height;
+    const minZ = pos.z - this.halfW, maxZ = pos.z + this.halfW;
+    for (let bx = Math.floor(minX); bx <= Math.floor(maxX); bx++)
+      for (let by = Math.floor(minY); by <= Math.floor(maxY); by++)
+        for (let bz = Math.floor(minZ); bz <= Math.floor(maxZ); bz++)
+          if (this.world.isSolid(bx, by, bz)) return true;
+    return false;
+  }
+
+  /** input: {keys, mouseDelta:{yaw,pitch}} */
+  update(dt, input) {
+    this.yaw += input.mouseDelta.yaw;
+    this.pitch += input.mouseDelta.pitch;
+    this.pitch = Math.max(-Math.PI / 2 + 0.01, Math.min(Math.PI / 2 - 0.01, this.pitch));
+
+    this.vel.y += this.GRAVITY * dt;
+    if (this.vel.y < -40) this.vel.y = -40;
+
+    // камера смотрит вдоль -Z, поэтому forward = R_y(yaw)*(0,0,-1)
+    const forward = new THREE.Vector3(-Math.sin(this.yaw), 0, -Math.cos(this.yaw));
+    const right = new THREE.Vector3(Math.cos(this.yaw), 0, -Math.sin(this.yaw));
+    const mv = new THREE.Vector3();
+    if (input.keys['KeyW']) mv.add(forward);
+    if (input.keys['KeyS']) mv.sub(forward);
+    if (input.keys['KeyD']) mv.add(right);
+    if (input.keys['KeyA']) mv.sub(right);
+    const moving = mv.lengthSq() > 0;
+    if (moving) mv.normalize().multiplyScalar(this.MOVE_SPEED);
+
+    if (input.keys['Space'] && this.onGround) {
+      this.vel.y = this.JUMP_SPEED;
+      this.onGround = false;
+    }
+
+    const dx = mv.x * dt, dz = mv.z * dt, dy = this.vel.y * dt;
+    const p = this.pos;
+
+    p.x += dx; if (this._collidesBox(p)) p.x -= dx;
+    p.z += dz; if (this._collidesBox(p)) p.z -= dz;
+    p.y += dy;
+    if (this._collidesBox(p)) {
+      p.y -= dy;
+      if (dy < 0) this.onGround = true;
+      this.vel.y = 0;
+    } else {
+      this.onGround = false;
+    }
+
+    p.x = Math.max(0.5, Math.min(this.world.sx - 0.5, p.x));
+    p.z = Math.max(0.5, Math.min(this.world.sz - 0.5, p.z));
+
+    // лёгкое покачивание камеры при ходьбе по земле — простая процедурная анимация
+    let bobOffset = 0;
+    if (moving && this.onGround) {
+      this._bobTimer += dt * 9;
+      bobOffset = Math.abs(Math.sin(this._bobTimer)) * 0.06;
+    } else {
+      this._bobTimer = 0;
+    }
+
+    this.camera.position.set(p.x, p.y + this.eye + bobOffset, p.z);
+    this.camera.rotation.order = 'YXZ';
+    this.camera.rotation.y = this.yaw;
+    this.camera.rotation.x = this.pitch;
+
+    this.model.position.set(p.x, p.y, p.z);
+    this.model.rotation.y = this.yaw;
+  }
+}
+
+// ---------------------------------------------------------------------------
+// UIManager — хотбар и панель редактора (цвета, текстуры, модели)
+// ---------------------------------------------------------------------------
+class UIManager {
+  constructor(game) {
+    this.game = game;
+    this.activeSlot = 1;
+    this.customModel = null;
+
+    this.hudEl = document.getElementById('hud');
+    this.editorPanel = document.getElementById('editorPanel');
+
+    document.getElementById('closeEditor').addEventListener('click', () => this.toggleEditor());
+    document.getElementById('applyModel').addEventListener('click', () => this._applyModel());
+
+    this.buildHud();
+    this.buildColorRows();
+    this.buildTextureRows();
+  }
+
+  toggleEditor() {
+    const show = this.editorPanel.style.display !== 'block';
+    this.editorPanel.style.display = show ? 'block' : 'none';
+    if (show && this.game.input.pointerLocked) this.game.input.exitLock();
+  }
+
+  selectSlot(n) {
+    this.activeSlot = n;
+    document.querySelectorAll('.slot').forEach(el => {
+      el.classList.toggle('active', parseInt(el.dataset.slot) === n);
+    });
+  }
+
+  buildHud() {
+    const world = this.game.world;
+    this.hudEl.innerHTML = '';
+    for (let i = 1; i <= 6; i++) {
+      const div = document.createElement('div');
+      div.className = 'slot' + (i === this.activeSlot ? ' active' : '');
+      div.dataset.slot = i;
+      const num = document.createElement('div'); num.className = 'num'; num.textContent = i;
+      const sw = document.createElement('div'); sw.className = 'swatch';
+      const lbl = document.createElement('div'); lbl.className = 'lbl';
+      if (i <= 5) {
+        const bt = world.blockTypes[i];
+        if (bt.texture) {
+          sw.style.backgroundImage = `url(${bt.texture.previewCanvas.toDataURL()})`;
+        } else {
+          sw.style.background = '#' + bt.color.toString(16).padStart(6, '0');
+        }
+        lbl.textContent = bt.name;
+      } else {
+        sw.style.background = 'linear-gradient(135deg,#6B4423,#2E7D32)';
+        lbl.textContent = 'Модель';
+      }
+      div.appendChild(num); div.appendChild(sw); div.appendChild(lbl);
+      div.addEventListener('click', () => this.selectSlot(i));
+      this.hudEl.appendChild(div);
+    }
+  }
+
+  buildColorRows() {
+    const world = this.game.world;
+    const wrap = document.getElementById('colorRows');
+    wrap.innerHTML = '';
+    Object.keys(world.blockTypes).forEach(t => {
+      const type = parseInt(t);
+      const bt = world.blockTypes[type];
+      const row = document.createElement('div');
+      row.className = 'row';
+      const label = document.createElement('span');
+      label.textContent = bt.name;
+      const input = document.createElement('input');
+      input.type = 'color';
+      input.value = '#' + bt.color.toString(16).padStart(6, '0');
+      input.addEventListener('input', () => {
+        bt.color = parseInt(input.value.replace('#', '0x'));
+        world.setBlockColor(type, input.value);
+        this.buildHud();
+      });
+      row.appendChild(label);
+      row.appendChild(input);
+      wrap.appendChild(row);
+    });
+  }
+
+  buildTextureRows() {
+    const world = this.game.world;
+    const wrap = document.getElementById('textureRows');
+    wrap.innerHTML = '';
+    Object.keys(world.blockTypes).forEach(t => {
+      const type = parseInt(t);
+      const bt = world.blockTypes[type];
+      const row = document.createElement('div');
+      row.className = 'texRow';
+
+      const head = document.createElement('div');
+      head.className = 'texHead';
+      const prev = document.createElement('canvas');
+      prev.className = 'prev';
+      const label = document.createElement('span');
+      label.textContent = bt.name + (bt.texture && bt.texture.isAnimated ? ' (анимация)' : '');
+      const applyBtn = document.createElement('button');
+      applyBtn.textContent = 'Применить';
+      head.appendChild(prev); head.appendChild(label); head.appendChild(applyBtn);
+
+      const ta = document.createElement('textarea');
+      ta.value = this.game.defaultTextures[type];
+
+      const msg = document.createElement('div');
+      msg.className = 'texMsg';
+
+      const refreshPreview = () => {
+        const src = bt.texture.previewCanvas;
+        prev.width = src.width; prev.height = src.height;
+        const pctx = prev.getContext('2d');
+        pctx.imageSmoothingEnabled = false;
+        pctx.clearRect(0, 0, prev.width, prev.height);
+        pctx.drawImage(src, 0, 0);
+      };
+
+      applyBtn.addEventListener('click', () => {
+        try {
+          const tex = new VoxelTexture(ta.value);
+          world.setBlockTexture(type, tex);
+          label.textContent = bt.name + (tex.isAnimated ? ' (анимация)' : '');
+          refreshPreview();
+          msg.style.color = '#a5d6a7';
+          msg.textContent = 'Текстура применена ✓';
+          this.buildHud();
+        } catch (err) {
+          msg.style.color = '#ef9a9a';
+          msg.textContent = 'Ошибка: ' + err.message;
+        }
+      });
+
+      row.appendChild(head); row.appendChild(ta); row.appendChild(msg);
+      wrap.appendChild(row);
+
+      // применяем дефолтную текстуру блока сразу
+      try {
+        const tex = new VoxelTexture(this.game.defaultTextures[type]);
+        world.setBlockTexture(type, tex);
+        refreshPreview();
+      } catch (err) { /* дефолтные текстуры валидны */ }
+    });
+  }
+
+  _applyModel() {
+    const msg = document.getElementById('editorMsg');
+    try {
+      const parsed = JSON.parse(document.getElementById('modelInput').value);
+      if (!Array.isArray(parsed)) throw new Error('Ожидался массив');
+      this.customModel = parsed;
+      this.selectSlot(6);
+      msg.style.color = '#a5d6a7';
+      msg.textContent = 'Модель сохранена в слот 6! Кликни ПКМ чтобы поставить.';
+    } catch (err) {
+      msg.style.color = '#ef9a9a';
+      msg.textContent = 'Ошибка JSON: ' + err.message;
+    }
+  }
+}
+
+// ---------------------------------------------------------------------------
+// Game — точка сборки: сцена, свет, мир, игрок, ввод, UI, главный цикл
+// ---------------------------------------------------------------------------
+class Game {
+  constructor() {
+    this.WORLD_X = 48; this.WORLD_Y = 28; this.WORLD_Z = 48;
+
+    this._initRenderer();
+    this._initLights();
+
+    this.world = new VoxelWorld(this.scene, this.WORLD_X, this.WORLD_Y, this.WORLD_Z);
+    this.world.registerBlockType(1, 'Трава', 0x5DBB4F);
+    this.world.registerBlockType(2, 'Земля', 0x8B5A2B);
+    this.world.registerBlockType(3, 'Камень', 0x8A8A8A);
+    this.world.registerBlockType(4, 'Дерево', 0x6B4423);
+    this.world.registerBlockType(5, 'Листва', 0x2E7D32);
+    this.world.generateTerrain();
+
+    this.defaultTextures = this._buildDefaultTextures();
+
+    this.clouds = new CloudSystem(this.scene, this.WORLD_X, this.WORLD_Z);
+    this.player = new Player(this.world, this.scene, this.camera);
+    this.input = new InputManager(this.renderer.domElement);
+    this.ui = new UIManager(this); // применит дефолтные текстуры блокам
+
+    this._bindKeys();
+    this._bindMouseActions();
+
+    document.getElementById('startBtn').addEventListener('click', () => {
+      document.getElementById('startScreen').style.display = 'none';
+      this.input.requestLock();
+    });
+
+    window.addEventListener('resize', () => this._onResize());
+
+    this._lastTime = performance.now();
+    this._loop = this._loop.bind(this);
+    requestAnimationFrame(this._loop);
+  }
+
+  _initRenderer() {
+    this.scene = new THREE.Scene();
+    this.scene.background = new THREE.Color(0x87ceeb);
+    this.scene.fog = new THREE.Fog(0x87ceeb, 28, 70);
+
+    this.camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.05, 200);
+
+    this.renderer = new THREE.WebGLRenderer({ antialias: true });
+    this.renderer.setSize(window.innerWidth, window.innerHeight);
+    this.renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+    this.renderer.shadowMap.enabled = true;
+    this.renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+    document.body.appendChild(this.renderer.domElement);
+  }
+
+  _initLights() {
+    const hemi = new THREE.HemisphereLight(0xbfe3ff, 0x3a4a2a, 0.55);
+    this.scene.add(hemi);
+    const ambient = new THREE.AmbientLight(0x404050, 0.25);
+    this.scene.add(ambient);
+
+    const sun = new THREE.DirectionalLight(0xfff3d6, 1.25);
+    sun.position.set(45, 70, 25);
+    sun.target.position.set(this.WORLD_X / 2, 0, this.WORLD_Z / 2);
+    sun.castShadow = true;
+    sun.shadow.mapSize.set(2048, 2048);
+    sun.shadow.camera.left = -60; sun.shadow.camera.right = 60;
+    sun.shadow.camera.top = 60; sun.shadow.camera.bottom = -60;
+    sun.shadow.camera.near = 1; sun.shadow.camera.far = 220;
+    sun.shadow.bias = -0.0018;
+    sun.shadow.normalBias = 0.02;
+    this.scene.add(sun);
+    this.scene.add(sun.target);
+  }
+
+  /** Дефолтные текстуры блоков 32x32 в собственном текстовом формате (генерируются кодом) */
+  _buildDefaultTextures() {
+    return {
+      1: buildSpeckleVtx({ size: 32, palette: { g: '6CC24A', k: '57A63D' }, weights: [0.82, 0.18], seed: 1 }),
+      2: buildSpeckleVtx({ size: 32, palette: { d: '8B5A2B', k: '6E4620', l: 'A16B3B' }, weights: [0.72, 0.14, 0.14], seed: 2 }),
+      3: buildSpeckleVtx({ size: 32, palette: { s: '8A8A8A', k: '6E6E6E', l: 'A3A3A3' }, weights: [0.7, 0.15, 0.15], seed: 3 }),
+      4: buildSpeckleVtx({ size: 32, palette: { w: '6B4423', k: '52341A' }, stripe: 4, seed: 4 }),
+      // листва анимирована — 3 кадра, 3 fps, лёгкое "мерцание на ветру"
+      5: buildSpeckleVtx({ size: 32, palette: { l: '2E7D32', k: '1B5E20' }, weights: [0.78, 0.22], frames: 3, fps: 3, seed: 5 }),
+    };
+  }
+
+  _bindKeys() {
+    this.input.onKeyDown = (e) => {
+      if (e.code.startsWith('Digit')) {
+        const n = parseInt(e.code.replace('Digit', ''));
+        if (n >= 1 && n <= 6) this.ui.selectSlot(n);
+      }
+      if (e.code === 'KeyE') this.ui.toggleEditor();
+    };
+  }
+
+  _raymarchTarget() {
+    const dir = new THREE.Vector3(0, 0, -1).applyEuler(this.camera.rotation);
+    const origin = this.camera.position.clone();
+    const step = 0.08, maxDist = 6;
+    let prev = null;
+    for (let d = 0; d < maxDist; d += step) {
+      const p = origin.clone().addScaledVector(dir, d);
+      const bx = Math.floor(p.x), by = Math.floor(p.y), bz = Math.floor(p.z);
+      if (this.world.getBlock(bx, by, bz) !== 0) return { hit: { x: bx, y: by, z: bz }, place: prev };
+      prev = { x: bx, y: by, z: bz };
+    }
+    return null;
+  }
+
+  _placeCustomModel(bx, by, bz) {
+    const model = this.ui.customModel && this.ui.customModel.length
+      ? this.ui.customModel
+      : JSON.parse(document.getElementById('modelInput').value);
+    model.forEach(c => {
+      const x = bx + c.x, y = by + c.y, z = bz + c.z;
+      if (this.world.getBlock(x, y, z) === 0) this.world.setBlock(x, y, z, c.t || 4);
+    });
+  }
+
+  _bindMouseActions() {
+    this.renderer.domElement.addEventListener('mousedown', (e) => {
+      if (!this.input.pointerLocked) return;
+      const target = this._raymarchTarget();
+      if (!target) return;
+
+      if (e.button === 0) { // ЛКМ — сломать
+        this.world.setBlock(target.hit.x, target.hit.y, target.hit.z, 0);
+      } else if (e.button === 2) { // ПКМ — поставить
+        if (!target.place) return;
+        const slot = this.ui.activeSlot;
+        if (slot === 6) {
+          this._placeCustomModel(target.place.x, target.place.y, target.place.z);
+        } else {
+          const p = target.place, feet = this.player.pos, hw = this.player.halfW;
+          const overlapsPlayer =
+            p.x + 1 > feet.x - hw && p.x < feet.x + hw &&
+            p.z + 1 > feet.z - hw && p.z < feet.z + hw &&
+            p.y + 1 > feet.y && p.y < feet.y + this.player.height;
+          if (!overlapsPlayer) this.world.setBlock(p.x, p.y, p.z, slot);
+        }
+      }
+    });
+  }
+
+  _onResize() {
+    this.camera.aspect = window.innerWidth / window.innerHeight;
+    this.camera.updateProjectionMatrix();
+    this.renderer.setSize(window.innerWidth, window.innerHeight);
+  }
+
+  _loop(now) {
+    requestAnimationFrame(this._loop);
+    let dt = (now - this._lastTime) / 1000;
+    dt = Math.min(dt, 0.05);
+    this._lastTime = now;
+
+    const frameInput = { keys: this.input.keys, mouseDelta: this.input.consumeMouseDelta() };
+    this.player.update(dt, frameInput);
+    this.clouds.update(dt);
+    this.world.updateTextureAnimations(dt);
+
+    this.renderer.render(this.scene, this.camera);
+  }
+}
+
+new Game();
+</script>
+</body>
+</html>
