@@ -1,18 +1,20 @@
 <div class="app">
 <header class="top">
   <div class="topin">
-    <div class="brand">
+    <a class="brand" href="#home" aria-label="ХимЛаб, басты бет">
       <svg viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3h8M13 3v9L5.5 25.2A3 3 0 0 0 8.1 29.5h15.8a3 3 0 0 0 2.6-4.3L19 12V3"/><path d="M9 21h14" opacity=".6"/><circle cx="14" cy="24.5" r="1.2" fill="currentColor"/><circle cx="19" cy="23.2" r=".9" fill="currentColor"/></svg>
       <b>ХимЛаб</b>
-    </div>
+    </a>
     <nav id="nav" role="tablist" aria-label="Бөлімдер">
-      <button role="tab" data-view="lab">Зертхана</button>
-      <button role="tab" data-view="titration">Титрлеу</button>
-      <button role="tab" data-view="elements">Периодтық кесте</button>
-      <button role="tab" data-view="solubility">Ерігіштік</button>
-      <button role="tab" data-view="calc">Есептеулер</button>
-      <button role="tab" data-view="gas">Газ заңдары</button>
+      <button role="tab" data-view="home"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 10.5 12 3l9 7.5"/><path d="M5 9.5V21h14V9.5"/><path d="M10 21v-6h4v6"/></svg><span>Басты бет</span></button>
+      <button role="tab" data-view="lab"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 3h6"/><path d="M10 3v6.5L4.6 18.6A2 2 0 0 0 6.3 21.5h11.4a2 2 0 0 0 1.7-2.9L14 9.5V3"/><path d="M7.5 15h9"/></svg><span>Зертхана</span></button>
+      <button role="tab" data-view="titration"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3s6 6.4 6 11a6 6 0 0 1-12 0c0-4.6 6-11 6-11z"/><path d="M9.5 15.5a2.6 2.6 0 0 0 2.5 2"/></svg><span>Титрлеу</span></button>
+      <button role="tab" data-view="elements"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="3" width="7.5" height="7.5" rx="1.5"/><rect x="13.5" y="3" width="7.5" height="7.5" rx="1.5"/><rect x="3" y="13.5" width="7.5" height="7.5" rx="1.5"/><rect x="13.5" y="13.5" width="7.5" height="7.5" rx="1.5"/></svg><span>Периодтық кесте</span></button>
+      <button role="tab" data-view="solubility"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M3 9.5h18M3 14.5h18M9 4v16M15 4v16"/></svg><span>Ерігіштік</span></button>
+      <button role="tab" data-view="calc"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="5" y="2.5" width="14" height="19" rx="2.5"/><path d="M8.5 6.5h7"/><path d="M8.5 11h.01M12 11h.01M15.5 11h.01M8.5 14.5h.01M12 14.5h.01M15.5 14.5h.01M8.5 18h.01M12 18h.01M15.5 18h.01"/></svg><span>Есептеулер</span></button>
+      <button role="tab" data-view="gas"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 17a8 8 0 1 1 16 0"/><path d="m12 17 4.5-5"/><circle cx="12" cy="17" r="1.2"/><path d="M4 20.5h16"/></svg><span>Газ заңдары</span></button>
     </nav>
+    <button class="themebtn" id="helpBtn" type="button" aria-label="Нұсқаулық" title="Нұсқаулық"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M9.3 9.2a2.8 2.8 0 0 1 5.4 1c0 1.9-2.7 2.5-2.7 4"/><path d="M12 17.3h.01"/></svg></button>
     <button class="themebtn" id="themeBtn" type="button" aria-label="Түсті ауыстыру" title="Жарық / қараңғы режим">
       <svg class="ic-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></svg>
     </button>
@@ -20,8 +22,97 @@
 </header>
 
 <main>
+<!-- ===== HOME ===== -->
+<section class="view" id="v-home">
+  <div class="hero panel">
+    <div class="hero-txt">
+      <span class="eyebrow">Виртуалды химия зертханасы</span>
+      <h1>Химияны көріп, <br>өз қолыңызбен үйреніңіз</h1>
+      <p>Оқушылар мен мұғалімдерге арналған: қауіпсіз тәжірибелер, нақты реакция теңдеулері және интерактивті кестелер. Тіркелусіз, тегін, кез келген браузерде жұмыс істейді.</p>
+      <div class="hero-act">
+        <button class="btn primary lg" type="button" data-go="lab">Тәжірибені бастау <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg></button>
+        <button class="btn lg" type="button" data-help="lab">Қалай қолдану керек?</button>
+      </div>
+    </div>
+    <div class="hero-art" aria-hidden="true">
+      <svg viewBox="0 0 320 260" fill="none">
+        <circle cx="160" cy="130" r="118" fill="var(--accent-soft)"/>
+        <g stroke="var(--fg)" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M132 52h56M140 52v52l-44 86a14 14 0 0 0 12.5 20.5h103a14 14 0 0 0 12.5-20.5l-44-86V52"/>
+        </g>
+        <path d="M112 160h96l18 34a8 8 0 0 1-7 12H101a8 8 0 0 1-7-12z" fill="var(--accent)" opacity=".9"/>
+        <circle cx="140" cy="182" r="6" fill="#fff" opacity=".8"/><circle cx="170" cy="190" r="4" fill="#fff" opacity=".7"/><circle cx="186" cy="174" r="3" fill="#fff" opacity=".7"/>
+        <circle cx="176" cy="132" r="5" fill="var(--accent)" opacity=".5"/><circle cx="162" cy="112" r="3.5" fill="var(--accent)" opacity=".4"/>
+        <g><circle cx="256" cy="74" r="13" fill="var(--good)"/><circle cx="283" cy="98" r="9" fill="var(--yellow)"/><path d="M265 83l12 9" stroke="var(--fg)" stroke-width="2.5"/></g>
+        <g><circle cx="58" cy="92" r="11" fill="var(--bad)"/><circle cx="40" cy="120" r="8" fill="var(--accent)"/><path d="M52 101l-7 12" stroke="var(--fg)" stroke-width="2.5"/></g>
+      </svg>
+    </div>
+  </div>
+
+  <div class="sect-t"><h2>Бөлімдер</h2><p>Бастау үшін керекті бөлімді таңдаңыз</p></div>
+  <div class="cards">
+    <button class="card-go panel" type="button" data-go="lab">
+      <span class="tile c-blue"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 3h6"/><path d="M10 3v6.5L4.6 18.6A2 2 0 0 0 6.3 21.5h11.4a2 2 0 0 0 1.7-2.9L14 9.5V3"/><path d="M7.5 15h9"/></svg></span>
+      <b>Зертхана</b><span class="d">Реактивтерді араластырып, тұнба, газ және түс өзгерісін бақылаңыз.</span>
+      <span class="meta">35 реактив · 12 тапсырма</span>
+      <span class="go">Ашу <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg></span>
+    </button>
+    <button class="card-go panel" type="button" data-go="titration">
+      <span class="tile c-green"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3s6 6.4 6 11a6 6 0 0 1-12 0c0-4.6 6-11 6-11z"/><path d="M9.5 15.5a2.6 2.6 0 0 0 2.5 2"/></svg></span>
+      <b>Титрлеу</b><span class="d">Бюреткамен титрлеп, ерітіндінің концентрациясын анықтаңыз.</span>
+      <span class="meta">pH графигі · 4 индикатор</span>
+      <span class="go">Ашу <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg></span>
+    </button>
+    <button class="card-go panel" type="button" data-go="elements">
+      <span class="tile c-yellow"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="3" width="7.5" height="7.5" rx="1.5"/><rect x="13.5" y="3" width="7.5" height="7.5" rx="1.5"/><rect x="3" y="13.5" width="7.5" height="7.5" rx="1.5"/><rect x="13.5" y="13.5" width="7.5" height="7.5" rx="1.5"/></svg></span>
+      <b>Периодтық кесте</b><span class="d">Әр элементтің Бор моделі, массасы және электрондық конфигурациясы.</span>
+      <span class="meta">118 элемент</span>
+      <span class="go">Ашу <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg></span>
+    </button>
+    <button class="card-go panel" type="button" data-go="solubility">
+      <span class="tile c-red"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M3 9.5h18M3 14.5h18M9 4v16M15 4v16"/></svg></span>
+      <b>Ерігіштік кестесі</b><span class="d">Тұздар мен негіздердің суда еритінін немесе тұнба түзетінін анықтаңыз.</span>
+      <span class="meta">15 катион · 10 анион</span>
+      <span class="go">Ашу <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg></span>
+    </button>
+    <button class="card-go panel" type="button" data-go="calc">
+      <span class="tile c-blue"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="5" y="2.5" width="14" height="19" rx="2.5"/><path d="M8.5 6.5h7"/><path d="M8.5 11h.01M12 11h.01M15.5 11h.01M8.5 14.5h.01M12 14.5h.01M15.5 14.5h.01M8.5 18h.01M12 18h.01M15.5 18h.01"/></svg></span>
+      <b>Есептеулер</b><span class="d">Теңдеуді теңестіру, молярлық масса, ерітінділер және pH.</span>
+      <span class="meta">5 калькулятор</span>
+      <span class="go">Ашу <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg></span>
+    </button>
+    <button class="card-go panel" type="button" data-go="gas">
+      <span class="tile c-green"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 17a8 8 0 1 1 16 0"/><path d="m12 17 4.5-5"/><circle cx="12" cy="17" r="1.2"/><path d="M4 20.5h16"/></svg></span>
+      <b>Газ заңдары</b><span class="d">Қысым, көлем және температура байланысын модельде көріңіз.</span>
+      <span class="meta">Бойль–Мариотт · Гей-Люссак · Шарль</span>
+      <span class="go">Ашу <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg></span>
+    </button>
+  </div>
+
+  <div class="duo">
+    <div class="panel pad how">
+      <h3>Тәжірибе үш қадаммен</h3>
+      <ol class="steps3">
+        <li><i>1</i><div><b>Реактивті таңдаңыз</b><span>Сол жақтағы сөреден немесе іздеу арқылы</span></div></li>
+        <li><i>2</i><div><b>Мөлшерін көрсетіңіз</b><span>2-ден 50 мл-ге дейін немесе грамммен</span></div></li>
+        <li><i>3</i><div><b>Ыдысты басыңыз</b><span>Реакция мен теңдеу журналда бірден шығады</span></div></li>
+      </ol>
+    </div>
+    <div class="panel pad how">
+      <h3>Мұғалімдерге</h3>
+      <ul class="ticks">
+        <li>Проектор мен интерактивті тақтаға ыңғайлы жарық режим</li>
+        <li>12 дайын зертханалық тапсырма, орындалғаны белгіленеді</li>
+        <li>Бақылау журналын бір батырмамен көшіріп алуға болады</li>
+        <li>Интернетсіз де жұмыс істейді: бір HTML файл</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
 <!-- ===== LAB ===== -->
 <section class="view" id="v-lab">
+  <div class="vhead"><h2>Зертхана</h2><p>Реактивті таңдап, мөлшерін көрсетіңіз де, ыдысты басыңыз.</p></div>
   <div class="labgrid">
     <aside class="shelf panel" aria-label="Реактивтер сөресі">
       <div class="sh">
@@ -202,5 +293,11 @@
   </div>
 </section>
 </main>
+<dialog id="help" class="dlg" aria-labelledby="helpT">
+  <div class="dlg-h"><span class="tile c-blue"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M9.3 9.2a2.8 2.8 0 0 1 5.4 1c0 1.9-2.7 2.5-2.7 4"/><path d="M12 17.3h.01"/></svg></span><h3 id="helpT"></h3>
+    <button class="x" type="button" id="helpX" aria-label="Жабу">✕</button></div>
+  <ol class="dlg-b" id="helpB"></ol>
+  <div class="dlg-f"><button class="btn primary" type="button" id="helpOk">Түсінікті</button></div>
+</dialog>
 <footer>ХимЛаб мектеп пен жоғары оқу орнының типтік реакцияларын жеңілдетілген түрде модельдейді: идеал ерітінділер, лездік тепе-теңдік, сапалық әсерлер. Нәтижелер зертханалық тәжірибені алмастырмайды.</footer>
 </div>
