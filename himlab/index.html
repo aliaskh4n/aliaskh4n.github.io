@@ -392,6 +392,116 @@ footer{max-width:1480px;margin:40px auto 0}
   .vhead .helpchip{grid-column:1;grid-row:auto;justify-self:start}
   .hero h1 br{display:none}
 }
+
+
+/* ================= v4: lab as a one-screen app ================= */
+body:has(#v-lab.on) footer{display:none}
+body:has(#v-lab.on){padding-bottom:16px}
+#v-lab{padding-top:16px}
+.lab3{display:grid;grid-template-columns:300px minmax(0,1fr) 360px;gap:14px;height:calc(100dvh - 60px - 16px - 16px - env(safe-area-inset-top,0px));min-height:560px}
+.lab3 .col{display:flex;flex-direction:column;min-height:0;overflow:hidden}
+.colh{display:flex;align-items:center;gap:10px;padding:14px 16px 8px}
+.colh b{font-size:15px;font-weight:650}
+.colh.sm{padding:0 0 8px}
+.colh.sm b{font-size:14px}
+.stepn{flex:none;width:24px;height:24px;border-radius:50%;background:var(--accent);color:#fff;display:inline-grid;place-items:center;font-size:12.5px;font-weight:700;font-style:normal}
+.stepn.inv{background:#fff;color:var(--accent)}
+
+/* shelf */
+.lab3 .shelf{position:static;max-height:none}
+.lab3 .shelf .sh{padding:0 14px 8px;gap:8px}
+.lab3 .shelf .list{flex:1;min-height:0;overflow:auto;padding:0 8px 10px}
+.lab3 .grp{margin:12px 8px 4px}
+
+/* bench */
+.bench{padding:0}
+.benchh{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:10px 12px;border-bottom:1px solid var(--line)}
+.vtabs{display:flex;gap:4px;background:var(--panel2);padding:4px;border-radius:12px}
+.vtabs button{border:0;background:none;border-radius:9px;padding:6px 14px;cursor:pointer;display:grid;line-height:1.15;text-align:left;color:var(--muted)}
+.vtabs button b{font-size:13.5px;font-weight:600}
+.vtabs button small{font-size:11px;font-family:var(--font-data)}
+.vtabs button.on{background:var(--panel);color:var(--fg);box-shadow:0 1px 3px rgba(16,24,40,.12)}
+.vtabs button.on small{color:var(--accent)}
+.btn.qbtn{background:none;border-color:transparent;box-shadow:none;color:var(--muted)}
+.btn.qbtn:hover{background:var(--panel2);color:var(--fg);border-color:transparent}
+.btn.qbtn .ic{width:17px;height:17px}
+.menu-d{position:relative}
+.menu-d>summary{list-style:none;cursor:pointer}
+.menu-d>summary::-webkit-details-marker{display:none}
+.menu-p{position:absolute;right:0;top:calc(100% + 6px);z-index:15;width:220px;background:var(--panel);border:1px solid var(--line);border-radius:14px;box-shadow:var(--shadow-lg);padding:12px;display:grid;gap:8px}
+.menu-p .seg{width:100%}.menu-p .seg button{flex:1}
+
+.lab3 .stations{display:block;flex:1;min-height:0;padding:12px 14px 0}
+.lab3 .station{height:100%;display:flex;flex-direction:column;gap:10px;min-height:0}
+.lab3 .station[hidden]{display:none}
+.stage{position:relative;flex:1;min-height:0;display:grid;place-items:center;border-radius:14px;overflow:hidden;background:linear-gradient(180deg,var(--stage) 0,var(--stage) 89%,color-mix(in srgb,var(--plate) 40%,var(--stage)) 89%,color-mix(in srgb,var(--plate) 55%,var(--stage)) 100%)}
+.lab3 .cwrap{margin:0;height:100%;max-width:100%;aspect-ratio:340/400;background:none;border-radius:0}
+.vsel-w{position:absolute;left:10px;top:10px;z-index:2}
+.vsel-w select.vsel{background:var(--panel);box-shadow:var(--shadow);font-weight:500}
+.read3{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
+.rt{background:var(--panel2);border-radius:12px;padding:8px 12px}
+.rt small{display:block;font-size:11px;color:var(--muted);font-weight:500}
+.rt b{font-family:var(--font-data);font-size:17px;font-weight:500;display:flex;align-items:center;gap:7px;font-variant-numeric:tabular-nums}
+.acts{display:flex;gap:8px;align-items:stretch}
+.btn.act{flex:1;justify-content:center;padding:9px 10px;gap:7px;font-size:14px}
+.btn.act .ic{width:18px;height:18px}
+.btn.act.on{background:var(--accent-soft);border-color:var(--accent);color:var(--accent);font-weight:600}
+.btn.act.sm{flex:none;padding:7px 11px;font-size:13px}
+.acts .more{position:relative;flex:1;display:flex;margin:0}
+.acts .more>summary{list-style:none;width:100%;padding:9px 10px;font-size:14px;color:var(--fg)}
+.acts .more>summary::-webkit-details-marker{display:none}
+.acts .more>summary::after{content:"▾";color:var(--muted);font-size:11px}
+.more-p{position:absolute;right:0;bottom:calc(100% + 6px);z-index:15;width:280px;background:var(--panel);border:1px solid var(--line);border-radius:14px;box-shadow:var(--shadow-lg);padding:12px}
+.more-p .comp{padding:6px 0 0}
+.lab3 .hand{display:flex;align-items:center;gap:20px;margin:12px 0 0;padding:14px;border-top:1px solid var(--line);background:color-mix(in srgb,var(--panel2) 55%,var(--panel));border-radius:0 0 16px 16px;box-shadow:none;flex-wrap:wrap}
+.hand-l{flex:1;min-width:0;display:grid;gap:8px}
+.lab3 .hand .cur{display:none}
+.lab3 .hand #doses{flex-wrap:nowrap;overflow-x:auto;scrollbar-width:none}
+.lab3 .hand #doses .chip{flex:none;padding:6px 14px;font-size:13.5px}
+.btn.xl .pl{display:grid;text-align:left;line-height:1.2}
+.btn.xl .pl b{font-weight:650}
+.btn.xl .pl small{font-size:12px;font-weight:500;opacity:.85;max-width:190px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.btn.xl{padding:14px 22px;font-size:16px;border-radius:14px;gap:10px;min-width:210px;justify-content:center}
+.btn.xl .ic{width:20px;height:20px}
+
+/* side */
+.stabs{display:flex;gap:2px;padding:8px;border-bottom:1px solid var(--line)}
+.stabs button{flex:1;white-space:nowrap;border:0;background:none;padding:8px 6px;border-radius:9px;cursor:pointer;font-weight:500;font-size:13.5px;color:var(--muted);position:relative}
+.stabs button:hover{background:var(--panel2);color:var(--fg)}
+.stabs button.on{background:var(--accent-soft);color:var(--accent);font-weight:600}
+.stabs button.new::after{content:"";position:absolute;top:6px;right:8px;width:7px;height:7px;border-radius:50%;background:var(--bad)}
+.stabs .cnt{font-family:var(--font-data);font-size:11px;opacity:.8}
+.spane{display:none;flex:1;min-height:0;overflow:auto;padding:12px 14px}
+.spane.on{display:block}
+.side .log,.side .tasks{padding:0;box-shadow:none;border:0;background:none}
+.logh{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:10px}
+.side .entries{max-height:none;overflow:visible}
+.empty.guide{display:grid;gap:8px;padding:14px;border:1px dashed var(--line);border-radius:12px;color:var(--fg);font-size:14px}
+.empty.guide ol{margin:0;padding-left:20px;display:grid;gap:4px;color:var(--muted)}
+.side .safety{margin:0;padding:0;box-shadow:none;border:0;font-size:14px}
+.side .safety ul{display:grid;gap:8px;padding-left:18px}
+.side .task:first-of-type{border-top:0}
+
+@media (max-width:1280px){ .lab3{grid-template-columns:270px minmax(0,1fr) 320px} }
+@media (max-width:1060px){
+  .lab3{grid-template-columns:minmax(0,1fr);height:auto;min-height:0}
+  .lab3 .shelf .list{max-height:260px}
+  .lab3 .stations{height:min(70vh,560px);flex:none}
+  .spane{max-height:420px}
+  body:has(#v-lab.on) footer{display:block}
+}
+@media (max-width:620px){
+  .btn.act span{font-size:13px}
+  .btn.xl{width:100%;min-width:0}
+  .vtabs button{padding:6px 10px}
+  .benchh .btn.qbtn span{display:none}
+}
+
+.logh{justify-content:flex-end}
+.acts{display:grid;grid-template-columns:repeat(4,minmax(0,1fr))}
+.acts .more>summary{justify-content:center}
+.lab3 .cwrap::after{top:auto;bottom:15%}
+@media (max-width:620px){ .acts{grid-template-columns:repeat(2,minmax(0,1fr))} .more-p{width:min(280px,80vw)} }
 </style>
 <div class="app">
 <header class="top">
@@ -507,42 +617,64 @@ footer{max-width:1480px;margin:40px auto 0}
 
 <!-- ===== LAB ===== -->
 <section class="view" id="v-lab">
-  <div class="vhead"><h2>Зертхана</h2><p>Реактивті таңдап, мөлшерін көрсетіңіз де, ыдысты басыңыз.</p></div>
-  <div class="labgrid">
-    <aside class="shelf panel" aria-label="Реактивтер сөресі">
+  <div class="lab3">
+    <aside class="col shelf panel" aria-label="Реактивтер сөресі">
+      <div class="colh"><span class="stepn">1</span><b>Реактивті таңдаңыз</b></div>
       <div class="sh">
         <input type="search" id="rsearch" placeholder="Реактив іздеу" aria-label="Реактив іздеу">
         <select id="rcats" aria-label="Санат"></select>
       </div>
       <div class="list" id="rlist"></div>
     </aside>
-    <div>
-      <div class="hand panel" id="hand">
-        <div class="cur" id="handcur"></div>
-        <div class="row" id="doses" aria-label="Мөлшері"></div>
-        <span class="hint">Қосу үшін ыдысты басыңыз</span>
-        <div class="tools">
-          <div class="seg" id="speed" title="Уақыт жылдамдығы"><button data-s="1" class="on">1×</button><button data-s="3">3×</button><button data-s="8">8×</button></div>
-          <button class="btn" id="resetAll">Бәрін тазарту</button>
+
+    <section class="col bench panel" aria-label="Зертханалық үстел">
+      <div class="benchh">
+        <div class="vtabs" id="vtabs" role="tablist" aria-label="Ыдыстар"></div>
+        <div class="row" style="gap:6px">
+          <button class="btn sm qbtn" type="button" data-help="lab"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M9.3 9.2a2.8 2.8 0 0 1 5.4 1c0 1.9-2.7 2.5-2.7 4"/><path d="M12 17.3h.01"/></svg><span>Нұсқаулық</span></button>
+          <details class="menu-d" id="labMenu">
+            <summary class="btn sm qbtn" aria-label="Баптаулар"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="5" cy="12" r="1.2"/><circle cx="12" cy="12" r="1.2"/><circle cx="19" cy="12" r="1.2"/></svg></summary>
+            <div class="menu-p">
+              <div class="lbl">Уақыт жылдамдығы</div>
+              <div class="seg" id="speed"><button data-s="1" class="on">1×</button><button data-s="3">3×</button><button data-s="8">8×</button></div>
+              <button class="btn sm" id="resetAll" type="button" style="width:100%;justify-content:center">Барлық ыдысты тазарту</button>
+            </div>
+          </details>
         </div>
       </div>
       <div class="stations" id="stations"></div>
-      <div class="under">
-        <details class="tasks panel" id="tasks"></details>
-        <div class="log panel" id="log"></div>
+      <div class="hand" id="hand">
+        <div class="cur" id="handcur"></div>
+        <div class="hand-l">
+          <div class="colh sm"><span class="stepn">2</span><b>Мөлшерін таңдаңыз</b></div>
+          <div class="row" id="doses" aria-label="Мөлшері"></div>
+        </div>
+        <button class="btn primary xl" type="button" id="pourBtn"><span class="stepn inv">3</span><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 4h9l-1 5H8z"/><path d="M11.5 9v3"/><path d="M11.5 15.5v.5M11.5 19v.5"/></svg><span class="pl"><b id="pourLbl">Құю</b><small id="pourSub"></small></span></button>
       </div>
-      <details class="safety panel">
-        <summary>Нағыз зертханадағы қауіпсіздік ережелері</summary>
-        <ul>
-          <li>Халат, көзілдірік және қолғаппен жұмыс істеңіз. Шашты жинаңыз, аяқ киім жабық болсын.</li>
-          <li>Қышқылды суға құяды, керісінше емес. Сілті мен қышқылдың дәмін татуға және иіскеуге болмайды.</li>
-          <li>Сілтілік металдарды май астында сақтап, пинцетпен алады. Сумен реакцияны аз мөлшерде, қорғаныш экранының артында жүргізеді.</li>
-          <li>Пробирканы көлбеу ұстап, аузын өзіңізден және көршілерден әрі қаратып қыздырыңыз. Оны үштен бірінен артық толтырмаңыз.</li>
-          <li>Ауыр металдардың (қорғасын, күміс, барий) тұздары улы. Қалдықтарды бөлек ыдысқа жинайды.</li>
-          <li>Бұл модель жеңілдетілген. Ол нағыз тәжірибені және мұғалімнің нұсқауын алмастырмайды.</li>
-        </ul>
-      </details>
-    </div>
+    </section>
+
+    <aside class="col side panel" aria-label="Журнал және тапсырмалар">
+      <div class="stabs" id="stabs" role="tablist">
+        <button type="button" data-t="log" class="on">Журнал</button>
+        <button type="button" data-t="tasks">Тапсырмалар <span class="cnt" id="taskCnt"></span></button>
+        <button type="button" data-t="safety">Қауіпсіздік</button>
+      </div>
+      <div class="spane on" data-p="log"><div class="log" id="log"></div></div>
+      <div class="spane" data-p="tasks"><div class="tasks" id="tasks"></div></div>
+      <div class="spane" data-p="safety">
+        <div class="safety">
+          <p class="muted">Нағыз зертханадағы қауіпсіздік ережелері:</p>
+          <ul>
+            <li>Халат, көзілдірік және қолғаппен жұмыс істеңіз. Шашты жинаңыз, аяқ киім жабық болсын.</li>
+            <li>Қышқылды суға құяды, керісінше емес. Сілті мен қышқылдың дәмін татуға және иіскеуге болмайды.</li>
+            <li>Сілтілік металдарды май астында сақтап, пинцетпен алады. Сумен реакцияны аз мөлшерде, қорғаныш экранының артында жүргізеді.</li>
+            <li>Пробирканы көлбеу ұстап, аузын өзіңізден және көршілерден әрі қаратып қыздырыңыз. Оны үштен бірінен артық толтырмаңыз.</li>
+            <li>Ауыр металдардың (қорғасын, күміс, барий) тұздары улы. Қалдықтарды бөлек ыдысқа жинайды.</li>
+            <li>Бұл модель жеңілдетілген. Ол нағыз тәжірибені және мұғалімнің нұсқауын алмастырмайды.</li>
+          </ul>
+        </div>
+      </div>
+    </aside>
   </div>
 </section>
 
@@ -1350,7 +1482,7 @@ const Eng=(()=>{
 /* ===== Lab bench: shelf, stations, rendering ===== */
 const Lab=(()=>{
   const LW=340,LH=400,CX=170,BY=330;
-  const S={stations:[],hand:{r:RBY.hcl,dose:10},speed:1,filter:'all',q:'',t0:performance.now(),done:new Set(),running:false,last:0};
+  const S={act:0,stations:[],hand:{r:RBY.hcl,dose:10},speed:1,filter:'all',q:'',t0:performance.now(),done:new Set(),running:false,last:0};
   try{const d=JSON.parse(localStorage.getItem('chemlab-tasks')||'[]');d.forEach(x=>S.done.add(x));}catch(e){}
 
   const TASKS=[
@@ -1408,6 +1540,8 @@ const Lab=(()=>{
   function renderHand(){
     const r=S.hand.r;
     $('#handcur').innerHTML=`<span>${bottleSVG(r.col,r.kind)}</span><div><span class="lbl">Қолда</span><b>${r.name}</b><span class="muted mono" style="font-size:12px">${chem(r.f)}${r.kind==='liq'&&r.c?' · '+r.c+' моль/л':''}</span></div>`;
+    const ps=$('#pourSub');if(ps)ps.textContent=r.name;
+    const pl=$('#pourLbl');if(pl)pl.textContent=r.kind==='ind'?'2 тамшы қосу':`Құю: ${S.hand.dose} ${r.kind==='solid'?'г':'мл'}`;
     const box=$('#doses');box.innerHTML='';
     if(r.kind==='ind'){box.append(H('span',{class:'muted'},'2 тамшы'));return;}
     const arr=r.kind==='solid'?(r.id==='na'?[0.05,0.1,0.2,0.5,1]:DOSES_SOL):DOSES_LIQ;
@@ -1461,18 +1595,29 @@ const Lab=(()=>{
     const obs=H('div',{class:'obs','aria-live':'polite'});
     const cw=H('div',{class:'cwrap',onclick:()=>addTo(st),title:'Таңдалған реактивті қосу үшін басыңыз'},cv,obs);
     const rT=H('b',{},'22 °C'),rPH=H('b',{},'—'),rV=H('b',{},'0 мл'),chip=H('i',{class:'phchip'});
-    const mk=(t,fn,cls='')=>H('button',{class:'btn sm '+cls,type:'button',onclick:fn},t);
-    const bHeat=mk('Қыздыру',()=>toggle(st,'heat')),bIce=mk('Мұз',()=>toggle(st,'ice')),bStir=mk('Араластырғыш',()=>{st.v.stir=!st.v.stir;sync(st);}),
-      bFilt=mk('Сүзгі',()=>{const v=st.v;for(const k in v.solids)if(!v.piece[k]||!Eng.PIECES.includes(k))delete v.solids[k];v.susp={};st.parts=[];flash(st,'Тұнба сүзілді.');sync(st);}),
-      bClr=mk('Төгу',()=>{st.v=Eng.newVessel(st.v.type);st.bub=[];st.steam=[];st.parts=[];st.shards=[];flash(st,'Ыдыс тазартылды.');sync(st);});
+    const IC={heat:'<path d="M12 3c.8 3 4.5 4.6 4.5 9.3a4.5 4.5 0 0 1-9 0c0-2.2 1.1-3.4 2.2-4.4.1 2 1 3.1 2.1 3.1 0-3-1.2-5 .2-8z"/>',
+      ice:'<path d="M12 3v18M4.2 7.5l15.6 9M4.2 16.5l15.6-9"/>',
+      clr:'<path d="M4 7h16M10 7V4h4v3M6 7l1 13h10l1-13"/>',
+      stir:'<path d="M4 12a8 8 0 0 1 14-5.3M20 12a8 8 0 0 1-14 5.3"/><path d="M18 3v4h-4M6 21v-4h4"/>',
+      filt:'<path d="M3 5h18l-7 8v6l-4 2v-8z"/>'};
+    const mk=(t,fn,ic,cls='')=>H('button',{class:'btn act '+cls,type:'button',onclick:fn,html:`<svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round">${IC[ic]}</svg><span>${t}</span>`});
+    const bHeat=mk('Қыздыру',()=>toggle(st,'heat'),'heat'),bIce=mk('Суыту',()=>toggle(st,'ice'),'ice'),bStir=mk('Араластыру',()=>{st.v.stir=!st.v.stir;sync(st);},'stir','sm'),
+      bFilt=mk('Сүзу',()=>{const v=st.v;for(const k in v.solids)if(!v.piece[k]||!Eng.PIECES.includes(k))delete v.solids[k];v.susp={};st.parts=[];flash(st,'Тұнба сүзілді.');sync(st);},'filt','sm'),
+      bClr=mk('Төгу',()=>{st.v=Eng.newVessel(st.v.type);st.bub=[];st.steam=[];st.parts=[];st.shards=[];flash(st,'Ыдыс тазартылды.');sync(st);},'clr');
     const comp=H('div',{class:'comp'});
-    const el=H('article',{class:'station panel'},
-      H('header',{},H('b',{},'Ыдыс '+(i+1)),seg),cw,
-      H('div',{class:'read'},H('span',{title:'Температура'},rT),H('span',{title:'Қышқылдық'},'pH ',rPH,chip),H('span',{title:'Көлем'},rV)),
-      H('div',{class:'sbtns'},bHeat,bIce,bClr),
-      H('details',{class:'more'},H('summary',{},'Тағы: араластырғыш, сүзгі, құрамы'),H('div',{class:'sbtns'},bStir,bFilt),comp));
+    const tile=(lbl,...k)=>H('div',{class:'rt'},H('small',{},lbl),H('b',{},...k));
+    const el=H('article',{class:'station'},
+      H('div',{class:'stage'},H('div',{class:'vsel-w'},seg),cw),
+      H('div',{class:'read3'},tile('Температура',rT),tile('pH',rPH,chip),tile('Көлем',rV)),
+      H('div',{class:'acts'},bHeat,bIce,bClr,
+        H('details',{class:'more'},H('summary',{class:'btn act'},H('span',{},'Тағы')),
+          H('div',{class:'more-p'},H('div',{class:'row'},bStir,bFilt),H('div',{class:'lbl',style:'margin-top:10px'},'Ерітінді құрамы'),comp))));
     Object.assign(st,{el,cv,cw,obs,rT,rPH,rV,chip,bHeat,bIce,bStir,seg,comp});
     return st;
+  }
+  function pickStation(i){
+    S.act=i;S.stations.forEach((s,k)=>{s.el.hidden=k!==i;});
+    $$('#vtabs button').forEach((b,k)=>{b.classList.toggle('on',k===i);b.setAttribute('aria-selected',k===i);});
   }
   function toggle(st,m){st.v.mode=st.v.mode===m?'off':m;if(st.v.mode==='off'&&m==='heat')st.v.dry=false;sync(st);}
   function setType(st,k){
@@ -1492,6 +1637,7 @@ const Lab=(()=>{
     st.cw.classList.toggle('isempty',v.vol<=0&&!v.broken);
     st.rT.textContent=v.T.toFixed(1)+' °C';
     st.rV.textContent=(v.vol<10?v.vol.toFixed(1):v.vol.toFixed(0))+' мл';
+    const tv=$(`#vtabs [data-i="${st.i}"] .vt-v`);if(tv)tv.textContent=v.broken?'сынған':v.vol>0?(v.vol<10?v.vol.toFixed(1):v.vol.toFixed(0))+' мл':'бос';
     st.rPH.firstChild.textContent=v.pH==null?'—':v.pH.toFixed(2);
     st.chip.style.background=v.pH==null?'transparent':`rgb(${phRGB(v.pH).map(x=>x|0)})`;
     if(st.el.querySelector('details').open){
@@ -1509,13 +1655,15 @@ const Lab=(()=>{
     const e=H('div',{class:'ent'+(ev.warn?' warn':'')},H('div',{class:'m'},`${mm}:${ss} · Ыдыс ${st.i+1}${ev.plain?' · әрекет':''}`),H('div',{html:chem(ev.text)}));
     if(ev.eq)e.append(H('div',{class:'q',html:chem(ev.eq)}));
     if(ev.plain)e.style.borderLeftColor='var(--line)';
-    const first=box.firstChild;if(first&&first.classList&&first.classList.contains('empty'))first.remove();
+    box.querySelectorAll('.empty').forEach(x=>x.remove());
     box.prepend(e);while(box.children.length>80)box.lastChild.remove();
+    const lt=$('#stabs [data-t="log"]');if(lt&&!lt.classList.contains('on'))lt.classList.add('new');
     if(!ev.plain)flash(st,ev.text);
   }
   function renderTasks(){
     const box=$('#tasks');box.innerHTML='';
-    box.append(H('summary',{},H('b',{},'Тапсырмалар'),H('span',{class:'muted mono',style:'font-size:12px'},`${S.done.size} / ${TASKS.length}`)));
+    box.append(H('p',{class:'muted',style:'margin:0 0 8px;font-size:13px'},'Тәжірибені дұрыс жасасаңыз, тапсырма өзі белгіленеді.'));
+    const c=$('#taskCnt');if(c)c.textContent=`${S.done.size}/${TASKS.length}`;
     for(const t of TASKS)box.append(H('div',{class:'task'+(S.done.has(t.tag)?' done':''),'data-tag':t.tag},H('i',{},S.done.has(t.tag)?'✓':''),H('div',{},H('b',{html:chem(t.t)}),H('span',{html:chem(t.d)}))));
   }
   function mark(tag){
@@ -1527,11 +1675,17 @@ const Lab=(()=>{
   }
   function renderLog(){
     const box=$('#log');box.innerHTML='';
-    box.append(H('h3',{},'Бақылау журналы',H('span',{class:'row'},
+    box.append(H('div',{class:'logh'},H('span',{class:'row',style:'gap:6px'},
       H('button',{class:'btn sm',type:'button',onclick:()=>{const txt=$$('#log .ent').reverse().map(e=>e.innerText.replace(/\n+/g,' | ')).join('\n');
         try{navigator.clipboard.writeText(txt).catch(()=>{});}catch(e){}}},'Көшіру'),
-      H('button',{class:'btn sm',type:'button',onclick:()=>{$('#log .entries').innerHTML='<div class="empty">Журнал тазартылды.</div>';}},'Тазарту'))));
-    box.append(H('div',{class:'entries'},H('div',{class:'empty'},'Мұнда бақылаулар мен реакция теңдеулері шығады.')));
+      H('button',{class:'btn sm',type:'button',onclick:()=>{$('#log .entries').innerHTML='';$('#log .entries').append(emptyLog());}},'Тазарту'))));
+    box.append(H('div',{class:'entries'},emptyLog()));
+  }
+  function emptyLog(){
+    return H('div',{class:'empty guide'},
+      H('b',{},'Тәжірибе әлі басталған жоқ'),
+      H('ol',{},H('li',{},'Сол жақтан реактивті таңдаңыз.'),H('li',{},'Төменнен мөлшерін таңдаңыз.'),H('li',{},'«Құю» батырмасын басыңыз немесе ыдыстың өзін басыңыз.'),H('li',{},'Басқа реактив қосыңыз: реакция осында жазылады.')),
+      H('span',{class:'muted'},'Идея керек пе? «Тапсырмалар» қойындысын ашыңыз.'));
   }
 
   /* ---------- rendering ---------- */
@@ -1555,8 +1709,7 @@ const Lab=(()=>{
     ctx.clearRect(0,0,LW,LH);
     const sh=v.fx.shake;ctx.save();if(sh>0)ctx.translate(rnd(-1,1)*sh*3,rnd(-1,1)*sh*3);
     // bench
-    ctx.fillStyle=rgba(TH.plate,.35);ctx.fillRect(0,BY+26,LW,LH-BY-26);
-    ctx.fillStyle=rgba(TH.fg,.08);ctx.fillRect(0,BY+26,LW,1.5);
+    // bench surface is drawn by CSS (.stage) so it spans the full width
     // heater / ice
     const pw=v.type==='tube'?60:v.type==='beaker'?170:190;
     const hot=v.mode==='heat';
@@ -1756,7 +1909,7 @@ const Lab=(()=>{
       while(rem>0){const h=Math.min(.05,rem);Eng.step(v,h);rem-=h;}
       if(v.events.length){for(const ev of v.events)logAdd(st,ev);v.events.length=0;}
       if(v.tags.size){for(const tg of v.tags)mark(tg);v.tags.clear();}
-      draw(st,t,dt);
+      if(!st.el.hidden)draw(st,t,dt);
       st.refr+=dt;if(st.refr>.12){st.refr=0;readouts(st);}
     }
     requestAnimationFrame(frame);
@@ -1765,7 +1918,14 @@ const Lab=(()=>{
   function stop(){S.running=false;}
   function init(){
     renderCats();renderShelf();renderHand();renderTasks();renderLog();
-    const box=$('#stations');for(let i=0;i<3;i++){const st=mkStation(i);S.stations.push(st);box.append(st.el);}
+    const box=$('#stations'),tabs=$('#vtabs');
+    for(let i=0;i<3;i++){const st=mkStation(i);S.stations.push(st);box.append(st.el);
+      tabs.append(H('button',{type:'button',role:'tab','data-i':i,onclick:()=>pickStation(i)},H('b',{},(i+1)+'-ыдыс'),H('small',{class:'vt-v'},'бос')));}
+    pickStation(0);
+    $('#pourBtn').addEventListener('click',()=>addTo(S.stations[S.act]));
+    $('#stabs').addEventListener('click',e=>{const b=e.target.closest('button');if(!b)return;
+      $$('#stabs button').forEach(x=>x.classList.toggle('on',x===b));b.classList.remove('new');
+      $$('.side .spane').forEach(p=>p.classList.toggle('on',p.dataset.p===b.dataset.t));});
     $('#rsearch').addEventListener('input',e=>{S.q=e.target.value;renderShelf();});
     $('#speed').addEventListener('click',e=>{const b=e.target.closest('button');if(!b)return;S.speed=+b.dataset.s;$$('#speed button').forEach(x=>x.classList.toggle('on',x===b));});
     $('#resetAll').addEventListener('click',()=>{S.stations.forEach(st=>{st.v=Eng.newVessel(st.v.type);st.bub=[];st.parts=[];st.steam=[];st.shards=[];sync(st);});renderLog();S.t0=performance.now();});

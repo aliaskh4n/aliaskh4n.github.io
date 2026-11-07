@@ -2,7 +2,7 @@
 /* ===== Lab bench: shelf, stations, rendering ===== */
 const Lab=(()=>{
   const LW=340,LH=400,CX=170,BY=330;
-  const S={stations:[],hand:{r:RBY.hcl,dose:10},speed:1,filter:'all',q:'',t0:performance.now(),done:new Set(),running:false,last:0};
+  const S={act:0,stations:[],hand:{r:RBY.hcl,dose:10},speed:1,filter:'all',q:'',t0:performance.now(),done:new Set(),running:false,last:0};
   try{const d=JSON.parse(localStorage.getItem('chemlab-tasks')||'[]');d.forEach(x=>S.done.add(x));}catch(e){}
 
   const TASKS=[
@@ -60,6 +60,8 @@ const Lab=(()=>{
   function renderHand(){
     const r=S.hand.r;
     $('#handcur').innerHTML=`<span>${bottleSVG(r.col,r.kind)}</span><div><span class="lbl">Қолда</span><b>${r.name}</b><span class="muted mono" style="font-size:12px">${chem(r.f)}${r.kind==='liq'&&r.c?' · '+r.c+' моль/л':''}</span></div>`;
+    const ps=$('#pourSub');if(ps)ps.textContent=r.name;
+    const pl=$('#pourLbl');if(pl)pl.textContent=r.kind==='ind'?'2 тамшы қосу':`Құю: ${S.hand.dose} ${r.kind==='solid'?'г':'мл'}`;
     const box=$('#doses');box.innerHTML='';
     if(r.kind==='ind'){box.append(H('span',{class:'muted'},'2 тамшы'));return;}
     const arr=r.kind==='solid'?(r.id==='na'?[0.05,0.1,0.2,0.5,1]:DOSES_SOL):DOSES_LIQ;
@@ -113,18 +115,29 @@ const Lab=(()=>{
     const obs=H('div',{class:'obs','aria-live':'polite'});
     const cw=H('div',{class:'cwrap',onclick:()=>addTo(st),title:'Таңдалған реактивті қосу үшін басыңыз'},cv,obs);
     const rT=H('b',{},'22 °C'),rPH=H('b',{},'—'),rV=H('b',{},'0 мл'),chip=H('i',{class:'phchip'});
-    const mk=(t,fn,cls='')=>H('button',{class:'btn sm '+cls,type:'button',onclick:fn},t);
-    const bHeat=mk('Қыздыру',()=>toggle(st,'heat')),bIce=mk('Мұз',()=>toggle(st,'ice')),bStir=mk('Араластырғыш',()=>{st.v.stir=!st.v.stir;sync(st);}),
-      bFilt=mk('Сүзгі',()=>{const v=st.v;for(const k in v.solids)if(!v.piece[k]||!Eng.PIECES.includes(k))delete v.solids[k];v.susp={};st.parts=[];flash(st,'Тұнба сүзілді.');sync(st);}),
-      bClr=mk('Төгу',()=>{st.v=Eng.newVessel(st.v.type);st.bub=[];st.steam=[];st.parts=[];st.shards=[];flash(st,'Ыдыс тазартылды.');sync(st);});
+    const IC={heat:'<path d="M12 3c.8 3 4.5 4.6 4.5 9.3a4.5 4.5 0 0 1-9 0c0-2.2 1.1-3.4 2.2-4.4.1 2 1 3.1 2.1 3.1 0-3-1.2-5 .2-8z"/>',
+      ice:'<path d="M12 3v18M4.2 7.5l15.6 9M4.2 16.5l15.6-9"/>',
+      clr:'<path d="M4 7h16M10 7V4h4v3M6 7l1 13h10l1-13"/>',
+      stir:'<path d="M4 12a8 8 0 0 1 14-5.3M20 12a8 8 0 0 1-14 5.3"/><path d="M18 3v4h-4M6 21v-4h4"/>',
+      filt:'<path d="M3 5h18l-7 8v6l-4 2v-8z"/>'};
+    const mk=(t,fn,ic,cls='')=>H('button',{class:'btn act '+cls,type:'button',onclick:fn,html:`<svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round">${IC[ic]}</svg><span>${t}</span>`});
+    const bHeat=mk('Қыздыру',()=>toggle(st,'heat'),'heat'),bIce=mk('Суыту',()=>toggle(st,'ice'),'ice'),bStir=mk('Араластыру',()=>{st.v.stir=!st.v.stir;sync(st);},'stir','sm'),
+      bFilt=mk('Сүзу',()=>{const v=st.v;for(const k in v.solids)if(!v.piece[k]||!Eng.PIECES.includes(k))delete v.solids[k];v.susp={};st.parts=[];flash(st,'Тұнба сүзілді.');sync(st);},'filt','sm'),
+      bClr=mk('Төгу',()=>{st.v=Eng.newVessel(st.v.type);st.bub=[];st.steam=[];st.parts=[];st.shards=[];flash(st,'Ыдыс тазартылды.');sync(st);},'clr');
     const comp=H('div',{class:'comp'});
-    const el=H('article',{class:'station panel'},
-      H('header',{},H('b',{},'Ыдыс '+(i+1)),seg),cw,
-      H('div',{class:'read'},H('span',{title:'Температура'},rT),H('span',{title:'Қышқылдық'},'pH ',rPH,chip),H('span',{title:'Көлем'},rV)),
-      H('div',{class:'sbtns'},bHeat,bIce,bClr),
-      H('details',{class:'more'},H('summary',{},'Тағы: араластырғыш, сүзгі, құрамы'),H('div',{class:'sbtns'},bStir,bFilt),comp));
+    const tile=(lbl,...k)=>H('div',{class:'rt'},H('small',{},lbl),H('b',{},...k));
+    const el=H('article',{class:'station'},
+      H('div',{class:'stage'},H('div',{class:'vsel-w'},seg),cw),
+      H('div',{class:'read3'},tile('Температура',rT),tile('pH',rPH,chip),tile('Көлем',rV)),
+      H('div',{class:'acts'},bHeat,bIce,bClr,
+        H('details',{class:'more'},H('summary',{class:'btn act'},H('span',{},'Тағы')),
+          H('div',{class:'more-p'},H('div',{class:'row'},bStir,bFilt),H('div',{class:'lbl',style:'margin-top:10px'},'Ерітінді құрамы'),comp))));
     Object.assign(st,{el,cv,cw,obs,rT,rPH,rV,chip,bHeat,bIce,bStir,seg,comp});
     return st;
+  }
+  function pickStation(i){
+    S.act=i;S.stations.forEach((s,k)=>{s.el.hidden=k!==i;});
+    $$('#vtabs button').forEach((b,k)=>{b.classList.toggle('on',k===i);b.setAttribute('aria-selected',k===i);});
   }
   function toggle(st,m){st.v.mode=st.v.mode===m?'off':m;if(st.v.mode==='off'&&m==='heat')st.v.dry=false;sync(st);}
   function setType(st,k){
@@ -144,6 +157,7 @@ const Lab=(()=>{
     st.cw.classList.toggle('isempty',v.vol<=0&&!v.broken);
     st.rT.textContent=v.T.toFixed(1)+' °C';
     st.rV.textContent=(v.vol<10?v.vol.toFixed(1):v.vol.toFixed(0))+' мл';
+    const tv=$(`#vtabs [data-i="${st.i}"] .vt-v`);if(tv)tv.textContent=v.broken?'сынған':v.vol>0?(v.vol<10?v.vol.toFixed(1):v.vol.toFixed(0))+' мл':'бос';
     st.rPH.firstChild.textContent=v.pH==null?'—':v.pH.toFixed(2);
     st.chip.style.background=v.pH==null?'transparent':`rgb(${phRGB(v.pH).map(x=>x|0)})`;
     if(st.el.querySelector('details').open){
@@ -161,13 +175,15 @@ const Lab=(()=>{
     const e=H('div',{class:'ent'+(ev.warn?' warn':'')},H('div',{class:'m'},`${mm}:${ss} · Ыдыс ${st.i+1}${ev.plain?' · әрекет':''}`),H('div',{html:chem(ev.text)}));
     if(ev.eq)e.append(H('div',{class:'q',html:chem(ev.eq)}));
     if(ev.plain)e.style.borderLeftColor='var(--line)';
-    const first=box.firstChild;if(first&&first.classList&&first.classList.contains('empty'))first.remove();
+    box.querySelectorAll('.empty').forEach(x=>x.remove());
     box.prepend(e);while(box.children.length>80)box.lastChild.remove();
+    const lt=$('#stabs [data-t="log"]');if(lt&&!lt.classList.contains('on'))lt.classList.add('new');
     if(!ev.plain)flash(st,ev.text);
   }
   function renderTasks(){
     const box=$('#tasks');box.innerHTML='';
-    box.append(H('summary',{},H('b',{},'Тапсырмалар'),H('span',{class:'muted mono',style:'font-size:12px'},`${S.done.size} / ${TASKS.length}`)));
+    box.append(H('p',{class:'muted',style:'margin:0 0 8px;font-size:13px'},'Тәжірибені дұрыс жасасаңыз, тапсырма өзі белгіленеді.'));
+    const c=$('#taskCnt');if(c)c.textContent=`${S.done.size}/${TASKS.length}`;
     for(const t of TASKS)box.append(H('div',{class:'task'+(S.done.has(t.tag)?' done':''),'data-tag':t.tag},H('i',{},S.done.has(t.tag)?'✓':''),H('div',{},H('b',{html:chem(t.t)}),H('span',{html:chem(t.d)}))));
   }
   function mark(tag){
@@ -179,11 +195,17 @@ const Lab=(()=>{
   }
   function renderLog(){
     const box=$('#log');box.innerHTML='';
-    box.append(H('h3',{},'Бақылау журналы',H('span',{class:'row'},
+    box.append(H('div',{class:'logh'},H('span',{class:'row',style:'gap:6px'},
       H('button',{class:'btn sm',type:'button',onclick:()=>{const txt=$$('#log .ent').reverse().map(e=>e.innerText.replace(/\n+/g,' | ')).join('\n');
         try{navigator.clipboard.writeText(txt).catch(()=>{});}catch(e){}}},'Көшіру'),
-      H('button',{class:'btn sm',type:'button',onclick:()=>{$('#log .entries').innerHTML='<div class="empty">Журнал тазартылды.</div>';}},'Тазарту'))));
-    box.append(H('div',{class:'entries'},H('div',{class:'empty'},'Мұнда бақылаулар мен реакция теңдеулері шығады.')));
+      H('button',{class:'btn sm',type:'button',onclick:()=>{$('#log .entries').innerHTML='';$('#log .entries').append(emptyLog());}},'Тазарту'))));
+    box.append(H('div',{class:'entries'},emptyLog()));
+  }
+  function emptyLog(){
+    return H('div',{class:'empty guide'},
+      H('b',{},'Тәжірибе әлі басталған жоқ'),
+      H('ol',{},H('li',{},'Сол жақтан реактивті таңдаңыз.'),H('li',{},'Төменнен мөлшерін таңдаңыз.'),H('li',{},'«Құю» батырмасын басыңыз немесе ыдыстың өзін басыңыз.'),H('li',{},'Басқа реактив қосыңыз: реакция осында жазылады.')),
+      H('span',{class:'muted'},'Идея керек пе? «Тапсырмалар» қойындысын ашыңыз.'));
   }
 
   /* ---------- rendering ---------- */
@@ -207,8 +229,7 @@ const Lab=(()=>{
     ctx.clearRect(0,0,LW,LH);
     const sh=v.fx.shake;ctx.save();if(sh>0)ctx.translate(rnd(-1,1)*sh*3,rnd(-1,1)*sh*3);
     // bench
-    ctx.fillStyle=rgba(TH.plate,.35);ctx.fillRect(0,BY+26,LW,LH-BY-26);
-    ctx.fillStyle=rgba(TH.fg,.08);ctx.fillRect(0,BY+26,LW,1.5);
+    // bench surface is drawn by CSS (.stage) so it spans the full width
     // heater / ice
     const pw=v.type==='tube'?60:v.type==='beaker'?170:190;
     const hot=v.mode==='heat';
@@ -408,7 +429,7 @@ const Lab=(()=>{
       while(rem>0){const h=Math.min(.05,rem);Eng.step(v,h);rem-=h;}
       if(v.events.length){for(const ev of v.events)logAdd(st,ev);v.events.length=0;}
       if(v.tags.size){for(const tg of v.tags)mark(tg);v.tags.clear();}
-      draw(st,t,dt);
+      if(!st.el.hidden)draw(st,t,dt);
       st.refr+=dt;if(st.refr>.12){st.refr=0;readouts(st);}
     }
     requestAnimationFrame(frame);
@@ -417,7 +438,14 @@ const Lab=(()=>{
   function stop(){S.running=false;}
   function init(){
     renderCats();renderShelf();renderHand();renderTasks();renderLog();
-    const box=$('#stations');for(let i=0;i<3;i++){const st=mkStation(i);S.stations.push(st);box.append(st.el);}
+    const box=$('#stations'),tabs=$('#vtabs');
+    for(let i=0;i<3;i++){const st=mkStation(i);S.stations.push(st);box.append(st.el);
+      tabs.append(H('button',{type:'button',role:'tab','data-i':i,onclick:()=>pickStation(i)},H('b',{},(i+1)+'-ыдыс'),H('small',{class:'vt-v'},'бос')));}
+    pickStation(0);
+    $('#pourBtn').addEventListener('click',()=>addTo(S.stations[S.act]));
+    $('#stabs').addEventListener('click',e=>{const b=e.target.closest('button');if(!b)return;
+      $$('#stabs button').forEach(x=>x.classList.toggle('on',x===b));b.classList.remove('new');
+      $$('.side .spane').forEach(p=>p.classList.toggle('on',p.dataset.p===b.dataset.t));});
     $('#rsearch').addEventListener('input',e=>{S.q=e.target.value;renderShelf();});
     $('#speed').addEventListener('click',e=>{const b=e.target.closest('button');if(!b)return;S.speed=+b.dataset.s;$$('#speed button').forEach(x=>x.classList.toggle('on',x===b));});
     $('#resetAll').addEventListener('click',()=>{S.stations.forEach(st=>{st.v=Eng.newVessel(st.v.type);st.bub=[];st.parts=[];st.steam=[];st.shards=[];sync(st);});renderLog();S.t0=performance.now();});

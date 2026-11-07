@@ -112,42 +112,64 @@
 
 <!-- ===== LAB ===== -->
 <section class="view" id="v-lab">
-  <div class="vhead"><h2>Зертхана</h2><p>Реактивті таңдап, мөлшерін көрсетіңіз де, ыдысты басыңыз.</p></div>
-  <div class="labgrid">
-    <aside class="shelf panel" aria-label="Реактивтер сөресі">
+  <div class="lab3">
+    <aside class="col shelf panel" aria-label="Реактивтер сөресі">
+      <div class="colh"><span class="stepn">1</span><b>Реактивті таңдаңыз</b></div>
       <div class="sh">
         <input type="search" id="rsearch" placeholder="Реактив іздеу" aria-label="Реактив іздеу">
         <select id="rcats" aria-label="Санат"></select>
       </div>
       <div class="list" id="rlist"></div>
     </aside>
-    <div>
-      <div class="hand panel" id="hand">
-        <div class="cur" id="handcur"></div>
-        <div class="row" id="doses" aria-label="Мөлшері"></div>
-        <span class="hint">Қосу үшін ыдысты басыңыз</span>
-        <div class="tools">
-          <div class="seg" id="speed" title="Уақыт жылдамдығы"><button data-s="1" class="on">1×</button><button data-s="3">3×</button><button data-s="8">8×</button></div>
-          <button class="btn" id="resetAll">Бәрін тазарту</button>
+
+    <section class="col bench panel" aria-label="Зертханалық үстел">
+      <div class="benchh">
+        <div class="vtabs" id="vtabs" role="tablist" aria-label="Ыдыстар"></div>
+        <div class="row" style="gap:6px">
+          <button class="btn sm qbtn" type="button" data-help="lab"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M9.3 9.2a2.8 2.8 0 0 1 5.4 1c0 1.9-2.7 2.5-2.7 4"/><path d="M12 17.3h.01"/></svg><span>Нұсқаулық</span></button>
+          <details class="menu-d" id="labMenu">
+            <summary class="btn sm qbtn" aria-label="Баптаулар"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="5" cy="12" r="1.2"/><circle cx="12" cy="12" r="1.2"/><circle cx="19" cy="12" r="1.2"/></svg></summary>
+            <div class="menu-p">
+              <div class="lbl">Уақыт жылдамдығы</div>
+              <div class="seg" id="speed"><button data-s="1" class="on">1×</button><button data-s="3">3×</button><button data-s="8">8×</button></div>
+              <button class="btn sm" id="resetAll" type="button" style="width:100%;justify-content:center">Барлық ыдысты тазарту</button>
+            </div>
+          </details>
         </div>
       </div>
       <div class="stations" id="stations"></div>
-      <div class="under">
-        <details class="tasks panel" id="tasks"></details>
-        <div class="log panel" id="log"></div>
+      <div class="hand" id="hand">
+        <div class="cur" id="handcur"></div>
+        <div class="hand-l">
+          <div class="colh sm"><span class="stepn">2</span><b>Мөлшерін таңдаңыз</b></div>
+          <div class="row" id="doses" aria-label="Мөлшері"></div>
+        </div>
+        <button class="btn primary xl" type="button" id="pourBtn"><span class="stepn inv">3</span><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 4h9l-1 5H8z"/><path d="M11.5 9v3"/><path d="M11.5 15.5v.5M11.5 19v.5"/></svg><span class="pl"><b id="pourLbl">Құю</b><small id="pourSub"></small></span></button>
       </div>
-      <details class="safety panel">
-        <summary>Нағыз зертханадағы қауіпсіздік ережелері</summary>
-        <ul>
-          <li>Халат, көзілдірік және қолғаппен жұмыс істеңіз. Шашты жинаңыз, аяқ киім жабық болсын.</li>
-          <li>Қышқылды суға құяды, керісінше емес. Сілті мен қышқылдың дәмін татуға және иіскеуге болмайды.</li>
-          <li>Сілтілік металдарды май астында сақтап, пинцетпен алады. Сумен реакцияны аз мөлшерде, қорғаныш экранының артында жүргізеді.</li>
-          <li>Пробирканы көлбеу ұстап, аузын өзіңізден және көршілерден әрі қаратып қыздырыңыз. Оны үштен бірінен артық толтырмаңыз.</li>
-          <li>Ауыр металдардың (қорғасын, күміс, барий) тұздары улы. Қалдықтарды бөлек ыдысқа жинайды.</li>
-          <li>Бұл модель жеңілдетілген. Ол нағыз тәжірибені және мұғалімнің нұсқауын алмастырмайды.</li>
-        </ul>
-      </details>
-    </div>
+    </section>
+
+    <aside class="col side panel" aria-label="Журнал және тапсырмалар">
+      <div class="stabs" id="stabs" role="tablist">
+        <button type="button" data-t="log" class="on">Журнал</button>
+        <button type="button" data-t="tasks">Тапсырмалар <span class="cnt" id="taskCnt"></span></button>
+        <button type="button" data-t="safety">Қауіпсіздік</button>
+      </div>
+      <div class="spane on" data-p="log"><div class="log" id="log"></div></div>
+      <div class="spane" data-p="tasks"><div class="tasks" id="tasks"></div></div>
+      <div class="spane" data-p="safety">
+        <div class="safety">
+          <p class="muted">Нағыз зертханадағы қауіпсіздік ережелері:</p>
+          <ul>
+            <li>Халат, көзілдірік және қолғаппен жұмыс істеңіз. Шашты жинаңыз, аяқ киім жабық болсын.</li>
+            <li>Қышқылды суға құяды, керісінше емес. Сілті мен қышқылдың дәмін татуға және иіскеуге болмайды.</li>
+            <li>Сілтілік металдарды май астында сақтап, пинцетпен алады. Сумен реакцияны аз мөлшерде, қорғаныш экранының артында жүргізеді.</li>
+            <li>Пробирканы көлбеу ұстап, аузын өзіңізден және көршілерден әрі қаратып қыздырыңыз. Оны үштен бірінен артық толтырмаңыз.</li>
+            <li>Ауыр металдардың (қорғасын, күміс, барий) тұздары улы. Қалдықтарды бөлек ыдысқа жинайды.</li>
+            <li>Бұл модель жеңілдетілген. Ол нағыз тәжірибені және мұғалімнің нұсқауын алмастырмайды.</li>
+          </ul>
+        </div>
+      </div>
+    </aside>
   </div>
 </section>
 
