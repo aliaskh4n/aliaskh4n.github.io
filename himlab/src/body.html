@@ -1,0 +1,206 @@
+<div class="app">
+<header class="top">
+  <div class="topin">
+    <div class="brand">
+      <svg viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3h8M13 3v9L5.5 25.2A3 3 0 0 0 8.1 29.5h15.8a3 3 0 0 0 2.6-4.3L19 12V3"/><path d="M9 21h14" opacity=".6"/><circle cx="14" cy="24.5" r="1.2" fill="currentColor"/><circle cx="19" cy="23.2" r=".9" fill="currentColor"/></svg>
+      <b>ХимЛаб</b>
+    </div>
+    <nav id="nav" role="tablist" aria-label="Бөлімдер">
+      <button role="tab" data-view="lab">Зертхана</button>
+      <button role="tab" data-view="titration">Титрлеу</button>
+      <button role="tab" data-view="elements">Периодтық кесте</button>
+      <button role="tab" data-view="solubility">Ерігіштік</button>
+      <button role="tab" data-view="calc">Есептеулер</button>
+      <button role="tab" data-view="gas">Газ заңдары</button>
+    </nav>
+    <button class="themebtn" id="themeBtn" type="button" aria-label="Түсті ауыстыру" title="Жарық / қараңғы режим">
+      <svg class="ic-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></svg>
+    </button>
+  </div>
+</header>
+
+<main>
+<!-- ===== LAB ===== -->
+<section class="view" id="v-lab">
+  <div class="labgrid">
+    <aside class="shelf panel" aria-label="Реактивтер сөресі">
+      <div class="sh">
+        <input type="search" id="rsearch" placeholder="Реактив іздеу" aria-label="Реактив іздеу">
+        <select id="rcats" aria-label="Санат"></select>
+      </div>
+      <div class="list" id="rlist"></div>
+    </aside>
+    <div>
+      <div class="hand panel" id="hand">
+        <div class="cur" id="handcur"></div>
+        <div class="row" id="doses" aria-label="Мөлшері"></div>
+        <span class="hint">Қосу үшін ыдысты басыңыз</span>
+        <div class="tools">
+          <div class="seg" id="speed" title="Уақыт жылдамдығы"><button data-s="1" class="on">1×</button><button data-s="3">3×</button><button data-s="8">8×</button></div>
+          <button class="btn" id="resetAll">Бәрін тазарту</button>
+        </div>
+      </div>
+      <div class="stations" id="stations"></div>
+      <div class="under">
+        <details class="tasks panel" id="tasks"></details>
+        <div class="log panel" id="log"></div>
+      </div>
+      <details class="safety panel">
+        <summary>Нағыз зертханадағы қауіпсіздік ережелері</summary>
+        <ul>
+          <li>Халат, көзілдірік және қолғаппен жұмыс істеңіз. Шашты жинаңыз, аяқ киім жабық болсын.</li>
+          <li>Қышқылды суға құяды, керісінше емес. Сілті мен қышқылдың дәмін татуға және иіскеуге болмайды.</li>
+          <li>Сілтілік металдарды май астында сақтап, пинцетпен алады. Сумен реакцияны аз мөлшерде, қорғаныш экранының артында жүргізеді.</li>
+          <li>Пробирканы көлбеу ұстап, аузын өзіңізден және көршілерден әрі қаратып қыздырыңыз. Оны үштен бірінен артық толтырмаңыз.</li>
+          <li>Ауыр металдардың (қорғасын, күміс, барий) тұздары улы. Қалдықтарды бөлек ыдысқа жинайды.</li>
+          <li>Бұл модель жеңілдетілген. Ол нағыз тәжірибені және мұғалімнің нұсқауын алмастырмайды.</li>
+        </ul>
+      </details>
+    </div>
+  </div>
+</section>
+
+<!-- ===== TITRATION ===== -->
+<section class="view" id="v-titration">
+  <div class="vhead"><h2>Қышқылдық-негіздік титрлеу</h2><p>Кранды ашып, индикатордың түсі өзгерген сәтті ұстаңыз.</p></div>
+  <div class="tgrid">
+    <div class="panel tapp"><canvas id="tcanvas" width="720" height="1040" aria-label="Бюретка және колба"></canvas></div>
+    <div class="tright">
+      <div class="panel tctl">
+        <label class="f">Талданатын ерітінді<select id="tAn"></select></label>
+        <label class="f">Сынама көлемі, мл<select id="tVa"><option>10</option><option>20</option><option selected>25</option><option>50</option></select></label>
+        <label class="f">Концентрация, моль/л<input type="number" id="tC" min="0.005" max="1" step="0.005" value="0.1"></label>
+        <label class="f">Индикатор<select id="tInd"></select></label>
+        <label class="f">Беру жылдамдығы <output id="tFlowO" class="mono">0.0 мл/с</output><input type="range" id="tFlow" min="0" max="100" value="0"></label>
+        <div class="row" style="grid-column:1/-1">
+          <button class="btn" id="tDrop" title="Бір тамшы, 0.05 мл">Тамшы</button>
+          <button class="btn" id="tStop">Кранды жабу</button>
+          <button class="btn" id="tReset">Қайтадан</button>
+        </div>
+        <label class="row" style="grid-column:1/-1;gap:8px;font-size:13px"><input type="checkbox" id="tUnknown"> Есеп: концентрация белгісіз</label>
+        <label class="row" style="grid-column:1/-1;gap:8px;font-size:13px"><input type="checkbox" id="tTheory"> Есептік қисықты көрсету</label>
+      </div>
+      <div class="panel">
+        <div class="stats" style="padding-top:14px">
+          <div class="stat"><small id="tTitL">Титрант</small><b id="tTit">NaOH</b></div>
+          <div class="stat"><small>Құйылды</small><b id="tV">0.00 мл</b></div>
+          <div class="stat"><small>pH</small><b id="tPH">—</b></div>
+          <div class="stat"><small>Түсі</small><b id="tCol" style="font-size:14px">—</b></div>
+        </div>
+        <div class="tchart"><div class="row" style="justify-content:space-between;padding:0 4px 6px"><span class="lbl">График</span><div class="seg" id="tMode"><button data-m="ph" class="on">pH(V)</button><button data-m="d">dpH/dV</button></div></div><canvas id="tchart" width="1280" height="720"></canvas></div>
+        <div class="row" style="padding:0 14px 12px">
+          <label class="f" style="flex:1;min-width:200px">Жауабыңыз: талданатын ерітіндінің концентрациясы, моль/л<input type="number" id="tAns" step="0.001" placeholder="мысалы 0.085"></label>
+          <button class="btn primary" id="tCheck" style="align-self:end">Тексеру</button>
+        </div>
+        <div class="verdict" id="tVerd"></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== ELEMENTS ===== -->
+<section class="view" id="v-elements">
+  <div class="vhead"><h2>Периодтық кесте</h2><p>Толығырақ білу үшін элементті басыңыз.</p></div>
+  <div class="ptwrap">
+    <div class="panel">
+      <div class="row" style="padding:12px 12px 8px">
+        <input type="text" id="ptq" placeholder="Іздеу: Fe, темір, 26" style="max-width:240px" aria-label="Элемент іздеу">
+        <div class="seg" id="ptmode"><button data-m="cat" class="on">Топтар</button><button data-m="en">Электртеріс.</button><button data-m="mass">Масса</button><button data-m="state">Күйі</button></div>
+      </div>
+      <div class="ptscroll"><div class="pt" id="pt"></div></div>
+      <div class="ptlegend" id="ptlegend"></div>
+    </div>
+    <aside class="panel ptside" id="ptside"></aside>
+  </div>
+</section>
+
+<!-- ===== SOLUBILITY ===== -->
+<section class="view" id="v-solubility">
+  <div class="vhead"><h2>Ерігіштік кестесі</h2><p><b class="cR">Е</b> ериді · <b class="cM">А</b> аз ериді · <b class="cN">Ж</b> ерімейді · — жоқ</p></div>
+  <div class="panel sol" id="soltbl"></div>
+  <div class="panel soldet" id="soldet"><span class="muted">Катион мен анионды таңдаңыз.</span></div>
+</section>
+
+<!-- ===== CALC ===== -->
+<section class="view" id="v-calc">
+  <div class="vhead"><h2>Есептеулер</h2><p>Коэффициенттерді қою, молярлық масса, ерітінділер және pH.</p></div>
+  <div class="cgrid">
+    <div class="panel card" id="cBal">
+      <h3>Реакция теңдеуін теңестіру</h3>
+      <label class="f">Теңдеу (нұсқар: -> немесе =)<input type="text" id="balIn" value="Fe + O2 -> Fe2O3" spellcheck="false"></label>
+      <div class="row" id="balEx"></div>
+      <div class="eqout" id="balOut"></div>
+      <div class="msg" id="balMsg"></div>
+    </div>
+    <div class="panel card" id="cMol">
+      <h3>Молярлық масса және құрамы</h3>
+      <label class="f">Формула (жақша мен кристаллогидрат жазуға болады)<input type="text" id="molIn" value="CuSO4·5H2O" spellcheck="false"></label>
+      <div class="big" id="molM">—</div>
+      <div class="msg" id="molMsg"></div>
+      <table class="t" id="molT"></table>
+      <div class="lbl">Шамаларды аудару</div>
+      <div class="grid2">
+        <label class="f">Масса, г<input type="number" id="cvG" step="any"></label>
+        <label class="f">Зат мөлшері, моль<input type="number" id="cvN" step="any"></label>
+        <label class="f">Бөлшектер саны ×10²³<input type="number" id="cvP" step="any"></label>
+        <label class="f">Газ көлемі (қ.ж.), л<input type="number" id="cvV" step="any"></label>
+      </div>
+    </div>
+    <div class="panel card" id="cSol">
+      <h3>Ерітінділер және сұйылту</h3>
+      <div class="grid2">
+        <label class="f">Зат<input type="text" id="slF" value="NaCl" spellcheck="false"></label>
+        <label class="f">Зат массасы, г<input type="number" id="slM" value="5.85" step="any"></label>
+        <label class="f">Ерітінді көлемі, мл<input type="number" id="slV" value="100" step="any"></label>
+        <label class="f">Тығыздық, г/мл<input type="number" id="slD" value="1.00" step="any"></label>
+      </div>
+      <div class="row" style="gap:18px"><div><div class="lbl">Молярлық</div><div class="big" id="slC">—</div></div><div><div class="lbl">Массалық үлес</div><div class="big" id="slW">—</div></div></div>
+      <div class="lbl">Сұйылту: C₁V₁ = C₂V₂</div>
+      <div class="grid2">
+        <label class="f">C₁, моль/л<input type="number" id="dlC1" value="1" step="any"></label>
+        <label class="f">V₁, мл<input type="number" id="dlV1" value="10" step="any"></label>
+        <label class="f">C₂, моль/л<input type="number" id="dlC2" value="0.1" step="any"></label>
+        <div class="stat"><small>Көлемге жеткізу</small><b id="dlV2">—</b></div>
+      </div>
+      <div class="msg" id="dlMsg"></div>
+    </div>
+    <div class="panel card" id="cPh">
+      <h3>Ерітіндінің pH мәні</h3>
+      <div class="grid2">
+        <label class="f">Зат<select id="phS"></select></label>
+        <label class="f">Концентрация, моль/л<input type="number" id="phC" value="0.1" step="any" min="0"></label>
+      </div>
+      <div class="big" id="phR">—</div>
+      <div class="gradbar" id="phBar"></div>
+      <div class="msg" id="phMsg"></div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== GAS ===== -->
+<section class="view" id="v-gas">
+  <div class="vhead"><h2>Газ заңдары</h2><p>Температураны, көлемді және газ мөлшерін өзгертіп, қысымды бақылаңыз.</p></div>
+  <div class="ggrid">
+    <div class="panel gbox"><canvas id="gcanvas" width="720" height="760" aria-label="Газы бар цилиндр"></canvas></div>
+    <div class="gright">
+      <div class="panel gctl">
+        <label class="f">Газ<select id="gGas"></select></label>
+        <label class="f">Температура <output id="gTo"></output><input type="range" id="gT" min="100" max="900" step="5" value="300"></label>
+        <label class="f">Зат мөлшері, моль <output id="gNo"></output><input type="range" id="gN" min="0.2" max="2" step="0.05" value="1"></label>
+        <label class="f">Көлем, л <output id="gVo"></output><input type="range" id="gV" min="5" max="50" step="0.5" value="25"></label>
+        <div class="row" style="grid-column:1/-1">
+          <span class="lbl">Процесс</span>
+          <div class="seg" id="gProc"><button data-p="none" class="on">Қолмен</button><button data-p="iso-T">Изотерма</button><button data-p="iso-P">Изобара</button><button data-p="iso-V">Изохора</button></div>
+          <button class="btn sm" id="gClear">Ізді тазарту</button>
+        </div>
+      </div>
+      <div class="panel">
+        <div class="stats" style="padding-top:14px" id="gStats"></div>
+        <div class="gcharts"><canvas id="gPV" width="640" height="480"></canvas><canvas id="gMax" width="640" height="480"></canvas></div>
+      </div>
+    </div>
+  </div>
+</section>
+</main>
+<footer>ХимЛаб мектеп пен жоғары оқу орнының типтік реакцияларын жеңілдетілген түрде модельдейді: идеал ерітінділер, лездік тепе-теңдік, сапалық әсерлер. Нәтижелер зертханалық тәжірибені алмастырмайды.</footer>
+</div>

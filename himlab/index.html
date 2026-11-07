@@ -1,0 +1,2269 @@
+<!doctype html>
+<html lang="kk">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>ХимЛаб</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Onest:wght@400;500;600&family=JetBrains+Mono:wght@400;500&family=Unbounded:wght@400;500;600&display=swap">
+<style>
+/* Layout: sticky instrument-style top bar with a pH strip; each view is a working panel.
+   Lab view = reagent shelf (left) + three glass stations (right) + practicum/journal underneath. */
+:root{
+  --bg:#ffffff; --panel:#ffffff; --panel2:#f3f5f9; --line:#dde2ea; --fg:#0a0d14; --muted:#5b6475;
+  --accent:#1f5eff; --accent-ink:#ffffff; --accent-soft:#e6edff;
+  --good:#12a150; --warn:#c98a00; --bad:#e0302b; --yellow:#f5c400;
+  --glass:#4a5468; --glasshi:#ffffff; --stage:#f3f5f9; --plate:#b7bfcc;
+  --shadow:0 1px 2px rgba(10,13,20,.05),0 4px 16px rgba(10,13,20,.05);
+  --font-ui:"Onest","Segoe UI",system-ui,-apple-system,Roboto,Arial,sans-serif;
+  --font-data:"JetBrains Mono",ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;
+  --font-disp:"Unbounded","Onest","Segoe UI",system-ui,sans-serif;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#000000; --panel:#0c0e13; --panel2:#161a22; --line:#262b36; --fg:#f4f6fa; --muted:#9099aa;
+    --accent:#4d84ff; --accent-ink:#ffffff; --accent-soft:#0f1d3d;
+    --good:#2fd277; --warn:#ffcc33; --bad:#ff5a52; --yellow:#ffd400;
+    --glass:#b9c2d3; --glasshi:#ffffff; --stage:#07080b; --plate:#3a4150;
+    --shadow:none; color-scheme:dark;
+  }
+}
+:root[data-theme="dark"]{
+    --bg:#000000; --panel:#0c0e13; --panel2:#161a22; --line:#262b36; --fg:#f4f6fa; --muted:#9099aa;
+    --accent:#4d84ff; --accent-ink:#ffffff; --accent-soft:#0f1d3d;
+    --good:#2fd277; --warn:#ffcc33; --bad:#ff5a52; --yellow:#ffd400;
+    --glass:#b9c2d3; --glasshi:#ffffff; --stage:#07080b; --plate:#3a4150;
+    --shadow:none; color-scheme:dark;
+}
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{background:var(--bg);color:var(--fg);font-family:var(--font-ui);font-size:15px;line-height:1.5;
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:0 28px;overflow-x:hidden}
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:30;background:var(--bg)}
+h1,h2,h3,h4{margin:0;font-weight:600;text-wrap:balance}
+button,input,select{font:inherit;color:inherit}
+sub,sup{line-height:0;font-size:.75em}
+.app{max-width:1480px;margin:0 auto}
+.mono{font-family:var(--font-data)}
+.muted{color:var(--muted)}
+
+/* top bar */
+.top{position:sticky;top:env(safe-area-inset-top,0px);z-index:20;background:var(--bg);border-bottom:1px solid var(--line)}
+.phline-unused{height:4px;background:linear-gradient(90deg,#e0243c 0%,#f3722c 14%,#f9c74f 28%,#8fd14f 42%,#2bb673 50%,#25a8a8 62%,#3a7bd5 76%,#5a4fcf 88%,#8e3ba8 100%);border-radius:0 0 3px 3px}
+.topin{display:flex;align-items:center;gap:20px;padding:12px 0}
+.brand{display:flex;align-items:center;gap:10px;flex:none}
+.brand svg{width:30px;height:30px;color:var(--accent)}
+.brand b{font-family:var(--font-disp);font-size:19px;font-weight:600;letter-spacing:.01em}
+.brand span{color:var(--muted);font-size:12px;line-height:1.2;max-width:110px}
+nav{display:flex;gap:6px;overflow-x:auto;scrollbar-width:none;min-width:0;flex:1}
+nav::-webkit-scrollbar{display:none}
+nav button{flex:none;background:none;border:1px solid transparent;padding:7px 14px;color:var(--muted);cursor:pointer;font-weight:500;border-radius:99px;white-space:nowrap;transition:background .15s,border-color .15s,color .15s}
+nav button:hover{color:var(--fg)}
+nav button[aria-selected="true"]{background:var(--accent);border-color:var(--accent);color:var(--accent-ink);font-weight:600}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+
+.view{display:none;padding-top:22px}
+.view.on{display:block}
+.vhead{display:grid;gap:4px;margin-bottom:16px}
+.vhead h2{font-family:var(--font-disp);font-size:22px;font-weight:600;letter-spacing:-.01em}
+.vhead p{margin:0;color:var(--muted);max-width:75ch;font-size:15px}
+
+.panel{background:var(--panel);border:1px solid var(--line);border-radius:14px}
+.pad{padding:16px}
+.lbl{font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);font-weight:600}
+
+/* controls */
+.btn{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:8px 13px;font-weight:500;cursor:pointer;line-height:1.2;display:inline-flex;align-items:center;gap:6px;white-space:nowrap}
+.btn:hover{border-color:var(--accent);color:var(--accent)}
+.btn.on:hover,.btn.primary:hover{color:var(--accent-ink);filter:brightness(1.08)}
+.btn:active{transform:translateY(1px)}
+.btn.on,.btn.primary{background:var(--accent);border-color:var(--accent);color:var(--accent-ink);font-weight:600}
+.btn.sm{padding:5px 8px;font-size:12px}
+.btn[disabled]{opacity:.45;cursor:not-allowed}
+.seg{display:inline-flex;border:1px solid var(--line);border-radius:8px;overflow:hidden;background:var(--panel2)}
+.seg button{background:none;border:0;padding:5px 9px;cursor:pointer;font-size:12px;color:var(--muted)}
+.seg button+button{border-left:1px solid var(--line)}
+.seg button.on{background:var(--accent);color:var(--accent-ink);font-weight:600}
+input[type=text],input[type=search],input[type=number],select{background:var(--panel2);border:1px solid var(--line);border-radius:8px;padding:7px 9px;min-width:0;width:100%}
+input:focus,select:focus{outline:2px solid var(--accent);outline-offset:0;border-color:var(--accent)}
+input[type=range]{width:100%;accent-color:var(--accent)}
+label.f{display:flex;flex-direction:column;gap:4px;font-size:12px;color:var(--muted)}
+.row{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.chip{border:1px solid var(--line);background:var(--panel2);border-radius:99px;padding:3px 10px;font-size:12px;cursor:pointer;color:var(--fg)}
+.chip:hover{border-color:var(--accent)}
+.chip.on{background:var(--accent-soft);border-color:var(--accent);color:var(--fg)}
+
+/* ===== lab ===== */
+.labgrid{display:grid;grid-template-columns:292px minmax(0,1fr);gap:16px;align-items:start}
+.shelf{position:sticky;top:calc(64px + env(safe-area-inset-top,0px));max-height:calc(100vh - 84px);display:flex;flex-direction:column;min-height:0}
+.shelf .sh{padding:12px 12px 8px;display:grid;gap:8px}
+.shelf .list{overflow:auto;padding:0 8px 10px;min-height:0;flex:1}
+.grp{margin:10px 4px 4px}
+.rg{display:grid;grid-template-columns:30px minmax(0,1fr) auto;gap:10px;align-items:center;width:100%;text-align:left;background:none;border:1px solid transparent;border-radius:8px;padding:5px 6px;cursor:grab;user-select:none;-webkit-user-select:none}
+.rg:hover{background:var(--panel2)}
+.rg.sel{background:var(--accent-soft);border-color:var(--accent)}
+.rg svg{width:28px;height:34px}
+.rg .n{font-weight:500;line-height:1.2;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.rg .s{font-size:12px;color:var(--muted)}
+.rg .c{font-family:var(--font-data);font-size:11px;color:var(--muted);text-align:right}
+.ghost{position:fixed;z-index:50;pointer-events:none;transform:translate(-50%,-70%) rotate(-25deg);filter:drop-shadow(0 6px 8px rgba(0,0,0,.35))}
+.ghost svg{width:44px;height:54px}
+
+.hand{display:flex;flex-wrap:wrap;gap:10px 16px;align-items:center;padding:10px 12px;margin-bottom:12px}
+.hand .cur{display:flex;gap:10px;align-items:center;min-width:200px}
+.hand .cur svg{width:26px;height:32px}
+.hand .cur b{display:block;line-height:1.2}
+.hand .hint{color:var(--accent);font-size:13px;font-weight:500}
+.hand .tools{margin-left:auto;display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.stations{display:grid;grid-template-columns:repeat(auto-fit,minmax(262px,1fr));gap:12px}
+.station{display:flex;flex-direction:column;min-width:0;transition:box-shadow .15s,border-color .15s}
+.station.drop{border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-soft)}
+.station>header{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:9px 10px 6px}
+.station>header b{font-size:13px}
+.cwrap{position:relative;margin:0 8px;border-radius:8px;overflow:hidden;background:var(--stage);aspect-ratio:340/400;cursor:pointer}
+.cwrap canvas{display:block;width:100%;height:100%}
+.obs{position:absolute;left:8px;right:8px;bottom:8px;padding:6px 9px;border-radius:7px;background:color-mix(in srgb,var(--panel) 88%,transparent);border:1px solid var(--line);font-size:12px;line-height:1.35;opacity:0;transform:translateY(6px);transition:opacity .3s,transform .3s;pointer-events:none}
+.obs.show{opacity:1;transform:none}
+.read{display:flex;justify-content:space-between;gap:8px;padding:10px 12px 4px;font-family:var(--font-data);font-size:13px;font-variant-numeric:tabular-nums}
+.read span{display:inline-flex;align-items:center;gap:5px;white-space:nowrap}
+.read b{font-weight:500}
+.phchip{width:10px;height:10px;border-radius:50%;border:1px solid var(--line);display:inline-block}
+.sbtns{display:flex;flex-wrap:wrap;gap:6px;padding:6px 8px 8px}
+.station details{margin-top:auto}
+.station details .sbtns{padding-top:0}
+.station summary{cursor:pointer;padding:4px 12px 10px;font-size:12px;color:var(--muted)}
+.station summary:hover{color:var(--accent)}
+.comp{padding:0 10px 10px;font-size:12px;display:grid;gap:3px}
+.comp div{display:flex;justify-content:space-between;gap:10px}
+.comp .mono{color:var(--muted)}
+.under{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.3fr);gap:12px;margin-top:12px}
+.tasks,.log{padding:12px 14px;min-width:0}
+.tasks h3,.log h3{font-size:14px;display:flex;justify-content:space-between;align-items:center;gap:8px;margin-bottom:8px}
+.task{display:grid;grid-template-columns:22px minmax(0,1fr);gap:8px;padding:7px 0;border-top:1px solid var(--line)}
+.task i{width:18px;height:18px;border-radius:50%;border:2px solid var(--line);margin-top:2px;display:grid;place-items:center;font-style:normal;font-size:11px}
+.task.done i{background:var(--good);border-color:var(--good);color:#fff}
+.task b{display:block;font-weight:600}
+.task span{color:var(--muted);font-size:13px}
+.entries{max-height:340px;overflow:auto;display:grid;gap:6px;align-content:start}
+.ent{border-left:3px solid var(--accent);background:var(--panel2);padding:6px 10px;border-radius:0 7px 7px 0;font-size:13px}
+.ent .m{font-size:11px;color:var(--muted);font-family:var(--font-data)}
+.ent .q{font-family:var(--font-data);font-size:12px;margin-top:2px;overflow-x:auto;white-space:nowrap}
+.ent.warn{border-left-color:var(--warn)}
+.empty{color:var(--muted);font-size:13px;padding:8px 0}
+.safety{margin-top:12px;padding:10px 14px;font-size:13px;color:var(--muted)}
+.safety summary{cursor:pointer;color:var(--fg);font-weight:600}
+.safety ul{margin:8px 0 0;padding-left:18px;display:grid;gap:3px}
+
+/* ===== titration ===== */
+.tgrid{display:grid;grid-template-columns:minmax(0,360px) minmax(0,1fr);gap:16px;align-items:start}
+.tapp{padding:8px}
+.tapp canvas{width:100%;aspect-ratio:360/520;display:block;border-radius:8px;background:var(--stage)}
+.tright{display:grid;gap:12px;min-width:0}
+.tctl{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:10px;padding:14px}
+.tchart{padding:10px}
+.tchart canvas{width:100%;max-width:820px;aspect-ratio:640/360;display:block;margin:0 auto}
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:8px;padding:0 14px 14px}
+.stat{background:var(--panel2);border-radius:8px;padding:8px 10px}
+.stat small{display:block;font-size:10px;letter-spacing:.07em;text-transform:uppercase;color:var(--muted)}
+.stat b{font-family:var(--font-data);font-weight:500;font-size:18px;font-variant-numeric:tabular-nums}
+.verdict{padding:0 14px 14px;font-size:13px}
+.verdict.ok{color:var(--good)} .verdict.bad{color:var(--bad)}
+
+/* ===== periodic table ===== */
+.ptwrap{display:grid;grid-template-columns:minmax(0,1fr) 330px;gap:16px;align-items:start}
+.ptscroll{overflow-x:auto;padding:12px}
+.pt{display:grid;grid-template-columns:repeat(18,minmax(40px,1fr));grid-auto-rows:minmax(46px,auto);gap:3px;min-width:800px}
+.el{position:relative;border:1px solid var(--line);border-radius:6px;background:var(--panel2);padding:3px 4px;cursor:pointer;text-align:left;display:flex;flex-direction:column;justify-content:space-between;min-width:0;transition:transform .12s,opacity .2s,box-shadow .12s}
+.el:hover{transform:scale(1.12);z-index:3;box-shadow:0 4px 14px rgba(0,0,0,.25)}
+.el small{font-family:var(--font-data);font-size:9px;color:var(--muted);line-height:1}
+.el b{font-size:15px;line-height:1;font-weight:600}
+.el.sel{outline:2px solid var(--accent);z-index:2}
+.el.dim{opacity:.18}
+.el.ph{background:none;border-style:dashed;cursor:default;font-size:10px;color:var(--muted);align-items:center;justify-content:center;text-align:center}
+.el.ph:hover{transform:none;box-shadow:none}
+.ptlegend{display:flex;flex-wrap:wrap;gap:6px;padding:0 12px 12px}
+.lg{display:inline-flex;align-items:center;gap:6px;font-size:12px;padding:3px 9px;border:1px solid var(--line);border-radius:99px;cursor:pointer;background:var(--panel2)}
+.lg i{width:10px;height:10px;border-radius:3px;display:inline-block}
+.lg.on{border-color:var(--accent)}
+.ptside{padding:14px;display:grid;gap:10px;position:sticky;top:calc(72px + env(safe-area-inset-top,0px))}
+.ptside canvas{width:100%;aspect-ratio:1;background:var(--stage);border-radius:8px;display:block}
+.ptside h3{font-family:var(--font-disp);font-size:22px;font-weight:500;display:flex;align-items:baseline;gap:10px}
+.ptside h3 small{font-family:var(--font-data);font-size:13px;color:var(--muted)}
+.kv{display:grid;grid-template-columns:auto 1fr;gap:4px 12px;font-size:13px}
+.kv dt{color:var(--muted)} .kv dd{margin:0;text-align:right;font-family:var(--font-data);font-size:12px;overflow-wrap:anywhere}
+.gradbar{height:8px;border-radius:4px;margin:2px 0 0}
+
+/* ===== solubility ===== */
+.sol{padding:12px;overflow-x:auto}
+.sol table{border-collapse:separate;border-spacing:3px;min-width:640px;margin:0 auto}
+.sol th{font-weight:600;padding:6px 8px;font-size:13px;white-space:nowrap}
+.sol th.c{text-align:left;color:var(--muted)}
+.sol td{width:54px;height:40px;text-align:center;border-radius:6px;cursor:pointer;font-weight:700;font-size:14px;border:1px solid transparent}
+.sol td.R{background:color-mix(in srgb,var(--good) 24%,var(--panel));color:var(--good)}
+.sol td.M{background:color-mix(in srgb,var(--warn) 26%,var(--panel));color:var(--warn)}
+.sol td.N{background:color-mix(in srgb,var(--bad) 24%,var(--panel));color:var(--bad)}
+.sol td.X{background:var(--panel2);color:var(--muted)}
+.sol td:hover,.sol td.sel{border-color:var(--fg)}
+.sol td.hl{filter:brightness(1.15)}
+.soldet{padding:12px 14px;margin-top:12px;display:flex;gap:14px;align-items:center;min-height:62px}
+.soldet .sw{width:34px;height:34px;border-radius:50%;border:1px solid var(--line);flex:none}
+
+/* ===== calc ===== */
+.cgrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,420px),1fr));gap:14px;align-items:start}
+.card{padding:14px;display:grid;gap:10px;min-width:0}
+.card h3{font-size:15px}
+.eqout{font-size:20px;line-height:1.7;overflow-x:auto;padding:10px 12px;background:var(--panel2);border-radius:8px;font-family:var(--font-data);min-height:56px}
+.eqout .k{color:var(--accent);font-weight:700}
+.msg{font-size:13px;color:var(--muted)} .msg.err{color:var(--bad)}
+table.t{width:100%;border-collapse:collapse;font-size:13px}
+table.t th{text-align:left;color:var(--muted);font-weight:500;padding:4px 6px;border-bottom:1px solid var(--line)}
+table.t td{padding:5px 6px;border-bottom:1px solid var(--line);font-variant-numeric:tabular-nums}
+table.t td.r,table.t th.r{text-align:right}
+.bar{height:8px;border-radius:4px;background:var(--accent);transition:width .5s cubic-bezier(.2,.8,.2,1)}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.big{font-family:var(--font-data);font-size:26px;font-variant-numeric:tabular-nums}
+
+/* ===== gas ===== */
+.ggrid{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.1fr);gap:16px;align-items:start}
+.gbox{padding:8px}
+.gbox canvas{width:100%;aspect-ratio:1/1.05;display:block;background:var(--stage);border-radius:8px}
+.gright{display:grid;gap:12px;min-width:0}
+.gright canvas{width:100%;display:block}
+.gctl{padding:14px;display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px}
+.gctl output{font-family:var(--font-data);color:var(--accent)}
+.gcharts{display:grid;grid-template-columns:1fr 1fr;gap:12px;padding:10px}
+.gcharts canvas{aspect-ratio:4/3}
+
+/* theme toggle */
+.themebtn{flex:none;width:38px;height:38px;border-radius:50%;border:1px solid var(--line);background:var(--panel2);display:grid;place-items:center;cursor:pointer;color:var(--fg)}
+.themebtn:hover{border-color:var(--accent);color:var(--accent)}
+.themebtn svg{width:18px;height:18px}
+
+select.vsel{width:auto;padding:4px 26px 4px 9px;font-size:12px;border-radius:8px}
+.shelf .sh select{width:100%}
+.cwrap::after{content:"+ қосу";position:absolute;left:50%;top:14px;transform:translateX(-50%);padding:5px 12px;border-radius:99px;background:var(--accent);color:var(--accent-ink);font-size:12px;font-weight:600;opacity:0;transition:opacity .15s;pointer-events:none;white-space:nowrap}
+.cwrap:hover::after{opacity:1}
+.cwrap.isempty::after{content:"Құю үшін басыңыз";opacity:1;background:var(--accent-soft);color:var(--accent)}
+.cwrap.isempty:hover::after{background:var(--accent);color:var(--accent-ink)}
+details.tasks>summary{cursor:pointer;display:flex;justify-content:space-between;align-items:center;font-size:14px;list-style:none}
+details.tasks>summary::-webkit-details-marker{display:none}
+details.tasks>summary b::before{content:"▸ ";color:var(--muted)}
+details.tasks[open]>summary b::before{content:"▾ "}
+details.tasks[open]>summary{margin-bottom:8px}
+.under{align-items:start}
+.cR{color:var(--good)} .cM{color:var(--warn)} .cN{color:var(--bad)}
+
+footer{margin-top:28px;color:var(--muted);font-size:12px;border-top:1px solid var(--line);padding-top:12px}
+
+@media (max-width:1060px){
+  .labgrid{grid-template-columns:minmax(0,1fr)}
+  .shelf{position:static;max-height:none}
+  .shelf .list{max-height:240px}
+  #rcats{flex-wrap:nowrap;overflow-x:auto;scrollbar-width:none}
+  #rcats .chip{flex:none}
+  .ptwrap{grid-template-columns:minmax(0,1fr)}
+  .ptside{position:static}
+  .under{grid-template-columns:1fr}
+  .ggrid,.tgrid{grid-template-columns:minmax(0,1fr)}
+}
+@media (max-width:620px){
+  .topin{flex-wrap:wrap;row-gap:10px}
+  .brand{flex:1}
+  nav{order:3;flex-basis:100%}
+  .brand span{display:none}
+  .topin{gap:8px}
+  .gcharts{grid-template-columns:1fr}
+  .hand .tools{margin-left:0}
+}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+<div class="app">
+<header class="top">
+  <div class="topin">
+    <div class="brand">
+      <svg viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3h8M13 3v9L5.5 25.2A3 3 0 0 0 8.1 29.5h15.8a3 3 0 0 0 2.6-4.3L19 12V3"/><path d="M9 21h14" opacity=".6"/><circle cx="14" cy="24.5" r="1.2" fill="currentColor"/><circle cx="19" cy="23.2" r=".9" fill="currentColor"/></svg>
+      <b>ХимЛаб</b>
+    </div>
+    <nav id="nav" role="tablist" aria-label="Бөлімдер">
+      <button role="tab" data-view="lab">Зертхана</button>
+      <button role="tab" data-view="titration">Титрлеу</button>
+      <button role="tab" data-view="elements">Периодтық кесте</button>
+      <button role="tab" data-view="solubility">Ерігіштік</button>
+      <button role="tab" data-view="calc">Есептеулер</button>
+      <button role="tab" data-view="gas">Газ заңдары</button>
+    </nav>
+    <button class="themebtn" id="themeBtn" type="button" aria-label="Түсті ауыстыру" title="Жарық / қараңғы режим">
+      <svg class="ic-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></svg>
+    </button>
+  </div>
+</header>
+
+<main>
+<!-- ===== LAB ===== -->
+<section class="view" id="v-lab">
+  <div class="labgrid">
+    <aside class="shelf panel" aria-label="Реактивтер сөресі">
+      <div class="sh">
+        <input type="search" id="rsearch" placeholder="Реактив іздеу" aria-label="Реактив іздеу">
+        <select id="rcats" aria-label="Санат"></select>
+      </div>
+      <div class="list" id="rlist"></div>
+    </aside>
+    <div>
+      <div class="hand panel" id="hand">
+        <div class="cur" id="handcur"></div>
+        <div class="row" id="doses" aria-label="Мөлшері"></div>
+        <span class="hint">Қосу үшін ыдысты басыңыз</span>
+        <div class="tools">
+          <div class="seg" id="speed" title="Уақыт жылдамдығы"><button data-s="1" class="on">1×</button><button data-s="3">3×</button><button data-s="8">8×</button></div>
+          <button class="btn" id="resetAll">Бәрін тазарту</button>
+        </div>
+      </div>
+      <div class="stations" id="stations"></div>
+      <div class="under">
+        <details class="tasks panel" id="tasks"></details>
+        <div class="log panel" id="log"></div>
+      </div>
+      <details class="safety panel">
+        <summary>Нағыз зертханадағы қауіпсіздік ережелері</summary>
+        <ul>
+          <li>Халат, көзілдірік және қолғаппен жұмыс істеңіз. Шашты жинаңыз, аяқ киім жабық болсын.</li>
+          <li>Қышқылды суға құяды, керісінше емес. Сілті мен қышқылдың дәмін татуға және иіскеуге болмайды.</li>
+          <li>Сілтілік металдарды май астында сақтап, пинцетпен алады. Сумен реакцияны аз мөлшерде, қорғаныш экранының артында жүргізеді.</li>
+          <li>Пробирканы көлбеу ұстап, аузын өзіңізден және көршілерден әрі қаратып қыздырыңыз. Оны үштен бірінен артық толтырмаңыз.</li>
+          <li>Ауыр металдардың (қорғасын, күміс, барий) тұздары улы. Қалдықтарды бөлек ыдысқа жинайды.</li>
+          <li>Бұл модель жеңілдетілген. Ол нағыз тәжірибені және мұғалімнің нұсқауын алмастырмайды.</li>
+        </ul>
+      </details>
+    </div>
+  </div>
+</section>
+
+<!-- ===== TITRATION ===== -->
+<section class="view" id="v-titration">
+  <div class="vhead"><h2>Қышқылдық-негіздік титрлеу</h2><p>Кранды ашып, индикатордың түсі өзгерген сәтті ұстаңыз.</p></div>
+  <div class="tgrid">
+    <div class="panel tapp"><canvas id="tcanvas" width="720" height="1040" aria-label="Бюретка және колба"></canvas></div>
+    <div class="tright">
+      <div class="panel tctl">
+        <label class="f">Талданатын ерітінді<select id="tAn"></select></label>
+        <label class="f">Сынама көлемі, мл<select id="tVa"><option>10</option><option>20</option><option selected>25</option><option>50</option></select></label>
+        <label class="f">Концентрация, моль/л<input type="number" id="tC" min="0.005" max="1" step="0.005" value="0.1"></label>
+        <label class="f">Индикатор<select id="tInd"></select></label>
+        <label class="f">Беру жылдамдығы <output id="tFlowO" class="mono">0.0 мл/с</output><input type="range" id="tFlow" min="0" max="100" value="0"></label>
+        <div class="row" style="grid-column:1/-1">
+          <button class="btn" id="tDrop" title="Бір тамшы, 0.05 мл">Тамшы</button>
+          <button class="btn" id="tStop">Кранды жабу</button>
+          <button class="btn" id="tReset">Қайтадан</button>
+        </div>
+        <label class="row" style="grid-column:1/-1;gap:8px;font-size:13px"><input type="checkbox" id="tUnknown"> Есеп: концентрация белгісіз</label>
+        <label class="row" style="grid-column:1/-1;gap:8px;font-size:13px"><input type="checkbox" id="tTheory"> Есептік қисықты көрсету</label>
+      </div>
+      <div class="panel">
+        <div class="stats" style="padding-top:14px">
+          <div class="stat"><small id="tTitL">Титрант</small><b id="tTit">NaOH</b></div>
+          <div class="stat"><small>Құйылды</small><b id="tV">0.00 мл</b></div>
+          <div class="stat"><small>pH</small><b id="tPH">—</b></div>
+          <div class="stat"><small>Түсі</small><b id="tCol" style="font-size:14px">—</b></div>
+        </div>
+        <div class="tchart"><div class="row" style="justify-content:space-between;padding:0 4px 6px"><span class="lbl">График</span><div class="seg" id="tMode"><button data-m="ph" class="on">pH(V)</button><button data-m="d">dpH/dV</button></div></div><canvas id="tchart" width="1280" height="720"></canvas></div>
+        <div class="row" style="padding:0 14px 12px">
+          <label class="f" style="flex:1;min-width:200px">Жауабыңыз: талданатын ерітіндінің концентрациясы, моль/л<input type="number" id="tAns" step="0.001" placeholder="мысалы 0.085"></label>
+          <button class="btn primary" id="tCheck" style="align-self:end">Тексеру</button>
+        </div>
+        <div class="verdict" id="tVerd"></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== ELEMENTS ===== -->
+<section class="view" id="v-elements">
+  <div class="vhead"><h2>Периодтық кесте</h2><p>Толығырақ білу үшін элементті басыңыз.</p></div>
+  <div class="ptwrap">
+    <div class="panel">
+      <div class="row" style="padding:12px 12px 8px">
+        <input type="text" id="ptq" placeholder="Іздеу: Fe, темір, 26" style="max-width:240px" aria-label="Элемент іздеу">
+        <div class="seg" id="ptmode"><button data-m="cat" class="on">Топтар</button><button data-m="en">Электртеріс.</button><button data-m="mass">Масса</button><button data-m="state">Күйі</button></div>
+      </div>
+      <div class="ptscroll"><div class="pt" id="pt"></div></div>
+      <div class="ptlegend" id="ptlegend"></div>
+    </div>
+    <aside class="panel ptside" id="ptside"></aside>
+  </div>
+</section>
+
+<!-- ===== SOLUBILITY ===== -->
+<section class="view" id="v-solubility">
+  <div class="vhead"><h2>Ерігіштік кестесі</h2><p><b class="cR">Е</b> ериді · <b class="cM">А</b> аз ериді · <b class="cN">Ж</b> ерімейді · — жоқ</p></div>
+  <div class="panel sol" id="soltbl"></div>
+  <div class="panel soldet" id="soldet"><span class="muted">Катион мен анионды таңдаңыз.</span></div>
+</section>
+
+<!-- ===== CALC ===== -->
+<section class="view" id="v-calc">
+  <div class="vhead"><h2>Есептеулер</h2><p>Коэффициенттерді қою, молярлық масса, ерітінділер және pH.</p></div>
+  <div class="cgrid">
+    <div class="panel card" id="cBal">
+      <h3>Реакция теңдеуін теңестіру</h3>
+      <label class="f">Теңдеу (нұсқар: -> немесе =)<input type="text" id="balIn" value="Fe + O2 -> Fe2O3" spellcheck="false"></label>
+      <div class="row" id="balEx"></div>
+      <div class="eqout" id="balOut"></div>
+      <div class="msg" id="balMsg"></div>
+    </div>
+    <div class="panel card" id="cMol">
+      <h3>Молярлық масса және құрамы</h3>
+      <label class="f">Формула (жақша мен кристаллогидрат жазуға болады)<input type="text" id="molIn" value="CuSO4·5H2O" spellcheck="false"></label>
+      <div class="big" id="molM">—</div>
+      <div class="msg" id="molMsg"></div>
+      <table class="t" id="molT"></table>
+      <div class="lbl">Шамаларды аудару</div>
+      <div class="grid2">
+        <label class="f">Масса, г<input type="number" id="cvG" step="any"></label>
+        <label class="f">Зат мөлшері, моль<input type="number" id="cvN" step="any"></label>
+        <label class="f">Бөлшектер саны ×10²³<input type="number" id="cvP" step="any"></label>
+        <label class="f">Газ көлемі (қ.ж.), л<input type="number" id="cvV" step="any"></label>
+      </div>
+    </div>
+    <div class="panel card" id="cSol">
+      <h3>Ерітінділер және сұйылту</h3>
+      <div class="grid2">
+        <label class="f">Зат<input type="text" id="slF" value="NaCl" spellcheck="false"></label>
+        <label class="f">Зат массасы, г<input type="number" id="slM" value="5.85" step="any"></label>
+        <label class="f">Ерітінді көлемі, мл<input type="number" id="slV" value="100" step="any"></label>
+        <label class="f">Тығыздық, г/мл<input type="number" id="slD" value="1.00" step="any"></label>
+      </div>
+      <div class="row" style="gap:18px"><div><div class="lbl">Молярлық</div><div class="big" id="slC">—</div></div><div><div class="lbl">Массалық үлес</div><div class="big" id="slW">—</div></div></div>
+      <div class="lbl">Сұйылту: C₁V₁ = C₂V₂</div>
+      <div class="grid2">
+        <label class="f">C₁, моль/л<input type="number" id="dlC1" value="1" step="any"></label>
+        <label class="f">V₁, мл<input type="number" id="dlV1" value="10" step="any"></label>
+        <label class="f">C₂, моль/л<input type="number" id="dlC2" value="0.1" step="any"></label>
+        <div class="stat"><small>Көлемге жеткізу</small><b id="dlV2">—</b></div>
+      </div>
+      <div class="msg" id="dlMsg"></div>
+    </div>
+    <div class="panel card" id="cPh">
+      <h3>Ерітіндінің pH мәні</h3>
+      <div class="grid2">
+        <label class="f">Зат<select id="phS"></select></label>
+        <label class="f">Концентрация, моль/л<input type="number" id="phC" value="0.1" step="any" min="0"></label>
+      </div>
+      <div class="big" id="phR">—</div>
+      <div class="gradbar" id="phBar"></div>
+      <div class="msg" id="phMsg"></div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== GAS ===== -->
+<section class="view" id="v-gas">
+  <div class="vhead"><h2>Газ заңдары</h2><p>Температураны, көлемді және газ мөлшерін өзгертіп, қысымды бақылаңыз.</p></div>
+  <div class="ggrid">
+    <div class="panel gbox"><canvas id="gcanvas" width="720" height="760" aria-label="Газы бар цилиндр"></canvas></div>
+    <div class="gright">
+      <div class="panel gctl">
+        <label class="f">Газ<select id="gGas"></select></label>
+        <label class="f">Температура <output id="gTo"></output><input type="range" id="gT" min="100" max="900" step="5" value="300"></label>
+        <label class="f">Зат мөлшері, моль <output id="gNo"></output><input type="range" id="gN" min="0.2" max="2" step="0.05" value="1"></label>
+        <label class="f">Көлем, л <output id="gVo"></output><input type="range" id="gV" min="5" max="50" step="0.5" value="25"></label>
+        <div class="row" style="grid-column:1/-1">
+          <span class="lbl">Процесс</span>
+          <div class="seg" id="gProc"><button data-p="none" class="on">Қолмен</button><button data-p="iso-T">Изотерма</button><button data-p="iso-P">Изобара</button><button data-p="iso-V">Изохора</button></div>
+          <button class="btn sm" id="gClear">Ізді тазарту</button>
+        </div>
+      </div>
+      <div class="panel">
+        <div class="stats" style="padding-top:14px" id="gStats"></div>
+        <div class="gcharts"><canvas id="gPV" width="640" height="480"></canvas><canvas id="gMax" width="640" height="480"></canvas></div>
+      </div>
+    </div>
+  </div>
+</section>
+</main>
+<footer>ХимЛаб мектеп пен жоғары оқу орнының типтік реакцияларын жеңілдетілген түрде модельдейді: идеал ерітінділер, лездік тепе-теңдік, сапалық әсерлер. Нәтижелер зертханалық тәжірибені алмастырмайды.</footer>
+</div>
+<script>
+'use strict';
+/* ===== helpers ===== */
+const $=(s,r=document)=>r.querySelector(s);
+const $$=(s,r=document)=>Array.from(r.querySelectorAll(s));
+function H(tag,props,...kids){
+  const e=document.createElement(tag);
+  if(props)for(const k in props){const v=props[k];
+    if(k==='class')e.className=v;else if(k==='html')e.innerHTML=v;
+    else if(k.startsWith('on'))e.addEventListener(k.slice(2),v);
+    else if(v!==false&&v!=null)e.setAttribute(k,v===true?'':v);}
+  for(const c of kids.flat()){if(c==null||c===false)continue;e.append(c.nodeType?c:document.createTextNode(c));}
+  return e;
+}
+const clamp=(x,a,b)=>Math.max(a,Math.min(b,x));
+const lerp=(a,b,t)=>a+(b-a)*t;
+const rnd=(a,b)=>a+Math.random()*(b-a);
+function chem(s){
+  return String(s).replace(/\^([0-9]*[+\-−])/g,'<sup>$1</sup>').replace(/([A-Za-z\)\]])(\d+)/g,'$1<sub>$2</sub>');
+}
+function hexRGB(h){h=h.trim();if(h[0]==='#'){if(h.length===4)h='#'+h[1]+h[1]+h[2]+h[2]+h[3]+h[3];return[parseInt(h.slice(1,3),16),parseInt(h.slice(3,5),16),parseInt(h.slice(5,7),16)];}
+  const m=h.match(/\d+/g);return m?m.slice(0,3).map(Number):[128,128,128];}
+function rgba(c,a){const r=typeof c==='string'?hexRGB(c):c;return `rgba(${r[0]|0},${r[1]|0},${r[2]|0},${a})`;}
+const TH={};
+function readTheme(){
+  const cs=getComputedStyle(document.documentElement);
+  for(const k of ['bg','panel','panel2','line','fg','muted','accent','glass','glasshi','stage','plate','good','warn','bad'])TH[k]=cs.getPropertyValue('--'+k).trim()||'#888';
+  TH.dark=(hexRGB(TH.bg)[0]+hexRGB(TH.bg)[1]+hexRGB(TH.bg)[2])<300;
+}
+readTheme();
+new MutationObserver(readTheme).observe(document.documentElement,{attributes:true,attributeFilter:['data-theme','class']});
+try{matchMedia('(prefers-color-scheme: dark)').addEventListener('change',()=>setTimeout(readTheme,30));}catch(e){}
+
+/* canvas helper: fit to css size with DPR, return {ctx,w,h}; logical size is lw x lh */
+function fitCanvas(cv,lw,lh){
+  const dpr=Math.min(window.devicePixelRatio||1,2),r=cv.getBoundingClientRect();
+  const cw=Math.max(1,Math.round(r.width*dpr)),ch=Math.max(1,Math.round(r.height*dpr));
+  if(cv.width!==cw||cv.height!==ch){cv.width=cw;cv.height=ch;}
+  const ctx=cv.getContext('2d');
+  ctx.setTransform(cw/lw,0,0,ch/lh,0,0);
+  return ctx;
+}
+
+/* ===== elements ===== */
+const EL_RAW=`H|Сутек|1.008|2.20
+He|Гелий|4.0026|
+Li|Литий|6.94|0.98
+Be|Бериллий|9.0122|1.57
+B|Бор|10.81|2.04
+C|Көміртек|12.011|2.55
+N|Азот|14.007|3.04
+O|Оттек|15.999|3.44
+F|Фтор|18.998|3.98
+Ne|Неон|20.180|
+Na|Натрий|22.990|0.93
+Mg|Магний|24.305|1.31
+Al|Алюминий|26.982|1.61
+Si|Кремний|28.085|1.90
+P|Фосфор|30.974|2.19
+S|Күкірт|32.06|2.58
+Cl|Хлор|35.45|3.16
+Ar|Аргон|39.948|
+K|Калий|39.098|0.82
+Ca|Кальций|40.078|1.00
+Sc|Скандий|44.956|1.36
+Ti|Титан|47.867|1.54
+V|Ванадий|50.942|1.63
+Cr|Хром|51.996|1.66
+Mn|Марганец|54.938|1.55
+Fe|Темір|55.845|1.83
+Co|Кобальт|58.933|1.88
+Ni|Никель|58.693|1.91
+Cu|Мыс|63.546|1.90
+Zn|Мырыш|65.38|1.65
+Ga|Галлий|69.723|1.81
+Ge|Германий|72.630|2.01
+As|Күшән|74.922|2.18
+Se|Селен|78.971|2.55
+Br|Бром|79.904|2.96
+Kr|Криптон|83.798|3.00
+Rb|Рубидий|85.468|0.82
+Sr|Стронций|87.62|0.95
+Y|Иттрий|88.906|1.22
+Zr|Цирконий|91.224|1.33
+Nb|Ниобий|92.906|1.60
+Mo|Молибден|95.95|2.16
+Tc|Технеций|98|1.90
+Ru|Рутений|101.07|2.20
+Rh|Родий|102.91|2.28
+Pd|Палладий|106.42|2.20
+Ag|Күміс|107.87|1.93
+Cd|Кадмий|112.41|1.69
+In|Индий|114.82|1.78
+Sn|Қалайы|118.71|1.96
+Sb|Сүрме|121.76|2.05
+Te|Теллур|127.60|2.10
+I|Йод|126.90|2.66
+Xe|Ксенон|131.29|2.60
+Cs|Цезий|132.91|0.79
+Ba|Барий|137.33|0.89
+La|Лантан|138.91|1.10
+Ce|Церий|140.12|1.12
+Pr|Празеодим|140.91|1.13
+Nd|Неодим|144.24|1.14
+Pm|Прометий|145|1.13
+Sm|Самарий|150.36|1.17
+Eu|Европий|151.96|1.20
+Gd|Гадолиний|157.25|1.20
+Tb|Тербий|158.93|1.10
+Dy|Диспрозий|162.50|1.22
+Ho|Гольмий|164.93|1.23
+Er|Эрбий|167.26|1.24
+Tm|Тулий|168.93|1.25
+Yb|Иттербий|173.05|1.10
+Lu|Лютеций|174.97|1.27
+Hf|Гафний|178.49|1.30
+Ta|Тантал|180.95|1.50
+W|Вольфрам|183.84|2.36
+Re|Рений|186.21|1.90
+Os|Осмий|190.23|2.20
+Ir|Иридий|192.22|2.20
+Pt|Платина|195.08|2.28
+Au|Алтын|196.97|2.54
+Hg|Сынап|200.59|2.00
+Tl|Таллий|204.38|1.62
+Pb|Қорғасын|207.2|2.33
+Bi|Висмут|208.98|2.02
+Po|Полоний|209|2.00
+At|Астат|210|2.20
+Rn|Радон|222|2.20
+Fr|Франций|223|0.70
+Ra|Радий|226|0.90
+Ac|Актиний|227|1.10
+Th|Торий|232.04|1.30
+Pa|Протактиний|231.04|1.50
+U|Уран|238.03|1.38
+Np|Нептуний|237|1.36
+Pu|Плутоний|244|1.28
+Am|Америций|243|1.13
+Cm|Кюрий|247|1.28
+Bk|Берклий|247|1.30
+Cf|Калифорний|251|1.30
+Es|Эйнштейний|252|1.30
+Fm|Фермий|257|1.30
+Md|Менделевий|258|1.30
+No|Нобелий|259|1.30
+Lr|Лоуренсий|266|1.30
+Rf|Резерфордий|267|
+Db|Дубний|268|
+Sg|Сиборгий|269|
+Bh|Борий|270|
+Hs|Хассий|277|
+Mt|Мейтнерий|278|
+Ds|Дармштадтий|281|
+Rg|Рентгений|282|
+Cn|Коперниций|285|
+Nh|Нихоний|286|
+Fl|Флеровий|289|
+Mc|Московий|290|
+Lv|Ливерморий|293|
+Ts|Теннессин|294|
+Og|Оганесон|294|`;
+const CATS={alkali:'Сілтілік металдар',alkearth:'Сілтілік жер металдары',trans:'Ауыспалы металдар',post:'Ауысудан кейінгі металдар',metalloid:'Жартылай металдар',nonmetal:'Бейметалдар',halogen:'Галогендер',noble:'Асыл газдар',lan:'Лантаноидтар',act:'Актиноидтар'};
+const CAT_HUE={alkali:12,alkearth:38,trans:205,post:165,metalloid:130,nonmetal:95,halogen:285,noble:320,lan:250,act:350};
+function catOf(z){
+  if([3,11,19,37,55,87].includes(z))return'alkali';
+  if([4,12,20,38,56,88].includes(z))return'alkearth';
+  if(z>=57&&z<=71)return'lan';
+  if(z>=89&&z<=103)return'act';
+  if([2,10,18,36,54,86,118].includes(z))return'noble';
+  if([9,17,35,53,85,117].includes(z))return'halogen';
+  if([5,14,32,33,51,52].includes(z))return'metalloid';
+  if([1,6,7,8,15,16,34].includes(z))return'nonmetal';
+  if((z>=21&&z<=30)||(z>=39&&z<=48)||(z>=72&&z<=80)||(z>=104&&z<=112))return'trans';
+  return'post';
+}
+function posOf(z){
+  if(z===1)return[1,1];if(z===2)return[1,18];
+  if(z<=4)return[2,z-2];if(z<=10)return[2,z+8];
+  if(z<=12)return[3,z-10];if(z<=18)return[3,z];
+  if(z<=36)return[4,z-18];if(z<=54)return[5,z-36];
+  if(z<=56)return[6,z-54];if(z<=71)return[9,z-54];
+  if(z<=86)return[6,z-68];
+  if(z<=88)return[7,z-86];if(z<=103)return[10,z-86];
+  return[7,z-100];
+}
+const GASES=[1,2,7,8,9,10,17,18,36,54,86];
+const ELEMENTS=EL_RAW.trim().split('\n').map((l,i)=>{
+  const p=l.split('|'),z=i+1,[row,col]=posOf(z);
+  const cat=catOf(z);
+  const state=z>=104?'unk':GASES.includes(z)?'gas':(z===35||z===80)?'liq':'solid';
+  const f=(z>=57&&z<=71)||(z>=89&&z<=103);
+  return{z,sym:p[0],name:p[1],mass:+p[2],en:p[3]?+p[3]:null,row,col,cat,state,period:z<=2?1:z<=10?2:z<=18?3:z<=36?4:z<=54?5:z<=86?6:7,
+    group:f?null:col,block:f?'f':(col<=2||z===2)?'s':col>=13?'p':'d'};
+});
+const BYSYM=Object.fromEntries(ELEMENTS.map(e=>[e.sym,e]));
+const ORB=[[1,0],[2,0],[2,1],[3,0],[3,1],[4,0],[3,2],[4,1],[5,0],[4,2],[5,1],[6,0],[4,3],[5,2],[6,1],[7,0],[5,3],[6,2],[7,1]];
+const LET='spdf';
+const MOVES={24:[['4s','3d',1]],29:[['4s','3d',1]],41:[['5s','4d',1]],42:[['5s','4d',1]],44:[['5s','4d',1]],45:[['5s','4d',1]],46:[['5s','4d',2]],47:[['5s','4d',1]],57:[['4f','5d',1]],58:[['4f','5d',1]],64:[['4f','5d',1]],78:[['6s','5d',1]],79:[['6s','5d',1]],89:[['5f','6d',1]],90:[['5f','6d',2]],91:[['5f','6d',1]],92:[['5f','6d',1]],93:[['5f','6d',1]],96:[['5f','6d',1]],103:[['6d','7p',1]]};
+function occupancy(z,moves=true){
+  let rem=z;const occ={};
+  for(const[n,l]of ORB){const e=Math.min(2*(2*l+1),rem);if(e>0)occ[n+LET[l]]=e;rem-=e;if(rem<=0)break;}
+  if(moves&&MOVES[z])for(const[a,b,k]of MOVES[z]){occ[a]-=k;occ[b]=(occ[b]||0)+k;if(occ[a]<=0)delete occ[a];}
+  return occ;
+}
+const SUPD='⁰¹²³⁴⁵⁶⁷⁸⁹';
+const supn=n=>String(n).split('').map(d=>SUPD[+d]).join('');
+function configOf(z){
+  const occ=occupancy(z),cores=[[86,'Rn'],[54,'Xe'],[36,'Kr'],[18,'Ar'],[10,'Ne'],[2,'He']];
+  let core=cores.find(c=>c[0]<z),rest={...occ};
+  if(core){const co=occupancy(core[0],false);for(const k in co){rest[k]=(rest[k]||0)-co[k];if(rest[k]<=0)delete rest[k];}}
+  const keys=Object.keys(rest).sort((a,b)=>a[0]-b[0]||LET.indexOf(a[1])-LET.indexOf(b[1]));
+  return(core?`[${core[1]}] `:'')+keys.map(k=>k+supn(rest[k])).join(' ');
+}
+function shellsOf(z){const occ=occupancy(z),sh=[];for(const k in occ){const n=+k[0];sh[n-1]=(sh[n-1]||0)+occ[k];}return sh.map(x=>x||0);}
+
+/* ===== reagents ===== */
+const RGROUPS=[['acid','Қышқылдар'],['base','Негіздер'],['salt','Тұздар'],['ox','Тотықтырғыштар'],['metal','Металдар'],['solid','Қатты заттар'],['ind','Индикаторлар'],['other','Су']];
+const REAGENTS=[
+ {id:'hcl',name:'Тұз қышқылы',f:'HCl',cat:'acid',kind:'liq',c:1,sp:{H:1,Cl:1},col:[200,232,245]},
+ {id:'h2so4',name:'Күкірт қышқылы',f:'H2SO4',cat:'acid',kind:'liq',c:.5,sp:{H:2,SO4:1},col:[205,232,240]},
+ {id:'hno3',name:'Азот қышқылы',f:'HNO3',cat:'acid',kind:'liq',c:1,sp:{H:1,NO3:1},col:[225,235,225]},
+ {id:'hac',name:'Сірке қышқылы',f:'CH3COOH',cat:'acid',kind:'liq',c:1,sp:{HAc:1},col:[235,238,225]},
+ {id:'naoh',name:'Натрий гидроксиді',f:'NaOH',cat:'base',kind:'liq',c:1,sp:{Na:1,OH:1},col:[210,225,245]},
+ {id:'koh',name:'Калий гидроксиді',f:'KOH',cat:'base',kind:'liq',c:1,sp:{K:1,OH:1},col:[215,225,245]},
+ {id:'nh3',name:'Аммиак (ерітінді)',f:'NH3',cat:'base',kind:'liq',c:1,sp:{NH3:1},col:[220,235,245]},
+ {id:'caoh2',name:'Әк суы',f:'Ca(OH)2',cat:'base',kind:'liq',c:.02,sp:{Ca:1,OH:2},col:[225,238,242]},
+ {id:'nacl',name:'Натрий хлориді',f:'NaCl',cat:'salt',kind:'liq',c:1,sp:{Na:1,Cl:1},col:[215,235,245]},
+ {id:'na2so4',name:'Натрий сульфаты',f:'Na2SO4',cat:'salt',kind:'liq',c:.5,sp:{Na:2,SO4:1},col:[215,235,245]},
+ {id:'na2co3',name:'Натрий карбонаты',f:'Na2CO3',cat:'salt',kind:'liq',c:.5,sp:{Na:2,CO3:1},col:[215,235,245]},
+ {id:'cuso4',name:'Мыс(II) сульфаты',f:'CuSO4',cat:'salt',kind:'liq',c:.1,sp:{Cu:1,SO4:1},col:[60,150,235]},
+ {id:'fecl3',name:'Темір(III) хлориді',f:'FeCl3',cat:'salt',kind:'liq',c:.1,sp:{Fe3:1,Cl:3},col:[215,140,50]},
+ {id:'feso4',name:'Темір(II) сульфаты',f:'FeSO4',cat:'salt',kind:'liq',c:.1,sp:{Fe2:1,SO4:1},col:[175,215,160]},
+ {id:'znso4',name:'Мырыш сульфаты',f:'ZnSO4',cat:'salt',kind:'liq',c:.1,sp:{Zn:1,SO4:1},col:[215,235,245]},
+ {id:'agno3',name:'Күміс нитраты',f:'AgNO3',cat:'salt',kind:'liq',c:.1,sp:{Ag:1,NO3:1},col:[220,236,246]},
+ {id:'bacl2',name:'Барий хлориді',f:'BaCl2',cat:'salt',kind:'liq',c:.1,sp:{Ba:1,Cl:2},col:[215,235,245]},
+ {id:'cacl2',name:'Кальций хлориді',f:'CaCl2',cat:'salt',kind:'liq',c:.1,sp:{Ca:1,Cl:2},col:[215,235,245]},
+ {id:'pbno32',name:'Қорғасын(II) нитраты',f:'Pb(NO3)2',cat:'salt',kind:'liq',c:.1,sp:{Pb:1,NO3:2},col:[220,236,246]},
+ {id:'ki',name:'Калий йодиді',f:'KI',cat:'salt',kind:'liq',c:.1,sp:{K:1,I:1},col:[225,238,244]},
+ {id:'kscn',name:'Калий роданиді',f:'KSCN',cat:'salt',kind:'liq',c:.1,sp:{K:1,SCN:1},col:[225,238,244]},
+ {id:'kmno4',name:'Калий перманганаты',f:'KMnO4',cat:'ox',kind:'liq',c:.02,sp:{K:1,MnO4:1},col:[150,30,170]},
+ {id:'h2o2',name:'Сутек пероксиді',f:'H2O2',cat:'ox',kind:'liq',c:.9,sp:{H2O2:1},col:[225,240,248]},
+ {id:'zn',name:'Мырыш (түйіршік)',f:'Zn',cat:'metal',kind:'solid',key:'Zn',M:65.38,col:[165,172,178]},
+ {id:'mg',name:'Магний (таспа)',f:'Mg',cat:'metal',kind:'solid',key:'Mg',M:24.305,col:[205,210,215]},
+ {id:'fe',name:'Темір (шеге)',f:'Fe',cat:'metal',kind:'solid',key:'Fe',M:55.845,col:[115,120,126]},
+ {id:'cu',name:'Мыс (сым)',f:'Cu',cat:'metal',kind:'solid',key:'Cu',M:63.546,col:[196,104,64]},
+ {id:'na',name:'Натрий (кесек)',f:'Na',cat:'metal',kind:'solid',key:'Na',M:22.99,col:[205,210,218],hot:true},
+ {id:'caco3',name:'Мәрмәр, бор',f:'CaCO3',cat:'solid',kind:'solid',key:'CaCO3',M:100.09,col:[238,236,230]},
+ {id:'nahco3',name:'Ас содасы',f:'NaHCO3',cat:'solid',kind:'solid',M:84.007,diss:true,sp:{Na:1,HCO3:1},col:[246,246,246]},
+ {id:'phph',name:'Фенолфталеин',f:'индикатор',cat:'ind',kind:'ind',col:[240,235,240]},
+ {id:'mo',name:'Метилоранж',f:'индикатор',cat:'ind',kind:'ind',col:[245,170,50]},
+ {id:'uni',name:'Әмбебап',f:'индикатор',cat:'ind',kind:'ind',col:[120,200,110]},
+ {id:'btb',name:'Бромтимол көгі',f:'индикатор',cat:'ind',kind:'ind',col:[100,190,150]},
+ {id:'water',name:'Дистилденген су',f:'H2O',cat:'other',kind:'liq',c:0,sp:{},col:[175,215,238]},
+];
+const RBY=Object.fromEntries(REAGENTS.map(r=>[r.id,r]));
+const DOSES_LIQ=[2,5,10,25,50],DOSES_SOL=[0.1,0.3,0.5,1,2];
+
+/* ===== indicators ===== */
+const IND={
+  phph:{name:'Фенолфталеин',range:[8.2,10],low:'түссіз',high:'таңқурай түсті',
+    color(p){if(p<8.2)return null;const t=clamp((p-8.2)/1.8,0,1);return{c:[lerp(250,222,t),lerp(215,25,t),lerp(235,120,t)],s:.15+.7*t};}},
+  mo:{name:'Метилоранж',range:[3.1,4.4],low:'қызыл',high:'сары',
+    color(p){const t=clamp((p-3.1)/1.3,0,1);return{c:[lerp(235,246,t),lerp(45,205,t),lerp(45,50,t)],s:.85};}},
+  uni:{name:'Әмбебап индикатор',range:[1,13],low:'қызыл',high:'күлгін',
+    color(p){const T=[[0,[220,20,40]],[2,[235,40,40]],[3,[245,110,40]],[4,[250,165,40]],[5,[250,210,50]],[6,[225,225,60]],[7,[90,185,90]],[8,[40,170,150]],[9,[40,120,200]],[10,[70,70,190]],[11,[100,50,170]],[14,[125,40,150]]];
+      for(let i=1;i<T.length;i++)if(p<=T[i][0]){const t=clamp((p-T[i-1][0])/(T[i][0]-T[i-1][0]),0,1);return{c:T[i][1].map((v,k)=>lerp(T[i-1][1][k],v,t)),s:.85};}
+      return{c:T[T.length-1][1],s:.85};}},
+  btb:{name:'Бромтимол көгі',range:[6,7.6],low:'сары',high:'көк',
+    color(p){const t=clamp((p-6)/1.6,0,1);const m=t<.5?[lerp(245,70,t*2),lerp(215,190,t*2),lerp(40,80,t*2)]:[lerp(70,40,(t-.5)*2),lerp(190,90,(t-.5)*2),lerp(80,200,(t-.5)*2)];return{c:m,s:.85};}}
+};
+function colorName(rgb){
+  const[r,g,b]=rgb;const mx=Math.max(r,g,b),mn=Math.min(r,g,b);
+  if(mx<70)return'күңгірт';if(mx-mn<28)return mx>200?'түссіз':'сұр';
+  let h;const d=mx-mn;if(mx===r)h=((g-b)/d+6)%6;else if(mx===g)h=(b-r)/d+2;else h=(r-g)/d+4;h*=60;
+  if(h<15||h>=340)return h>=300||h<15?(r>200&&g>120?'қызғылт':'қызыл'):'қызыл';
+  if(h<40)return'қызғылт сары';if(h<70)return'сары';if(h<165)return'жасыл';if(h<200)return'көгілдір-жасыл';if(h<255)return'көк';if(h<300)return'күлгін';return'таңқурай түсті';
+}
+function phRGB(p){return IND.uni.color(clamp(p,0,14)).c;}
+
+/* ===== solubility table ===== */
+const SOL_AN=[['OH','OH^-','гидроксид'],['Cl','Cl^-','хлорид'],['Br','Br^-','бромид'],['I','I^-','йодид'],['NO3','NO3^-','нитрат'],['SO4','SO4^2-','сульфат'],['CO3','CO3^2-','карбонат'],['S','S^2-','сульфид'],['PO4','PO4^3-','фосфат'],['Ac','CH3COO^-','ацетат']];
+const SOL_CAT=[
+ ['H','H^+','Сутек','РРРРРРРРРР'],['NH4','NH4^+','Аммоний','РРРРРРРРРР'],['Li','Li^+','Литий','РРРРРРРРНР'],['Na','Na^+','Натрий','РРРРРРРРРР'],['K','K^+','Калий','РРРРРРРРРР'],
+ ['Mg','Mg^2+','Магний','НРРРРРНXНР'],['Ca','Ca^2+','Кальций','МРРРРМНXНР'],['Ba','Ba^2+','Барий','РРРРРННXНР'],['Al','Al^3+','Алюминий','НРРРРРXXНР'],
+ ['Zn','Zn^2+','Мырыш','НРРРРРНННР'],['Fe2','Fe^2+','Темір(II)','НРРРРРНННР'],['Fe3','Fe^3+','Темір(III)','НРРXРРXXНР'],['Cu','Cu^2+','Мыс(II)','НРРXРРXННР'],
+ ['Ag','Ag^+','Күміс','XНННРМНННМ'],['Pb','Pb^2+','Қорғасын(II)','НММНРННННР']
+];
+const SOL_COL={'Ag|Cl':'ақ ірімшік тәрізді','Ag|Br':'ақшыл сары','Ag|I':'сары','Ag|CO3':'сарғыш-ақ','Ag|S':'қара','Ag|PO4':'сары','Ba|SO4':'ақ','Ba|CO3':'ақ','Ba|PO4':'ақ','Ca|CO3':'ақ','Ca|PO4':'ақ','Ca|SO4':'ақ','Cu|OH':'көгілдір','Cu|S':'қара','Cu|PO4':'көгілдірлеу','Fe3|OH':'қоңыр','Fe2|OH':'сұрғылт-жасыл','Fe2|S':'қара','Fe2|CO3':'ақшыл-жасыл','Zn|S':'ақ','Zn|OH':'ақ','Zn|CO3':'ақ','Zn|PO4':'ақ','Mg|OH':'ақ','Mg|CO3':'ақ','Mg|PO4':'ақ','Pb|I':'ашық сары','Pb|SO4':'ақ','Pb|Cl':'ақ','Pb|Br':'ақ','Pb|S':'қара','Pb|CO3':'ақ','Pb|OH':'ақ','Pb|PO4':'ақ','Al|OH':'ақ іркілдек','Al|PO4':'ақ'};
+
+'use strict';
+/* ===== reaction engine: ions (mol), solids (mol), gas pool, temperature ===== */
+const Eng=(()=>{
+  const E=1e-9;
+  const CHG={H:1,OH:-1,Na:1,K:1,Cl:-1,SO4:-2,NO3:-1,CO3:-2,HCO3:-1,Ca:2,Ba:2,Cu:2,Fe3:3,Fe2:2,Ag:1,Pb:2,I:-1,MnO4:-1,SCN:-1,NH3:0,NH4:1,Zn:2,Mg:2,HAc:0,Ac:-1,H2O2:0,Mn:2,I2:0,CuNH3:2,AgNH3:1,ZnOH4:-2,FeSCN:2};
+  const ION_FMT={H:'H^+',OH:'OH^-',Na:'Na^+',K:'K^+',Cl:'Cl^-',SO4:'SO4^2-',NO3:'NO3^-',CO3:'CO3^2-',HCO3:'HCO3^-',Ca:'Ca^2+',Ba:'Ba^2+',Cu:'Cu^2+',Fe3:'Fe^3+',Fe2:'Fe^2+',Ag:'Ag^+',Pb:'Pb^2+',I:'I^-',MnO4:'MnO4^-',SCN:'SCN^-',NH3:'NH3',NH4:'NH4^+',Zn:'Zn^2+',Mg:'Mg^2+',HAc:'CH3COOH',Ac:'CH3COO^-',H2O2:'H2O2',Mn:'Mn^2+',I2:'I2',CuNH3:'[Cu(NH3)4]^2+',AgNH3:'[Ag(NH3)2]^+',ZnOH4:'[Zn(OH)4]^2-',FeSCN:'[Fe(SCN)]^2+'};
+  const VESSELS={
+    tube:{name:'Пробирка',cap:25,H:250,limit:1500,
+      w:y=>{const R=26;if(y<R){const d=R-y;return 2*Math.sqrt(Math.max(0,R*R-d*d));}return 2*R;}},
+    beaker:{name:'Стақан',cap:250,H:178,limit:7000,
+      w:y=>y<9?140-2*(9-Math.sqrt(Math.max(0,81-(9-y)*(9-y)))):140},
+    flask:{name:'Колба',cap:250,H:206,limit:5000,
+      w:y=>{const base=y<10?(10-Math.sqrt(Math.max(0,100-(10-y)*(10-y))))*2:0;return(y<=120?lerp(164,44,y/120):44)-base;}}
+  };
+  for(const k in VESSELS){ // cumulative volume table (area ~ w^2) up to 90% height = nominal capacity
+    const V=VESSELS[k],tab=[0];let s=0;
+    for(let y=1;y<=V.H;y++){s+=Math.pow(V.w(y-.5),2);tab.push(s);}
+    const hm=Math.round(V.H*.9);V.hmax=hm;V.tab=tab.map(x=>x/tab[hm]*V.cap);
+  }
+  function levelOf(type,vol){
+    const V=VESSELS[type],t=V.tab;
+    if(vol<=0)return 0;
+    let lo=0,hi=V.H;while(hi-lo>1){const m=(lo+hi)>>1;if(t[m]<vol)lo=m;else hi=m;}
+    const a=t[lo],b=t[hi];return lo+(b>a?(vol-a)/(b-a):0);
+  }
+  /* ---- precipitation table: cat, an, nCat, nAn, key, colour, text, Ksp (0 = complete) ---- */
+  const PBK=T=>4.4e-9*Math.pow(10,Math.max(0,T-20)*.0556);
+  const PREC=[
+    ['Ag','Cl',1,1,'AgCl',[240,242,244],'күміс хлоридінің ақ ірімшік тәрізді тұнбасы түзіледі',0],
+    ['Ag','I',1,1,'AgI',[232,222,110],'күміс йодидінің ақшыл сары тұнбасы түзіледі',0],
+    ['Ag','CO3',2,1,'Ag2CO3',[225,220,160],'күміс карбонатының сарғыш-ақ тұнбасы түзіледі',0],
+    ['Ag','OH',1,1,'Ag2O',[120,80,48],'күміс оксидінің қоңыр тұнбасы түзіледі',0],
+    ['Ag','SO4',2,1,'Ag2SO4',[245,245,245],'күміс сульфатының ақ тұнбасы түзіледі',1.2e-5],
+    ['Ba','SO4',1,1,'BaSO4',[246,246,246],'барий сульфатының ақ ұсақ кристалды тұнбасы түзіледі',0],
+    ['Ba','CO3',1,1,'BaCO3',[244,244,244],'барий карбонатының ақ тұнбасы түзіледі',0],
+    ['Ca','CO3',1,1,'CaCO3',[244,244,240],'кальций карбонатының ақ тұнбасы түзіледі',0],
+    ['Ca','SO4',1,1,'CaSO4',[246,246,246],'кальций сульфатының ақ тұнбасы түзіледі',4.9e-5],
+    ['Ca','OH',1,2,'Ca(OH)2',[244,244,244],'кальций гидроксидінің ақ лайы пайда болады',5.5e-6],
+    ['Pb','SO4',1,1,'PbSO4',[246,246,246],'қорғасын сульфатының ақ тұнбасы түзіледі',0],
+    ['Pb','I',1,2,'PbI2',[250,200,25],'қорғасын йодидінің ашық сары тұнбасы түзіледі',PBK],
+    ['Pb','Cl',1,2,'PbCl2',[245,245,245],'қорғасын хлоридінің ақ тұнбасы түзіледі',1.7e-5],
+    ['Pb','OH',1,2,'Pb(OH)2',[244,244,244],'қорғасын гидроксидінің ақ тұнбасы түзіледі',0],
+    ['Cu','OH',1,2,'Cu(OH)2',[70,135,240],'мыс(II) гидроксидінің көгілдір іркілдек тұнбасы түзіледі',0],
+    ['Cu','CO3',1,1,'CuCO3',[80,190,165],'мыстың негіздік карбонатының көкшіл-жасыл тұнбасы түзіледі',0],
+    ['Fe3','OH',1,3,'Fe(OH)3',[160,68,28],'темір(III) гидроксидінің қоңыр іркілдек тұнбасы түзіледі',0],
+    ['Fe2','OH',1,2,'Fe(OH)2',[150,185,140],'темір(II) гидроксидінің сұрғылт-жасыл тұнбасы түзіледі',0],
+    ['Mg','OH',1,2,'Mg(OH)2',[244,244,244],'магний гидроксидінің ақ тұнбасы түзіледі',0],
+    ['Mg','CO3',1,1,'MgCO3',[244,244,244],'магний карбонатының ақ тұнбасы түзіледі',0],
+    ['Zn','OH',1,2,'Zn(OH)2',[244,244,244],'мырыш гидроксидінің ақ тұнбасы түзіледі',0],
+    ['Zn','CO3',1,1,'ZnCO3',[244,244,244],'мырыш карбонатының ақ тұнбасы түзіледі',0],
+  ];
+  const SOLID={Zn:{c:[165,172,178]},Mg:{c:[205,210,215]},Fe:{c:[115,120,126]},Cu:{c:[190,98,60]},Na:{c:[205,210,218]},Ag:{c:[222,226,232]},Pb:{c:[95,100,106]},CuI:{c:[236,230,220]},MnO2:{c:[85,60,45]}};
+  for(const r of PREC)SOLID[r[4]]={c:r[5],gel:/OH/.test(r[1])&&r[0]!=='Ca'&&r[0]!=='Ag'};
+  const PIECES=['Zn','Mg','Fe','Cu','Na','CaCO3'];
+  const MET={Mg:{E:-2.37,z:2,ion:'Mg',k:.55},Zn:{E:-.76,z:2,ion:'Zn',k:.16},Fe:{E:-.44,z:2,ion:'Fe2',k:.06},Cu:{E:.34,z:2,ion:'Cu',k:.14}};
+  const OX=[{id:'Ag',E:.80,n:1},{id:'Fe3',E:.77,n:1},{id:'Cu',E:.34,n:2},{id:'Pb',E:-.13,n:2},{id:'H',E:0,n:1},{id:'HAc',E:0,n:1,slow:.22}];
+  const DISS=PREC.filter(r=>r[1]==='OH'||r[1]==='CO3').map(r=>({key:r[4],cat:r[0],nc:r[2],an:r[1],na:r[3]}));
+  const SPC={Cu:{c:[40,140,240],k:5},Fe3:{c:[205,125,40],k:7},Fe2:{c:[165,210,145],k:2.5},MnO4:{c:[150,20,165],k:45},I2:{c:[150,70,20],k:30},FeSCN:{c:[185,15,15],k:70},CuNH3:{c:[15,45,205],k:12}};
+  const HYD={Fe3:2.2,Cu:7.5,Zn:8.7,Pb:7.7,Fe2:9.6};
+
+  function newVessel(type='beaker'){
+    return{type,vol:0,ions:{},solids:{},piece:{},pieceInit:{},gas:{},T:22,mode:'off',stir:false,ind:null,susp:{},t:0,last:{},flags:{},
+      fx:{gas:0,gasKind:null,foam:0,flame:0,sparkle:0,shake:0,heat:0},events:[],tags:new Set(),pH:null,broken:false,pour:null,spawn:[],
+      color:{r:150,g:205,b:235,a:.22},foam:0,dry:false,seed:Math.random()*1000};
+  }
+  const cap=v=>VESSELS[v.type].cap;
+  function note(v,id,text,eq,tag){
+    if(tag)v.tags.add(tag);
+    const l=v.last[id];v.last[id]=v.t;
+    if(l!==undefined&&v.t-l<2.5)return;
+    v.events.push({text,eq,tag});
+  }
+  function heat(v,Q){v.T+=Q/(4.18*Math.max(v.vol,3));}
+  const gas=(v,k,n)=>{v.gas[k]=(v.gas[k]||0)+n;};
+
+  /* ---- adding reagents ---- */
+  function add(v,r,amt){
+    if(v.broken)return{msg:'Ыдыс сынды. Жаңасын қою үшін «Төгу» батырмасын басыңыз.'};
+    const I=v.ions;
+    if(r.kind==='liq'||r.kind==='ind'){
+      let ml=r.kind==='ind'?.2:amt,msg='';
+      const free=cap(v)-v.vol;
+      if(free<=.01)return{msg:'Ыдыс толы.'};
+      if(ml>free){ml=free;msg=`Ыдыс толды: ${ml.toFixed(1)} мл қосылды.`;}
+      v.T=(v.T*Math.max(v.vol,0)+22*ml)/(v.vol+ml||1);
+      v.vol+=ml;
+      if(r.kind==='ind'){v.ind=r.id;note(v,'ind','Ерітіндіге индикатор қосылды: '+IND[r.id].name+'.','','ind');}
+      else for(const k in r.sp)I[k]=(I[k]||0)+r.c*ml/1000*r.sp[k];
+      v.pour={kind:r.kind,col:r.col,t:0,dur:r.kind==='ind'?.9:clamp(.7+ml/35,.7,1.8)};
+      return{ml,msg};
+    }
+    const mol=amt/r.M;
+    if(r.diss){for(const k in r.sp)I[k]=(I[k]||0)+r.sp[k]*mol;note(v,'diss-'+r.id,`${r.name} суда ериді.`,'','');}
+    else{v.solids[r.key]=(v.solids[r.key]||0)+mol;v.piece[r.key]=true;v.pieceInit[r.key]=Math.max(v.pieceInit[r.key]||0,v.solids[r.key]);
+      if(r.id==='na'&&v.vol<.5)note(v,'dryna','Натрий сусыз түбінде жатыр: реакция жоқ.','','');}
+    v.pour={kind:'solid',col:r.col,t:0,dur:.55};
+    return{g:amt,msg:''};
+  }
+
+  /* ---- instant ionic rules ---- */
+  function instant(v){
+    const I=v.ions,S=v.solids,V=v.vol/1000;let ch=false;
+    if(V<=0)return false;
+    const g=k=>I[k]||0,ad=(k,n)=>{I[k]=(I[k]||0)+n;if(I[k]<1e-12)I[k]=0;},sd=(k,n)=>{S[k]=(S[k]||0)+n;if(S[k]<1e-12)S[k]=0;};
+    const useAcid=n=>{const a=Math.min(g('H'),n);ad('H',-a);const b=n-a;if(b>0){ad('HAc',-b);ad('Ac',b);}};
+    const acid=()=>g('H')+g('HAc');
+    const born=(key,u)=>{v.susp[key]=(v.susp[key]||0)+u;v.spawn.push({key,n:u});};
+    let n;
+    // acid-base
+    n=Math.min(g('H'),g('OH'));
+    if(n>E){ad('H',-n);ad('OH',-n);heat(v,n*55800);v.flags.neut=true;ch=true;note(v,'neut','Бейтараптану реакциясы: ерітінді қызады.','H^+ + OH^- → H2O','neut');}
+    n=Math.min(g('HAc'),g('OH'));
+    if(n>E){ad('HAc',-n);ad('OH',-n);ad('Ac',n);heat(v,n*56000);ch=true;v.flags.neut=true;note(v,'neutac','Сірке қышқылы сілтімен бейтараптанады.','CH3COOH + OH^- → CH3COO^- + H2O','neut');}
+    n=Math.min(g('NH3'),g('H'));
+    if(n>E){ad('NH3',-n);ad('H',-n);ad('NH4',n);heat(v,n*52000);ch=true;v.flags.neut=true;note(v,'nh3h','Аммиак қышқылды байланыстырады.','NH3 + H^+ → NH4^+','neut');}
+    n=Math.min(g('HCO3'),g('OH'));
+    if(n>E){ad('HCO3',-n);ad('OH',-n);ad('CO3',n);ch=true;note(v,'hco3oh','Гидрокарбонат карбонатқа айналады.','HCO3^- + OH^- → CO3^2- + H2O','');}
+    // carbonates + acid
+    n=Math.min(acid(),g('CO3'));
+    if(n>E){useAcid(n);ad('CO3',-n);ad('HCO3',n);ch=true;}
+    n=Math.min(acid(),g('HCO3'));
+    if(n>E){useAcid(n);ad('HCO3',-n);gas(v,'CO2',n);ch=true;v.flags.co2=true;note(v,'co2','Көмірқышқыл газы қарқынды бөлінеді.','HCO3^- + H^+ → H2O + CO2↑','co2');}
+    // Fe3+ with carbonates: mutual hydrolysis
+    n=Math.min(g('Fe3')/2,g('CO3')/3);
+    if(n>E){ad('Fe3',-2*n);ad('CO3',-3*n);sd('Fe(OH)3',2*n);born('Fe(OH)3',2*n);gas(v,'CO2',3*n);ch=true;note(v,'fecarb','Қоңыр тұнба түзіліп, газ бөлінеді: бірлескен гидролиз.','2Fe^3+ + 3CO3^2- + 3H2O → 2Fe(OH)3↓ + 3CO2↑','co2');}
+    n=Math.min(g('Fe3'),g('HCO3')/3);
+    if(n>E){ad('Fe3',-n);ad('HCO3',-3*n);sd('Fe(OH)3',n);born('Fe(OH)3',n);gas(v,'CO2',3*n);ch=true;note(v,'fecarb2','Қоңыр тұнба түзіліп, газ бөлінеді.','Fe^3+ + 3HCO3^- → Fe(OH)3↓ + 3CO2↑','co2');}
+    // ammonia as a base for hydroxides
+    for(const[c,z,nm]of[['Cu',2,'Cu(OH)2'],['Fe3',3,'Fe(OH)3'],['Fe2',2,'Fe(OH)2'],['Zn',2,'Zn(OH)2'],['Pb',2,'Pb(OH)2']]){
+      n=Math.min(g(c),g('NH3')/z);
+      if(n>E){ad(c,-n);ad('NH3',-z*n);ad('NH4',z*n);sd(nm,n);born(nm,n);ch=true;
+        const row=PREC.find(r=>r[4]===nm);note(v,'amm-'+c,'Аммиак ерітіндісімен: '+row[6]+'.',`${ION_FMT[c]} + ${z}NH3 + ${z}H2O → ${nm}↓ + ${z}NH4^+`,c==='Cu'?'cu-oh':'');}
+    }
+    // redox, fast
+    n=Math.min(g('Cu')/2,g('I')/4);
+    if(n>E){ad('Cu',-2*n);ad('I',-4*n);sd('CuI',2*n);born('CuI',2*n);ad('I2',n);ch=true;note(v,'cui','CuI ақ тұнбасы түзіледі, ерітінді йодтан қоңырланады.','2Cu^2+ + 4I^- → 2CuI↓ + I2','redox');}
+    n=Math.min(g('Fe3')/2,g('I')/2);
+    if(n>E){ad('Fe3',-2*n);ad('I',-2*n);ad('Fe2',2*n);ad('I2',n);ch=true;note(v,'fei','Темір(III) иондары йодидті тотықтырады: ерітінді қоңырланады.','2Fe^3+ + 2I^- → 2Fe^2+ + I2','redox');}
+    n=Math.min(g('MnO4')/2,g('H2O2')/5,g('H')/6);
+    if(n>E){ad('MnO4',-2*n);ad('H2O2',-5*n);ad('H',-6*n);ad('Mn',2*n);gas(v,'O2',5*n);heat(v,n*400000);ch=true;note(v,'mnh2o2','Күлгін түс жоғалады, оттек бөлінеді.','2MnO4^- + 5H2O2 + 6H^+ → 2Mn^2+ + 5O2↑ + 8H2O','redox');}
+    n=Math.min(g('MnO4')/2,g('H2O2')/3);
+    if(n>E&&g('H')<1e-7){ad('MnO4',-2*n);ad('H2O2',-3*n);ad('OH',2*n);sd('MnO2',2*n);born('MnO2',2*n);gas(v,'O2',3*n);ch=true;note(v,'mnoh2o2','MnO2 қоңыр тұнбасы түзіліп, оттек бөлінеді.','2MnO4^- + 3H2O2 → 2MnO2↓ + 3O2↑ + 2OH^- + 2H2O','redox');}
+    n=Math.min(g('MnO4')/2,g('I')/10,g('H')/16);
+    if(n>E){ad('MnO4',-2*n);ad('I',-10*n);ad('H',-16*n);ad('Mn',2*n);ad('I2',5*n);ch=true;note(v,'mni','Ерітінді қоңырланады: йод бөлінеді.','2MnO4^- + 10I^- + 16H^+ → 2Mn^2+ + 5I2 + 8H2O','redox');}
+    n=Math.min(g('MnO4'),g('Fe2')/5,g('H')/8);
+    if(n>E){ad('MnO4',-n);ad('Fe2',-5*n);ad('H',-8*n);ad('Mn',n);ad('Fe3',5*n);ch=true;note(v,'mnfe','Күлгін түс жоғалады: Fe(II) Fe(III)-ке дейін тотығады.','MnO4^- + 5Fe^2+ + 8H^+ → Mn^2+ + 5Fe^3+ + 4H2O','redox');}
+    // complexes
+    n=Math.min(g('Fe3'),g('SCN'));
+    if(n>E){ad('Fe3',-n);ad('SCN',-n);ad('FeSCN',n);ch=true;note(v,'fescn','Комплекстің қан-қызыл түсі пайда болады.','Fe^3+ + SCN^- → [Fe(SCN)]^2+','fescn');}
+    n=Math.min(S['Cu(OH)2']||0,g('NH3')/4);
+    if(n>E){sd('Cu(OH)2',-n);ad('NH3',-4*n);ad('CuNH3',n);ad('OH',2*n);v.susp['Cu(OH)2']=Math.min(v.susp['Cu(OH)2']||0,S['Cu(OH)2']||0);ch=true;note(v,'cunh3','Аммиак артық болғанда тұнба ериді: ашық көк комплекс.','Cu(OH)2 + 4NH3 → [Cu(NH3)4]^2+ + 2OH^-','cu-complex');}
+    n=Math.min(S['AgCl']||0,g('NH3')/2);
+    if(n>E){sd('AgCl',-n);ad('NH3',-2*n);ad('AgNH3',n);ad('Cl',n);v.susp.AgCl=Math.min(v.susp.AgCl||0,S.AgCl||0);ch=true;note(v,'agnh3','AgCl тұнбасы аммиакта ериді.','AgCl + 2NH3 → [Ag(NH3)2]^+ + Cl^-','ag-complex');}
+    n=Math.min(g('Ag'),g('NH3')/2);
+    if(n>E&&g('Cl')<E){ad('Ag',-n);ad('NH3',-2*n);ad('AgNH3',n);ch=true;}
+    n=Math.min(g('AgNH3'),g('H')/2);
+    if(n>E){ad('AgNH3',-n);ad('H',-2*n);ad('Ag',n);ad('NH4',2*n);ch=true;note(v,'agnh3h','Қышқыл комплексті бұзады: күміс қайта тұнбаға түседі.','[Ag(NH3)2]^+ + 2H^+ → Ag^+ + 2NH4^+','');}
+    n=Math.min(g('CuNH3'),g('H')/4);
+    if(n>E){ad('CuNH3',-n);ad('H',-4*n);ad('Cu',n);ad('NH4',4*n);ch=true;note(v,'cunh3h','Көк комплекс қышқылмен бұзылады.','[Cu(NH3)4]^2+ + 4H^+ → Cu^2+ + 4NH4^+','');}
+    n=Math.min(S['Zn(OH)2']||0,g('OH')/2);
+    if(n>E){sd('Zn(OH)2',-n);ad('OH',-2*n);ad('ZnOH4',n);v.susp['Zn(OH)2']=Math.min(v.susp['Zn(OH)2']||0,S['Zn(OH)2']||0);ch=true;note(v,'znoh','Мырыш гидроксиді амфотерлі: сілті артық болғанда тұнба ериді.','Zn(OH)2 + 2OH^- → [Zn(OH)4]^2-','amph');}
+    n=Math.min(g('ZnOH4'),g('H')/2);
+    if(n>E){ad('ZnOH4',-n);ad('H',-2*n);sd('Zn(OH)2',n);born('Zn(OH)2',n);ch=true;note(v,'znohh','Қышқыл мырыш гидроксидінің тұнбасын қайтарады.','[Zn(OH)4]^2- + 2H^+ → Zn(OH)2↓ + 2H2O','amph');}
+    // precipitation / dissolution by Ksp
+    for(const r of PREC){
+      const[c,a,nc,na,key,col,txt,ksp]=r;
+      const C=g(c),A=g(a);
+      if(!ksp){
+        const u=Math.min(C/nc,A/na);
+        if(u>E){ad(c,-u*nc);ad(a,-u*na);sd(key,u);born(key,u);ch=true;
+          note(v,'p-'+key,txt[0].toUpperCase()+txt.slice(1)+'.',`${nc>1?nc:''}${ION_FMT[c]} + ${na>1?na:''}${ION_FMT[a]} → ${key}↓`,key==='AgCl'?'agcl':key==='BaSO4'?'baso4':key==='Cu(OH)2'?'cu-oh':key==='PbI2'?'pbi2':'prec');}
+        continue;
+      }
+      const kT=typeof ksp==='function'?ksp(v.T):ksp,sol=S[key]||0;
+      if(C<E&&sol<E)continue;
+      const f=x=>Math.pow(Math.max(0,C-nc*x)/V,nc)*Math.pow(Math.max(0,A-na*x)/V,na)-kT;
+      let lo=-sol,hi=Math.min(C/nc,A/na),x=0;
+      if(f(0)>0){if(hi<=E)continue;if(f(hi)>0)x=hi;else{let a0=0,b0=hi;for(let i=0;i<50;i++){const m=(a0+b0)/2;if(f(m)>0)a0=m;else b0=m;}x=(a0+b0)/2;}}
+      else{if(sol<E)continue;if(f(lo)<0)x=lo;else{let a0=lo,b0=0;for(let i=0;i<50;i++){const m=(a0+b0)/2;if(f(m)>0)a0=m;else b0=m;}x=(a0+b0)/2;}}
+      if(Math.abs(x)<2e-8)continue;
+      ad(c,-x*nc);ad(a,-x*na);sd(key,x);ch=true;
+      if(x>0){
+        born(key,x);
+        if(key==='PbI2'&&v.flags.pbHot&&x>.00002){v.fx.sparkle=1;v.flags.pbHot=false;v.flags.gold=v.t;note(v,'gold','«Алтын жаңбыр»: суығанда қорғасын йодиді жылтыр алтын түсті қабыршақтар болып кристалданады.','PbI2(ер.) → PbI2↓ (кристалдар)','goldenrain');}
+        else note(v,'p-'+key,txt[0].toUpperCase()+txt.slice(1)+'.',`${ION_FMT[c]} + ${ION_FMT[a]} → ${key}↓`,key==='PbI2'?'pbi2':'prec');
+      }else{
+        v.susp[key]=Math.min(v.susp[key]||0,S[key]||0);
+        if(key==='PbI2'&&(S[key]||0)<sol*.35&&v.T>60)v.flags.pbHot=true;
+        if(key==='PbI2')note(v,'pbd','Қыздырғанда PbI2 сары тұнбасы ериді.','PbI2↓ → Pb^2+ + 2I^-','');
+        else note(v,'d-'+key,`${key} тұнбасы сұйылтқанда немесе қыздырғанда ішінара ериді.`,'','');
+      }
+    }
+    return ch;
+  }
+
+  /* ---- kinetic rules (rates in 1/s) ---- */
+  function kinetic(v,dt){
+    const I=v.ions,S=v.solids,V=v.vol/1000;if(V<=0)return;
+    const g=k=>I[k]||0,ad=(k,n)=>{I[k]=(I[k]||0)+n;if(I[k]<1e-12)I[k]=0;},sd=(k,n)=>{S[k]=(S[k]||0)+n;if(S[k]<1e-12)S[k]=0;};
+    const tf=Math.pow(2,(v.T-22)/12)*(v.stir?1.6:1);
+    // sodium
+    if((S.Na||0)>E&&v.vol>.5){
+      const m=S.Na*(1-Math.exp(-1.6*dt));
+      S.Na-=m;ad('Na',m);ad('OH',m);gas(v,'H2',m/2);heat(v,m*185000);
+      v.fx.flame=Math.max(v.fx.flame,clamp(.4+S.Na*23*.4,.4,1));v.fx.shake=Math.max(v.fx.shake,.8);
+      note(v,'na','Натрий бетінде жүгіріп, балқиды және сумен қарқынды әрекеттеседі. Ерітінді сілтілі болады.','2Na + 2H2O → 2Na^+ + 2OH^- + H2↑','na');
+    }
+    // metals
+    for(const m in MET){
+      const M=MET[m];let avail=S[m]||0;if(avail<E)continue;
+      let budget=avail*(1-Math.exp(-M.k*tf*dt));
+      for(const o of OX){
+        if(!(M.E<o.E)||budget<1e-12)continue;
+        const conc=g(o.id)/V;if(conc<=1e-6)continue;
+        const surf=Math.min(1,conc/.05)*(o.slow||1);
+        const mUsed=Math.min(budget*surf,g(o.id)*o.n/M.z,avail);
+        if(mUsed<1e-11)continue;
+        const e=mUsed*M.z;
+        sd(m,-mUsed);ad(M.ion,mUsed);ad(o.id,-e/o.n);budget-=mUsed;
+        heat(v,96485*(o.E-M.E)*e);
+        const zc=M.z/o.n,cm=zc>1?zc:'';
+        const mf=m==='Fe'?'Fe^2+':ION_FMT[M.ion];
+        if(o.id==='H'||o.id==='HAc'){
+          if(o.id==='HAc')ad('Ac',e);
+          gas(v,'H2',e/2);
+          note(v,`m-${m}-${o.id}`,`${m} ериді, сутек бөлінеді.`,o.id==='H'?`${m} + 2H^+ → ${mf} + H2↑`:`${m} + 2CH3COOH → ${mf} + 2CH3COO^- + H2↑`,'h2');
+        }else if(o.id==='Fe3'){ad('Fe2',e);note(v,`m-${m}-Fe3`,'Темір(III) темір(II)-ге дейін тотықсызданады, сары түс әлсірейді.',`${m} + 2Fe^3+ → ${mf} + 2Fe^2+`,'');}
+        else{
+          const dep=o.id,k=e/o.n;sd(dep,k);v.susp[dep]=(v.susp[dep]||0)+k*.15;
+          const txt=dep==='Cu'?`${m} бетіне қызыл-қоңыр мыс отырады, көгілдір түс солғындайды.`:dep==='Ag'?`${m} бетінде күміс түсті кристалдар өседі («күміс ағаш»).`:`${m} бетіне сұр қорғасын отырады («қорғасын ағаш»).`;
+          note(v,`m-${m}-${dep}`,txt,`${m} + ${cm}${ION_FMT[dep]} → ${mf} + ${cm}${dep}↓`,dep==='Cu'?'cu-displace':dep==='Ag'?'ag-tree':'');
+        }
+      }
+    }
+    // copper + nitric acid
+    if((S.Cu||0)>E&&g('NO3')>E&&g('H')/V>.25){
+      const m=Math.min(S.Cu*(1-Math.exp(-.07*tf*dt)),g('H')*3/8,g('NO3')*3/2);
+      if(m>1e-11){sd('Cu',-m);ad('Cu',m);ad('H',-m*8/3);ad('NO3',-m*2/3);gas(v,'NOx',m*2/3);heat(v,m*90000);v.fx.heat=1;
+        note(v,'cuhno3','Мыс ериді, ерітінді көгереді, үстінде NO2 қоңыр газы пайда болады.','3Cu + 8H^+ + 2NO3^- → 3Cu^2+ + 2NO↑ + 4H2O  (2NO + O2 → 2NO2)','nox');}
+    }
+    // hydroxides/carbonates + acid
+    for(const d of DISS){
+      const s=S[d.key]||0;if(s<E)continue;
+      const need=d.an==='OH'?d.na:2*d.na,avail=g('H')+g('HAc');if(avail<E)continue;
+      const surf=Math.min(1,(g('H')+.25*g('HAc'))/V/.04);
+      const k=(d.an==='CO3'?.45:1.6)*tf*surf;
+      const m=Math.min(s,avail/need,s*(1-Math.exp(-k*dt)));
+      if(m<1e-11)continue;
+      const a1=Math.min(g('H'),m*need);ad('H',-a1);const b=m*need-a1;if(b>0){ad('HAc',-b);ad('Ac',b);}
+      sd(d.key,-m);ad(d.cat,m*d.nc);v.susp[d.key]=Math.min(v.susp[d.key]||0,S[d.key]||0);
+      if(d.an==='CO3'){gas(v,'CO2',m*d.na);note(v,'dc-'+d.key,`${d.key} қышқылда көмірқышқыл газын бөліп ериді.`,`${d.key} + 2H^+ → ${d.nc>1?d.nc:''}${ION_FMT[d.cat]} + CO2↑ + H2O`,'co2');
+        if(d.key==='CaCO3')v.flags.chalk=true;}
+      else note(v,'dh-'+d.key,`${d.key} тұнбасы қышқылда ериді.`,`${d.key} + ${need}H^+ → ${d.nc>1?d.nc:''}${ION_FMT[d.cat]} + H2O`,'');
+      heat(v,m*need*30000);
+    }
+    // peroxide catalysis by iodide
+    if(g('H2O2')>E&&g('I')/V>.002){
+      const m=g('H2O2')*(1-Math.exp(-.9*tf*dt));
+      ad('H2O2',-m);gas(v,'O2',m/2);heat(v,m*98000);v.fx.foam=1;
+      note(v,'cat','Йодид-ион сутек пероксидінің ыдырауын катализдейді: қатты көпіршіп, ерітінді қызады.','2H2O2 →(I^-) 2H2O + O2↑','catalysis');
+    }
+  }
+
+  function releaseGas(v,dt){
+    let tot=0,best=0,kind=null;
+    for(const k in v.gas){
+      const p=v.gas[k];if(p<1e-10){v.gas[k]=0;continue;}
+      const out=p*(1-Math.exp(-dt/1.5));v.gas[k]-=out;tot+=out;if(out>best){best=out;kind=k;}
+    }
+    const flux=tot/Math.max(dt,1e-3);
+    v.fx.gas=Math.min(300,flux*7000);v.fx.gasKind=kind||v.fx.gasKind;
+    v.fx.foam=Math.max(v.fx.foam,Math.min(.9,v.fx.gas/180));
+  }
+
+  /* ---- thermal ---- */
+  function thermal(v,dt){
+    const P=500;
+    if(v.vol<=.01){v.T+=(22-v.T)*.05*dt;return;}
+    if(v.mode==='heat'){
+      if(v.vol<=3){v.mode='off';v.dry=true;note(v,'dry','Қыздыру тоқтатылды: сұйықтық буланып, құрғақ қалдық қалды.','','dry');}
+      else if(v.T<100)v.T+=P/(4.18*v.vol)*dt;
+      else{v.T=100;v.vol=Math.max(3,v.vol-.9*dt);v.flags.boil=true;}
+    }else if(v.mode==='ice'){v.T+=(1-v.T)*.12*dt;}
+    else v.T+=(22-v.T)*.012*dt;
+    v.exAcc=(v.exAcc||0)*Math.exp(-dt/.6);
+    if(v.T>100){ // excess reaction energy boils off water
+      const ex=(v.T-100)*4.18*Math.max(v.vol,3);v.T=100;v.exAcc+=ex;
+      v.vol=Math.max(.5,v.vol-ex/2260*.5);v.flags.boil=true;v.fx.heat=1;
+      if(v.exAcc>VESSELS[v.type].limit&&!v.broken)shatter(v);
+    }
+    if(v.T<1)v.T=1;
+    if(v.mode==='off'&&v.T<98)v.flags.boil=false;
+  }
+  function shatter(v){
+    v.broken=true;v.events.push({text:'Ыдыс шыдамады: кенет қатты қызу шыныны жарып жіберді. Нағыз зертханада мұндай тәжірибені тек қорғаныш экранының артында және аз мөлшермен жасайды.',eq:'',tag:'broken',warn:true});
+    v.tags.add('broken');v.ions={};v.solids={};v.gas={};v.susp={};v.piece={};v.vol=0;v.mode='off';v.stir=false;v.fx.flame=0;v.fx.shake=1;v.shard=1;
+  }
+
+  /* ---- pH from charge balance with weak acid/base systems ---- */
+  function calcPH(v){
+    const V=v.vol/1000;if(V<5e-4)return null;
+    const I=v.ions,c=k=>(I[k]||0)/V,weak={HAc:1,Ac:1,NH3:1,NH4:1,CO3:1,HCO3:1};
+    let Q=0;for(const k in I){if(k==='H'||k==='OH'||weak[k])continue;Q+=(CHG[k]||0)*c(k);}
+    const Tac=c('HAc')+c('Ac'),Tn=c('NH3')+c('NH4'),Tc=c('CO3')+c('HCO3');
+    const hy=[];for(const k in HYD){const t=c(k);if(t>0)hy.push([t,Math.pow(10,-HYD[k])]);}
+    const Ka=1.8e-5,Kn=5.6e-10,K1=4.45e-7,K2=4.7e-11,Kw=1e-14;
+    const F=x=>{
+      let s=x-Kw/x+Q;
+      s-=Tac*Ka/(Ka+x);s+=Tn*x/(x+Kn);
+      const D=x*x+K1*x+K1*K2;s-=Tc*(K1*x+2*K1*K2)/D;
+      for(const[t,ka]of hy)s-=t*ka/(ka+x);
+      return s;
+    };
+    let a=-1.5,b=15.5;
+    for(let i=0;i<48;i++){const m=(a+b)/2;if(F(Math.pow(10,-m))>0)a=m;else b=m;}
+    return clamp((a+b)/2,0,14);
+  }
+  function liquidColor(v){
+    const V=v.vol/1000;if(V<=0)return v.color;
+    const L=[];
+    for(const k in SPC){const n=v.ions[k]||0;if(n>0)L.push([SPC[k].c,1-Math.exp(-SPC[k].k*n/V)]);}
+    if(v.ind&&v.pH!=null){const ic=IND[v.ind].color(v.pH);if(ic)L.push([ic.c,ic.s]);}
+    for(const k in v.susp){const s=v.susp[k]||0;if(s>0&&SOLID[k])L.push([SOLID[k].c,(1-Math.exp(-70*s/V))*.9]);}
+    let keep=1,r=0,g=0,b=0,w=0;
+    for(const l of L){keep*=1-l[1];r+=l[0][0]*l[1];g+=l[0][1]*l[1];b+=l[0][2]*l[1];w+=l[1];}
+    if(w<1e-4)return{r:150,g:205,b:235,a:.22};
+    return{r:r/w,g:g/w,b:b/w,a:1-.78*keep};
+  }
+
+  function step(v,dt){
+    v.t+=dt;if(v.broken){v.fx.shake=Math.max(0,v.fx.shake-dt*2);return;}
+    v.fx.heat=Math.max(0,v.fx.heat-dt);v.fx.flame=Math.max(0,v.fx.flame-dt*2.5);v.fx.shake=Math.max(0,v.fx.shake-dt*3);v.fx.sparkle=Math.max(0,v.fx.sparkle-dt/9);
+    v.fx.foam=Math.max(0,v.fx.foam-dt*.4);
+    thermal(v,dt);
+    for(let i=0;i<5&&instant(v);i++);
+    kinetic(v,dt);
+    for(let i=0;i<3&&instant(v);i++);
+    releaseGas(v,dt);
+    const tau0=v.stir?60:16;
+    for(const k in v.susp){const tau=SOLID[k]&&SOLID[k].gel?tau0*2.2:tau0;v.susp[k]=Math.min(v.susp[k]*Math.exp(-dt/tau),v.solids[k]||0);if(v.susp[k]<1e-9)delete v.susp[k];}
+    if(v.vol>.2&&Object.keys(v.solids).every(k=>(v.solids[k]||0)<1e-10))v.flags.sol=false;
+    if(v.T>60&&v.solids.PbI2)v.flags.pbHotTry=true;
+    v.pH=calcPH(v);v.color=liquidColor(v);
+    // task helpers
+    if(v.ind==='phph'&&v.pH!=null){
+      if(v.pH>9.2)v.flags.pink=true;
+      if(v.flags.pink&&v.flags.neut&&v.pH>6&&v.pH<7.9&&(v.ions.Na||v.ions.K)&&v.ions.Cl){v.tags.add('neutralized');}
+    }
+    if(v.flags.chalk&&v.flags.co2&&v.ions.Ca>E*100)v.tags.add('marble');
+  }
+  function composition(v){
+    const V=v.vol/1000,out={ions:[],solids:[]};if(V<=0)return out;
+    for(const k in v.ions){const c=v.ions[k]/V;if(c>1e-5&&ION_FMT[k]&&k!=='H2O2'||(k==='H2O2'&&c>1e-5))out.ions.push([ION_FMT[k],c]);}
+    out.ions.sort((a,b)=>b[1]-a[1]);
+    for(const k in v.solids){const m=v.solids[k];if(m>1e-6)out.solids.push([k,m]);}
+    return out;
+  }
+  return{VESSELS,SOLID,PIECES,PREC,newVessel,add,step,levelOf,composition,cap,CHG,ION_FMT,MET,calcPH};
+})();
+
+'use strict';
+/* ===== Lab bench: shelf, stations, rendering ===== */
+const Lab=(()=>{
+  const LW=340,LH=400,CX=170,BY=330;
+  const S={stations:[],hand:{r:RBY.hcl,dose:10},speed:1,filter:'all',q:'',t0:performance.now(),done:new Set(),running:false,last:0};
+  try{const d=JSON.parse(localStorage.getItem('chemlab-tasks')||'[]');d.forEach(x=>S.done.add(x));}catch(e){}
+
+  const TASKS=[
+    {tag:'agcl',t:'Хлорид-ионға сапалық реакция',d:'Күміс нитраты AgNO3-ті натрий хлоридімен немесе тұз қышқылымен араластырыңыз.'},
+    {tag:'neutralized',t:'Индикатормен бейтараптау',d:'10 мл NaOH құйып, фенолфталеин қосыңыз (таңқурай түсі), содан кейін түссізденгенше HCl құйыңыз. Концентрациялары да, көлемдері де тең.'},
+    {tag:'co2',t:'«Жанартау»: содадан газ',d:'Ас содасын сірке немесе тұз қышқылына салып, көпіршуін бақылаңыз.'},
+    {tag:'cu-displace',t:'Орынбасу реакциясы',d:'Мырыш, темір немесе магнийді CuSO4 ерітіндісіне салыңыз. Металда қызыл мыс пайда болады.'},
+    {tag:'cu-complex',t:'Мыстың аммиакты комплексі',d:'CuSO4-ке аммиак қосыңыз: алдымен көгілдір тұнба, содан кейін ашық көк ерітінді.'},
+    {tag:'fescn',t:'Fe^3+ ионына сапалық реакция',d:'FeCl3-ті калий роданиді KSCN-мен араластырыңыз: қан-қызыл комплекс пайда болады.'},
+    {tag:'baso4',t:'Сульфат-ионға реакция',d:'BaCl2-ні күкірт қышқылына немесе мыс сульфатына құйыңыз.'},
+    {tag:'amph',t:'Мырыш гидроксидінің амфотерлігі',d:'ZnSO4-ке NaOH қосыңыз: ақ тұнба түзіледі. Тағы NaOH қоссаңыз, тұнба ериді.'},
+    {tag:'redox',t:'Тотығу-тотықсыздану реакциясы',d:'Қышқыл ортада KMnO4 + H2O2 (H2SO4 қосыңыз): күлгін түс жоғалып, оттек бөлінеді.'},
+    {tag:'catalysis',t:'Йодидпен катализ',d:'H2O2 мен KI араластырыңыз. Көпіршу мен қызу йодид жұмсалмай жүреді.'},
+    {tag:'goldenrain',t:'«Алтын жаңбыр»',d:'Pb(NO3)2 мен KI-ден PbI2 алыңыз, тұнба ерігенше қыздырыңыз, содан кейін суытыңыз («Мұз» тездетеді).'},
+    {tag:'na',t:'Сілтілік металл және су',d:'0.1 г натрийді су мен фенолфталеин құйылған стақанға салыңыз. Пробиркаға салуға болмайды.'},
+  ];
+
+  /* ---------- shelf ---------- */
+  function bottleSVG(col,kind){
+    const c=`rgb(${col[0]|0},${col[1]|0},${col[2]|0})`;
+    if(kind==='solid')return `<svg viewBox="0 0 28 34"><path d="M5 14h18v14a3 3 0 0 1-3 3H8a3 3 0 0 1-3-3z" fill="${c}" stroke="currentColor" stroke-width="1.4"/><path d="M9 14V9h10v5" fill="none" stroke="currentColor" stroke-width="1.4"/><path d="M7 3h14" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>`;
+    if(kind==='ind')return `<svg viewBox="0 0 28 34"><path d="M10 14h8v14a3 3 0 0 1-3 3h-2a3 3 0 0 1-3-3z" fill="${c}" stroke="currentColor" stroke-width="1.4"/><path d="M12 14V7h4v7M11 3h6v4h-6z" fill="none" stroke="currentColor" stroke-width="1.4"/></svg>`;
+    return `<svg viewBox="0 0 28 34"><path d="M9 13c-3 2-5 4-5 8v7a3 3 0 0 0 3 3h14a3 3 0 0 0 3-3v-7c0-4-2-6-5-8V7H9z" fill="${c}" fill-opacity=".85" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round"/><path d="M8 4h12" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/><path d="M8 20h12" stroke="currentColor" stroke-width="1" opacity=".5"/></svg>`;
+  }
+  function renderShelf(){
+    const list=$('#rlist');list.innerHTML='';
+    const q=S.q.trim().toLowerCase();
+    for(const[g,gn]of RGROUPS){
+      if(S.filter!=='all'&&S.filter!==g)continue;
+      const items=REAGENTS.filter(r=>r.cat===g&&(!q||(r.name+' '+r.f).toLowerCase().includes(q)));
+      if(!items.length)continue;
+      list.append(H('div',{class:'grp lbl'},gn));
+      for(const r of items){
+        const b=H('button',{class:'rg'+(S.hand.r===r?' sel':''),type:'button','data-id':r.id,title:'Алу үшін басыңыз. Ыдысқа сүйреп апаруға болады.'},
+          H('span',{html:bottleSVG(r.col,r.kind)}),
+          H('span',{style:'min-width:0'},H('div',{class:'n'},r.name),H('div',{class:'s',html:chem(r.f)})),
+          H('span',{class:'c'},r.kind==='liq'&&r.c?`${r.c} M`:r.kind==='solid'?'қатты':r.kind==='ind'?'тамшы':''));
+        b.addEventListener('click',()=>{select(r);});
+        b.addEventListener('pointerdown',e=>startDrag(e,r));
+        list.append(b);
+      }
+    }
+    if(!list.children.length)list.append(H('div',{class:'empty'},'Ештеңе табылмады.'));
+  }
+  function renderCats(){
+    const sel=$('#rcats');sel.innerHTML='';
+    for(const[k,n]of[['all','Барлық реактивтер'],...RGROUPS.filter(g=>g[0]!=='other')])sel.append(H('option',{value:k},n));
+    sel.value=S.filter;sel.onchange=()=>{S.filter=sel.value;renderShelf();};
+  }
+  function select(r){
+    S.hand.r=r;
+    S.hand.dose=r.kind==='solid'?(r.id==='na'?0.1:0.5):r.kind==='ind'?0:10;
+    renderShelf();renderHand();
+  }
+  function renderHand(){
+    const r=S.hand.r;
+    $('#handcur').innerHTML=`<span>${bottleSVG(r.col,r.kind)}</span><div><span class="lbl">Қолда</span><b>${r.name}</b><span class="muted mono" style="font-size:12px">${chem(r.f)}${r.kind==='liq'&&r.c?' · '+r.c+' моль/л':''}</span></div>`;
+    const box=$('#doses');box.innerHTML='';
+    if(r.kind==='ind'){box.append(H('span',{class:'muted'},'2 тамшы'));return;}
+    const arr=r.kind==='solid'?(r.id==='na'?[0.05,0.1,0.2,0.5,1]:DOSES_SOL):DOSES_LIQ;
+    for(const d of arr)box.append(H('button',{class:'chip'+(S.hand.dose===d?' on':''),type:'button',onclick:()=>{S.hand.dose=d;renderHand();}},d+(r.kind==='solid'?' г':' мл')));
+  }
+
+  /* ---------- drag from shelf ---------- */
+  let drag=null;
+  function startDrag(e,r){
+    if(e.pointerType==='touch'||e.button!==0)return;
+    drag={r,x:e.clientX,y:e.clientY,ghost:null,over:null};
+    document.addEventListener('pointermove',onDragMove);
+    document.addEventListener('pointerup',onDragEnd,{once:true});
+  }
+  function onDragMove(e){
+    if(!drag)return;
+    if(!drag.ghost){
+      if(Math.hypot(e.clientX-drag.x,e.clientY-drag.y)<6)return;
+      select(drag.r);
+      drag.ghost=H('div',{class:'ghost',html:bottleSVG(drag.r.col,drag.r.kind)});document.body.append(drag.ghost);
+    }
+    drag.ghost.style.left=e.clientX+'px';drag.ghost.style.top=e.clientY+'px';
+    const el=document.elementFromPoint(e.clientX,e.clientY),st=el&&el.closest('.station');
+    S.stations.forEach(s=>s.el.classList.toggle('drop',s.el===st));drag.over=st;
+  }
+  function onDragEnd(){
+    document.removeEventListener('pointermove',onDragMove);
+    if(drag&&drag.ghost){drag.ghost.remove();
+      const st=S.stations.find(s=>s.el===drag.over);if(st)addTo(st);}
+    S.stations.forEach(s=>s.el.classList.remove('drop'));drag=null;
+  }
+  function addTo(st){
+    const r=S.hand.r,res=Eng.add(st.v,r,S.hand.dose);
+    if(res.msg)flash(st,res.msg);
+    if(res.ml||res.g){
+      st.addLog=r.kind==='liq'?`+ ${res.ml.toFixed(res.ml<1?1:0)} мл: ${r.name}`:r.kind==='ind'?`+ индикатор: ${r.name}`:`+ ${res.g} г: ${r.name}`;
+      logAdd(st,{text:st.addLog,eq:'',tag:'',plain:true});
+    }
+    sync(st);
+  }
+
+  /* ---------- stations ---------- */
+  function mkStation(i){
+    const v=Eng.newVessel(i===0?'tube':i===1?'beaker':'flask');
+    const st={i,v,bub:[],steam:[],parts:[],sparks:[],shards:[],goldSeen:null,obsT:0,refr:0};
+    const seg=H('select',{class:'vsel','aria-label':'Ыдыс түрі',onchange:e=>setType(st,e.target.value)});
+    const names={tube:'Пробирка',beaker:'Стақан',flask:'Колба'};
+    for(const k in names)seg.append(H('option',{value:k},names[k]));
+    seg.value=v.type;
+    const cv=H('canvas',{width:680,height:800,'aria-label':'Зертханалық ыдыс '+(i+1)});
+    const obs=H('div',{class:'obs','aria-live':'polite'});
+    const cw=H('div',{class:'cwrap',onclick:()=>addTo(st),title:'Таңдалған реактивті қосу үшін басыңыз'},cv,obs);
+    const rT=H('b',{},'22 °C'),rPH=H('b',{},'—'),rV=H('b',{},'0 мл'),chip=H('i',{class:'phchip'});
+    const mk=(t,fn,cls='')=>H('button',{class:'btn sm '+cls,type:'button',onclick:fn},t);
+    const bHeat=mk('Қыздыру',()=>toggle(st,'heat')),bIce=mk('Мұз',()=>toggle(st,'ice')),bStir=mk('Араластырғыш',()=>{st.v.stir=!st.v.stir;sync(st);}),
+      bFilt=mk('Сүзгі',()=>{const v=st.v;for(const k in v.solids)if(!v.piece[k]||!Eng.PIECES.includes(k))delete v.solids[k];v.susp={};st.parts=[];flash(st,'Тұнба сүзілді.');sync(st);}),
+      bClr=mk('Төгу',()=>{st.v=Eng.newVessel(st.v.type);st.bub=[];st.steam=[];st.parts=[];st.shards=[];flash(st,'Ыдыс тазартылды.');sync(st);});
+    const comp=H('div',{class:'comp'});
+    const el=H('article',{class:'station panel'},
+      H('header',{},H('b',{},'Ыдыс '+(i+1)),seg),cw,
+      H('div',{class:'read'},H('span',{title:'Температура'},rT),H('span',{title:'Қышқылдық'},'pH ',rPH,chip),H('span',{title:'Көлем'},rV)),
+      H('div',{class:'sbtns'},bHeat,bIce,bClr),
+      H('details',{class:'more'},H('summary',{},'Тағы: араластырғыш, сүзгі, құрамы'),H('div',{class:'sbtns'},bStir,bFilt),comp));
+    Object.assign(st,{el,cv,cw,obs,rT,rPH,rV,chip,bHeat,bIce,bStir,seg,comp});
+    return st;
+  }
+  function toggle(st,m){st.v.mode=st.v.mode===m?'off':m;if(st.v.mode==='off'&&m==='heat')st.v.dry=false;sync(st);}
+  function setType(st,k){
+    const v=st.v;if(v.broken){return;}
+    if(v.vol>Eng.VESSELS[k].cap){flash(st,'Ішіндегісі бұл ыдысқа сыймайды.');return;}
+    v.type=k;st.bub=[];st.parts=[];sync(st);
+  }
+  function flash(st,text){st.obs.textContent=text;st.obs.classList.add('show');clearTimeout(st.obsT);st.obsT=setTimeout(()=>st.obs.classList.remove('show'),5200);}
+  function sync(st){
+    const v=st.v;
+    st.seg.value=v.type;
+    st.bHeat.classList.toggle('on',v.mode==='heat');st.bIce.classList.toggle('on',v.mode==='ice');st.bStir.classList.toggle('on',v.stir);
+    readouts(st);
+  }
+  function readouts(st){
+    const v=st.v;
+    st.cw.classList.toggle('isempty',v.vol<=0&&!v.broken);
+    st.rT.textContent=v.T.toFixed(1)+' °C';
+    st.rV.textContent=(v.vol<10?v.vol.toFixed(1):v.vol.toFixed(0))+' мл';
+    st.rPH.firstChild.textContent=v.pH==null?'—':v.pH.toFixed(2);
+    st.chip.style.background=v.pH==null?'transparent':`rgb(${phRGB(v.pH).map(x=>x|0)})`;
+    if(st.el.querySelector('details').open){
+      const c=Eng.composition(v);st.comp.innerHTML='';
+      if(!c.ions.length&&!c.solids.length)st.comp.append(H('div',{class:'muted'},'Бос'));
+      c.ions.slice(0,9).forEach(([n,x])=>st.comp.append(H('div',{},H('span',{html:chem(n)}),H('span',{class:'mono'},x>=.1?x.toFixed(2)+' М':x.toExponential(1)+' М'))));
+      c.solids.forEach(([n,m])=>st.comp.append(H('div',{},H('span',{html:chem(n)+' (қ.)'}),H('span',{class:'mono'},(m*1000).toFixed(m<.01?2:1)+' ммоль'))));
+    }
+  }
+
+  /* ---------- journal & tasks ---------- */
+  function logAdd(st,ev){
+    const box=$('#log .entries');if(!box)return;
+    const t=Math.floor((performance.now()-S.t0)/1000),mm=String(Math.floor(t/60)).padStart(2,'0'),ss=String(t%60).padStart(2,'0');
+    const e=H('div',{class:'ent'+(ev.warn?' warn':'')},H('div',{class:'m'},`${mm}:${ss} · Ыдыс ${st.i+1}${ev.plain?' · әрекет':''}`),H('div',{html:chem(ev.text)}));
+    if(ev.eq)e.append(H('div',{class:'q',html:chem(ev.eq)}));
+    if(ev.plain)e.style.borderLeftColor='var(--line)';
+    const first=box.firstChild;if(first&&first.classList&&first.classList.contains('empty'))first.remove();
+    box.prepend(e);while(box.children.length>80)box.lastChild.remove();
+    if(!ev.plain)flash(st,ev.text);
+  }
+  function renderTasks(){
+    const box=$('#tasks');box.innerHTML='';
+    box.append(H('summary',{},H('b',{},'Тапсырмалар'),H('span',{class:'muted mono',style:'font-size:12px'},`${S.done.size} / ${TASKS.length}`)));
+    for(const t of TASKS)box.append(H('div',{class:'task'+(S.done.has(t.tag)?' done':''),'data-tag':t.tag},H('i',{},S.done.has(t.tag)?'✓':''),H('div',{},H('b',{html:chem(t.t)}),H('span',{html:chem(t.d)}))));
+  }
+  function mark(tag){
+    if(!tag||S.done.has(tag)||!TASKS.some(t=>t.tag===tag))return;
+    S.done.add(tag);try{localStorage.setItem('chemlab-tasks',JSON.stringify([...S.done]));}catch(e){}
+    renderTasks();
+    const t=TASKS.find(x=>x.tag===tag);
+    const box=$('#log .entries');if(box){const e=H('div',{class:'ent',style:'border-left-color:var(--good)'},H('div',{class:'m'},'Практикум'),H('div',{html:'✓ Тапсырма орындалды: '+chem(t.t)}));box.prepend(e);}
+  }
+  function renderLog(){
+    const box=$('#log');box.innerHTML='';
+    box.append(H('h3',{},'Бақылау журналы',H('span',{class:'row'},
+      H('button',{class:'btn sm',type:'button',onclick:()=>{const txt=$$('#log .ent').reverse().map(e=>e.innerText.replace(/\n+/g,' | ')).join('\n');
+        try{navigator.clipboard.writeText(txt).catch(()=>{});}catch(e){}}},'Көшіру'),
+      H('button',{class:'btn sm',type:'button',onclick:()=>{$('#log .entries').innerHTML='<div class="empty">Журнал тазартылды.</div>';}},'Тазарту'))));
+    box.append(H('div',{class:'entries'},H('div',{class:'empty'},'Мұнда бақылаулар мен реакция теңдеулері шығады.')));
+  }
+
+  /* ---------- rendering ---------- */
+  function outline(ctx,type,off){
+    const V=Eng.VESSELS[type];ctx.beginPath();
+    let first=true;
+    for(let y=V.H;y>=0;y-=3){const hw=V.w(y)/2+off;if(first){ctx.moveTo(CX-hw,BY-y);first=false;}else ctx.lineTo(CX-hw,BY-y);}
+    for(let y=0;y<=V.H;y+=3)ctx.lineTo(CX+V.w(y)/2+off,BY-y);
+  }
+  function seeded(n){let s=n*9301+49297;return()=>{s=(s*9301+49297)%233280;return s/233280;};}
+  function chunk(ctx,x,y,r,col,seed,coat){
+    const R=seeded(seed),n=7;ctx.beginPath();
+    for(let i=0;i<n;i++){const a=i/n*Math.PI*2,rr=r*(.72+R()*.45);const px=x+Math.cos(a)*rr,py=y+Math.sin(a)*rr*.8;i?ctx.lineTo(px,py):ctx.moveTo(px,py);}
+    ctx.closePath();
+    const g=ctx.createLinearGradient(x-r,y-r,x+r,y+r);g.addColorStop(0,rgba(col.map(c=>Math.min(255,c+40)),1));g.addColorStop(1,rgba(col.map(c=>c*.7),1));
+    ctx.fillStyle=g;ctx.fill();ctx.strokeStyle='rgba(0,0,0,.35)';ctx.lineWidth=1;ctx.stroke();
+    if(coat&&coat.a>.02){ctx.fillStyle=rgba(coat.c,coat.a);ctx.fill();}
+  }
+  function draw(st,t,dt){
+    const v=st.v,ctx=fitCanvas(st.cv,LW,LH),V=Eng.VESSELS[v.type];
+    ctx.clearRect(0,0,LW,LH);
+    const sh=v.fx.shake;ctx.save();if(sh>0)ctx.translate(rnd(-1,1)*sh*3,rnd(-1,1)*sh*3);
+    // bench
+    ctx.fillStyle=rgba(TH.plate,.35);ctx.fillRect(0,BY+26,LW,LH-BY-26);
+    ctx.fillStyle=rgba(TH.fg,.08);ctx.fillRect(0,BY+26,LW,1.5);
+    // heater / ice
+    const pw=v.type==='tube'?60:v.type==='beaker'?170:190;
+    const hot=v.mode==='heat';
+    if(hot){const g=ctx.createRadialGradient(CX,BY+10,6,CX,BY+10,pw*.8);g.addColorStop(0,'rgba(255,120,40,.55)');g.addColorStop(1,'rgba(255,120,40,0)');ctx.fillStyle=g;ctx.fillRect(0,BY-40,LW,110);}
+    ctx.fillStyle=hot?'#c4552c':TH.plate;ctx.beginPath();ctx.roundRect?ctx.roundRect(CX-pw/2-14,BY+2,pw+28,22,5):ctx.rect(CX-pw/2-14,BY+2,pw+28,22);ctx.fill();
+    ctx.fillStyle=rgba(TH.fg,.25);ctx.fillRect(CX-pw/2-6,BY+10,pw+12,2);
+    if(v.mode==='ice'){const R=seeded(5);for(let i=0;i<10;i++){const x=CX-pw/2-18+R()*(pw+36),y=BY-4+R()*24;ctx.fillStyle='rgba(170,225,250,.55)';ctx.strokeStyle='rgba(220,245,255,.8)';ctx.save();ctx.translate(x,y);ctx.rotate(R()*1.4);ctx.fillRect(-7,-7,14,14);ctx.strokeRect(-7,-7,14,14);ctx.restore();}}
+    if(v.broken){ // shards
+      ctx.fillStyle=rgba(TH.fg,.5);ctx.font='13px Onest,sans-serif';ctx.textAlign='center';ctx.fillText('Ыдыс сынды',CX,BY-110);ctx.font='11px Onest,sans-serif';ctx.fillStyle=rgba(TH.muted,1);ctx.fillText('Жаңасын қою үшін «Төгу» басыңыз',CX,BY-92);
+      drawShards(ctx,st,dt);ctx.restore();return;
+    }
+    // liquid
+    const lvl=Eng.levelOf(v.type,v.vol),ytop=BY-lvl;
+    ctx.save();outline(ctx,v.type,0);ctx.closePath();ctx.clip();
+    if(v.vol>.05){
+      const c=v.color,amp=1.1+v.fx.gas/70+(v.stir?1.6:0)+(v.flags.boil?2:0);
+      const wv=x=>Math.sin(x*.07+t*2.1+v.seed)*amp+Math.sin(x*.16-t*3.3)*amp*.55;
+      ctx.beginPath();ctx.moveTo(CX-100,ytop+wv(CX-100));for(let x=CX-100;x<=CX+100;x+=4)ctx.lineTo(x,ytop+wv(x));ctx.lineTo(CX+100,BY+4);ctx.lineTo(CX-100,BY+4);ctx.closePath();
+      const g=ctx.createLinearGradient(0,ytop,0,BY);g.addColorStop(0,rgba([c.r,c.g,c.b],c.a));g.addColorStop(1,rgba([c.r*.82,c.g*.82,c.b*.86],Math.min(1,c.a+.12)));
+      ctx.fillStyle=g;ctx.fill();
+      ctx.strokeStyle=rgba([255,255,255],.45);ctx.lineWidth=1.2;ctx.beginPath();ctx.moveTo(CX-100,ytop+wv(CX-100));for(let x=CX-100;x<=CX+100;x+=4)ctx.lineTo(x,ytop+wv(x));ctx.stroke();
+    }
+    // sediment
+    let sh0=0;const maxS=Math.max(8,lvl*.55);
+    for(const k in v.solids){
+      if(v.piece[k]&&Eng.PIECES.includes(k))continue;
+      const mol=Math.max(0,(v.solids[k]||0)-(v.susp[k]||0));if(mol<1e-7||!Eng.SOLID[k])continue;
+      const th=Math.min(clamp(Math.sqrt(mol)*170,2.5,52),maxS-sh0);if(th<=0)continue;
+      const col=Eng.SOLID[k].c,R=seeded(k.length*7+Math.round(mol*1e4));
+      ctx.fillStyle=rgba(col,.97);ctx.fillRect(CX-100,BY-sh0-th+2,200,th+4);
+      ctx.fillStyle=rgba(col.map(c=>c*.8),.7);for(let i=0;i<th*1.5;i++)ctx.fillRect(CX-V.w(3)/2+R()*V.w(3),BY-sh0-th+R()*th,1.6,1.6);
+      sh0+=th;
+    }
+    st.sed=sh0;
+    // pieces
+    const pcs=[];
+    const dep=['Cu','Ag','Pb'].map(k=>[k,v.piece[k]?0:(v.solids[k]||0)]).sort((a,b)=>b[1]-a[1]);
+    const depTot=dep.reduce((a,b)=>a+b[1],0),depCol=dep[0][1]>0?Eng.SOLID[dep[0][0]].c:null;
+    for(const k of Eng.PIECES){
+      const m=v.solids[k]||0;if(!v.piece[k]||m<1e-7)continue;
+      const r=RBY[Object.keys(RBY).find(id=>RBY[id].key===k)],g=m*r.M,col=r.col;
+      if(k==='Na'){
+        const w=V.w(Math.max(lvl-2,5))/2-14,x=CX+Math.sin(t*1.7+v.seed)*w*Math.min(1,v.vol>.5?1:0),y=v.vol>.5?ytop-2:BY-8;
+        const rr=clamp(3+Math.cbrt(g)*7,3,13);chunk(ctx,x,y,rr,col,3,null);pcs.push({x,y:ytop,k});continue;
+      }
+      if(k==='Mg'){
+        const len=clamp(40+g*160,16,150),y0=BY-4;ctx.strokeStyle=rgba(col,1);ctx.lineWidth=4;ctx.lineCap='round';ctx.beginPath();
+        for(let i=0;i<=24;i++){const x=CX-len/2+len*i/24,y=y0-Math.abs(Math.sin(i*.55))*7;i?ctx.lineTo(x,y):ctx.moveTo(x,y);}ctx.stroke();
+        if(depCol&&depTot>0){ctx.strokeStyle=rgba(depCol,clamp(depTot/(v.pieceInit[k]||1),0,.9));ctx.stroke();}
+        pcs.push({x:CX,y:y0-4,k});continue;
+      }
+      if(k==='Fe'){
+        const f=Math.sqrt(m/(v.pieceInit[k]||m)),L=Math.min(150,V.H-40)*clamp(f,.15,1);
+        ctx.save();ctx.translate(CX-V.w(10)/2+14,BY-3);ctx.rotate(-1.1+(v.type==='tube'?.25:0));
+        ctx.fillStyle=rgba(col,1);ctx.fillRect(0,-3,L,6);ctx.fillRect(-4,-6,5,12);
+        if(depCol&&depTot>0){ctx.fillStyle=rgba(depCol,clamp(depTot/(v.pieceInit[k]||1)*1.2,0,.9));ctx.fillRect(0,-3,L,6);}
+        ctx.restore();pcs.push({x:CX-V.w(10)/2+24,y:BY-14,k});continue;
+      }
+      if(k==='Cu'){
+        const L=clamp(34+g*70,14,110);ctx.strokeStyle=rgba(col,1);ctx.lineWidth=3.5;ctx.lineCap='round';ctx.beginPath();
+        for(let i=0;i<=30;i++){const a=i*.9,x=CX-L/2+L*i/30,y=BY-8-Math.abs(Math.sin(a))*9;i?ctx.lineTo(x,y):ctx.moveTo(x,y);}ctx.stroke();pcs.push({x:CX,y:BY-12,k});continue;
+      }
+      const n=clamp(Math.ceil(g/.7),1,6),rr=clamp(4+Math.cbrt(g/n)*9,3,16),R=seeded(k.length+5);
+      const coat=depCol&&depTot>0&&(k==='Zn')?{c:depCol,a:clamp(depTot/((v.pieceInit[k]||1)*.8),0,.92)}:null;
+      for(let i=0;i<n;i++){const x=CX+(R()-.5)*(V.w(rr+8)-rr*2-8),y=BY-sh0-rr*.55-(i>2?rr*.9:0);chunk(ctx,x,y,rr,col,i*5+3,coat);pcs.push({x,y,k});}
+    }
+    st.pcs=pcs;
+    // particles
+    updateParts(st,dt,ytop,V);
+    for(const p of st.parts){
+      if(p.gl){const a=.45+.55*Math.abs(Math.sin(t*6+p.ph));ctx.save();ctx.translate(p.x,p.y);ctx.rotate(p.rot+t*p.vr);ctx.fillStyle=`rgba(255,${190+p.ph*8|0},40,${a})`;ctx.fillRect(-p.r,-p.r*.35,p.r*2,p.r*.7);ctx.restore();}
+      else{ctx.fillStyle=rgba(p.c,p.a);ctx.beginPath();ctx.arc(p.x,p.y,p.r,0,6.29);ctx.fill();}
+    }
+    // bubbles
+    updateBubbles(st,dt,ytop,V);
+    for(const b of st.bub){ctx.strokeStyle=b.brown?'rgba(150,80,30,.8)':'rgba(255,255,255,.75)';ctx.fillStyle=b.brown?'rgba(190,110,40,.25)':'rgba(255,255,255,.14)';ctx.lineWidth=1;ctx.beginPath();ctx.arc(b.x,b.y,b.r,0,6.29);ctx.fill();ctx.stroke();}
+    // stirrer rod inside
+    if(v.stir&&v.vol>.2){const a=t*5,x=CX+Math.cos(a)*Math.min(18,V.w(30)/2-14);ctx.strokeStyle=rgba(TH.glass,.8);ctx.lineWidth=3.5;ctx.lineCap='round';ctx.beginPath();ctx.moveTo(CX+50,BY-V.H-16);ctx.lineTo(x,BY-14);ctx.stroke();}
+    ctx.restore();
+    // foam above surface
+    if(v.foam>.02||v.fx.foam>.02){
+      v.foam+=(v.fx.foam-v.foam)*Math.min(1,dt*3);
+      const fh=v.foam*30,R=seeded(11);ctx.save();outline(ctx,v.type,0);ctx.closePath();ctx.clip();
+      for(let i=0;i<v.foam*60;i++){const w=V.w(lvl)/2,x=CX+(R()*2-1)*w,y=ytop-R()*fh+Math.sin(t*3+i)*1.2,r=2+R()*5;ctx.fillStyle='rgba(255,255,255,.55)';ctx.strokeStyle='rgba(180,200,210,.7)';ctx.beginPath();ctx.arc(x,y,r,0,6.29);ctx.fill();ctx.stroke();}
+      ctx.restore();
+    }
+    // glass
+    ctx.lineJoin='round';ctx.lineCap='round';
+    outline(ctx,v.type,2.5);ctx.strokeStyle=rgba(TH.glass,.9);ctx.lineWidth=2.6;ctx.stroke();
+    ctx.beginPath();for(let y=V.H*.2;y<V.H*.82;y+=4){const x=CX-V.w(y)/2+7;y===V.H*.2?ctx.moveTo(x,BY-y):ctx.lineTo(x,BY-y);}ctx.strokeStyle=rgba(TH.glasshi,TH.dark?.28:.7);ctx.lineWidth=3;ctx.stroke();
+    ctx.beginPath();ctx.moveTo(CX-V.w(V.H)/2-8,BY-V.H);ctx.lineTo(CX-V.w(V.H)/2-1,BY-V.H);ctx.moveTo(CX+V.w(V.H)/2+8,BY-V.H);ctx.lineTo(CX+V.w(V.H)/2+1,BY-V.H);ctx.strokeStyle=rgba(TH.glass,.9);ctx.lineWidth=2.6;ctx.stroke();
+    // graduation
+    ctx.font='9px "JetBrains Mono",monospace';ctx.textAlign='right';ctx.fillStyle=rgba(TH.glass,.85);ctx.strokeStyle=rgba(TH.glass,.7);ctx.lineWidth=1;
+    const step=v.type==='tube'?5:50,minor=v.type==='tube'?1:10;
+    for(let m=minor;m<=V.cap;m+=minor){const y=Eng.levelOf(v.type,m);if(y>V.H-6)break;const hw=V.w(y)/2,big=m%step===0;
+      ctx.beginPath();ctx.moveTo(CX+hw-(big?13:7),BY-y);ctx.lineTo(CX+hw-2,BY-y);ctx.stroke();if(big)ctx.fillText(m,CX+hw-16,BY-y+3);}
+    // thermometer
+    drawThermo(ctx,v);
+    // flame / steam / sparks
+    if(v.fx.flame>.05){const px=st.pcs&&st.pcs.find(p=>p.k==='Na');if(px)drawFlame(ctx,px.x,ytop-6,v.fx.flame,t);}
+    updateSteam(st,dt,ytop,V);
+    for(const s of st.steam){ctx.fillStyle=rgba(TH.dark?[220,230,235]:[120,140,150],s.a);ctx.beginPath();ctx.arc(s.x,s.y,s.r,0,6.29);ctx.fill();}
+    if(v.gasKind==='NOx'||(v.fx.gasKind==='NOx'&&v.fx.gas>2)){const a=clamp(v.fx.gas/80,0,.5);const g=ctx.createLinearGradient(0,BY-V.H-90,0,BY-V.H);g.addColorStop(0,'rgba(170,80,20,0)');g.addColorStop(1,`rgba(170,80,20,${a})`);ctx.fillStyle=g;ctx.fillRect(CX-V.w(V.H)/2-6,BY-V.H-90,V.w(V.H)+12,90);}
+    // pour
+    if(v.pour){const p=v.pour;p.t+=dt;if(p.t>p.dur)v.pour=null;else drawPour(ctx,p,ytop,lvl,V);}
+    ctx.restore();
+  }
+  function drawThermo(ctx,v){
+    const x=304,y0=98,y1=312,T0=-10,T1=130;
+    ctx.fillStyle=rgba(TH.panel,.7);ctx.strokeStyle=rgba(TH.glass,.8);ctx.lineWidth=1.6;
+    ctx.beginPath();ctx.moveTo(x-4,y0);ctx.lineTo(x-4,y1);ctx.arc(x,y1+6,8,Math.PI*1.2,Math.PI*1.8,true);ctx.lineTo(x+4,y0);ctx.arc(x,y0,4,0,Math.PI,true);ctx.closePath();ctx.fill();ctx.stroke();
+    const f=clamp((v.T-T0)/(T1-T0),0,1),yy=y1-(y1-y0)*f;
+    ctx.fillStyle='#e0453a';ctx.fillRect(x-1.6,yy,3.2,y1-yy+4);ctx.beginPath();ctx.arc(x,y1+6,6,0,6.29);ctx.fill();
+    ctx.fillStyle=rgba(TH.glass,.7);ctx.font='8px "JetBrains Mono",monospace';ctx.textAlign='left';
+    for(let T=0;T<=120;T+=20){const y=y1-(y1-y0)*((T-T0)/(T1-T0));ctx.fillRect(x+5,y,5,1);ctx.fillText(T,x+12,y+3);}
+  }
+  function drawFlame(ctx,x,y,k,t){
+    ctx.save();ctx.translate(x,y);ctx.globalCompositeOperation='lighter';
+    for(let i=0;i<5;i++){const h=(26+Math.sin(t*17+i*2)*9+i*2)*k,w=(11-i)*k;
+      const g=ctx.createLinearGradient(0,0,0,-h);g.addColorStop(0,'rgba(255,230,90,.85)');g.addColorStop(.5,'rgba(255,150,30,.55)');g.addColorStop(1,'rgba(255,90,20,0)');
+      ctx.fillStyle=g;ctx.beginPath();ctx.moveTo(-w+Math.sin(t*9+i)*3,0);ctx.quadraticCurveTo(-w*.6,-h*.5,Math.sin(t*13+i)*4,-h);ctx.quadraticCurveTo(w*.6,-h*.5,w+Math.sin(t*11+i)*3,0);ctx.fill();}
+    ctx.restore();
+  }
+  function drawPour(ctx,p,ytop,lvl,V){
+    const k=p.t/p.dur,fade=Math.min(1,k*6,(1-k)*6),col=p.col,my=62;
+    ctx.save();ctx.globalAlpha=fade;
+    ctx.translate(CX+8,my);ctx.rotate(-2.35);
+    ctx.fillStyle=rgba(col,.9);ctx.strokeStyle=rgba(TH.glass,1);ctx.lineWidth=2;
+    ctx.beginPath();ctx.roundRect?ctx.roundRect(-6,0,12,16,2):ctx.rect(-6,0,12,16);ctx.fill();ctx.stroke();
+    ctx.beginPath();ctx.roundRect?ctx.roundRect(-17,14,34,46,7):ctx.rect(-17,14,34,46);ctx.fill();ctx.stroke();
+    ctx.restore();
+    const yEnd=lvl>0?ytop:BY-4;
+    ctx.save();ctx.globalAlpha=fade;
+    if(p.kind==='liq'){ctx.strokeStyle=rgba(col,.9);ctx.lineWidth=3.6*(1-k*.4);ctx.lineCap='round';ctx.beginPath();ctx.moveTo(CX+2,my+8);ctx.lineTo(CX+2,yEnd);ctx.stroke();}
+    else if(p.kind==='ind'){for(let i=0;i<2;i++){const kk=((k*2+i*.5)%1);ctx.fillStyle=rgba(col,.95);ctx.beginPath();ctx.arc(CX+2,lerp(my+10,yEnd,kk*kk),3,0,6.29);ctx.fill();}}
+    else{const R=seeded(9);for(let i=0;i<7;i++){const kk=clamp(k*1.6-i*.08,0,1);if(kk<=0||kk>=1)continue;ctx.fillStyle=rgba(col,1);ctx.fillRect(CX-6+R()*12,lerp(my+8,yEnd,kk*kk),4,4);}}
+    ctx.restore();
+  }
+  function updateBubbles(st,dt,ytop,V){
+    const v=st.v;let rate=v.fx.gas;if(v.flags.boil)rate+=70;else if(v.T>70)rate+=(v.T-70)*.6;
+    if(v.vol<.3)rate=0;
+    st.acc=(st.acc||0)+rate*dt;
+    while(st.acc>=1){st.acc-=1;
+      const src=st.pcs&&st.pcs.length&&v.fx.gas>1&&Math.random()<.85?st.pcs[(Math.random()*st.pcs.length)|0]:null;
+      const hw=V.w(14)/2-6;
+      let x=src?src.x+rnd(-8,8):CX+rnd(-hw,hw),y=src?Math.min(src.y,BY-6):BY-8;
+      st.bub.push({x,y,r:rnd(1.6,4.6),vy:rnd(40,95),ph:Math.random()*6,brown:v.fx.gasKind==='NOx'&&v.fx.gas>1});
+    }
+    for(const b of st.bub){b.y-=b.vy*dt;b.x+=Math.sin(b.y*.12+b.ph)*.35;b.r+=dt*.4;
+      const hw=V.w(BY-b.y)/2-b.r-1;b.x=clamp(b.x,CX-hw,CX+hw);}
+    st.bub=st.bub.filter(b=>b.y>ytop+2&&v.vol>.2);
+    if(st.bub.length>260)st.bub.splice(0,st.bub.length-260);
+  }
+  function updateSteam(st,dt,ytop,V){
+    const v=st.v;
+    if(v.T>55&&v.vol>.5){st.sacc=(st.sacc||0)+((v.T-55)/45*(v.flags.boil?26:8))*dt;
+      while(st.sacc>=1){st.sacc-=1;const hw=V.w(V.H)/2-8;st.steam.push({x:CX+rnd(-hw,hw),y:BY-V.H+rnd(-4,4),r:rnd(5,10),a:.16,vy:rnd(18,36),vx:rnd(-6,6)});}}
+    for(const s of st.steam){s.y-=s.vy*dt;s.x+=s.vx*dt;s.r+=dt*14;s.a-=dt*.07;}
+    st.steam=st.steam.filter(s=>s.a>0.01&&s.y>-20);
+  }
+  function updateParts(st,dt,ytop,V){
+    const v=st.v;
+    for(const sp of v.spawn){
+      const col=Eng.SOLID[sp.key]?Eng.SOLID[sp.key].c:[240,240,240],cnt=clamp(Math.round(sp.n*7000),12,100);
+      const hw=V.w(Math.max(8,BY-ytop))/2-6;
+      for(let i=0;i<cnt;i++)st.parts.push({x:CX+rnd(-hw,hw),y:rnd(ytop+4,BY-6),vx:0,vy:rnd(3,9),r:rnd(1,2.6),c:col,a:.85,key:sp.key,swirl:Math.random()});
+    }
+    v.spawn.length=0;
+    if(v.flags.gold&&v.flags.gold!==st.goldSeen){st.goldSeen=v.flags.gold;const hw=V.w(Math.max(8,BY-ytop))/2-8;
+      for(let i=0;i<120;i++)st.parts.push({gl:true,x:CX+rnd(-hw,hw),y:rnd(ytop+4,BY-20),vx:0,vy:rnd(5,14),r:rnd(1.8,3.6),ph:Math.random()*6,rot:Math.random()*3,vr:rnd(-2,2),key:'PbI2'});}
+    const sedTop=BY-(st.sed||0)-2;
+    for(const p of st.parts){
+      if(!p.gl&&!v.susp[p.key])p.vy+=dt*60;
+      p.y+=p.vy*dt;
+      if(v.stir){const a=performance.now()/1000*3+p.swirl*6;p.x+=Math.cos(a)*30*dt;p.y+=Math.sin(a)*14*dt-8*dt;}
+      else p.x+=Math.sin(p.y*.1+p.swirl*9)*3*dt;
+      const hw=V.w(BY-p.y)/2-3;p.x=clamp(p.x,CX-hw,CX+hw);
+      if(p.y<ytop+2)p.y=ytop+2;
+    }
+    st.parts=st.parts.filter(p=>p.y<sedTop-(p.gl?0:0)&&v.vol>.1);
+    if(st.parts.length>400)st.parts.splice(0,st.parts.length-400);
+  }
+  function drawShards(ctx,st,dt){
+    const v=st.v;
+    if(v.shard){v.shard=0;for(let i=0;i<26;i++)st.shards.push({x:CX+rnd(-30,30),y:BY-rnd(20,120),vx:rnd(-160,160),vy:rnd(-220,-30),r:rnd(3,9),rot:Math.random()*3,vr:rnd(-8,8)});}
+    for(const s of st.shards){s.vy+=520*dt;s.x+=s.vx*dt;s.y+=s.vy*dt;s.rot+=s.vr*dt;if(s.y>BY+16){s.y=BY+16;s.vx*=.4;s.vy=0;s.vr=0;}
+      ctx.save();ctx.translate(s.x,s.y);ctx.rotate(s.rot);ctx.fillStyle=rgba(TH.glass,.45);ctx.strokeStyle=rgba(TH.glass,.9);ctx.beginPath();ctx.moveTo(-s.r,0);ctx.lineTo(0,-s.r*.6);ctx.lineTo(s.r,s.r*.3);ctx.closePath();ctx.fill();ctx.stroke();ctx.restore();}
+  }
+
+  /* ---------- loop ---------- */
+  function frame(ts){
+    if(!S.running)return;
+    const t=ts/1000,dt=Math.min(.05,S.last?t-S.last:.016);S.last=t;
+    for(const st of S.stations){
+      const v=st.v;
+      let rem=dt*S.speed;
+      while(rem>0){const h=Math.min(.05,rem);Eng.step(v,h);rem-=h;}
+      if(v.events.length){for(const ev of v.events)logAdd(st,ev);v.events.length=0;}
+      if(v.tags.size){for(const tg of v.tags)mark(tg);v.tags.clear();}
+      draw(st,t,dt);
+      st.refr+=dt;if(st.refr>.12){st.refr=0;readouts(st);}
+    }
+    requestAnimationFrame(frame);
+  }
+  function start(){if(S.running)return;S.running=true;S.last=0;requestAnimationFrame(frame);}
+  function stop(){S.running=false;}
+  function init(){
+    renderCats();renderShelf();renderHand();renderTasks();renderLog();
+    const box=$('#stations');for(let i=0;i<3;i++){const st=mkStation(i);S.stations.push(st);box.append(st.el);}
+    $('#rsearch').addEventListener('input',e=>{S.q=e.target.value;renderShelf();});
+    $('#speed').addEventListener('click',e=>{const b=e.target.closest('button');if(!b)return;S.speed=+b.dataset.s;$$('#speed button').forEach(x=>x.classList.toggle('on',x===b));});
+    $('#resetAll').addEventListener('click',()=>{S.stations.forEach(st=>{st.v=Eng.newVessel(st.v.type);st.bub=[];st.parts=[];st.steam=[];st.shards=[];sync(st);});renderLog();S.t0=performance.now();});
+    S.stations.forEach(sync);
+  }
+  return{init,start,stop,S,select,addTo};
+})();
+
+'use strict';
+/* ===== Titration ===== */
+const Titr=(()=>{
+  const AN=[
+    {id:'hcl',name:'HCl, күшті қышқыл',type:'acid',K:1e9,f:'HCl',tit:'NaOH'},
+    {id:'hac',name:'CH3COOH, әлсіз қышқыл',type:'acid',K:1.8e-5,f:'CH3COOH',tit:'NaOH'},
+    {id:'hcooh',name:'HCOOH, құмырсқа қышқылы',type:'acid',K:1.8e-4,f:'HCOOH',tit:'NaOH'},
+    {id:'naoh',name:'NaOH, күшті негіз',type:'base',K:1e-30,f:'NaOH',tit:'HCl'},
+    {id:'nh3',name:'NH3, әлсіз негіз',type:'base',K:5.6e-10,f:'NH3',tit:'HCl'},
+  ];
+  const CT=0.1,VMAX=50;
+  const S={an:AN[0],Va:25,C:.1,ind:'phph',Vt:0,flow:0,pts:[],unknown:false,revealed:false,mode:'ph',theory:false,drops:[],drip:0,last:0,running:false,refr:0,swirl:0,ans:null};
+
+  function pHat(V){
+    const an=S.an,Vtot=S.Va+V,T=S.C*S.Va/Vtot,tit=CT*V/Vtot,Kw=1e-14,K=an.K;
+    const F=an.type==='acid'?x=>x+tit-Kw/x-T*K/(K+x):x=>x+T*x/(x+K)-Kw/x-tit;
+    let a=-1.5,b=15.5;for(let i=0;i<50;i++){const m=(a+b)/2;if(F(Math.pow(10,-m))>0)a=m;else b=m;}
+    return clamp((a+b)/2,0,14);
+  }
+  const Veq=()=>S.C*S.Va/CT;
+  function reset(keepC){
+    S.Vt=0;S.pts=[{V:0,pH:pHat(0)}];S.flow=0;S.drops=[];S.revealed=false;S.ans=null;
+    $('#tFlow').value=0;$('#tVerd').textContent='';$('#tVerd').className='verdict';$('#tAns').value='';
+    if(!keepC)S.C=S.unknown?Math.round(rnd(.04,.2)*1000)/1000:clamp(+$('#tC').value||.1,.005,1);
+    $('#tTit').innerHTML=chem(S.an.tit)+' '+CT.toFixed(3)+' М';$('#tTitL').textContent='Бюреткадағы титрант';
+    updateUI(true);
+  }
+  function setFlowFromSlider(){
+    const s=+$('#tFlow').value;S.flow=s===0?0:.03+Math.pow(s/100,2)*2.6;
+    $('#tFlowO').textContent=S.flow.toFixed(2)+' мл/с';
+  }
+  function addVol(dv){
+    S.Vt=clamp(S.Vt+dv,0,VMAX);
+    const last=S.pts[S.pts.length-1];
+    if(S.Vt-last.V>=.05-1e-9||S.Vt>=VMAX)S.pts.push({V:S.Vt,pH:pHat(S.Vt)});
+  }
+  function indColor(pH){const ic=IND[S.ind].color(pH);return ic;}
+
+  /* ---------- apparatus ---------- */
+  const AW=360,AH=520;
+  function drawApp(t,dt){
+    const cv=$('#tcanvas'),ctx=fitCanvas(cv,AW,AH);ctx.clearRect(0,0,AW,AH);
+    const dark=TH.dark;
+    // stand
+    ctx.fillStyle=rgba(TH.plate,1);ctx.fillRect(16,504,300,10);ctx.fillRect(46,24,7,484);
+    ctx.fillRect(53,150,118,6);ctx.fillStyle=rgba(TH.fg,.35);ctx.fillRect(160,142,24,22);
+    // burette
+    const bx=180,top=44,mm=5.6,yv=v=>top+v*mm,bot=yv(50)+2;
+    ctx.fillStyle=rgba(TH.panel,.5);ctx.strokeStyle=rgba(TH.glass,.9);ctx.lineWidth=2;
+    ctx.beginPath();ctx.moveTo(bx-10,top-14);ctx.lineTo(bx-10,bot+6);ctx.lineTo(bx-5,bot+22);ctx.lineTo(bx-1.5,bot+42);ctx.lineTo(bx+1.5,bot+42);ctx.lineTo(bx+5,bot+22);ctx.lineTo(bx+10,bot+6);ctx.lineTo(bx+10,top-14);ctx.stroke();
+    // liquid
+    const ly=yv(S.Vt);
+    ctx.save();ctx.beginPath();ctx.rect(bx-9,ly,18,bot+10-ly);ctx.clip();
+    ctx.fillStyle=rgba([90,190,210],.42);ctx.fillRect(bx-10,ly,20,bot-ly+10);
+    ctx.restore();
+    if(S.Vt<VMAX){ctx.fillStyle=rgba([90,190,210],.42);ctx.beginPath();ctx.moveTo(bx-10,bot+6);ctx.lineTo(bx-5,bot+22);ctx.lineTo(bx-1.5,bot+40);ctx.lineTo(bx+1.5,bot+40);ctx.lineTo(bx+5,bot+22);ctx.lineTo(bx+10,bot+6);ctx.fill();}
+    // meniscus line
+    if(S.Vt<VMAX){ctx.strokeStyle=rgba([40,140,160],.9);ctx.lineWidth=1.4;ctx.beginPath();ctx.moveTo(bx-9,ly);ctx.quadraticCurveTo(bx,ly+3,bx+9,ly);ctx.stroke();}
+    // scale
+    ctx.fillStyle=rgba(TH.glass,.9);ctx.strokeStyle=rgba(TH.glass,.85);ctx.lineWidth=1;ctx.font='9px "JetBrains Mono",monospace';ctx.textAlign='right';
+    for(let v=0;v<=50;v++){const y=yv(v),L=v%5===0?10:v%1===0?5:0;ctx.beginPath();ctx.moveTo(bx-10,y);ctx.lineTo(bx-10+L,y);ctx.stroke();if(v%5===0)ctx.fillText(v,bx-14,y+3);}
+    // stopcock
+    ctx.fillStyle=rgba(TH.plate,1);ctx.fillRect(bx-8,bot+2,16,10);ctx.save();ctx.translate(bx,bot+7);ctx.rotate(S.flow>0?0:Math.PI/2);ctx.fillStyle=S.flow>0?TH.good:TH.bad;ctx.fillRect(-18,-3,36,6);ctx.restore();
+    // drops
+    const tipY=bot+42;
+    if(S.flow>.9){ctx.strokeStyle=rgba([90,190,210],.7);ctx.lineWidth=2.4;ctx.beginPath();ctx.moveTo(bx,tipY);ctx.lineTo(bx,388);ctx.stroke();}
+    else{
+      S.drip+=S.flow/.05*dt;
+      while(S.drip>=1){S.drip-=1;S.drops.push({y:tipY,v:0});}
+      for(const d of S.drops){d.v+=520*dt;d.y+=d.v*dt;ctx.fillStyle=rgba([90,190,210],.9);ctx.beginPath();ctx.ellipse(bx,d.y,2.4,3.4,0,0,6.29);ctx.fill();}
+      S.drops=S.drops.filter(d=>d.y<400);
+      if(S.flow>0&&S.flow<=.9){const k=(S.drip%1);ctx.fillStyle=rgba([90,190,210],.8);ctx.beginPath();ctx.ellipse(bx,tipY-1+k*3,1.5+k*1.5,1.5+k*2,0,0,6.29);ctx.fill();}
+    }
+    // tile + stirrer
+    ctx.fillStyle='rgba(250,250,250,.94)';ctx.beginPath();ctx.roundRect?ctx.roundRect(88,390,184,106,8):ctx.rect(88,390,184,106);ctx.fill();
+    ctx.fillStyle=rgba(TH.plate,1);ctx.fillRect(70,498,220,8);
+    // flask
+    const fx=180,fb=494,fh=108;
+    const wAt=y=>y<62?lerp(150,36,y/62):36; // y from bottom
+    const pathF=off=>{ctx.beginPath();for(let y=fh;y>=0;y-=4){const hw=wAt(y)/2+off;y===fh?ctx.moveTo(fx-hw,fb-y):ctx.lineTo(fx-hw,fb-y);}for(let y=0;y<=fh;y+=4)ctx.lineTo(fx+wAt(y)/2+off,fb-y);};
+    const tot=S.Va+S.Vt,level=clamp(10+tot/100*50,6,70);
+    const pH=S.pts[S.pts.length-1].pH,ic=indColor(pH);
+    ctx.save();pathF(0);ctx.closePath();ctx.clip();
+    const col=ic?[ic.c[0],ic.c[1],ic.c[2]]:[190,215,230],al=ic?clamp(.18+ic.s*.75,.18,.93):.22;
+    ctx.fillStyle=rgba(col,al);
+    const amp=1.2+Math.min(3,S.flow*2)+1.5;ctx.beginPath();ctx.moveTo(fx-90,fb-level);
+    for(let x=fx-90;x<=fx+90;x+=4)ctx.lineTo(x,fb-level+Math.sin(x*.09+t*5)*amp*.6);
+    ctx.lineTo(fx+90,fb+4);ctx.lineTo(fx-90,fb+4);ctx.closePath();ctx.fill();
+    // swirl streaks
+    ctx.strokeStyle='rgba(255,255,255,.35)';ctx.lineWidth=1.4;for(let i=0;i<3;i++){const a=t*4+i*2.1,w=30+i*14;ctx.beginPath();ctx.ellipse(fx,fb-level*.55,w,5+i*1.3,0,a,a+2);ctx.stroke();}
+    // stir bar
+    ctx.fillStyle='rgba(255,255,255,.8)';ctx.save();ctx.translate(fx,fb-7);ctx.rotate(t*9);ctx.fillRect(-14,-2.2,28,4.4);ctx.restore();
+    ctx.restore();
+    pathF(2.2);ctx.strokeStyle=rgba('#3f5b63',.95);ctx.lineWidth=2.4;ctx.stroke();
+    ctx.beginPath();for(let y=10;y<fh*.7;y+=4){const x=fx-wAt(y)/2+6;y===10?ctx.moveTo(x,fb-y):ctx.lineTo(x,fb-y);}ctx.strokeStyle='rgba(255,255,255,.8)';ctx.lineWidth=2.6;ctx.stroke();
+    ctx.strokeStyle=rgba('#3f5b63',.95);ctx.lineWidth=2.4;ctx.beginPath();ctx.moveTo(fx-26,fb-fh);ctx.lineTo(fx-16,fb-fh);ctx.moveTo(fx+16,fb-fh);ctx.lineTo(fx+26,fb-fh);ctx.stroke();
+  }
+
+  /* ---------- chart ---------- */
+  const CW=640,CH=360,ML=50,MR=16,MT=14,MB=40;
+  function drawChart(){
+    const cv=$('#tchart'),ctx=fitCanvas(cv,CW,CH);ctx.clearRect(0,0,CW,CH);
+    const pw=CW-ML-MR,ph=CH-MT-MB,mode=S.mode;
+    const X=v=>ML+v/VMAX*pw;
+    let ymax=14,Y=p=>MT+ph-p/14*ph,dpts=null;
+    if(mode==='d'){
+      dpts=[];const P=S.pts;
+      for(let i=1;i<P.length;i++){const dv=P[i].V-P[i-1].V;if(dv>=.04)dpts.push({V:(P[i].V+P[i-1].V)/2,d:(P[i].pH-P[i-1].pH)/dv});}
+      ymax=Math.max(2,...dpts.map(d=>d.d))*1.12;Y=p=>MT+ph-p/ymax*ph;
+    }
+    ctx.font='11px "JetBrains Mono",monospace';ctx.fillStyle=rgba(TH.muted,1);ctx.strokeStyle=rgba(TH.line,1);ctx.lineWidth=1;
+    // grid
+    ctx.textAlign='right';
+    const ystep=mode==='d'?niceStep(ymax/5):2;
+    for(let p=0;p<=ymax+1e-6;p+=ystep){const y=Y(p);ctx.beginPath();ctx.moveTo(ML,y);ctx.lineTo(CW-MR,y);ctx.stroke();ctx.fillText(mode==='d'?(+p.toFixed(1)):p,ML-6,y+4);}
+    ctx.textAlign='center';for(let v=0;v<=VMAX;v+=10){const x=X(v);ctx.beginPath();ctx.moveTo(x,MT);ctx.lineTo(x,MT+ph);ctx.stroke();ctx.fillText(v,x,CH-MB+16);}
+    ctx.fillText('Титрант көлемі, мл',ML+pw/2,CH-6);
+    ctx.save();ctx.translate(13,MT+ph/2);ctx.rotate(-Math.PI/2);ctx.fillText(mode==='d'?'dpH/dV':'pH',0,0);ctx.restore();
+    ctx.strokeStyle=rgba(TH.fg,.6);ctx.strokeRect(ML,MT,pw,ph);
+    // indicator band
+    if(mode==='ph'){const r=IND[S.ind].range;ctx.fillStyle=rgba(TH.accent,.12);ctx.fillRect(ML,Y(r[1]),pw,Y(r[0])-Y(r[1]));ctx.fillStyle=rgba(TH.accent,.9);ctx.textAlign='left';ctx.fillText('ауысу аралығы: '+IND[S.ind].name.toLowerCase(),ML+6,Y(r[1])+13);}
+    // theory
+    if(S.theory&&mode==='ph'){ctx.strokeStyle=rgba(TH.muted,.9);ctx.setLineDash([4,4]);ctx.lineWidth=1.4;ctx.beginPath();for(let v=0;v<=VMAX;v+=.25){const x=X(v),y=Y(pHat(v));v?ctx.lineTo(x,y):ctx.moveTo(x,y);}ctx.stroke();ctx.setLineDash([]);}
+    // equivalence
+    if(!S.unknown||S.revealed){const ve=Veq();if(ve<=VMAX){ctx.strokeStyle=rgba(TH.warn,.9);ctx.setLineDash([5,4]);ctx.lineWidth=1.4;ctx.beginPath();ctx.moveTo(X(ve),MT);ctx.lineTo(X(ve),MT+ph);ctx.stroke();ctx.setLineDash([]);ctx.fillStyle=rgba(TH.warn,1);ctx.textAlign='left';ctx.fillText('V экв = '+ve.toFixed(2)+' мл',X(ve)+5,MT+ph-8);}}
+    // data
+    ctx.lineWidth=2.4;ctx.strokeStyle=rgba(TH.accent,1);ctx.lineJoin='round';
+    if(mode==='ph'){
+      ctx.beginPath();S.pts.forEach((p,i)=>{const x=X(p.V),y=Y(p.pH);i?ctx.lineTo(x,y):ctx.moveTo(x,y);});ctx.stroke();
+      const l=S.pts[S.pts.length-1];ctx.fillStyle=rgba(TH.accent,1);ctx.beginPath();ctx.arc(X(l.V),Y(l.pH),5,0,6.29);ctx.fill();ctx.strokeStyle=rgba(TH.panel,1);ctx.lineWidth=2;ctx.stroke();
+    }else if(dpts.length){
+      ctx.beginPath();dpts.forEach((p,i)=>{const x=X(p.V),y=Y(p.d);i?ctx.lineTo(x,y):ctx.moveTo(x,y);});ctx.stroke();
+      const mx=dpts.reduce((a,b)=>b.d>a.d?b:a);ctx.fillStyle=rgba(TH.warn,1);ctx.beginPath();ctx.arc(X(mx.V),Y(mx.d),5,0,6.29);ctx.fill();
+      ctx.textAlign='left';ctx.fillText('максимум: '+mx.V.toFixed(2)+' мл',Math.min(X(mx.V)+8,CW-150),Y(mx.d)+4);
+    }
+  }
+  function niceStep(x){const p=Math.pow(10,Math.floor(Math.log10(x))),m=x/p;return(m<1.5?1:m<3.5?2:m<7.5?5:10)*p;}
+
+  function updateUI(force){
+    const l=S.pts[S.pts.length-1],ic=indColor(l.pH);
+    $('#tV').textContent=S.Vt.toFixed(2)+' мл';
+    $('#tPH').textContent=l.pH.toFixed(2);
+    $('#tCol').textContent=ic&&ic.s>.3?colorName(ic.c):ic?'солғын':'түссіз';
+    $('#tTit').innerHTML=chem(S.an.tit)+' '+CT.toFixed(3)+' М';
+  }
+  function frame(ts){
+    if(!S.running)return;
+    const t=ts/1000,dt=Math.min(.05,S.last?t-S.last:.016);S.last=t;
+    if(S.flow>0&&S.Vt<VMAX)addVol(S.flow*dt);
+    if(S.Vt>=VMAX&&S.flow>0){S.flow=0;$('#tFlow').value=0;setFlowFromSlider();}
+    drawApp(t,dt);
+    S.refr+=dt;if(S.refr>.1){S.refr=0;updateUI();drawChart();}
+    requestAnimationFrame(frame);
+  }
+  function check(){
+    const a=parseFloat($('#tAns').value),box=$('#tVerd');
+    if(!(a>0)){box.textContent='Сан енгізіңіз, мысалы 0.085.';box.className='verdict bad';return;}
+    const err=Math.abs(a-S.C)/S.C*100;S.revealed=true;
+    if(err<=2){box.innerHTML=`Дұрыс. Нақты концентрация ${S.C.toFixed(3)} моль/л, айырмашылық ${err.toFixed(1)}%. Есептеу: C = C(титрант)·V экв / V сынама = ${CT}·${Veq().toFixed(2)} / ${S.Va}.`;box.className='verdict ok';}
+    else{box.innerHTML=`Сәйкес келмеді: жауабыңыз ${err.toFixed(0)}%-ға ерекшеленеді. V экв-ті pH секірісі немесе dpH/dV максимумы бойынша тауып, C = C(титрант)·V экв / V сынама арқылы есептеңіз.`;box.className='verdict bad';S.revealed=false;}
+    drawChart();
+  }
+  function init(){
+    const sa=$('#tAn');AN.forEach(a=>sa.append(H('option',{value:a.id},a.name)));
+    const si=$('#tInd');Object.entries(IND).forEach(([k,v])=>si.append(H('option',{value:k},v.name)));
+    sa.addEventListener('change',()=>{S.an=AN.find(a=>a.id===sa.value);reset();});
+    $('#tVa').addEventListener('change',e=>{S.Va=+e.target.value;reset(true);});
+    $('#tC').addEventListener('change',()=>reset());
+    si.addEventListener('change',e=>{S.ind=e.target.value;updateUI();drawChart();});
+    $('#tFlow').addEventListener('input',setFlowFromSlider);
+    $('#tDrop').addEventListener('click',()=>{if(S.Vt<VMAX){addVol(.05);S.drops.push({y:400,v:0});}});
+    $('#tStop').addEventListener('click',()=>{$('#tFlow').value=0;setFlowFromSlider();});
+    $('#tReset').addEventListener('click',()=>reset());
+    $('#tUnknown').addEventListener('change',e=>{S.unknown=e.target.checked;$('#tC').disabled=S.unknown;reset();});
+    $('#tTheory').addEventListener('change',e=>{S.theory=e.target.checked;drawChart();});
+    $('#tMode').addEventListener('click',e=>{const b=e.target.closest('button');if(!b)return;S.mode=b.dataset.m;$$('#tMode button').forEach(x=>x.classList.toggle('on',x===b));drawChart();});
+    $('#tCheck').addEventListener('click',check);
+    reset();
+  }
+  function start(){if(S.running)return;S.running=true;S.last=0;requestAnimationFrame(frame);drawChart();}
+  function stop(){S.running=false;}
+  return{init,start,stop};
+})();
+
+'use strict';
+/* ===== Periodic table + Bohr model ===== */
+const PTable=(()=>{
+  const S={sel:BYSYM.Fe,mode:'cat',q:'',filter:null,running:false,cells:{}};
+  const STATE={gas:'газ',liq:'сұйық',solid:'қатты',unk:'белгісіз'};
+  const lab=(e)=>e.cat;
+  function bg(e){
+    const m=S.mode;
+    if(m==='cat'){const h=CAT_HUE[e.cat];return[`color-mix(in srgb, hsl(${h} 70% 52%) 26%, var(--panel))`,`hsl(${h} 60% 52% / .6)`];}
+    if(m==='en'){if(e.en==null)return['var(--panel2)','var(--line)'];const t=clamp((e.en-.7)/(3.98-.7),0,1),h=lerp(215,8,t);return[`color-mix(in srgb, hsl(${h} 75% 52%) 38%, var(--panel))`,`hsl(${h} 60% 52% / .6)`];}
+    if(m==='mass'){const t=clamp(e.mass/294,0,1);return[`color-mix(in srgb, var(--accent) ${(8+t*62).toFixed(0)}%, var(--panel))`,'var(--line)'];}
+    const h={solid:225,liq:28,gas:190,unk:0}[e.state];
+    return e.state==='unk'?['var(--panel2)','var(--line)']:[`color-mix(in srgb, hsl(${h} 70% 52%) 28%, var(--panel))`,`hsl(${h} 60% 52% / .6)`];
+  }
+  function third(e){return S.mode==='en'?(e.en!=null?e.en.toFixed(2):'—'):S.mode==='state'?'':(e.mass>=100?String(Math.round(e.mass)):String(e.mass));}
+  function build(){
+    const g=$('#pt');g.innerHTML='';g.style.gridTemplateRows='repeat(7,minmax(46px,auto)) 14px repeat(2,minmax(46px,auto))';
+    for(const e of ELEMENTS){
+      const b=H('button',{class:'el',type:'button','data-z':e.z,title:`${e.name}, ${e.z}`,'aria-label':`${e.name}, нөмірі ${e.z}`},H('small',{},e.z),H('b',{},e.sym),H('small',{class:'t3'},''));
+      b.style.gridRow=e.row;b.style.gridColumn=e.col;
+      b.addEventListener('click',()=>select(e));
+      g.append(b);S.cells[e.z]=b;
+    }
+    const ph=(r,t)=>{const d=H('div',{class:'el ph'},t);d.style.gridRow=r;d.style.gridColumn=3;g.append(d);};
+    ph(6,'57–71');ph(7,'89–103');
+    const lb=(r,t)=>{const d=H('div',{class:'el ph',style:'border:0;justify-content:flex-end;align-items:flex-end;text-align:right'},t);d.style.gridRow=r;d.style.gridColumn='1 / 3';g.append(d);};
+    lb(9,'Лантаноидтар');lb(10,'Актиноидтар');
+  }
+  function paint(){
+    const q=S.q.trim().toLowerCase();
+    for(const e of ELEMENTS){
+      const b=S.cells[e.z],[bgc,bc]=bg(e);b.style.background=bgc;b.style.borderColor=bc;b.querySelector('.t3').textContent=third(e);
+      let on=true;
+      if(S.filter)on=e.cat===S.filter;
+      if(on&&q)on=e.sym.toLowerCase()===q||e.name.toLowerCase().includes(q)||String(e.z)===q;
+      b.classList.toggle('dim',!on);b.classList.toggle('sel',e===S.sel);
+    }
+    legend();
+  }
+  function legend(){
+    const L=$('#ptlegend');L.innerHTML='';
+    if(S.mode==='cat')for(const k in CATS)L.append(H('button',{class:'lg'+(S.filter===k?' on':''),type:'button',onclick:()=>{S.filter=S.filter===k?null:k;paint();}},H('i',{style:`background:hsl(${CAT_HUE[k]} 65% 52%)`}),CATS[k]));
+    else if(S.mode==='en'){L.append(H('div',{style:'width:100%;max-width:420px'},H('div',{class:'gradbar',style:'background:linear-gradient(90deg,hsl(215 75% 52%),hsl(111 75% 52%),hsl(8 75% 52%))'}),H('div',{class:'row',style:'justify-content:space-between;font-size:12px;color:var(--muted)'},H('span',{},'0.7 (төмен)'),H('span',{},'3.98 (фтор)'))));}
+    else if(S.mode==='mass'){L.append(H('div',{style:'width:100%;max-width:420px'},H('div',{class:'gradbar',style:'background:linear-gradient(90deg,color-mix(in srgb,var(--accent) 8%,var(--panel)),var(--accent))'}),H('div',{class:'row',style:'justify-content:space-between;font-size:12px;color:var(--muted)'},H('span',{},'1 м.а.б.'),H('span',{},'294 м.а.б.'))));}
+    else for(const[k,h]of[['solid',225],['liq',28],['gas',190],['unk',0]])L.append(H('span',{class:'lg',style:'cursor:default'},H('i',{style:k==='unk'?'background:var(--line)':`background:hsl(${h} 65% 52%)`}),STATE[k]));
+  }
+  function select(e){S.sel=e;paint();side();}
+  function side(){
+    const e=S.sel,sh=shellsOf(e.z),box=$('#ptside');
+    const val=e.block==='s'||e.block==='p'?sh[sh.length-1]:null;
+    const neutrons=Math.round(e.mass)-e.z;
+    box.innerHTML='';
+    box.append(H('h3',{},e.name,H('small',{},`${e.sym} · ${e.z}`)));
+    box.append(H('canvas',{id:'bohr',width:600,height:600,'aria-label':'Бор моделі: '+e.name}));
+    const kv=H('dl',{class:'kv'});
+    const row=(k,v)=>{kv.append(H('dt',{},k),H('dd',{html:v}));};
+    row('Санаты',CATS[e.cat]);
+    row('Атомдық масса',e.mass+' м.а.б.');
+    row('Период / топ',`${e.period} / ${e.group||'—'}`);
+    row('Блок',e.block+'-элемент');
+    row('Конфигурация',configOf(e.z));
+    row('Қабаттардағы электрондар',sh.join(' · '));
+    row('Валенттік электрондар',val!=null?val:'тотығу дәрежесіне байланысты');
+    row('Протондар / нейтрондар',`${e.z} / ${neutrons}`);
+    row('Электртерістілік',e.en!=null?e.en.toFixed(2)+' (Полинг бойынша)':'деректер жоқ');
+    row('20 °C кезіндегі күйі',STATE[e.state]);
+    box.append(kv);
+  }
+  /* ---- bohr ---- */
+  function seeded(n){let s=n*7919+13;return()=>{s=(s*9301+49297)%233280;return s/233280;};}
+  function drawBohr(t){
+    const cv=$('#bohr');if(!cv)return;const ctx=fitCanvas(cv,300,300);ctx.clearRect(0,0,300,300);
+    const e=S.sel,sh=shellsOf(e.z),n=sh.length,cx=150,cy=150,Rmax=140,r0=24;
+    // nucleus
+    const A=Math.round(e.mass),R=seeded(e.z),nr=clamp(5+Math.cbrt(A)*1.5,6,15);
+    const gl=ctx.createRadialGradient(cx,cy,2,cx,cy,nr*2.4);gl.addColorStop(0,rgba(TH.accent,.5));gl.addColorStop(1,rgba(TH.accent,0));ctx.fillStyle=gl;ctx.beginPath();ctx.arc(cx,cy,nr*2.4,0,6.29);ctx.fill();
+    const cnt=Math.min(e.z+A-e.z,60),pr=e.z/(A||1);
+    for(let i=0;i<Math.min(A,60);i++){const a=R()*6.29,d=Math.sqrt(R())*nr;ctx.fillStyle=R()<pr?'#e0554a':rgba(TH.muted,1);ctx.beginPath();ctx.arc(cx+Math.cos(a)*d,cy+Math.sin(a)*d,2.6,0,6.29);ctx.fill();}
+    for(let i=0;i<n;i++){
+      const r=r0+(i+1)*(Rmax-r0)/n,cnt=sh[i],last=i===n-1,w=(i%2?-1:1)*1.1/(1+i*.5);
+      ctx.strokeStyle=rgba(TH.muted,last?.6:.3);ctx.lineWidth=1;ctx.beginPath();ctx.arc(cx,cy,r,0,6.29);ctx.stroke();
+      for(let k=0;k<cnt;k++){const a=k/cnt*6.29+w*t+i*.7,x=cx+Math.cos(a)*r,y=cy+Math.sin(a)*r;
+        if(last){const g=ctx.createRadialGradient(x,y,0,x,y,9);g.addColorStop(0,rgba(TH.accent,.55));g.addColorStop(1,rgba(TH.accent,0));ctx.fillStyle=g;ctx.beginPath();ctx.arc(x,y,9,0,6.29);ctx.fill();}
+        ctx.fillStyle=last?rgba(TH.accent,1):rgba(TH.fg,.85);ctx.beginPath();ctx.arc(x,y,last?3.6:3,0,6.29);ctx.fill();}
+      ctx.font='9px "JetBrains Mono",monospace';ctx.textAlign='center';ctx.fillStyle=rgba(TH.muted,1);ctx.fillText(cnt,cx,cy-r-3);
+    }
+  }
+  function frame(ts){if(!S.running)return;drawBohr(ts/1000);requestAnimationFrame(frame);}
+  function start(){if(S.running)return;S.running=true;requestAnimationFrame(frame);}
+  function stop(){S.running=false;}
+  function init(){
+    build();paint();side();
+    $('#ptq').addEventListener('input',e=>{S.q=e.target.value;paint();const q=S.q.trim().toLowerCase();if(q){const m=ELEMENTS.find(x=>x.sym.toLowerCase()===q||x.name.toLowerCase()===q||String(x.z)===q);if(m&&m!==S.sel)select(m);}});
+    $('#ptmode').addEventListener('click',e=>{const b=e.target.closest('button');if(!b)return;S.mode=b.dataset.m;S.filter=null;$$('#ptmode button').forEach(x=>x.classList.toggle('on',x===b));paint();});
+  }
+  return{init,start,stop};
+})();
+
+'use strict';
+/* ===== Solubility table ===== */
+const Sol=(()=>{
+  const CH={H:1,NH4:1,Li:1,Na:1,K:1,Mg:2,Ca:2,Ba:2,Al:3,Zn:2,Fe2:2,Fe3:3,Cu:2,Ag:1,Pb:2};
+  const CF={H:'H',NH4:'NH4',Li:'Li',Na:'Na',K:'K',Mg:'Mg',Ca:'Ca',Ba:'Ba',Al:'Al',Zn:'Zn',Fe2:'Fe',Fe3:'Fe',Cu:'Cu',Ag:'Ag',Pb:'Pb'};
+  const AC={OH:1,Cl:1,Br:1,I:1,NO3:1,SO4:2,CO3:2,S:2,PO4:3,Ac:1};
+  const AF={OH:'OH',Cl:'Cl',Br:'Br',I:'I',NO3:'NO3',SO4:'SO4',CO3:'CO3',S:'S',PO4:'PO4',Ac:'CH3COO'};
+  const POLY=new Set(['NH4','OH','NO3','SO4','CO3','PO4','Ac']);
+  const gcd=(a,b)=>b?gcd(b,a%b):a;
+  const HEX={'ақ':'#f4f4f4','ақ ірімшік тәрізді':'#f4f4f4','ақшыл сары':'#efe6a0','сары':'#f3d34a','ашық сары':'#f8c61a','сарғыш-ақ':'#efe8b8','қара':'#222','көгілдір':'#4b8ff0','қоңыр':'#a0501f','сұрғылт-жасыл':'#96b88c','ақшыл-жасыл':'#cfe0c8','көгілдірлеу':'#bcd8f5','ақ іркілдек':'#eef2f4'};
+  const NAMES={R:'ериді',M:'аз ериді',N:'іс жүзінде ерімейді',X:'жоқ немесе сумен ыдырайды'};
+  const MAP={'Р':'R','М':'M','Н':'N','X':'X'};
+  function formula(c,a){
+    const zc=CH[c],za=AC[a],g=gcd(zc,za),nc=za/g,na=zc/g;
+    const part=(s,n,poly)=>n>1?(poly?`(${s})${n}`:`${s}${n}`):s;
+    return part(CF[c],nc,POLY.has(c))+part(AF[a],na,POLY.has(a));
+  }
+  let sel=null;
+  function init(){
+    const box=$('#soltbl');box.innerHTML='';
+    const tb=H('table',{});
+    const hr=H('tr',{},H('th',{}));
+    SOL_AN.forEach(a=>hr.append(H('th',{html:chem(a[1])+`<div class="muted" style="font-weight:400;font-size:10px">${a[2]}</div>`})));
+    tb.append(hr);
+    SOL_CAT.forEach(c=>{
+      const tr=H('tr',{},H('th',{class:'c',html:chem(c[1])+`<span class="muted" style="font-weight:400;font-size:11px"> ${c[2]}</span>`}));
+      SOL_AN.forEach((a,i)=>{
+        const k=MAP[c[3][i]],td=H('td',{class:k,'data-c':c[0],'data-a':a[0],tabindex:0,role:'button','aria-label':`${c[2]} ${a[2]}: ${NAMES[k]}`},k==='R'?'Е':k==='M'?'А':k==='N'?'Ж':'—');
+        const go=()=>pick(td,c,a,k);td.addEventListener('click',go);td.addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();go();}});
+        td.addEventListener('mouseenter',()=>hover(c[0],a[0],true));td.addEventListener('mouseleave',()=>hover(c[0],a[0],false));
+        tr.append(td);
+      });
+      tb.append(tr);
+    });
+    box.append(tb);
+    pick($('td[data-c="Ag"][data-a="Cl"]',box),SOL_CAT.find(c=>c[0]==='Ag'),SOL_AN[1],'N');
+  }
+  function hover(c,a,on){$$('#soltbl td').forEach(td=>td.classList.toggle('hl',on&&(td.dataset.c===c||td.dataset.a===a)));}
+  function pick(td,c,a,k){
+    $$('#soltbl td.sel').forEach(x=>x.classList.remove('sel'));td.classList.add('sel');
+    const f=formula(c[0],a[0]),col=SOL_COL[c[0]+'|'+a[0]],inLab=Eng.PREC.some(r=>r[0]===c[0]&&r[1]===a[0]);
+    const d=$('#soldet');d.innerHTML='';
+    d.append(H('span',{class:'sw',style:`background:${k==='R'?'transparent':col&&HEX[col]?HEX[col]:'var(--panel2)'}`}));
+    d.append(H('div',{},H('div',{style:'font-size:18px;font-weight:600',html:`${chem(f)} <span class="muted" style="font-size:13px;font-weight:400">${c[2]} ${a[2]}</span>`}),
+      H('div',{html:`${NAMES[k][0].toUpperCase()+NAMES[k].slice(1)}${k!=='R'&&col?`, тұнба: ${col}`:''}.`+(inLab?' Бұл реакцияны «Зертхана» бөлімінде жасауға болады.':'')}),
+      H('div',{class:'muted mono',style:'font-size:12px;margin-top:2px',html:chem(`${c[1]} + ${a[1]}`)+(k==='N'||k==='M'?' → '+chem(f)+'↓':'')})));
+  }
+  return{init};
+})();
+
+'use strict';
+/* ===== Calculators: equation balancer, molar mass, solutions, pH ===== */
+const Calc=(()=>{
+  /* ---------- formula parser ---------- */
+  function parseFormula(raw){
+    let s=String(raw).replace(/\s+/g,'');
+    let charge=0;const cm=s.match(/\^(\d*)([+\-−])$/);
+    if(cm){charge=(cm[2]==='+'?1:-1)*(cm[1]?+cm[1]:1);s=s.slice(0,cm.index);}
+    if(!s)throw new Error('Формула бос');
+    const parts=s.split(/[·•*.]/),total={};
+    for(const part of parts){
+      let p=part,mult=1;const lead=p.match(/^(\d+)(?=[A-Z(\[])/);
+      if(lead&&parts.length>1){mult=+lead[1];p=p.slice(lead[1].length);}
+      let i=0;
+      const num=()=>{let n='';while(i<p.length&&/\d/.test(p[i]))n+=p[i++];return n?+n:1;};
+      const parse=depth=>{
+        const m={};
+        while(i<p.length){
+          const c=p[i];
+          if(c==='('||c==='['){i++;const inner=parse(depth+1),n=num();for(const k in inner)m[k]=(m[k]||0)+inner[k]*n;}
+          else if(c===')'||c===']'){if(depth===0)throw new Error('Артық жабатын жақша');i++;return m;}
+          else if(/[A-Z]/.test(c)){let sym=c;i++;if(i<p.length&&/[a-z]/.test(p[i]))sym+=p[i++];
+            if(!BYSYM[sym])throw new Error('Белгісіз элемент: '+sym);m[sym]=(m[sym]||0)+num();}
+          else throw new Error('Рұқсат етілмеген таңба «'+c+'»');
+        }
+        if(depth>0)throw new Error('Жақша жабылмаған');
+        return m;
+      };
+      const m=parse(0);for(const k in m)total[k]=(total[k]||0)+m[k]*mult;
+    }
+    return{atoms:total,charge};
+  }
+  const molarMass=a=>Object.entries(a).reduce((s,[k,n])=>s+BYSYM[k].mass*n,0);
+
+  /* ---------- rational arithmetic ---------- */
+  const bgcd=(a,b)=>{a=a<0n?-a:a;b=b<0n?-b:b;while(b){[a,b]=[b,a%b];}return a;};
+  class Fr{constructor(n,d=1n){if(d<0n){n=-n;d=-d;}const g=bgcd(n,d)||1n;this.n=n/g;this.d=d/g;}
+    add(o){return new Fr(this.n*o.d+o.n*this.d,this.d*o.d);}sub(o){return new Fr(this.n*o.d-o.n*this.d,this.d*o.d);}
+    mul(o){return new Fr(this.n*o.n,this.d*o.d);}div(o){return new Fr(this.n*o.d,this.d*o.n);}z(){return this.n===0n;}}
+  function balance(eq){
+    const sides=eq.split(/->|→|=>|⟶|=/);
+    if(sides.length!==2)throw new Error('Бір ғана нұсқар керек: «->» немесе «=».');
+    const split=s=>s.split(/\s\+\s|\+(?=[A-Z(\[\d])/).map(x=>x.trim().replace(/^\d+\s*(?=[A-Z(\[])/,'')).filter(Boolean);
+    const L=split(sides[0]),R=split(sides[1]);
+    if(!L.length||!R.length)throw new Error('Нұсқардың екі жағына да заттарды жазыңыз.');
+    const sp=[...L,...R].map(parseFormula),n=sp.length;
+    const els=[...new Set(sp.flatMap(x=>Object.keys(x.atoms)))];
+    const hasCh=sp.some(x=>x.charge!==0);
+    const rows=els.map(e=>sp.map((x,j)=>(x.atoms[e]||0)*(j<L.length?1:-1)));
+    if(hasCh)rows.push(sp.map((x,j)=>x.charge*(j<L.length?1:-1)));
+    for(const e of els)if(!sp.slice(0,L.length).some(x=>x.atoms[e])||!sp.slice(L.length).some(x=>x.atoms[e]))throw new Error(`${e} элементі теңдеудің тек бір жағында бар.`);
+    // RREF
+    const M=rows.map(r=>r.map(v=>new Fr(BigInt(v))));const piv=[];let r=0;
+    for(let c=0;c<n&&r<M.length;c++){
+      let p=r;while(p<M.length&&M[p][c].z())p++;if(p===M.length)continue;
+      [M[r],M[p]]=[M[p],M[r]];const pv=M[r][c];M[r]=M[r].map(v=>v.div(pv));
+      for(let i=0;i<M.length;i++)if(i!==r&&!M[i][c].z()){const f=M[i][c];M[i]=M[i].map((v,k)=>v.sub(f.mul(M[r][k])));}
+      piv.push(c);r++;
+    }
+    const free=[...Array(n).keys()].filter(c=>!piv.includes(c));
+    if(free.length===0)throw new Error('Теңдеуді теңестіру мүмкін емес: заттардың формулаларын тексеріңіз.');
+    if(free.length>1)throw new Error('Шешім бірмәнді емес: сызбада бірнеше тәуелсіз реакция бар. Оларды бөліп жазыңыз.');
+    const x=Array(n).fill(null);x[free[0]]=new Fr(1n);
+    piv.forEach((c,i)=>{x[c]=new Fr(0n).sub(M[i][free[0]]);});
+    let l=1n;for(const v of x)l=l*v.d/bgcd(l,v.d);
+    let co=x.map(v=>v.n*(l/v.d));
+    if(co.every(v=>v<=0n))co=co.map(v=>-v);
+    if(co.some(v=>v<=0n))throw new Error('Коэффициенттер теріс шығады: реакция бұл түрде мүмкін емес.');
+    let g=0n;for(const v of co)g=bgcd(g,v);co=co.map(v=>Number(v/g));
+    return{L,R,co,els:hasCh?[...els,'заряд']:els,rows,sp,names:[...L,...R]};
+  }
+  function fmtEq(res){
+    const f=(names,co)=>names.map((nm,i)=>(co[i]>1?`<span class="k">${co[i]}</span>`:'')+chem(nm.replace(/·/g,'·'))).join(' + ');
+    return f(res.L,res.co.slice(0,res.L.length))+' → '+f(res.R,res.co.slice(res.L.length));
+  }
+  function runBalance(){
+    const out=$('#balOut'),msg=$('#balMsg');
+    try{
+      const r=balance($('#balIn').value);out.innerHTML=fmtEq(r);
+      let t='<details><summary style="cursor:pointer">Атомдар бойынша тексеру</summary><table class="t" style="margin-top:6px"><tr><th>Элемент</th><th class="r">Сол жақ</th><th class="r">Оң жақ</th></tr>';
+      r.els.forEach((e,i)=>{let a=0,b=0;r.rows[i].forEach((v,j)=>{if(j<r.L.length)a+=v*r.co[j];else b-=v*r.co[j];});t+=`<tr><td>${e}</td><td class="r">${a}</td><td class="r">${b}</td></tr>`;});
+      msg.className='msg';msg.innerHTML=t+'</table></details>';
+    }catch(e){out.innerHTML='<span class="muted">—</span>';msg.className='msg err';msg.textContent=e.message;}
+  }
+
+  /* ---------- molar mass ---------- */
+  let M0=0;
+  function runMol(){
+    const msg=$('#molMsg'),T=$('#molT');
+    try{
+      const f=parseFormula($('#molIn').value),M=molarMass(f.atoms);M0=M;
+      $('#molM').textContent=M.toFixed(3)+' г/моль';msg.textContent='';
+      T.innerHTML='<tr><th>Элемент</th><th class="r">Атом саны</th><th class="r">Ar</th><th class="r">Үлесі</th><th style="width:30%"></th></tr>';
+      Object.entries(f.atoms).sort((a,b)=>BYSYM[b[0]].mass*b[1]-BYSYM[a[0]].mass*a[1]).forEach(([k,n])=>{
+        const m=BYSYM[k].mass*n,w=m/M*100;
+        const tr=H('tr',{},H('td',{},`${BYSYM[k].name} (${k})`),H('td',{class:'r'},n),H('td',{class:'r'},BYSYM[k].mass),H('td',{class:'r'},w.toFixed(2)+' %'),H('td',{},H('div',{class:'bar',style:'width:0'})));
+        T.append(tr);requestAnimationFrame(()=>requestAnimationFrame(()=>{tr.querySelector('.bar').style.width=w+'%';}));
+      });
+      conv('cvG');
+    }catch(e){M0=0;$('#molM').textContent='—';msg.className='msg err';msg.textContent=e.message;T.innerHTML='';}
+  }
+  const NA=6.02214076;
+  function conv(src){
+    if(!M0)return;
+    const g=$('#cvG'),n=$('#cvN'),p=$('#cvP'),v=$('#cvV');
+    const val=+$('#'+src).value;let mol;
+    if(isNaN(val)||$('#'+src).value==='')mol=null;
+    else mol=src==='cvG'?val/M0:src==='cvN'?val:src==='cvP'?val/NA:val/22.4;
+    const set=(el,x)=>{if(el.id!==src)el.value=mol==null?'':+x.toPrecision(5);};
+    if(mol!=null){set(g,mol*M0);set(n,mol);set(p,mol*NA);set(v,mol*22.4);}
+  }
+
+  /* ---------- solutions ---------- */
+  function runSol(){
+    try{
+      const M=molarMass(parseFormula($('#slF').value).atoms),m=+$('#slM').value,V=+$('#slV').value,d=+$('#slD').value||1;
+      $('#slC').textContent=V>0?(m/M/(V/1000)).toFixed(4)+' М':'—';
+      $('#slW').textContent=V>0&&d>0?(m/(V*d)*100).toFixed(2)+' %':'—';
+    }catch(e){$('#slC').textContent='—';$('#slW').textContent='—';}
+    const c1=+$('#dlC1').value,v1=+$('#dlV1').value,c2=+$('#dlC2').value,msg=$('#dlMsg');
+    if(c1>0&&v1>0&&c2>0){
+      const v2=c1*v1/c2;$('#dlV2').textContent=v2.toFixed(2)+' мл';
+      if(c2>c1){msg.className='msg err';msg.textContent='Сұйылту арқылы концентрлірек ерітінді алу мүмкін емес.';}
+      else{msg.className='msg';msg.textContent=`${v1} мл ерітінді алып, оған ${(v2-v1).toFixed(2)} мл су қосыңыз (сұйылту еселігі ${(c1/c2).toFixed(2)}).`;}
+    }else{$('#dlV2').textContent='—';msg.textContent='';}
+  }
+
+  /* ---------- pH ---------- */
+  const Kw=1e-14;
+  const SUBS=[
+    ['HCl, күшті қышқыл',C=>x=>x-C-Kw/x,'pH = −lg C'],
+    ['HNO₃, күшті қышқыл',C=>x=>x-C-Kw/x,'pH = −lg C'],
+    ['H₂SO₄ (екінші саты Ka = 0.012)',C=>x=>x-C*(1+.012/(.012+x))-Kw/x,'бірінші саты толық, екіншісі ішінара'],
+    ['CH₃COOH, Ka = 1.8·10⁻⁵',C=>x=>x-Kw/x-C*1.8e-5/(1.8e-5+x),'әлсіз қышқыл: [H⁺] ≈ √(Ka·C)'],
+    ['HCOOH, Ka = 1.8·10⁻⁴',C=>x=>x-Kw/x-C*1.8e-4/(1.8e-4+x),'әлсіз қышқыл'],
+    ['HF, Ka = 6.8·10⁻⁴',C=>x=>x-Kw/x-C*6.8e-4/(6.8e-4+x),'әлсіз қышқыл'],
+    ['HCN, Ka = 6.2·10⁻¹⁰',C=>x=>x-Kw/x-C*6.2e-10/(6.2e-10+x),'өте әлсіз қышқыл'],
+    ['NaOH, күшті негіз',C=>x=>x+C-Kw/x,'pOH = −lg C'],
+    ['Ca(OH)₂, күшті негіз',C=>x=>x+2*C-Kw/x,'[OH⁻] = 2C'],
+    ['NH₃, Kb = 1.8·10⁻⁵',C=>x=>x+C*x/(x+5.6e-10)-Kw/x,'әлсіз негіз: [OH⁻] ≈ √(Kb·C)'],
+    ['NaCl',C=>x=>x-Kw/x,'күшті қышқыл мен күшті негіздің тұзы: бейтарап орта'],
+    ['CH₃COONa',C=>x=>x+C-Kw/x-C*1.8e-5/(1.8e-5+x),'анион бойынша гидролиз: орта сілтілі'],
+    ['NH₄Cl',C=>x=>x-Kw/x+C*x/(x+5.6e-10)-C,'катион бойынша гидролиз: орта қышқыл'],
+    ['Na₂CO₃ (анион бойынша гидролиз)',C=>x=>{const K1=4.45e-7,K2=4.7e-11,D=x*x+K1*x+K1*K2;return x+2*C-Kw/x-C*(K1*x+2*K1*K2)/D;},'карбонат-ион: күшті гидролизденетін тұз'],
+    ['NaHCO₃',C=>x=>{const K1=4.45e-7,K2=4.7e-11,D=x*x+K1*x+K1*K2;return x+C-Kw/x-C*(K1*x+2*K1*K2)/D;},'амфолит: pH ≈ ½(pK₁ + pK₂)'],
+  ];
+  function runPh(){
+    const i=+$('#phS').value,C=+$('#phC').value,msg=$('#phMsg'),R=$('#phR'),bar=$('#phBar');
+    if(!(C>0)){R.textContent='—';msg.textContent='Нөлден үлкен концентрация енгізіңіз.';return;}
+    const F=SUBS[i][1](C);let a=-2,b=16;for(let k=0;k<60;k++){const m=(a+b)/2;if(F(Math.pow(10,-m))>0)a=m;else b=m;}
+    const pH=(a+b)/2;R.textContent='pH '+pH.toFixed(2);
+    const kind=pH<6.5?'қышқыл орта':pH>7.5?'сілтілі орта':'бейтарапқа жақын';
+    msg.innerHTML=`${kind}; pOH = ${(14-pH).toFixed(2)}; [H⁺] = ${Math.pow(10,-pH).toExponential(2)} моль/л. ${SUBS[i][2]}.`;
+    let mk=bar.firstChild;if(!mk){mk=H('div',{style:'position:absolute;top:-4px;width:4px;height:16px;border-radius:2px;background:var(--fg);transition:left .4s'});bar.append(mk);}
+    mk.style.left=`calc(${clamp(pH,0,14)/14*100}% - 2px)`;
+  }
+
+  function init(){
+    // balancer
+    const ex=['Fe + O2 -> Fe2O3','C3H8 + O2 -> CO2 + H2O','Al + H2SO4 -> Al2(SO4)3 + H2','KMnO4 + HCl -> KCl + MnCl2 + Cl2 + H2O','MnO4^- + Fe^2+ + H^+ -> Mn^2+ + Fe^3+ + H2O','CuSO4·5H2O -> CuSO4 + H2O','Ca3(PO4)2 + SiO2 + C -> CaSiO3 + P + CO'];
+    ex.forEach(t=>$('#balEx').append(H('button',{class:'chip',type:'button',onclick:()=>{$('#balIn').value=t;runBalance();}},t)));
+    $('#balIn').addEventListener('input',runBalance);runBalance();
+    // mol
+    $('#molIn').addEventListener('input',runMol);runMol();
+    ['cvG','cvN','cvP','cvV'].forEach(id=>$('#'+id).addEventListener('input',()=>conv(id)));
+    $('#cvG').value=12.5;conv('cvG');
+    // solutions
+    ['slF','slM','slV','slD','dlC1','dlV1','dlC2'].forEach(id=>$('#'+id).addEventListener('input',runSol));runSol();
+    // ph
+    SUBS.forEach((s,i)=>$('#phS').append(H('option',{value:i},s[0])));
+    $('#phBar').style.cssText='position:relative;height:8px;border-radius:4px;background:linear-gradient(90deg,#e0243c,#f3722c,#f9c74f,#8fd14f,#2bb673,#25a8a8,#3a7bd5,#5a4fcf,#8e3ba8)';
+    $('#phS').addEventListener('change',runPh);$('#phC').addEventListener('input',runPh);runPh();
+  }
+  return{init,parseFormula,molarMass,balance};
+})();
+
+'use strict';
+/* ===== Ideal gas simulator ===== */
+const Gas=(()=>{
+  const R=8.314,GASES=[['He','Гелий He',4.003,3],['H2','Сутек H₂',2.016,3],['N2','Азот N₂',28.014,4],['O2','Оттек O₂',31.998,4],['Ar','Аргон Ar',39.948,4.3],['CO2','Көмірқышқыл газы CO₂',44.01,4.8]];
+  const SC=.25,W=360,Hh=380,L=30,Rr=250,FLOOR=332,PMAX=50;
+  const S={gas:GASES[2],T:300,n:1,V:25,pV:25,proc:'none',parts:[],trail:[],hist:new Array(40).fill(0),hits:0,hitRate:0,hitT:0,P0:null,running:false,last:0,refr:0,lastX:null};
+  const P=()=>S.n*R*S.T/S.V;               // kPa for V in litres
+  const sigma=()=>Math.sqrt(R*S.T/(S.gas[2]/1000)); // m/s per axis
+  function gauss(){let u=0,v=0;while(!u)u=Math.random();while(!v)v=Math.random();return Math.sqrt(-2*Math.log(u))*Math.cos(6.2832*v);}
+  const pistonY=()=>FLOOR-S.pV/50*270-12;
+  function spawn(){
+    const top=pistonY()+16,s=sigma()*SC;
+    return{x:rnd(L+6,Rr-6),y:rnd(top+4,FLOOR-6),vx:gauss()*s,vy:gauss()*s,r:S.gas[3]};
+  }
+  function setN(){const N=Math.round(S.n*45);while(S.parts.length<N)S.parts.push(spawn());S.parts.length=Math.min(S.parts.length,N);}
+  function retemp(old){const f=Math.sqrt(S.T/old.T)*Math.sqrt(old.M/S.gas[2]);for(const p of S.parts){p.vx*=f;p.vy*=f;p.r=S.gas[3];}}
+  function sync(){
+    $('#gTo').textContent=S.T+' K ('+(S.T-273.15).toFixed(0)+' °C)';$('#gNo').textContent=S.n.toFixed(2);$('#gVo').textContent=S.V.toFixed(1)+' л';
+    $('#gT').disabled=S.proc==='iso-T';$('#gV').disabled=S.proc==='iso-V'||S.proc==='iso-P';
+    $('#gT').value=S.T;$('#gV').value=S.V;$('#gN').value=S.n;
+  }
+  function onChange(which){
+    const old={T:S.T,M:S.gas[2]};
+    if(which==='T'){const t=+$('#gT').value;const o=S.T;S.T=t;retemp({T:o,M:S.gas[2]});
+      if(S.proc==='iso-P'){S.V=clamp(S.n*R*S.T/S.P0,5,50);}}
+    if(which==='V'){S.V=+$('#gV').value;}
+    if(which==='N'){S.n=+$('#gN').value;setN();if(S.proc==='iso-P')S.P0=P();}
+    if(which==='G'){const o={T:S.T,M:S.gas[2]};S.gas=GASES.find(g=>g[0]===$('#gGas').value);retemp(o);}
+    sync();trace();
+  }
+  function axes(){
+    const p=S.proc;
+    if(p==='iso-P')return{x:'T',y:'V',xr:[100,900],yr:[0,55],xl:'T, К',yl:'V, л',fx:()=>S.T,fy:()=>S.V,curve:x=>S.n*R*x/S.P0};
+    if(p==='iso-V')return{x:'T',y:'P',xr:[100,900],yr:[0,PMAX*8],xl:'T, К',yl:'P, кПа',fx:()=>S.T,fy:()=>P(),curve:x=>S.n*R*x/S.V};
+    return{x:'V',y:'P',xr:[0,52],yr:[0,PMAX*8],xl:'V, л',yl:'P, кПа',fx:()=>S.V,fy:()=>P(),curve:x=>S.n*R*S.T/x};
+  }
+  function trace(){const a=axes(),x=a.fx(),y=a.fy();const l=S.trail[S.trail.length-1];if(!l||Math.abs(l[0]-x)+Math.abs(l[1]-y)>.01){S.trail.push([x,y]);if(S.trail.length>400)S.trail.shift();}}
+
+  /* ---------- drawing ---------- */
+  function drawCyl(ctx,t){
+    ctx.clearRect(0,0,W,Hh);
+    const py=pistonY(),hot=S.T>330,cold=S.T<250;
+    // heater
+    ctx.fillStyle=rgba(TH.plate,1);ctx.fillRect(L-14,FLOOR+6,Rr-L+28,12);
+    if(hot){const k=clamp((S.T-330)/570,.15,1);for(let i=0;i<9;i++){const x=L+10+i*(Rr-L-20)/8,h=(14+Math.sin(t*12+i)*5)*(.6+k*1.6);const g=ctx.createLinearGradient(0,FLOOR+6,0,FLOOR+6-h);g.addColorStop(0,'rgba(255,200,60,.9)');g.addColorStop(1,'rgba(255,80,20,0)');ctx.fillStyle=g;ctx.beginPath();ctx.moveTo(x-6,FLOOR+6);ctx.quadraticCurveTo(x-2,FLOOR+6-h*.5,x+Math.sin(t*9+i)*3,FLOOR+6-h);ctx.quadraticCurveTo(x+3,FLOOR+6-h*.5,x+6,FLOOR+6);ctx.fill();}}
+    if(cold){for(let i=0;i<7;i++){ctx.fillStyle='rgba(170,225,250,.55)';ctx.strokeStyle='rgba(220,245,255,.8)';ctx.fillRect(L+i*32,FLOOR+8,22,10);ctx.strokeRect(L+i*32,FLOOR+8,22,10);}}
+    // gas tint
+    const k=clamp((S.T-100)/800,0,1),hue=lerp(210,8,k);
+    ctx.fillStyle=`hsla(${hue},80%,55%,.08)`;ctx.fillRect(L,py+16,Rr-L,FLOOR-py-16);
+    // walls
+    ctx.strokeStyle=rgba(TH.glass,.95);ctx.lineWidth=3;ctx.lineCap='round';ctx.beginPath();ctx.moveTo(L,24);ctx.lineTo(L,FLOOR);ctx.lineTo(Rr,FLOOR);ctx.lineTo(Rr,24);ctx.stroke();
+    ctx.font='9px "JetBrains Mono",monospace';ctx.fillStyle=rgba(TH.glass,.85);ctx.textAlign='left';ctx.lineWidth=1;
+    for(let v=5;v<=50;v+=5){const y=FLOOR-v/50*270-12+12;ctx.beginPath();ctx.moveTo(Rr,y);ctx.lineTo(Rr+(v%10===0?10:5),y);ctx.stroke();if(v%10===0)ctx.fillText(v,Rr+13,y+3);}
+    // particles
+    const s0=sigma()*SC;
+    for(const p of S.parts){
+      const sp=Math.hypot(p.vx,p.vy)/s0,h=lerp(215,0,clamp((sp-.4)/2.2,0,1));
+      ctx.fillStyle=`hsl(${h},85%,${TH.dark?62:48}%)`;ctx.beginPath();ctx.arc(p.x,p.y,p.r,0,6.29);ctx.fill();
+    }
+    // piston
+    const g=ctx.createLinearGradient(0,py,0,py+14);g.addColorStop(0,rgba(TH.plate,1));g.addColorStop(1,rgba(TH.muted,1));
+    ctx.fillStyle=g;ctx.fillRect(L+1,py,Rr-L-2,14);ctx.strokeStyle=rgba(TH.fg,.5);ctx.lineWidth=1.2;ctx.strokeRect(L+1,py,Rr-L-2,14);
+    ctx.fillStyle=rgba(TH.plate,1);ctx.fillRect((L+Rr)/2-4,10,8,py-10);ctx.fillRect((L+Rr)/2-30,4,60,8);
+    // gauge
+    const gx=318,gy=96,gr=34;ctx.fillStyle=rgba(TH.panel,1);ctx.strokeStyle=rgba(TH.fg,.5);ctx.lineWidth=2;ctx.beginPath();ctx.arc(gx,gy,gr,0,6.29);ctx.fill();ctx.stroke();
+    ctx.lineWidth=1;ctx.font='8px "JetBrains Mono",monospace';ctx.textAlign='center';ctx.fillStyle=rgba(TH.muted,1);
+    for(let i=0;i<=8;i++){const a=Math.PI*.75+i/8*Math.PI*1.5,c=Math.cos(a),s=Math.sin(a);ctx.strokeStyle=rgba(TH.fg,.6);ctx.beginPath();ctx.moveTo(gx+c*(gr-8),gy+s*(gr-8));ctx.lineTo(gx+c*(gr-3),gy+s*(gr-3));ctx.stroke();if(i%2===0)ctx.fillText(i*50,gx+c*(gr-16),gy+s*(gr-16)+3);}
+    const pf=clamp(P()/400,0,1),a=Math.PI*.75+pf*Math.PI*1.5;ctx.strokeStyle=rgba(TH.bad,1);ctx.lineWidth=2;ctx.beginPath();ctx.moveTo(gx,gy);ctx.lineTo(gx+Math.cos(a)*(gr-9),gy+Math.sin(a)*(gr-9));ctx.stroke();
+    ctx.fillStyle=rgba(TH.fg,1);ctx.beginPath();ctx.arc(gx,gy,3,0,6.29);ctx.fill();ctx.fillStyle=rgba(TH.muted,1);ctx.fillText('кПа',gx,gy+gr-9);
+  }
+  function stepSim(dt){
+    const target=S.V;S.pV+=(target-S.pV)*Math.min(1,dt*6);
+    const py=pistonY()+14,s0=sigma()*SC;
+    for(const p of S.parts){
+      p.x+=p.vx*dt;p.y+=p.vy*dt;
+      if(p.x<L+p.r){p.x=L+p.r;p.vx=Math.abs(p.vx);S.hits++;}
+      if(p.x>Rr-p.r){p.x=Rr-p.r;p.vx=-Math.abs(p.vx);S.hits++;}
+      if(p.y>FLOOR-p.r){p.y=FLOOR-p.r;p.vy=-Math.abs(p.vy);S.hits++;}
+      if(p.y<py+p.r){p.y=py+p.r;p.vy=Math.abs(p.vy)+(target<S.pV-.05?20:0);S.hits++;}
+    }
+    // histogram (speeds in m/s)
+    const bins=S.hist.length,vmax=Math.max(sigma()*4.2,200);
+    const cur=new Array(bins).fill(0);
+    for(const p of S.parts){const v=Math.hypot(p.vx,p.vy)/SC,b=Math.min(bins-1,Math.floor(v/vmax*bins));cur[b]++;}
+    const a=Math.min(1,dt*.6);
+    if(S.hmax!==vmax){S.hist=S.hist.map((_,i)=>cur[i]);S.hmax=vmax;}
+    for(let i=0;i<bins;i++)S.hist[i]+=(cur[i]-S.hist[i])*a;
+    S.hitT+=dt;if(S.hitT>=1){S.hitRate=S.hits/S.hitT;S.hits=0;S.hitT=0;}
+  }
+  function drawChartPV(){
+    const cv=$('#gPV'),ctx=fitCanvas(cv,640,480),a=axes();ctx.clearRect(0,0,640,480);
+    const ml=52,mr=14,mt=14,mb=40,pw=640-ml-mr,ph=480-mt-mb;
+    const X=v=>ml+(v-a.xr[0])/(a.xr[1]-a.xr[0])*pw,Y=v=>mt+ph-(v-a.yr[0])/(a.yr[1]-a.yr[0])*ph;
+    ctx.font='15px "JetBrains Mono",monospace';ctx.lineWidth=1;
+    const xs=nice((a.xr[1]-a.xr[0])/6),ys=nice((a.yr[1]-a.yr[0])/5);
+    ctx.textAlign='center';ctx.strokeStyle=rgba(TH.line,1);ctx.fillStyle=rgba(TH.muted,1);
+    for(let v=Math.ceil(a.xr[0]/xs)*xs;v<=a.xr[1];v+=xs){ctx.beginPath();ctx.moveTo(X(v),mt);ctx.lineTo(X(v),mt+ph);ctx.stroke();ctx.fillText(v,X(v),480-mb+16);}
+    ctx.textAlign='right';for(let v=a.yr[0];v<=a.yr[1];v+=ys){ctx.beginPath();ctx.moveTo(ml,Y(v));ctx.lineTo(640-mr,Y(v));ctx.stroke();ctx.fillText(v,ml-6,Y(v)+4);}
+    ctx.textAlign='center';ctx.fillText(a.xl,ml+pw/2,476);ctx.save();ctx.translate(14,mt+ph/2);ctx.rotate(-Math.PI/2);ctx.fillText(a.yl,0,0);ctx.restore();
+    ctx.strokeStyle=rgba(TH.fg,.6);ctx.strokeRect(ml,mt,pw,ph);
+    ctx.save();ctx.beginPath();ctx.rect(ml,mt,pw,ph);ctx.clip();
+    ctx.strokeStyle=rgba(TH.muted,.9);ctx.setLineDash([5,4]);ctx.lineWidth=1.5;ctx.beginPath();
+    let first=true;for(let x=a.xr[0]+(a.xr[0]===0?.5:0);x<=a.xr[1];x+=(a.xr[1]-a.xr[0])/160){const y=a.curve(x);const px=X(x),py=Y(y);first?ctx.moveTo(px,py):ctx.lineTo(px,py);first=false;}ctx.stroke();ctx.setLineDash([]);
+    if(S.trail.length>1){ctx.strokeStyle=rgba(TH.accent,.85);ctx.lineWidth=2.4;ctx.beginPath();S.trail.forEach((p,i)=>i?ctx.lineTo(X(p[0]),Y(p[1])):ctx.moveTo(X(p[0]),Y(p[1])));ctx.stroke();}
+    ctx.fillStyle=rgba(TH.accent,1);ctx.beginPath();ctx.arc(X(a.fx()),Y(a.fy()),6,0,6.29);ctx.fill();ctx.strokeStyle=rgba(TH.panel,1);ctx.lineWidth=2;ctx.stroke();
+    ctx.restore();
+  }
+  function nice(x){const p=Math.pow(10,Math.floor(Math.log10(x))),m=x/p;return(m<1.5?1:m<3.5?2:m<7.5?5:10)*p;}
+  function drawMax(){
+    const cv=$('#gMax'),ctx=fitCanvas(cv,640,480);ctx.clearRect(0,0,640,480);
+    const ml=40,mr=14,mt=14,mb=40,pw=640-ml-mr,ph=480-mt-mb,bins=S.hist.length,vmax=S.hmax||Math.max(sigma()*4.2,200),sg=sigma();
+    const N=Math.max(1,S.parts.length),bw=vmax/bins;
+    const f=v=>v/(sg*sg)*Math.exp(-v*v/(2*sg*sg)); // 2D Rayleigh pdf
+    let ymax=0;for(let v=0;v<vmax;v+=vmax/120)ymax=Math.max(ymax,f(v)*bw*N);ymax*=1.35;
+    const X=v=>ml+v/vmax*pw,Y=c=>mt+ph-c/ymax*ph;
+    ctx.fillStyle=rgba(TH.accent,.35);const bwp=pw/bins;
+    for(let i=0;i<bins;i++){const h=S.hist[i]/ymax*ph;ctx.fillRect(ml+i*bwp+1,mt+ph-h,bwp-2,h);}
+    ctx.strokeStyle=rgba(TH.warn,1);ctx.lineWidth=2.4;ctx.beginPath();for(let v=0;v<=vmax;v+=vmax/160){const y=Y(f(v)*bw*N);v?ctx.lineTo(X(v),y):ctx.moveTo(X(v),y);}ctx.stroke();
+    ctx.font='15px "JetBrains Mono",monospace';ctx.fillStyle=rgba(TH.muted,1);ctx.textAlign='center';ctx.strokeStyle=rgba(TH.line,1);ctx.lineWidth=1;
+    const xs=nice(vmax/6);for(let v=0;v<=vmax;v+=xs){ctx.beginPath();ctx.moveTo(X(v),mt+ph);ctx.lineTo(X(v),mt+ph+5);ctx.stroke();ctx.fillText(v,X(v),480-mb+18);}
+    ctx.fillText('жылдамдық, м/с',ml+pw/2,476);ctx.textAlign='left';ctx.fillText('бөлшектер саны',ml+8,mt+18);
+    ctx.fillStyle=rgba(TH.warn,1);ctx.textAlign='right';ctx.fillText('— Максвелл теориясы (2D)',ml+pw-8,mt+18);
+    ctx.strokeStyle=rgba(TH.fg,.6);ctx.strokeRect(ml,mt,pw,ph);
+  }
+  function stats(){
+    const p=P(),vr=Math.sqrt(3*R*S.T/(S.gas[2]/1000)),ek=1.5*R*S.T/1000;
+    const items=[['Қысым',p.toFixed(1)+' кПа'],['Атмосферамен',(p/101.325).toFixed(2)+' атм'],['v орт. кв.',vr.toFixed(0)+' м/с'],['Ek, моль',ek.toFixed(2)+' кДж'],['Қабырғаға соққы',S.hitRate.toFixed(0)+' /с']];
+    const box=$('#gStats');if(!box.children.length)items.forEach(()=>box.append(H('div',{class:'stat'},H('small',{}),H('b',{style:'font-size:16px'}))));
+    items.forEach((it,i)=>{const c=box.children[i];c.firstChild.textContent=it[0];c.lastChild.textContent=it[1];});
+  }
+  function frame(ts){
+    if(!S.running)return;
+    const t=ts/1000,dt=Math.min(.05,S.last?t-S.last:.016);S.last=t;
+    stepSim(dt);
+    const cv=$('#gcanvas'),ctx=fitCanvas(cv,W,Hh);drawCyl(ctx,t);
+    S.refr+=dt;if(S.refr>.1){S.refr=0;stats();drawChartPV();drawMax();trace();}
+    // isobaric: V follows T
+    if(S.proc==='iso-P'){S.V=clamp(S.n*R*S.T/S.P0,5,50);$('#gV').value=S.V;$('#gVo').textContent=S.V.toFixed(1)+' л';}
+    requestAnimationFrame(frame);
+  }
+  function start(){if(S.running)return;S.running=true;S.last=0;requestAnimationFrame(frame);}
+  function stop(){S.running=false;}
+  function init(){
+    const g=$('#gGas');GASES.forEach(x=>g.append(H('option',{value:x[0]},x[1])));g.value='N2';
+    g.addEventListener('change',()=>onChange('G'));
+    $('#gT').addEventListener('input',()=>onChange('T'));$('#gV').addEventListener('input',()=>onChange('V'));$('#gN').addEventListener('input',()=>onChange('N'));
+    $('#gClear').addEventListener('click',()=>{S.trail=[];trace();});
+    $('#gProc').addEventListener('click',e=>{const b=e.target.closest('button');if(!b)return;S.proc=b.dataset.p;$$('#gProc button').forEach(x=>x.classList.toggle('on',x===b));
+      S.P0=P();S.trail=[];sync();trace();});
+    S.pV=S.V;setN();sync();trace();
+  }
+  return{init,start,stop};
+})();
+
+'use strict';
+/* ===== shell: tabs + hash routing ===== */
+const App=(()=>{
+  const views=['lab','titration','elements','solubility','calc','gas'];
+  const hooks={};
+  let cur=null;
+  function show(name,push=true){
+    if(!views.includes(name))name='lab';
+    if(cur===name)return;
+    if(cur&&hooks[cur]&&hooks[cur].leave)hooks[cur].leave();
+    cur=name;
+    $$('.view').forEach(v=>v.classList.toggle('on',v.id==='v-'+name));
+    $$('#nav button').forEach(b=>{const on=b.dataset.view===name;b.setAttribute('aria-selected',on);b.tabIndex=on?0:-1;if(on)b.scrollIntoView({block:'nearest',inline:'center'});});
+    if(push&&location.hash!=='#'+name)history.replaceState(null,'','#'+name);
+    if(hooks[name]&&hooks[name].enter)hooks[name].enter();
+  }
+  const SUN='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></svg>';
+  const MOON='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/></svg>';
+  function isDark(){const t=document.documentElement.dataset.theme;return t?t==='dark':matchMedia('(prefers-color-scheme: dark)').matches;}
+  function paintThemeBtn(){const b=$('#themeBtn');if(b)b.innerHTML=isDark()?SUN:MOON;}
+  function initTheme(){
+    try{const t=localStorage.getItem('himlab-theme');if(t)document.documentElement.dataset.theme=t;}catch(e){}
+    paintThemeBtn();
+    const b=$('#themeBtn');if(!b)return;
+    b.addEventListener('click',()=>{const t=isDark()?'light':'dark';document.documentElement.dataset.theme=t;try{localStorage.setItem('himlab-theme',t);}catch(e){}paintThemeBtn();});
+  }
+  function init(){
+    initTheme();
+    $('#nav').addEventListener('click',e=>{const b=e.target.closest('button');if(b)show(b.dataset.view);});
+    window.addEventListener('hashchange',()=>show(location.hash.slice(1),false));
+    for(const m of[Lab,typeof Titr!=='undefined'&&Titr,typeof PTable!=='undefined'&&PTable,typeof Sol!=='undefined'&&Sol,typeof Calc!=='undefined'&&Calc,typeof Gas!=='undefined'&&Gas])if(m&&m.init)m.init();
+    hooks.lab={enter:Lab.start,leave:Lab.stop};
+    if(typeof Titr!=='undefined')hooks.titration={enter:Titr.start,leave:Titr.stop};
+    if(typeof PTable!=='undefined')hooks.elements={enter:PTable.start,leave:PTable.stop};
+    if(typeof Gas!=='undefined')hooks.gas={enter:Gas.start,leave:Gas.stop};
+    show(location.hash.slice(1)||'lab',false);
+    $$('#nav button')[views.indexOf(cur)].setAttribute('aria-selected','true');
+  }
+  return{init,show};
+})();
+document.addEventListener('DOMContentLoaded',()=>{try{App.init();}catch(e){console.error(e);}});
+
+</script>
