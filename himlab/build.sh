@@ -1,7 +1,7 @@
 #!/bin/bash
 # concatenates sources into one self-contained HTML page
 cd "$(dirname "$0")/src"
-JS="data.js engine.js lab.js"
+JS="data.js engine.js lab.js book3d.js"
 for f in titr.js ptable.js sol.js calc.js gas.js; do [ -f $f ] && JS="$JS $f"; done
 JS="$JS app.js"
 {
@@ -14,7 +14,7 @@ cat <<'HEAD'
 <meta name="claude:viewport-fit-sides" content="cover">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Onest:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Onest:wght@400;500;600;700;800&family=Caveat:wght@600;700&family=JetBrains+Mono:wght@400;500&display=swap">
 <style>
 HEAD
 cat style.css

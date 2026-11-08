@@ -8,6 +8,7 @@
     <nav id="nav" role="tablist" aria-label="Бөлімдер">
       <button role="tab" data-view="home"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 10.5 12 3l9 7.5"/><path d="M5 9.5V21h14V9.5"/><path d="M10 21v-6h4v6"/></svg><span>Басты бет</span></button>
       <button role="tab" data-view="lab"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 3h6"/><path d="M10 3v6.5L4.6 18.6A2 2 0 0 0 6.3 21.5h11.4a2 2 0 0 0 1.7-2.9L14 9.5V3"/><path d="M7.5 15h9"/></svg><span>Зертхана</span></button>
+      <button role="tab" data-view="book"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 6.5C10 5 7 4.5 3.5 5v13c3.5-.5 6.5 0 8.5 1.5 2-1.5 5-2 8.5-1.5V5C17 4.5 14 5 12 6.5z"/><path d="M12 6.5v13"/></svg><span>3D сабақ</span></button>
       <button role="tab" data-view="titration"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3s6 6.4 6 11a6 6 0 0 1-12 0c0-4.6 6-11 6-11z"/><path d="M9.5 15.5a2.6 2.6 0 0 0 2.5 2"/></svg><span>Титрлеу</span></button>
       <button role="tab" data-view="elements"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="3" width="7.5" height="7.5" rx="1.5"/><rect x="13.5" y="3" width="7.5" height="7.5" rx="1.5"/><rect x="3" y="13.5" width="7.5" height="7.5" rx="1.5"/><rect x="13.5" y="13.5" width="7.5" height="7.5" rx="1.5"/></svg><span>Периодтық кесте</span></button>
       <button role="tab" data-view="solubility"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M3 9.5h18M3 14.5h18M9 4v16M15 4v16"/></svg><span>Ерігіштік</span></button>
@@ -49,6 +50,15 @@
     </div>
   </div>
 
+  <button class="feat panel" type="button" data-go="book">
+    <div class="feat-t">
+      <span class="eyebrow">Жаңа · 3D</span>
+      <b>3D сабақтар</b>
+      <span class="d">Сабақ тақырыбын таңдаңыз: кітап ашылып, тәжірибе 3D-де шығады. Өзіңіз жасайсыз, нәтижені дәптерге жазасыз.</span>
+      <span class="go">Сабақты ашу <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg></span>
+    </div>
+    <div class="feat-art" aria-hidden="true"></div>
+  </button>
   <div class="sect-t"><h2>Бөлімдер</h2><p>Бастау үшін керекті бөлімді таңдаңыз</p></div>
   <div class="cards">
     <button class="card-go panel" type="button" data-go="lab">
@@ -107,6 +117,57 @@
         <li>Интернетсіз де жұмыс істейді: бір HTML файл</li>
       </ul>
     </div>
+  </div>
+</section>
+
+<!-- ===== 3D BOOK ===== -->
+<section class="view" id="v-book">
+  <div id="bkPick">
+    <div class="vhead"><h2>3D сабақтар</h2><p>Тақырыпты таңдаңыз. Кітап ашылады, тәжірибе беттен шығады, нәтижені дәптерге жазасыз.</p></div>
+    <div class="bk-shelf" id="bkShelf"></div>
+    <div class="bk-foot"><span>Нәтижелер осы браузерде сақталады.</span><button class="btn sm" type="button" id="bkPrintAll">Барлық дәптерді басып шығару</button></div>
+  </div>
+  <div class="bk-app" id="bkApp" hidden>
+    <div class="bk-stage" id="bkStage">
+      <canvas id="bkCanvas" aria-label="3D сабақ"></canvas>
+      <svg class="bk-lines" id="bkLines"></svg>
+      <div class="bk-labels" id="bkLabels"></div>
+      <div class="bk-top">
+        <button class="bk-chip" type="button" id="bkBack"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 6l-6 6 6 6"/></svg><span id="bkTitle">Сабақтар</span></button>
+        <div class="bk-hint" id="bkHint"></div>
+        <button class="bk-chip" type="button" id="bkNbBtn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 4h11a3 3 0 0 1 3 3v13H8a3 3 0 0 1-3-3z"/><path d="M5 17a3 3 0 0 1 3-3h11"/><path d="M9 8h6"/></svg><span>Дәптер</span></button>
+      </div>
+      <div class="bk-tasks" id="bkTasks" hidden></div>
+      <div class="bk-bar">
+        <button class="bb" type="button" id="bkMenu" title="Сабақтар тізімі" aria-label="Сабақтар тізімі"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h16"/></svg></button>
+        <button class="bb" type="button" id="bkPrev" title="Артқа" aria-label="Артқа"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 6l-6 6 6 6"/></svg></button>
+        <button class="bb" type="button" id="bkPlay" title="Автоматты ойнату" aria-label="Автоматты ойнату"></button>
+        <div class="bk-cap" id="bkCap" aria-live="polite"></div>
+        <div class="bk-dots" id="bkDots"></div>
+        <button class="bb nx" type="button" id="bkNext" title="Келесі" aria-label="Келесі"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 6l6 6-6 6"/></svg></button>
+        <span class="bk-sep"></span>
+        <button class="bb" type="button" id="bkTeach" title="Мұғалім режимі: жауаптарды көрсету" aria-label="Мұғалім режимі"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2 9l10-5 10 5-10 5z"/><path d="M6 11v5c3 2 9 2 12 0v-5"/><path d="M22 9v6"/></svg></button>
+      </div>
+      <div class="bk-load" id="bkLoad">3D жүктелуде…</div>
+    </div>
+    <aside class="bk-nb panel" id="bkNb" hidden aria-label="Зертханалық дәптер">
+      <div class="nb-h"><div><small>Зертханалық дәптер</small><b id="nbTitle"></b></div><button class="x" type="button" id="bkNbX" aria-label="Жабу">✕</button></div>
+      <div class="nb-b">
+        <div class="nb-sum" id="nbSum"></div>
+        <h4><span class="stepn">1</span>Бақылаулар <em>өзі жазылады</em></h4>
+        <div id="nbObs"></div>
+        <h4><span class="stepn s2">2</span>Сұрақтар</h4>
+        <div id="nbQs"></div>
+        <h4><span class="stepn s3">3</span>Қорытынды</h4>
+        <textarea id="nbConcl" rows="4" placeholder="Не байқадыңыз? Қандай қорытынды жасайсыз?"></textarea>
+        <p class="nb-t" id="nbHint" hidden></p>
+      </div>
+      <div class="nb-f">
+        <button class="btn primary" type="button" id="nbCheck">Тексеру</button>
+        <button class="btn" type="button" id="nbCopy">Көшіру</button>
+        <button class="btn" type="button" id="nbPrint">Басып шығару</button>
+      </div>
+    </aside>
   </div>
 </section>
 
