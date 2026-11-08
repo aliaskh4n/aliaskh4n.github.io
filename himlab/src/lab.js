@@ -34,7 +34,7 @@ const Lab=(()=>{
       if(S.filter!=='all'&&S.filter!==g)continue;
       const items=REAGENTS.filter(r=>r.cat===g&&(!q||(r.name+' '+r.f).toLowerCase().includes(q)));
       if(!items.length)continue;
-      list.append(H('div',{class:'grp lbl'},gn));
+      list.append(H('div',{class:'grp lbl k-'+['blue','green','yellow','red'][RGROUPS.findIndex(x=>x[0]===g)%4]},gn));
       for(const r of items){
         const b=H('button',{class:'rg'+(S.hand.r===r?' sel':''),type:'button','data-id':r.id,title:'Алу үшін басыңыз. Ыдысқа сүйреп апаруға болады.'},
           H('span',{html:bottleSVG(r.col,r.kind)}),
@@ -121,14 +121,14 @@ const Lab=(()=>{
       stir:'<path d="M4 12a8 8 0 0 1 14-5.3M20 12a8 8 0 0 1-14 5.3"/><path d="M18 3v4h-4M6 21v-4h4"/>',
       filt:'<path d="M3 5h18l-7 8v6l-4 2v-8z"/>'};
     const mk=(t,fn,ic,cls='')=>H('button',{class:'btn act '+cls,type:'button',onclick:fn,html:`<svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round">${IC[ic]}</svg><span>${t}</span>`});
-    const bHeat=mk('Қыздыру',()=>toggle(st,'heat'),'heat'),bIce=mk('Суыту',()=>toggle(st,'ice'),'ice'),bStir=mk('Араластыру',()=>{st.v.stir=!st.v.stir;sync(st);},'stir','sm'),
-      bFilt=mk('Сүзу',()=>{const v=st.v;for(const k in v.solids)if(!v.piece[k]||!Eng.PIECES.includes(k))delete v.solids[k];v.susp={};st.parts=[];flash(st,'Тұнба сүзілді.');sync(st);},'filt','sm'),
-      bClr=mk('Төгу',()=>{st.v=Eng.newVessel(st.v.type);st.bub=[];st.steam=[];st.parts=[];st.shards=[];flash(st,'Ыдыс тазартылды.');sync(st);},'clr');
+    const bHeat=mk('Қыздыру',()=>toggle(st,'heat'),'heat','k-red'),bIce=mk('Суыту',()=>toggle(st,'ice'),'ice','k-blue'),bStir=mk('Араластыру',()=>{st.v.stir=!st.v.stir;sync(st);},'stir','sm k-green'),
+      bFilt=mk('Сүзу',()=>{const v=st.v;for(const k in v.solids)if(!v.piece[k]||!Eng.PIECES.includes(k))delete v.solids[k];v.susp={};st.parts=[];flash(st,'Тұнба сүзілді.');sync(st);},'filt','sm k-yellow'),
+      bClr=mk('Төгу',()=>{st.v=Eng.newVessel(st.v.type);st.bub=[];st.steam=[];st.parts=[];st.shards=[];flash(st,'Ыдыс тазартылды.');sync(st);},'clr','k-yellow');
     const comp=H('div',{class:'comp'});
-    const tile=(lbl,...k)=>H('div',{class:'rt'},H('small',{},lbl),H('b',{},...k));
+    const tile=(lbl,c,...k)=>H('div',{class:'rt '+c},H('small',{},lbl),H('b',{},...k));
     const el=H('article',{class:'station'},
       H('div',{class:'stage'},H('div',{class:'vsel-w'},seg),cw),
-      H('div',{class:'read3'},tile('Температура',rT),tile('pH',rPH,chip),tile('Көлем',rV)),
+      H('div',{class:'read3'},tile('Температура','k-red',rT),tile('pH','k-green',rPH,chip),tile('Көлем','k-blue',rV)),
       H('div',{class:'acts'},bHeat,bIce,bClr,
         H('details',{class:'more'},H('summary',{class:'btn act'},H('span',{},'Тағы')),
           H('div',{class:'more-p'},H('div',{class:'row'},bStir,bFilt),H('div',{class:'lbl',style:'margin-top:10px'},'Ерітінді құрамы'),comp))));

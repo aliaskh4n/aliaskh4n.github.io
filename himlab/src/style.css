@@ -492,3 +492,77 @@ body:has(#v-lab.on){padding-bottom:16px}
 .acts .more>summary{justify-content:center}
 .lab3 .cwrap::after{top:auto;bottom:15%}
 @media (max-width:620px){ .acts{grid-template-columns:repeat(2,minmax(0,1fr))} .more-p{width:min(280px,80vw)} }
+
+/* ================= v5: more color ================= */
+.k-blue{--k:var(--accent)} .k-green{--k:var(--good)} .k-yellow{--k:#e0a800} .k-red{--k:var(--bad)}
+:root[data-theme="dark"] .k-yellow{--k:var(--yellow)}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]) .k-yellow{--k:var(--yellow)}}
+
+/* soft colored backdrop */
+body{background:
+  radial-gradient(900px 500px at 0% 0%,color-mix(in srgb,var(--accent) 9%,transparent),transparent 70%),
+  radial-gradient(700px 500px at 100% 100%,color-mix(in srgb,var(--good) 7%,transparent),transparent 70%),
+  radial-gradient(600px 400px at 100% 0%,color-mix(in srgb,var(--yellow) 7%,transparent),transparent 70%),
+  var(--bg);background-attachment:fixed}
+.brand svg{background:linear-gradient(135deg,var(--accent),color-mix(in srgb,var(--accent) 55%,var(--good)))}
+
+/* nav: each section its own color */
+nav button[data-view="home"],nav button[data-view="lab"],nav button[data-view="calc"]{--k:var(--accent)}
+nav button[data-view="titration"],nav button[data-view="gas"]{--k:var(--good)}
+nav button[data-view="elements"]{--k:#e0a800}
+nav button[data-view="solubility"]{--k:var(--bad)}
+nav button .ic{color:var(--k);opacity:1}
+nav button[aria-selected="true"]{background:color-mix(in srgb,var(--k) 13%,transparent);color:var(--fg)}
+#helpBtn{color:var(--accent)}
+
+/* lab columns: colored top stripe */
+.lab3 .col{border-top:3px solid var(--k)}
+.lab3 .shelf{--k:var(--accent)} .lab3 .bench{--k:var(--good)} .lab3 .side{--k:#e0a800}
+.lab3 .shelf .colh{color:var(--accent)} .lab3 .shelf .colh b{color:var(--fg)}
+.stepn.s2{background:var(--good)}
+
+/* reagent groups + list */
+.lab3 .grp{display:flex;align-items:center;gap:7px;color:var(--k)}
+.lab3 .grp::before{content:"";width:8px;height:8px;border-radius:50%;background:var(--k)}
+.rg:hover{background:color-mix(in srgb,var(--accent) 7%,transparent)}
+.rg.sel{background:color-mix(in srgb,var(--accent) 12%,transparent)}
+
+/* stage tint */
+.stage{background:
+  radial-gradient(60% 50% at 50% 35%,color-mix(in srgb,var(--accent) 8%,transparent),transparent 70%),
+  linear-gradient(180deg,var(--stage) 0,var(--stage) 89%,color-mix(in srgb,var(--plate) 40%,var(--stage)) 89%,color-mix(in srgb,var(--plate) 55%,var(--stage)) 100%)}
+.vtabs button.on{box-shadow:0 1px 3px rgba(16,24,40,.12),inset 0 -2px 0 var(--good)}
+.vtabs button.on small{color:var(--good)}
+
+/* readout tiles */
+.rt[class*="k-"]{background:color-mix(in srgb,var(--k) 9%,var(--panel));border:1px solid color-mix(in srgb,var(--k) 22%,transparent)}
+.rt[class*="k-"] small{color:var(--k);font-weight:600}
+
+/* action buttons */
+.btn.act[class*="k-"]{background:color-mix(in srgb,var(--k) 8%,var(--panel));border-color:color-mix(in srgb,var(--k) 28%,var(--line))}
+.btn.act[class*="k-"] .ic{color:var(--k)}
+.btn.act[class*="k-"]:hover{background:color-mix(in srgb,var(--k) 15%,var(--panel));border-color:var(--k)}
+.btn.act.on[class*="k-"]{background:var(--k);border-color:var(--k);color:#fff}
+.btn.act.on[class*="k-"] .ic{color:#fff}
+.acts .more>summary{background:var(--panel2)}
+
+/* dose chips */
+.lab3 .hand{background:linear-gradient(90deg,color-mix(in srgb,var(--good) 7%,var(--panel)),color-mix(in srgb,var(--accent) 8%,var(--panel)))}
+.lab3 .hand #doses .chip{background:var(--panel)}
+.lab3 .hand #doses .chip:hover{border-color:var(--good)}
+.lab3 .hand #doses .chip.on{background:var(--good);border-color:var(--good);color:#fff;font-weight:600}
+
+/* side tabs */
+.stabs button.on{background:color-mix(in srgb,var(--k) 13%,transparent);color:var(--k)}
+.stabs button.k-yellow.on{color:color-mix(in srgb,var(--k) 70%,var(--fg))}
+.empty.guide{border-color:color-mix(in srgb,var(--accent) 35%,var(--line));background:color-mix(in srgb,var(--accent) 5%,transparent)}
+.empty.guide ol li::marker{color:var(--accent);font-weight:700}
+.side .safety li::marker{color:var(--bad)}
+
+/* home cards + section headers */
+.card-go{border-top:3px solid var(--k,var(--accent))}
+.card-go:has(.c-blue){--k:var(--accent)} .card-go:has(.c-green){--k:var(--good)} .card-go:has(.c-yellow){--k:#e0a800} .card-go:has(.c-red){--k:var(--bad)}
+.card-go .go{color:var(--k)}
+.steps3 li:nth-child(2) i{background:var(--good)} .steps3 li:nth-child(3) i{background:#e0a800}
+.vhead h2{display:flex;align-items:center;gap:12px}
+.vhead h2::before{content:"";width:6px;height:26px;border-radius:3px;background:linear-gradient(180deg,var(--accent),var(--good))}
